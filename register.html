@@ -23,8 +23,8 @@
   <style>
     /* OTP Input Styles */
     .otp-input {
-      width: 48px;
-      height: 54px;
+      width: 40px;
+      height: 48px;
       text-align: center;
       font-size: 24px;
       font-weight: 700;
@@ -461,17 +461,19 @@
               <div style="font-size: 40px; margin-bottom: 10px;">📧</div>
               <h3 style="margin-bottom: 5px; color: #fff;">Verify Your Email</h3>
               <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 5px;">
-                We've sent a 6-digit verification code to
+                We've sent an 8-digit verification code to
               </p>
               <p id="otpEmail" style="color: #7c3aed; font-weight: 600; font-size: 16px; margin-bottom: 15px;"></p>
 
-              <div id="otpInputContainer" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px;">
+              <div id="otpInputContainer" style="display: flex; gap: 6px; justify-content: center; margin-bottom: 15px;">
                 <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="off" inputmode="numeric" />
                 <input type="text" maxlength="1" class="otp-input" data-index="1" autocomplete="off" inputmode="numeric" />
                 <input type="text" maxlength="1" class="otp-input" data-index="2" autocomplete="off" inputmode="numeric" />
                 <input type="text" maxlength="1" class="otp-input" data-index="3" autocomplete="off" inputmode="numeric" />
                 <input type="text" maxlength="1" class="otp-input" data-index="4" autocomplete="off" inputmode="numeric" />
                 <input type="text" maxlength="1" class="otp-input" data-index="5" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="6" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="7" autocomplete="off" inputmode="numeric" />
               </div>
 
               <div id="otpError" style="color: #e74c3c; font-size: 13px; margin-bottom: 10px; display: none;"></div>

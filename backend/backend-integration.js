@@ -221,8 +221,8 @@
               let otpCode = '';
               otpInputs.forEach(input => otpCode += input.value);
 
-              if (otpCode.length !== 6) {
-                document.getElementById('otpError').textContent = 'Please enter the complete 6-digit code.';
+              if (otpCode.length !== 8) {
+                document.getElementById('otpError').textContent = 'Please enter the complete 8-digit code.';
                 document.getElementById('otpError').style.display = 'block';
                 document.getElementById('otpInputContainer').classList.add('otp-shake');
                 setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
@@ -404,16 +404,16 @@
         }
       });
 
-      // Handle paste (paste full 6-digit code)
+      // Handle paste (paste full 8-digit code)
       input.addEventListener('paste', (e) => {
         e.preventDefault();
         const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
-        if (pastedData.length >= 6) {
+        if (pastedData.length >= 8) {
           inputs.forEach((inp, i) => {
             inp.value = pastedData[i] || '';
             if (inp.value) inp.classList.add('filled');
           });
-          inputs[5].focus();
+          inputs[inputs.length - 1].focus();
         }
       });
     });
