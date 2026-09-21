@@ -80,25 +80,42 @@
        /* Enhanced for modern browsers */
     }
 
-    /* Left Side Image */
+    /* Left Side Image / Illustration */
     .login-illustration {
       flex: 0 0 50%;
       display: flex !important;
       align-items: center;
       justify-content: center;
-      padding: 40px;
-      background: rgba(124, 58, 237, 0.05) !important;
+      padding: 30px;
+      background: transparent !important;
       min-height: 530px;
-      border-right: 1px solid rgba(124, 58, 237, 0.2);
+      border: none !important;
+      overflow: hidden;
     }
 
     .login-illustration dotlottie-wc {
       display: block !important;
       width: 100%;
-      max-width: 600px;
+      max-width: 480px;
       height: auto;
       opacity: 1 !important;
       visibility: visible !important;
+    }
+
+    .login-illustration img {
+      max-width: 100%;
+      max-height: 480px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .login-illustration svg {
+      max-width: 100%;
+      max-height: 480px;
+      height: auto;
     }
 
   
@@ -314,7 +331,9 @@
         display: flex !important;
       }
 
-      .login-illustration dotlottie-wc {
+      .login-illustration dotlottie-wc,
+      .login-illustration img,
+      .login-illustration svg {
         max-width: 400px;
         max-height: 400px;
       }
@@ -417,13 +436,12 @@
             ></script>
 
             <dotlottie-wc
-              src="Password Authentication.json"
-              style="width: 600px;height: 1300px"
+              src="login-animation.json"
+              style="width: 100%; max-width: 480px; height: 480px;"
               autoplay
               speed="1"
               transition="transform 0.3s ease-out, opacity 0.3s ease-out"
               loop
-              style="padding-bottom: 30px;"
             ></dotlottie-wc>
           </div>
 
