@@ -21,6 +21,45 @@
   <link href="css/loading-animation.css" rel="stylesheet" type="text/css" />
 
   <style>
+    /* OTP Input Styles */
+    .otp-input {
+      width: 48px;
+      height: 54px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(124, 58, 237, 0.1);
+      border: 2px solid rgba(124, 58, 237, 0.3);
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.3s ease;
+      caret-color: #7c3aed;
+    }
+    .otp-input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+      background: rgba(124, 58, 237, 0.15);
+    }
+    .otp-input.filled {
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, 0.2);
+    }
+    .otp-input.error {
+      border-color: #e74c3c;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
+    }
+    .otp-input.success {
+      border-color: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-6px); }
+    }
+    .otp-shake { animation: shake 0.4s ease; }
      html, body {
       height: 100%;
       margin: 0;
@@ -415,6 +454,40 @@
 
             <button class="login-btn" type="submit">Create Account</button>
           </form>
+
+          <!-- OTP Verification Section (hidden by default) -->
+          <div id="otpSection" style="display: none;">
+            <div style="text-align: center; padding: 10px 0;">
+              <div style="font-size: 40px; margin-bottom: 10px;">📧</div>
+              <h3 style="margin-bottom: 5px; color: #fff;">Verify Your Email</h3>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 5px;">
+                We've sent a 6-digit verification code to
+              </p>
+              <p id="otpEmail" style="color: #7c3aed; font-weight: 600; font-size: 16px; margin-bottom: 15px;"></p>
+
+              <div id="otpInputContainer" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px;">
+                <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="1" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="2" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="3" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="4" autocomplete="off" inputmode="numeric" />
+                <input type="text" maxlength="1" class="otp-input" data-index="5" autocomplete="off" inputmode="numeric" />
+              </div>
+
+              <div id="otpError" style="color: #e74c3c; font-size: 13px; margin-bottom: 10px; display: none;"></div>
+
+              <button id="verifyOtpBtn" class="login-btn" type="button" style="width: 100%; margin-bottom: 12px;">
+                Verify & Continue
+              </button>
+
+              <div style="font-size: 13px; color: rgba(255,255,255,0.6);">
+                Didn't receive the code?
+                <button id="resendOtpBtn" type="button" style="background: none; border: none; color: #7c3aed; cursor: pointer; font-weight: 600; font-size: 13px;" disabled>
+                  Resend in <span id="resendTimer">60</span>s
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div class="signup-link">
             Already have an account? <a href="login.html">Sign In</a>

@@ -195,20 +195,69 @@
 
         if (result.success) {
           if (result.session) {
-            // Show verification success message
-            showNotification('success', 'Account created & verified! Logging you in automatically in 3 seconds...');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Redirecting to Dashboard...';
+            // Auto-confirmed (mailer_autoconfirm is ON) - but we want OTP flow
+            // Sign out the auto-session so user must verify first
+            await window.AuthService.logout();
+          }
 
-            // Automatically redirect to dashboard after 3 seconds
-            setTimeout(() => {
-              window.location.href = 'dashboard.html';
-            }, 3000);
-          } else {
-            showNotification('success', result.message || 'Registration successful! Redirecting in 3 seconds...');
-            setTimeout(() => {
-              window.location.href = 'login.html';
-            }, 3000);
+          // Show OTP verification section
+          showNotification('success', 'Account created! Please check your email for the 6-digit verification code.');
+          
+          // Hide the register form
+          form.style.display = 'none';
+          
+          // Show OTP section
+          const otpSection = document.getElementById('otpSection');
+          if (otpSection) {
+            otpSection.style.display = 'block';
+            document.getElementById('otpEmail').textContent = email;
+
+            // Setup OTP inputs
+            setupOtpInputs();
+
+            // Setup verify button
+            document.getElementById('verifyOtpBtn').onclick = async function () {
+              const otpInputs = document.querySelectorAll('.otp-input');
+              let otpCode = '';
+              otpInputs.forEach(input => otpCode += input.value);
+
+              if (otpCode.length !== 6) {
+                document.getElementById('otpError').textContent = 'Please enter the complete 6-digit code.';
+                document.getElementById('otpError').style.display = 'block';
+                document.getElementById('otpInputContainer').classList.add('otp-shake');
+                setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
+                return;
+              }
+
+              const verifyBtn = this;
+              verifyBtn.disabled = true;
+              verifyBtn.textContent = 'Verifying...';
+
+              const verifyResult = await window.AuthService.verifyEmailOTP(email, otpCode);
+
+              if (verifyResult.success) {
+                // Mark all inputs green
+                otpInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
+                document.getElementById('otpError').style.display = 'none';
+                showNotification('success', '✅ Email verified successfully! Redirecting to dashboard...');
+                verifyBtn.textContent = 'Verified! Redirecting...';
+                
+                setTimeout(() => {
+                  window.location.href = 'dashboard.html';
+                }, 2000);
+              } else {
+                otpInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
+                document.getElementById('otpError').textContent = verifyResult.error;
+                document.getElementById('otpError').style.display = 'block';
+                document.getElementById('otpInputContainer').classList.add('otp-shake');
+                setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify & Continue';
+              }
+            };
+
+            // Setup resend button with 60s countdown
+            startResendCountdown(email);
           }
         } else {
           // Show error message
@@ -312,6 +361,102 @@
     }, 5000);
   }
 
+  /**
+   * Setup OTP input behavior (auto-focus next, paste support, backspace)
+   */
+  function setupOtpInputs() {
+    const inputs = document.querySelectorAll('.otp-input');
+    if (!inputs.length) return;
+
+    // Focus first input
+    inputs[0].focus();
+
+    inputs.forEach((input, index) => {
+      // On input, auto-focus next
+      input.addEventListener('input', (e) => {
+        const val = e.target.value;
+        // Only allow digits
+        e.target.value = val.replace(/[^0-9]/g, '');
+        
+        if (e.target.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+
+        // Update filled style
+        if (e.target.value) {
+          e.target.classList.add('filled');
+          e.target.classList.remove('error');
+        } else {
+          e.target.classList.remove('filled');
+        }
+      });
+
+      // On backspace, go to previous input
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+          inputs[index - 1].value = '';
+          inputs[index - 1].classList.remove('filled');
+        }
+        // Enter key triggers verify
+        if (e.key === 'Enter') {
+          document.getElementById('verifyOtpBtn').click();
+        }
+      });
+
+      // Handle paste (paste full 6-digit code)
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        if (pastedData.length >= 6) {
+          inputs.forEach((inp, i) => {
+            inp.value = pastedData[i] || '';
+            if (inp.value) inp.classList.add('filled');
+          });
+          inputs[5].focus();
+        }
+      });
+    });
+  }
+
+  /**
+   * Start 60-second countdown for resend OTP button
+   */
+  function startResendCountdown(email) {
+    const resendBtn = document.getElementById('resendOtpBtn');
+    const timerSpan = document.getElementById('resendTimer');
+    if (!resendBtn || !timerSpan) return;
+
+    let seconds = 60;
+    resendBtn.disabled = true;
+    timerSpan.textContent = seconds;
+    resendBtn.innerHTML = 'Resend in <span id="resendTimer">' + seconds + '</span>s';
+
+    const interval = setInterval(() => {
+      seconds--;
+      const timer = document.getElementById('resendTimer');
+      if (timer) timer.textContent = seconds;
+
+      if (seconds <= 0) {
+        clearInterval(interval);
+        resendBtn.disabled = false;
+        resendBtn.innerHTML = 'Resend Code';
+        resendBtn.onclick = async function () {
+          resendBtn.disabled = true;
+          resendBtn.innerHTML = 'Sending...';
+          const resendResult = await window.AuthService.resendConfirmationEmail(email);
+          if (resendResult.success) {
+            showNotification('success', 'New verification code sent to ' + email);
+          } else {
+            showNotification('error', resendResult.error || 'Failed to resend code.');
+          }
+          // Restart countdown
+          startResendCountdown(email);
+        };
+      }
+    }, 1000);
+  }
+
   // Add CSS animations
   const style = document.createElement('style');
   style.textContent = `
@@ -341,7 +486,9 @@
   // Export for use in other scripts
   window.BackendIntegration = {
     checkAuthState,
-    showNotification
+    showNotification,
+    setupOtpInputs,
+    startResendCountdown
   };
 
 })();

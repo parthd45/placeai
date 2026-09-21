@@ -595,6 +595,43 @@ async function createUserProfile(userId, profileData) {
   }
 }
 
+/**
+ * Verify email OTP code after registration
+ * @param {string} email - User's email address
+ * @param {string} token - 6-digit OTP code
+ * @returns {Promise<Object>} Verification result
+ */
+async function verifyEmailOTP(email, token) {
+  try {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: 'signup'
+    });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      user: data.user,
+      session: data.session,
+      message: 'Email verified successfully!'
+    };
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    let errorMessage = error.message || 'Invalid verification code';
+    if (errorMessage.toLowerCase().includes('expired') || errorMessage.toLowerCase().includes('invalid')) {
+      errorMessage = 'Invalid or expired verification code. Please try again or request a new code.';
+    }
+    return {
+      success: false,
+      error: errorMessage
+    };
+  }
+}
+
 // Export functions for use in other files
 if (typeof window !== 'undefined') {
   window.AuthService = {
@@ -610,6 +647,7 @@ if (typeof window !== 'undefined') {
     resetPassword,
     updatePassword,
     resendConfirmationEmail,
+    verifyEmailOTP,
     createUserProfile
   };
 }
