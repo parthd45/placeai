@@ -1,0 +1,118 @@
+/* Modern Page Transition Loading Animation - Circular Dots Only */
+.page-transition-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.page-transition-loader.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Circular Dot Loader */
+.transition-spinner {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.transition-spinner::before,
+.transition-spinner::after,
+.transition-spinner span {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #8b5cf6;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+}
+
+/* Create 8 dots in a circle */
+.transition-spinner::before {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.transition-spinner::after {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.transition-spinner span:nth-child(1) {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.transition-spinner span:nth-child(2) {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.9s;
+}
+
+.transition-spinner span:nth-child(3) {
+  top: 15%;
+  right: 15%;
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+.transition-spinner span:nth-child(4) {
+  bottom: 15%;
+  right: 15%;
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.45s;
+}
+
+.transition-spinner span:nth-child(5) {
+  bottom: 15%;
+  left: 15%;
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 0.75s;
+}
+
+.transition-spinner span:nth-child(6) {
+  top: 15%;
+  left: 15%;
+  animation: dotPulse 1.2s ease-in-out infinite;
+  animation-delay: 1.05s;
+}
+
+@keyframes dotPulse {
+
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+    background: #6366f1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    background: #a855f7;
+  }
+}

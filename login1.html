@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login - PlaceAI</title>
+  <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Login to PlaceAI" />
+  <meta name="author" content="PlaceAI" />
+  <meta name="robots" content="noindex, nofollow" /> <!-- Added for login page security -->
+
+  <!-- CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/vendors.css" rel="stylesheet" type="text/css" />
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
+  <link id="colors" href="css/colors/scheme-01.css" rel="stylesheet" type="text/css" />
+
+  <style>
+    /* Header */
+    header {
+      position: relative;
+      background: transparent;
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+    }
+
+    /* Hero Section */
+    #section-hero-login {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Arial', sans-serif; /* Added for consistency */
+    }
+
+    #wrapper {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Main Center Area */
+    .login-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 20px 60px;
+    }
+
+    /* Outer box wrapper */
+    .login-container {
+      width: 100%;
+      max-width: 1150px;
+    }
+
+    /* Login Box */
+    .login-box {
+      display: flex;
+      width: 100%;
+      height: 530px;
+      background:transparent;
+      border: 1px solid transparent;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: transparent;
+       /* Enhanced for modern browsers */
+    }
+
+    /* Left Side Image */
+    .login-illustration {
+      flex: 1.1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: linear-gradient(145deg,transparent,transparent), url('images/login-illustration-bg.jpg') no-repeat center/cover;
+    }
+
+  
+
+    /* Right Login White Panel */
+    .login-form-section {
+      flex: 1;
+      padding: 20px 25px;
+      background: transparent;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Inputs */
+    .form-group {
+      margin-bottom: 8px;
+    }
+
+    .form-group label {
+      color:white;
+      opacity: 1;
+      font-size: 17px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      height: 42px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: transparent;
+      color: white;
+      transition: 0.3s;
+      font-size: 17px;
+    }
+
+    .form-group input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+      outline: none;
+    }
+
+    /* Remember + Forgot */
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      color: white;
+      font-size: 13px;
+    }
+
+    .remember-forgot input {
+      width: 14px;
+      height: 14px;
+      margin-right: 5px;
+    }
+
+    .remember-forgot a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .remember-forgot a:hover {
+      text-decoration: underline;
+    }
+
+    /* Login Button */
+    .login-btn {
+      width: 60%;
+      height: 44px;
+      background: #7c3aed;
+      border-radius: 20px;
+      font-size: 15px;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background: #6926e8;
+    }
+
+    .login-btn:focus {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+
+    /* Divider */
+    .divider {
+      text-align: center;
+      margin: 16px 0;
+      position: relative;
+      color: white;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      height: 1px;
+      background: white;
+      top: 50%;
+    }
+
+    .divider span {
+      background: white;
+      padding: 0 14px;
+      color: black;
+      font-size: 17px;
+      position: relative;
+    }
+
+    /* Social Buttons */
+    .social-login {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .social-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1.5px solid #ccc;
+      background: transparent;
+      color: white;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .social-btn:hover {
+      border-color: #7c3aed;
+      background: transparent;
+    }
+
+    .social-btn:focus {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+
+    .social-btn img {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Signup */
+    .signup-link {
+      text-align: center;
+      font-size: 13px;
+      color: white;
+    }
+
+    .signup-link a {
+      color: #7c3aed;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .signup-link a:hover {
+      color: #6926e8;
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(20, 20, 40, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 00px 0;
+      margin-top: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .login-box {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .login-illustration {
+        padding: 25px;
+      }
+
+      .login-illustration img {
+        max-height: 200px;
+      }
+
+      .login-form-section {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .login-form-section {
+        padding: 22px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .form-group input {
+        height: 38px;
+      }
+
+      .login-btn {
+        height: 40px;
+      }
+
+      .social-login {
+        flex-direction: column;
+      }
+    }
+
+    /* Accessibility and Focus Improvements */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Error Messages */
+    .error-message {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="dark-scheme">
+  <div id="wrapper">
+    <header class="transparent">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="de-flex">
+              <div class="de-flex-col">
+                <div id="logo">
+                  <a href="index.html">
+                    <img src="images/logo.webp" alt="PlaceAI Logo" class="logo-main" />
+                  </a>
+                </div>
+                <nav class="de-flex-col header-col-mid" aria-label="Main Navigation">
+                  <ul id="mainmenu">
+                    <li><a href="index.html">About</a></li>
+                    <li><a href="index.html">Features</a></li>
+                    <li><a href="index.html">Key Modules</a></li>
+                    <li><a href="index.html">Benefits</a></li>
+                    <li><a href="index.html">Workflow</a></li>
+                    <li><a href="index.html">FAQ</a></li>
+                  </ul>
+                </nav>
+              </div>
+              <div class="de-flex-col">
+                <a class="btn-main fx-slide" href="index.html"><span>Back to Home</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="section-hero-login" class="jarallax no-top no-bottom text-light" data-video-src="mp4:video.mp4" aria-hidden="true">
+      <div class="gradient-edge-top h-50"></div>
+      <div class="gradient-edge-bottom"></div>
+      <div class="sw-overlay"></div>
+    </section>
+    <main class="login-main" role="main">
+      <div class="login-container">
+        <div class="login-box">
+          <div class="login-illustration">
+            <script
+  src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js"
+  type="module"
+></script>
+
+<dotlottie-wc
+  src="Password Authentication.json"
+  style="width: 600px;height: 1300px"
+  autoplay
+  speed="1"
+  transition="transform 0.3s ease-out, opacity 0.3s ease-out"
+  loop
+  style="padding-bottom: 30px;"
+></dotlottie-wc>
+          </div>
+
+          <div class="login-form-section">
+<h2 style="text-align:start;">Sign In</h2>
+              <h4 style="text-align:start;">Welcome back ! login to Place Wise🎓.</h4>
+
+            <form id="loginForm" method="POST" action="/login" novalidate>
+              <div class="form-group">
+                <label for="emailOrMobile">Email / Mobile Number :</label>
+                <input type="text" id="emailOrMobile" name="emailOrMobile" placeholder="Enter email or mobile" required aria-describedby="emailError" />
+                <div id="emailError" class="error-message" role="alert">Please enter a valid email or mobile number.</div>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Password :</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required aria-describedby="passwordError" />
+                <div id="passwordError" class="error-message" role="alert">Password is required.</div>
+              </div>
+
+              <div class="remember-forgot">
+                <label><input type="checkbox" name="remember" /> Remember me</label>
+                <a href="forgot-password.html">Forgot password?</a>
+              </div>
+
+              <button type="submit" class="login-btn">Sign In</button>
+            </form>
+
+            <div class="divider"><span>OR</span></div>
+
+            <div class="social-login">
+              <button class="social-btn" type="button" aria-label="Continue with Google">
+                <img src="images/search.png" alt="Google icon" />
+                Continue with Google
+              </button>
+              <button class="social-btn" type="button" aria-label="Continue with Facebook">
+                <img src="images/facebook.png" alt="Facebook icon" />
+                Continue with Facebook
+              </button>
+            </div>
+
+            <div class="signup-link">
+              New to Place Wise🎓? <a href="register.html">Create an account</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-dark text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <p>&copy; 2025 PlaceAI. All rights reserved. | AI-Driven Training & Placement Support</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/vendors.js"></script>
+  <script src="js/designesia.js"></script>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const emailInput = form.emailOrMobile;
+      const passwordInput = form.password;
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+
+      // Simple validation
+      let isValid = true;
+      if (!emailInput.value.trim()) {
+        emailError.style.display = "block";
+        isValid = false;
+      } else {
+        emailError.style.display = "none";
+      }
+      if (!passwordInput.value.trim()) {
+        passwordError.style.display = "block";
+        isValid = false;
+      } else {
+        passwordError.style.display = "none";
+      }
+
+      if (isValid) {
+        // Simulate login (replace with actual backend call)
+        alert("Login successful! (Backend integration needed)");
+        // window.location.href = "/dashboard"; // Redirect after success
+      }
+    });
+
+    // Social login placeholders
+    document.querySelectorAll(".social-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        alert("Social login integration needed");
+      });
+    });
+  </script>
+</body>
+</html>

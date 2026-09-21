@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Contact Us - Place Wise</title>
+    <link rel="icon" href="images/icon.webp" type="image/gif" sizes="16x16" />
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="Contact Place Wise - AI-Driven Training and Placement Support System" name="description" />
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap" />
+    <link href="css/vendors.css" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <link id="colors" href="css/colors/scheme-01.css" rel="stylesheet" type="text/css" />
+    <style>
+      .page-transition-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .page-transition-loader.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .transition-spinner {
+        width: 80px;
+        height: 80px;
+        border: 6px solid rgba(138, 43, 226, 0.2);
+        border-top: 6px solid #a855f7;
+        border-radius: 50%;
+        animation: transitionSpin 1s linear infinite;
+        margin-bottom: 30px;
+      }
+
+      @keyframes transitionSpin {
+        to { transform: rotate(360deg); }
+      }
+
+      .transition-text {
+        color: #a855f7;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        animation: transitionPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes transitionPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+
+      .progress-bar {
+        width: 200px;
+        height: 4px;
+        background: rgba(138, 43, 226, 0.2);
+        border-radius: 2px;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8a2be2, #a855f7);
+        width: 0%;
+        animation: progressAnimation 2s ease-out forwards;
+      }
+
+      @keyframes progressAnimation {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+      }
+
+      .contact-info-box {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 30px;
+        transition: all 0.3s ease;
+        height: 100%;
+      }
+
+      .contact-info-box:hover {
+        background: rgba(168, 85, 247, 0.1);
+        border-color: rgba(168, 85, 247, 0.3);
+        transform: translateY(-5px);
+      }
+
+      .contact-info-box i {
+        font-size: 40px;
+        color: #a855f7;
+        margin-bottom: 20px;
+      }
+
+      .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #a855f7;
+        color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(168, 85, 247, 0.25);
+      }
+
+      .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .form-label {
+        color: #a855f7;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+      }
+
+      .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: #a855f7;
+        font-size: 20px;
+        margin: 0 10px;
+        transition: all 0.3s ease;
+      }
+
+      .social-links a:hover {
+        background: #a855f7;
+        color: #fff;
+        transform: translateY(-3px);
+      }
+
+      .alert-success {
+        background: rgba(168, 85, 247, 0.2);
+        border: 1px solid #a855f7;
+        color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body class="dark-scheme">
+    <div id="wrapper">
+      <div class="float-text show-on-scroll">
+        <span><a href="#">Scroll to top</a></span>
+      </div>
+      <div class="scrollbar-v show-on-scroll"></div>
+
+      <!-- page preloader begin -->
+      <div id="de-loader"></div>
+      <!-- page preloader close -->
+
+      <header class="transparent">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="de-flex">
+                <div class="de-flex-col">
+                  <div id="logo">
+                    <a href="index.html">
+                      <img class="logo-main" src="images/logo1.webp" alt="" />
+                      <img class="logo-scroll" src="images/logo1.webp" alt="" />
+                      <img class="logo-mobile" src="images/logo1.webp" alt="" />
+                    </a>
+                  </div>
+                </div>
+
+                <div class="de-flex-col">
+                  <div class="de-flex-col header-col-mid">
+                    <ul id="mainmenu">
+                      <li><a class="menu-item" href="index.html">Home</a></li>
+                      <li><a class="menu-item" href="index.html#section-about">About</a></li>
+                      <li><a class="menu-item" href="index.html#section-features">Features</a></li>
+                      <li><a class="menu-item active" href="contact.html">Contact</a></li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="de-flex-col">
+                  <a class="btn-main fx-slide w-100" href="login.html"><span>Get Started</span></a>
+                  <div class="menu_side_area">
+                    <span id="menu-btn"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section id="section-hero" class="section-dark no-top no-bottom text-light jarallax relative mh-600" data-video-src="mp4:video.mp4">
+        <div class="gradient-edge-top op-6 h-50 color"></div>
+        <div class="gradient-edge-bottom"></div>
+        <div class="sw-overlay op-8"></div>
+        <div class="abs abs-centered z-2 w-80">
+          <div class="container wow fadeInUp" data-wow-duration="1s">
+            <div class="row">
+              <div class="col-lg-12 text-center">
+                <div class="subtitle">Get In Touch</div>
+                <h1 class="fs-80 text-uppercase mb-4 lh-1">Contact Us</h1>
+                <p class="lead">We'd love to hear from you. Reach out to learn more about Place Wise 🎓</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-dark section-dark text-light">
+        <div class="container">
+          <div class="row g-4 mb-5">
+            <div class="col-lg-4 col-md-6">
+              <div class="contact-info-box text-center wow fadeInUp">
+                <i class="fa fa-map-marker"></i>
+                <h4>Visit Us</h4>
+                <p class="mb-0">
+                  123 Tech Park, Innovation Hub<br />
+                  Nagpur, Maharashtra 440001<br />
+                  India
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+              <div class="contact-info-box text-center wow fadeInUp" data-wow-delay=".1s">
+                <i class="fa fa-envelope"></i>
+                <h4>Email Us</h4>
+                <p class="mb-0">
+                  <a href="mailto:placewiseinfo@gmail.com" class="text-light">placewiseinfo@gmail.com</a><br />
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+              <div class="contact-info-box text-center wow fadeInUp" data-wow-delay=".2s">
+                <i class="fa fa-phone"></i>
+                <h4>Call Us</h4>
+                <p class="mb-0">
+                  <a href="tel:+91 99239 06061" class="text-light">+91 123 456 7890</a><br />
+                  <a href="tel:+91 70280 30836" class="text-light">+91 123 456 7891</a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-5 align-items-start">
+            <div class="col-lg-6">
+              <div class="wow fadeInLeft">
+                <div class="subtitle mb-3">Send Message</div>
+                <h2 class="mb-4">Let's Start a Conversation</h2>
+                <p class="mb-4">
+                  Fill out the form below and our team will get back to you within 24 hours. Whether you're interested in implementing Place Wise 🎓 at your institution or have questions about our features, we're here to help.
+                </p>
+
+                <div class="social-links mb-4">
+  <a href="#" title="Facebook" class="btn btn-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-2" style="width: 45px; height: 45px;">
+    <i class="fab fa-facebook-f"></i>
+  </a>
+  <a href="#" title="Twitter" class="btn btn-info rounded-circle d-inline-flex align-items-center justify-content-center mx-2" style="width: 45px; height: 45px;">
+    <i class="fab fa-twitter"></i>
+  </a>
+  <a href="#" title="LinkedIn" class="btn btn-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-2" style="width: 45px; height: 45px;">
+    <i class="fab fa-linkedin-in"></i>
+  </a>
+  <a href="#" title="Instagram" class="btn btn-danger rounded-circle d-inline-flex align-items-center justify-content-center mx-2" style="width: 45px; height: 45px;">
+    <i class="fab fa-instagram"></i>
+  </a>
+</div>
+
+                <div class="spacer-20"></div>
+
+                <h5 class="mb-3">Office Hours</h5>
+                <p class="mb-2"><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM</p>
+                <p class="mb-2"><strong>Saturday:</strong> 10:00 AM - 4:00 PM</p>
+                <p class="mb-0"><strong>Sunday:</strong> Closed</p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="wow fadeInRight">
+                <div id="success-message" class="alert-success mb-4">
+                  <i class="fa fa-check-circle me-2"></i>
+                  Thank you! Your message has been sent successfully. We'll get back to you soon.
+                </div>
+
+                <form id="contact-form" class="form-dark">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="+91 123 456 7890" />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <select class="form-select" id="subject" name="subject" required>
+                          <option value="">Select a subject</option>
+                          <option value="general">General Inquiry</option>
+                          <option value="demo">Request a Demo</option>
+                          <option value="pricing">Pricing Information</option>
+                          <option value="support">Technical Support</option>
+                          <option value="partnership">Partnership Opportunities</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="mb-3">
+                        <label for="institution" class="form-label">Institution Name</label>
+                        <input type="text" class="form-control" id="institution" name="institution" placeholder="Your University/College" />
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="mb-3">
+                        <label for="message" class="form-label">Message *</label>
+                        <textarea class="form-control" id="message" name="message" placeholder="Tell us more about your needs..." required></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <button type="submit" class="btn-main fx-slide w-100">
+                        <span>Send Message</span>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-dark section-dark text-light p-0">
+        <div class="wow fadeInUp">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119066.54834168815!2d78.99010825820312!3d21.161065299999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c0a5a31faf13%3A0x19b37d06d0bb3e2b!2sNagpur%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1704387600000!5m2!1sen!2sin" 
+            width="100%" 
+            height="500" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy">
+          </iframe>
+        </div>
+      </section>
+
+      <section class="bg-color section-dark text-light pt-80 pb-80">
+        <div class="container">
+          <div class="row g-4 justify-content-center">
+            <div class="col-lg-8 text-center">
+              <div class="subtitle mb-3 wow fadeInUp">Ready to Get Started?</div>
+              <h2 class="wow fadeInUp" data-wow-delay=".2s">
+                Transform Your Placement Process Today
+              </h2>
+              <p class="lead mb-4 wow fadeInUp" data-wow-delay=".4s">
+                Join educational institutions already using Place Wise 🎓 to improve outcomes.
+              </p>
+              <a class="btn-main mx-2 fx-slide wow fadeInUp" href="login.html" data-wow-delay=".6s">
+                <span>Get Started</span>
+              </a>
+              <a class="btn-main btn-line mx-2 fx-slide wow fadeInUp" href="index.html#section-features" data-wow-delay=".6s">
+                <span>Learn More</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="bg-dark pt-40 pb-40 text-center">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="spacer-single"></div>
+              <h6>&copy; 2026 Place Wise 🎓. All rights reserved. | AI-Driven Training and Placement Support System</h6>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Page Transition Loader -->
+    <div class="page-transition-loader" id="pageTransitionLoader">
+      <div class="transition-spinner"></div>
+      <div class="transition-text">Loading...</div>
+      <div class="progress-bar">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <script src="js/vendors.js"></script>
+    <script src="js/designesia.js"></script>
+    <script>
+      // Page Transition Loading
+      const transitionLoader = document.getElementById('pageTransitionLoader');
+      
+      document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link && link.href && !link.target && link.hostname === window.location.hostname) {
+          if (!link.href.includes('#')) {
+            transitionLoader.classList.add('active');
+          }
+        }
+      });
+
+      window.addEventListener('beforeunload', function() {
+        transitionLoader.classList.add('active');
+      });
+
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          transitionLoader.classList.remove('active');
+        }, 300);
+      });
+
+      // Contact Form Handler
+      document.getElementById('contact-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          subject: document.getElementById('subject').value,
+          institution: document.getElementById('institution').value,
+          message: document.getElementById('message').value
+        };
+
+        // Show success message
+        const successMsg = document.getElementById('success-message');
+        successMsg.style.display = 'block';
+        
+        // Reset form
+        this.reset();
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+        }, 5000);
+
+        // Scroll to success message
+        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        console.log('Form submitted:', formData);
+      });
+    </script>
+  </body>
+</html>

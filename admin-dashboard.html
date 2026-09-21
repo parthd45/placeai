@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin Dashboard - PlaceWise</title>
+    <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="backend/supabase-init.js"></script>
+    <script src="backend/auth-service.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .admin-header {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Users Table */
+        .users-section {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 200px;
+        }
+
+        .search-box input::placeholder {
+            color: #64748b;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .users-table th {
+            background: rgba(15, 23, 42, 0.5);
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .users-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .premium-badge.active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .premium-badge.free {
+            background: rgba(100, 116, 139, 0.3);
+            color: #94a3b8;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn.edit {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .action-btn.view {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .action-btn.toggle-premium {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Filter buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-right: 16px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Export button */
+        .export-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* User details modal */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .detail-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #f59e0b;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 60px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* Quick Actions Menu */
+        .quick-actions-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-actions-menu button {
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #e2e8f0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-actions-menu button:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+        }
+
+        .quick-actions-menu button i {
+            width: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="logo">
+            <img src="images/logo1.webp" alt="PlaceWise Logo">
+            <span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn btn-danger" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"
+                    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="totalUsers">-</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"
+                    style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-value" id="premiumUsers">-</div>
+                <div class="stat-label">Premium Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"
+                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-value" id="newUsersToday">-</div>
+                <div class="stat-label">New Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"
+                    style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="stat-value" id="freeUsers">-</div>
+                <div class="stat-label">Free Users</div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-users"></i> All Users</h2>
+                <div class="header-controls">
+                    <!-- Bulk Actions Bar (hidden by default) -->
+                    <div id="bulkActionsBar" style="display: none; gap: 8px; align-items: center;">
+                        <span style="color: #94a3b8; font-size: 14px; font-weight: 600;" id="selectedCount">0
+                            selected</span>
+                        <button class="btn"
+                            style="background: #10b981; color: white; padding: 6px 12px; font-size: 13px;"
+                            onclick="bulkGrantPremium()">
+                            <i class="fas fa-crown"></i> Grant Premium
+                        </button>
+                        <button class="btn"
+                            style="background: #f59e0b; color: white; padding: 6px 12px; font-size: 13px;"
+                            onclick="bulkRevokePremium()">
+                            <i class="fas fa-user"></i> Revoke
+                        </button>
+                        <button class="btn"
+                            style="background: #ef4444; color: white; padding: 6px 12px; font-size: 13px;"
+                            onclick="bulkDeleteUsers()">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        <button class="btn"
+                            style="background: #64748b; color: white; padding: 6px 12px; font-size: 13px;"
+                            onclick="clearSelection()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <select id="premiumFilter" onchange="applyFilters()"
+                        style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.5); color: white; font-size: 13px;">
+                        <option value="all">All Users</option>
+                        <option value="premium">Premium Only</option>
+                        <option value="free">Free Only</option>
+                        <option value="expired">Expired Premium</option>
+                    </select>
+
+                    <select id="sortBy" onchange="applyFilters()"
+                        style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.5); color: white; font-size: 13px;">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name">Name A-Z</option>
+                        <option value="premium_first">Premium First</option>
+                    </select>
+
+                    <button class="export-btn" onclick="exportToCSV()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+
+                    <div class="search-box">
+                        <i class="fas fa-search" style="color: #64748b;"></i>
+                        <input type="text" id="searchInput" placeholder="Search by name or email..."
+                            oninput="applyFilters()">
+                    </div>
+                </div>
+            </div>
+            <div id="usersTableContainer">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 16px; color: #94a3b8;">Loading users...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-edit"></i> Edit User</h3>
+                <p style="color: #94a3b8;">Update user information</p>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="editFirstName">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="editLastName">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" readonly style="opacity: 0.6;">
+                </div>
+                <div class="form-group">
+                    <label>Mobile</label>
+                    <input type="text" id="editMobile">
+                </div>
+                <div class="form-group">
+                    <label>Premium Status</label>
+                    <select id="editPremium">
+                        <option value="false">Free User</option>
+                        <option value="true">Premium User</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" style="background: #475569;"
+                        onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View User Details Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-circle"></i> User Details</h3>
+                <p style="color: #94a3b8;">Complete user information</p>
+            </div>
+            <div class="detail-grid" id="userDetailsGrid">
+                <!-- Details will be populated dynamically -->
+            </div>
+            <div class="modal-actions" style="margin-top: 24px;">
+                <button type="button" class="btn btn-primary" onclick="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin Configuration
+        const ADMIN_EMAIL = 'admin@placewise.tech';
+        let allUsers = [];
+        let currentFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAdminAuth();
+            await loadDashboardData();
+        });
+
+        // Check if user is admin
+        async function checkAdminAuth() {
+            try {
+                console.log('Checking admin auth...');
+
+                const sessionResult = await window.AuthService.getCurrentSession();
+                console.log('Session result:', sessionResult);
+
+                if (!sessionResult.success || !sessionResult.session) {
+                    console.log('No active session, redirecting to login');
+                    window.location.replace('login.html');
+                    return;
+                }
+
+                const userEmail = sessionResult.session.user.email;
+                console.log('User email:', userEmail);
+
+                if (userEmail.toLowerCase() !== ADMIN_EMAIL) {
+                    console.log('Not admin user, redirecting to dashboard');
+                    alert('Access denied. Admin only.');
+                    window.location.replace('dashboard.html');
+                    return;
+                }
+
+                console.log('Admin auth successful');
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.replace('login.html');
+            }
+        }
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            try {
+                const supabase = window.supabaseClient;
+
+                // Fetch all users
+                const { data: users, error } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allUsers = users || [];
+                updateStats(allUsers);
+                renderUsersTable(allUsers);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('usersTableContainer').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load users. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStats(users) {
+            const totalUsers = users.length;
+            const premiumUsers = users.filter(u => u.is_premium).length;
+            const freeUsers = totalUsers - premiumUsers;
+            const today = new Date().toDateString();
+            const newToday = users.filter(u => new Date(u.created_at).toDateString() === today).length;
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('premiumUsers').textContent = premiumUsers;
+            document.getElementById('newUsersToday').textContent = newToday;
+            document.getElementById('freeUsers').textContent = freeUsers;
+        }
+
+        // Render users table
+        function renderUsersTable(users) {
+            if (users.length === 0) {
+                document.getElementById('usersTableContainer').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users-slash"></i>
+                        <p>No users found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHtml = `
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Mobile</th>
+                            <th>Status</th>
+                            <th>Premium Expiry</th>
+                            <th>Last Active</th>
+                            <th>Joined</th>
+                            <th style="width: 200px;">Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => {
+                const daysUntilExpiry = user.premium_end_date ? Math.ceil((new Date(user.premium_end_date) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+                const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+                const isExpired = daysUntilExpiry !== null && daysUntilExpiry < 0;
+
+                return `
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">${(user.first_name || 'U')[0].toUpperCase()}</div>
+                                        <div>
+                                            <div class="user-name">${user.first_name || ''} ${user.last_name || ''}</div>
+                                            <div class="user-email">${user.email || 'No email'}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${user.mobile || '-'}</td>
+                                <td>
+                                    <span class="premium-badge ${user.is_premium ? 'active' : 'free'}">
+                                        <i class="fas ${user.is_premium ? 'fa-crown' : 'fa-user'}"></i>
+                                        ${user.is_premium ? 'Premium' : 'Free'}
+                                    </span>
+                                </td>
+                                <td style="font-size: 12px;">
+                                    ${user.premium_end_date ? `
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            <span>${new Date(user.premium_end_date).toLocaleDateString()}</span>
+                                            ${isExpiringSoon ? `<span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">⚠️ ${daysUntilExpiry}d left</span>` : ''}
+                                            ${isExpired ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">❌ Expired</span>` : ''}
+                                        </div>
+                                    ` : '-'}
+                                </td>
+                                <td style="font-size: 12px; color: #94a3b8;">-</td>
+                                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="action-btn view" onclick="openViewModal('${user.user_id}')" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" onclick="openEditModal('${user.user_id}')" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        
+                                        <!-- Quick Actions Dropdown -->
+                                        <div style="position: relative;">
+                                            <button class="action-btn" onclick="toggleQuickActions('${user.user_id}')" title="Quick Actions" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                                                <i class="fas fa-bolt"></i>
+                                            </button>
+                                            <div id="quickActions_${user.user_id}" class="quick-actions-menu" style="display: none;">
+                                                ${user.is_premium ? `
+                                                    <button onclick="extendPremium('${user.user_id}', 7); event.stopPropagation();"><i class="fas fa-plus"></i> +7 Days</button>
+                                                    <button onclick="extendPremium('${user.user_id}', 30); event.stopPropagation();"><i class="fas fa-plus"></i> +30 Days</button>
+                                                    <button onclick="extendPremium('${user.user_id}', 90); event.stopPropagation();"><i class="fas fa-plus"></i> +90 Days</button>
+                                                    <button onclick="togglePremium('${user.user_id}', false); event.stopPropagation();" style="color: #f59e0b;"><i class="fas fa-user"></i> Revoke Premium</button>
+                                                ` : `
+                                                    <button onclick="grantPremium('${user.user_id}', 30); event.stopPropagation();"><i class="fas fa-crown"></i> Grant 30 Days</button>
+                                                    <button onclick="grantPremium('${user.user_id}', 90); event.stopPropagation();"><i class="fas fa-crown"></i> Grant 90 Days</button>
+                                                    <button onclick="grantPremium('${user.user_id}', 365); event.stopPropagation();"><i class="fas fa-crown"></i> Grant 1 Year</button>
+                                                `}
+                                                <button onclick="addUserNote('${user.user_id}'); event.stopPropagation();"><i class="fas fa-sticky-note"></i> Add Note</button>
+                                                <button onclick="deleteUser('${user.user_id}'); event.stopPropagation();" style="color: #ef4444;"><i class="fas fa-trash"></i> Delete User</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('usersTableContainer').innerHTML = tableHtml;
+        }
+
+        // Filter users by search
+        function filterUsers() {
+            applyFilters();
+        }
+
+        // Set filter type (all, premium, free)
+        function setFilter(filter) {
+            currentFilter = filter;
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
+            applyFilters();
+        }
+
+        // Apply both search and status filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = allUsers.filter(user => {
+                const name = `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                return name.includes(searchTerm) || email.includes(searchTerm);
+            });
+
+            // Apply status filter
+            if (currentFilter === 'premium') {
+                filtered = filtered.filter(u => u.is_premium);
+            } else if (currentFilter === 'free') {
+                filtered = filtered.filter(u => !u.is_premium);
+            }
+
+            renderUsersTable(filtered);
+        }
+
+        // Export users to CSV
+        function exportToCSV() {
+            const headers = ['Name', 'Email', 'Mobile', 'Status', 'Premium Plan', 'Payment ID', 'Joined Date', 'Premium Start', 'Premium Expiry'];
+            const rows = allUsers.map(user => [
+                `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+                user.email || '',
+                user.mobile || '',
+                user.is_premium ? 'Premium' : 'Free',
+                user.premium_plan || '',
+                user.premium_payment_id || '',
+                user.created_at ? new Date(user.created_at).toLocaleDateString() : '',
+                user.premium_start_date ? new Date(user.premium_start_date).toLocaleDateString() : '',
+                user.premium_end_date ? new Date(user.premium_end_date).toLocaleDateString() : ''
+            ]);
+
+            let csvContent = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `placewise_users_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // View user details modal
+        function openViewModal(userId) {
+            const user = allUsers.find(u => u.user_id === userId);
+            if (!user) return;
+
+            const detailsHtml = `
+                <div class="detail-item">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">${user.first_name || ''} ${user.last_name || ''}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${user.email || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Mobile</div>
+                    <div class="detail-value">${user.mobile || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">User ID</div>
+                    <div class="detail-value" style="font-size: 11px; word-break: break-all;">${user.user_id}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">
+                        <span class="premium-badge ${user.is_premium ? 'active' : 'free'}" style="font-size: 11px;">
+                            <i class="fas ${user.is_premium ? 'fa-crown' : 'fa-user'}"></i>
+                            ${user.is_premium ? 'Premium' : 'Free'}
+                        </span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Premium Plan</div>
+                    <div class="detail-value">${user.premium_plan || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Payment ID</div>
+                    <div class="detail-value" style="font-size: 11px;">${user.premium_payment_id || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Joined Date</div>
+                    <div class="detail-value">${user.created_at ? new Date(user.created_at).toLocaleString() : '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Premium Start</div>
+                    <div class="detail-value">${user.premium_start_date ? new Date(user.premium_start_date).toLocaleString() : '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Premium Expiry</div>
+                    <div class="detail-value">${user.premium_end_date ? new Date(user.premium_end_date).toLocaleString() : '-'}</div>
+                </div>
+            `;
+
+            document.getElementById('userDetailsGrid').innerHTML = detailsHtml;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('active');
+        }
+
+        // Delete user
+        async function deleteUser(userId) {
+            const user = allUsers.find(u => u.user_id === userId);
+            if (!user) return;
+
+            if (!confirm(`Are you sure you want to delete ${user.first_name || ''} ${user.last_name || ''}?\n\nThis action cannot be undone!`)) return;
+
+            try {
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .delete()
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert('User deleted successfully!');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Failed to delete user: ' + error.message);
+            }
+        }
+
+        // Open edit modal
+        function openEditModal(userId) {
+            const user = allUsers.find(u => u.user_id === userId);
+            if (!user) return;
+
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editFirstName').value = user.first_name || '';
+            document.getElementById('editLastName').value = user.last_name || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editMobile').value = user.mobile || '';
+            document.getElementById('editPremium').value = user.is_premium ? 'true' : 'false';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Save user changes
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('editUserId').value;
+            const updates = {
+                first_name: document.getElementById('editFirstName').value,
+                last_name: document.getElementById('editLastName').value,
+                mobile: document.getElementById('editMobile').value,
+                is_premium: document.getElementById('editPremium').value === 'true'
+            };
+
+            try {
+                const supabase = window.supabaseClient;
+
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .update(updates)
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert('User updated successfully!');
+                closeEditModal();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('Failed to update user: ' + error.message);
+            }
+        });
+
+        // Toggle premium status
+        async function togglePremium(userId, newStatus) {
+            if (!confirm(`${newStatus ? 'Grant' : 'Revoke'} premium access for this user?`)) return;
+
+            try {
+                const supabase = window.supabaseClient;
+
+                // Prepare update data
+                let updateData = { is_premium: newStatus };
+
+                if (newStatus) {
+                    // Granting premium - set dates and plan
+                    updateData.premium_plan = 'admin_granted';
+                    updateData.premium_start_date = new Date().toISOString();
+                    updateData.premium_end_date = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString(); // 100 years
+                } else {
+                    // Revoking premium - clear fields
+                    updateData.premium_plan = null;
+                    updateData.premium_start_date = null;
+                    updateData.premium_end_date = null;
+                    updateData.premium_payment_id = null;
+                }
+
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .update(updateData)
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert(`Premium ${newStatus ? 'granted' : 'revoked'} successfully!`);
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Toggle error:', error);
+                alert('Failed to update premium status');
+            }
+        }
+
+        // ===== QUICK ACTIONS =====
+
+        // Toggle quick actions menu
+        function toggleQuickActions(userId) {
+            // Close all other menus
+            document.querySelectorAll('.quick-actions-menu').forEach(menu => {
+                if (menu.id !== `quickActions_${userId}`) {
+                    menu.style.display = 'none';
+                }
+            });
+
+            // Toggle current menu
+            const menu = document.getElementById(`quickActions_${userId}`);
+            if (menu) {
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Close quick actions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.action-btn') && !e.target.closest('.quick-actions-menu')) {
+                document.querySelectorAll('.quick-actions-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
+
+        // Extend premium for existing premium users
+        async function extendPremium(userId, days) {
+            const user = allUsers.find(u => u.user_id === userId);
+            if (!user || !user.premium_end_date) return;
+
+            if (!confirm(`Extend premium by ${days} days?`)) return;
+
+            try {
+                const currentEnd = new Date(user.premium_end_date);
+                const newEnd = new Date(currentEnd);
+                newEnd.setDate(newEnd.getDate() + days);
+
+                const { error } = await window.supabaseClient
+                    .from('user_profiles')
+                    .update({
+                        premium_end_date: newEnd.toISOString()
+                    })
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert(`✅ Premium extended by ${days} days!`);
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Extend premium error:', error);
+                alert('Failed to extend premium');
+            }
+        }
+
+        // Grant premium to free users
+        async function grantPremium(userId, days) {
+            if (!confirm(`Grant ${days} days of premium?`)) return;
+
+            try {
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + days);
+
+                const { error } = await window.supabaseClient
+                    .from('user_profiles')
+                    .update({
+                        is_premium: true,
+                        premium_plan: 'admin_granted',
+                        premium_start_date: new Date().toISOString(),
+                        premium_end_date: endDate.toISOString()
+                    })
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert(`✅ Premium granted for ${days} days!`);
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Grant premium error:', error);
+                alert('Failed to grant premium');
+            }
+        }
+
+        // Add note to user
+        async function addUserNote(userId) {
+            const note = prompt('Enter note for this user:');
+            if (!note) return;
+
+            try {
+                const user = allUsers.find(u => u.user_id === userId);
+                const currentNotes = user.admin_notes || [];
+                const newNote = {
+                    text: note,
+                    date: new Date().toISOString(),
+                    admin: 'admin@placewise.tech'
+                };
+
+                const { error } = await window.supabaseClient
+                    .from('user_profiles')
+                    .update({
+                        admin_notes: [...currentNotes, newNote]
+                    })
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+
+                alert('✅ Note added successfully!');
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Add note error:', error);
+                alert('Failed to add note');
+            }
+        }
+
+        // Refresh data
+        async function refreshData() {
+            document.getElementById('usersTableContainer').innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 16px; color: #94a3b8;">Refreshing...</p>
+                </div>
+            `;
+            await loadDashboardData();
+        }
+
+        // ===== BULK ACTIONS =====
+
+        // Toggle select all checkboxes
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+
+        // Update bulk actions bar visibility
+        function updateBulkActions() {
+            const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+            const count = checkboxes.length;
+            const bulkBar = document.getElementById('bulkActionsBar');
+            const selectedCount = document.getElementById('selectedCount');
+
+            if (count > 0) {
+                bulkBar.style.display = 'flex';
+                selectedCount.textContent = `${count} selected`;
+            } else {
+                bulkBar.style.display = 'none';
+                document.getElementById('selectAll').checked = false;
+            }
+        }
+
+        // Clear all selections
+        function clearSelection() {
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            updateBulkActions();
+        }
+
+        // Get selected user IDs
+        function getSelectedUserIds() {
+            const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.dataset.userId);
+        }
+
+        // Bulk grant premium
+        async function bulkGrantPremium() {
+            const userIds = getSelectedUserIds();
+            if (userIds.length === 0) return;
+
+            const days = prompt(`Grant premium for how many days? (Enter number)`, '30');
+            if (!days || isNaN(days)) return;
+
+            if (!confirm(`Grant ${days} days of premium to ${userIds.length} user(s)?`)) return;
+
+            try {
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + parseInt(days));
+
+                for (const userId of userIds) {
+                    const { error } = await window.supabase
+                        .from('user_profiles')
+                        .update({
+                            is_premium: true,
+                            premium_plan: 'admin_granted',
+                            premium_start_date: new Date().toISOString(),
+                            premium_end_date: endDate.toISOString()
+                        })
+                        .eq('user_id', userId);
+
+                    if (error) throw error;
+                }
+
+                alert(`Successfully granted premium to ${userIds.length} user(s)`);
+                clearSelection();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Bulk grant premium error:', error);
+                alert('Failed to grant premium to some users');
+            }
+        }
+
+        // Bulk revoke premium
+        async function bulkRevokePremium() {
+            const userIds = getSelectedUserIds();
+            if (userIds.length === 0) return;
+
+            if (!confirm(`Revoke premium from ${userIds.length} user(s)?`)) return;
+
+            try {
+                for (const userId of userIds) {
+                    const { error } = await window.supabase
+                        .from('user_profiles')
+                        .update({
+                            is_premium: false,
+                            premium_plan: null,
+                            premium_start_date: null,
+                            premium_end_date: null
+                        })
+                        .eq('user_id', userId);
+
+                    if (error) throw error;
+                }
+
+                alert(`Successfully revoked premium from ${userIds.length} user(s)`);
+                clearSelection();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Bulk revoke premium error:', error);
+                alert('Failed to revoke premium from some users');
+            }
+        }
+
+        // Bulk delete users
+        async function bulkDeleteUsers() {
+            const userIds = getSelectedUserIds();
+            if (userIds.length === 0) return;
+
+            if (!confirm(`⚠️ PERMANENTLY DELETE ${userIds.length} user(s)? This cannot be undone!`)) return;
+
+            try {
+                for (const userId of userIds) {
+                    const { error } = await window.supabase
+                        .from('user_profiles')
+                        .delete()
+                        .eq('user_id', userId);
+
+                    if (error) throw error;
+                }
+
+                alert(`Successfully deleted ${userIds.length} user(s)`);
+                clearSelection();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+                alert('Failed to delete some users');
+            }
+        }
+
+        // ===== ADVANCED FILTERING =====
+
+        // Apply all filters and sorting
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const premiumFilter = document.getElementById('premiumFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            let filtered = [...allUsers];
+
+            // Filter by search
+            if (searchTerm) {
+                filtered = filtered.filter(user => {
+                    const name = `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase();
+                    const email = (user.email || '').toLowerCase();
+                    return name.includes(searchTerm) || email.includes(searchTerm);
+                });
+            }
+
+            // Filter by premium status
+            if (premiumFilter === 'premium') {
+                filtered = filtered.filter(u => u.is_premium);
+            } else if (premiumFilter === 'free') {
+                filtered = filtered.filter(u => !u.is_premium);
+            } else if (premiumFilter === 'expired') {
+                filtered = filtered.filter(u => {
+                    if (!u.premium_end_date) return false;
+                    return new Date(u.premium_end_date) < new Date();
+                });
+            }
+
+            // Sort
+            if (sortBy === 'newest') {
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else if (sortBy === 'oldest') {
+                filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            } else if (sortBy === 'name') {
+                filtered.sort((a, b) => {
+                    const nameA = `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase();
+                    const nameB = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+            } else if (sortBy === 'premium_first') {
+                filtered.sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
+            }
+
+            renderUsersTable(filtered);
+        }
+
+        // Logout
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    console.log('Logging out...');
+
+                    // Clear auth service session
+                    await window.AuthService.logout();
+
+                    // Force redirect
+                    window.location.replace('login.html');
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Force redirect anyway
+                    window.location.replace('login.html');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

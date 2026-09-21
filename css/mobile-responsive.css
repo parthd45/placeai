@@ -1,0 +1,432 @@
+/* 
+ * Global Mobile Responsive Styles
+ * Apply to all pages for consistent mobile experience
+ */
+
+/* Base Mobile Breakpoints */
+:root {
+    --mobile-sm: 480px;
+    --mobile-md: 768px;
+    --tablet: 1024px;
+}
+
+/* Mobile-First Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Tablet and Below (1024px) */
+@media (max-width: 1024px) {
+
+    /* Sidebar adjustments */
+    .sidebar {
+        width: 70px !important;
+    }
+
+    .sidebar-logo-text,
+    .menu-text,
+    .sidebar-footer-text {
+        display: none !important;
+    }
+
+    .sidebar-logo {
+        justify-content: center !important;
+    }
+
+    .menu-item {
+        justify-content: center !important;
+        padding: 12px !important;
+    }
+
+    /* Main content adjustment */
+    .main-content {
+        margin-left: 70px !important;
+    }
+
+    /* Dashboard grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Mobile (768px and below) */
+@media (max-width: 768px) {
+
+    /* Hide sidebar on mobile, show hamburger */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        width: 280px !important;
+    }
+
+    .sidebar.mobile-open {
+        left: 0;
+    }
+
+    .sidebar-logo-text,
+    .menu-text,
+    .sidebar-footer-text {
+        display: block !important;
+    }
+
+    .menu-item {
+        justify-content: flex-start !important;
+        padding: 12px 20px !important;
+    }
+
+    /* Mobile overlay */
+    .mobile-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+    }
+
+    .mobile-overlay.active {
+        display: block;
+    }
+
+    /* Main content full width */
+    .main-content {
+        margin-left: 0 !important;
+        padding: 16px !important;
+    }
+
+    /* Mobile header with hamburger */
+    .mobile-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: #1e293b;
+        border-bottom: 1px solid #334155;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .hamburger-menu {
+        display: flex !important;
+        flex-direction: column;
+        gap: 4px;
+        cursor: pointer;
+        padding: 8px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .hamburger-menu:active {
+        background: rgba(139, 92, 246, 0.2);
+        transform: scale(0.95);
+    }
+
+    .hamburger-menu span {
+        width: 24px;
+        height: 3px;
+        background: #8b5cf6;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    /* Add padding to body to account for fixed header */
+    body {
+        padding-top: 60px !important;
+    }
+
+    /* Dashboard adjustments */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .stat-card,
+    .feature-card {
+        padding: 16px !important;
+    }
+
+    /* Job Matching */
+    .jobs-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .filters-sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 1001;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .filters-sidebar.mobile-open {
+        left: 0;
+    }
+
+    .jobs-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .job-card {
+        padding: 16px !important;
+    }
+
+    /* Resume Analyzer */
+    .resume-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .upload-section,
+    .analysis-section {
+        padding: 16px !important;
+    }
+
+    /* Skill Analysis */
+    .skills-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Career Recommendations */
+    .careers-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Learning Paths */
+    .paths-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Forms */
+    .form-row {
+        flex-direction: column !important;
+    }
+
+    .form-group {
+        width: 100% !important;
+    }
+
+    /* Buttons */
+    .btn-group {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    button,
+    .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Modals */
+    .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 20px auto !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    /* Tables */
+    table {
+        font-size: 14px !important;
+    }
+
+    th,
+    td {
+        padding: 8px !important;
+    }
+
+    /* Hide desktop-only elements */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Show mobile-only elements */
+    .mobile-only {
+        display: block !important;
+    }
+}
+
+/* Small Mobile (480px and below) */
+@media (max-width: 480px) {
+
+    /* Typography */
+    h1 {
+        font-size: 24px !important;
+    }
+
+    h2 {
+        font-size: 20px !important;
+    }
+
+    h3 {
+        font-size: 18px !important;
+    }
+
+    p,
+    span,
+    div {
+        font-size: 14px !important;
+    }
+
+    /* Padding/Spacing */
+    .main-content {
+        padding: 12px !important;
+    }
+
+    .stat-card,
+    .feature-card,
+    .job-card {
+        padding: 12px !important;
+    }
+
+    /* Job meta items wrap */
+    .job-meta {
+        flex-wrap: wrap !important;
+    }
+
+    .meta-item {
+        font-size: 12px !important;
+    }
+
+    /* Smaller buttons */
+    button,
+    .btn {
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+
+    /* Modal adjustments */
+    .modal-content {
+        width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        max-height: 100vh !important;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .mobile-header {
+        padding: 8px 16px !important;
+    }
+
+    .modal-content {
+        max-height: 95vh !important;
+    }
+}
+
+/* Touch-friendly enhancements */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Larger tap targets */
+    button,
+    .btn,
+    a,
+    .clickable {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+
+    /* Remove hover effects on touch devices */
+    *:hover {
+        transform: none !important;
+    }
+
+    /* Add active states instead */
+    *:active {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+}
+
+/* Print styles */
+@media print {
+
+    .sidebar,
+    .mobile-header,
+    .hamburger-menu,
+    .mobile-overlay,
+    button,
+    .btn {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* Utility Classes */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+}
+
+/* Responsive Images */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive Videos */
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Prevent horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* Safe area for notched devices (iPhone X, etc.) */
+@supports (padding: max(0px)) {
+
+    .main-content,
+    .mobile-header {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+}

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register Page Animations - Complete Code</title>
+  
+  <style>
+    /* ========================================
+       ALL ANIMATION CODE FROM LOGIN & REGISTER PAGES
+       ======================================== */
+
+    /* ============ BASE STYLES ============ */
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* ============ HEADER ANIMATIONS ============ */
+    header {
+      position: relative;
+      background: transparent;
+      backdrop-filter: blur(12px); /* Blur animation effect */
+      z-index: 1000;
+    }
+
+    /* ============ BACKGROUND VIDEO SECTION ============ */
+    #section-hero-login {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    /* ============ INPUT FOCUS ANIMATIONS ============ */
+    .form-group input {
+      width: 100%;
+      height: 42px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: transparent;
+      color: white;
+      transition: 0.3s; /* Smooth transition animation */
+      font-size: 17px;
+    }
+
+    .form-group input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 8px rgba(124, 58, 237, 0.4); /* Glow animation on focus */
+      outline: none;
+    }
+
+    /* ============ BUTTON HOVER ANIMATIONS ============ */
+    .login-btn {
+      width: 60%;
+      height: 44px;
+      background: #7c3aed;
+      border-radius: 20px;
+      font-size: 15px;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: 0.3s; /* Smooth transition animation */
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background: #6926e8; /* Color change animation */
+    }
+
+    .login-btn:focus {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+
+    /* ============ SOCIAL BUTTON ANIMATIONS ============ */
+    .social-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1.5px solid #ccc;
+      background: transparent;
+      color: white;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.3s; /* Smooth transition animation */
+    }
+
+    .social-btn:hover {
+      border-color: #7c3aed; /* Border color change animation */
+      background: transparent;
+    }
+
+    .social-btn:focus {
+      outline: 2px solid #7c3aed;
+      outline-offset: 2px;
+    }
+
+    /* ============ LINK HOVER ANIMATIONS ============ */
+    .signup-link a {
+      color: #7c3aed;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s; /* Smooth transition */
+    }
+
+    .signup-link a:hover {
+      color: #6926e8; /* Color change animation */
+      text-decoration: underline;
+    }
+
+    /* ============ FLOATING LABEL ANIMATION (Register Page) ============ */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%); /* Transform animation */
+      font-size: 15px;
+      color: rgba(255,255,255,.7);
+      transition: all 0.3s ease; /* Smooth transition for label movement */
+      pointer-events: none;
+    }
+
+    /* Floating label animation on focus or when input has value */
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label,
+    .form-group select:focus + label,
+    .form-group select:not([value=""]) + label {
+      top: 10px;
+      font-size: 12px;
+      color: #7c3aed;
+      transform: translateY(0); /* Transform animation */
+    }
+
+    /* ============ TOGGLE BUTTON ANIMATION (Register Page) ============ */
+    .toggle-btn {
+      flex: 1;
+      border-radius: 20px;
+      border: 1px solid #7c3aed;
+      background: transparent;
+      color: #fff;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease; /* Smooth transition animation */
+    }
+
+    .toggle-btn.active {
+      background: #7c3aed; /* Background color change animation */
+    }
+
+    /* ============ PASSWORD EYE BUTTON ANIMATION ============ */
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%); /* Transform animation */
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.3s; /* Fade animation */
+    }
+
+    .eye-btn:hover {
+      opacity: 0.7; /* Opacity change on hover */
+    }
+
+    /* ============ FOOTER BACKDROP BLUR ============ */
+    footer {
+      background: rgba(20, 20, 40, 0.85);
+      backdrop-filter: blur(12px); /* Blur animation effect */
+      padding: 10px 0;
+      margin-top: 0;
+    }
+
+    /* ============ RESPONSIVE ANIMATIONS ============ */
+    @media (max-width: 992px) {
+      .login-box {
+        transition: all 0.3s ease; /* Smooth layout transition */
+      }
+    }
+
+    /* ============ DEMO CONTAINER STYLES ============ */
+    .demo-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      border-radius: 12px;
+    }
+
+    .demo-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #16213e;
+      border-radius: 8px;
+    }
+
+    .demo-section h2 {
+      color: #7c3aed;
+      margin-top: 0;
+    }
+
+    .demo-section p {
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    code {
+      background: #0f3460;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #64ffda;
+    }
+  </style>
+</head>
+<body style="background: #0f0f23; color: white;">
+
+  <div class="demo-container">
+    <h1 style="color: #7c3aed; text-align: center;">Login & Register Page Animations - Complete Code</h1>
+    
+    <!-- ========================================
+         1. LOTTIE ANIMATIONS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>1. Lottie Animation (Illustration)</h2>
+      <p>Both login and register pages use Lottie animations for the illustration section.</p>
+      
+      <h3 style="color: #64ffda;">Login Page - Password Authentication Animation:</h3>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>&lt;!-- Load Lottie Player Library --&gt;
+&lt;script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js" type="module"&gt;&lt;/script&gt;
+
+&lt;!-- Lottie Animation Component --&gt;
+&lt;dotlottie-wc
+  src="Password Authentication.json"
+  style="width: 600px; height: 1300px"
+  autoplay
+  speed="1"
+  transition="transform 0.3s ease-out, opacity 0.3s ease-out"
+  loop
+  style="padding-bottom: 30px;"
+&gt;&lt;/dotlottie-wc&gt;</code></pre>
+
+      <h3 style="color: #64ffda;">Register Page - Appointment Booking Animation:</h3>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>&lt;!-- Load Lottie Player Library --&gt;
+&lt;script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js"&gt;&lt;/script&gt;
+
+&lt;!-- Lottie Animation Component --&gt;
+&lt;dotlottie-wc
+  src="Appointment booking with smartphone.json"
+  style="width: 600px; height: 600px"
+  autoplay
+  speed="1"
+  transition="transform 0.3s ease-out, opacity 0.3s ease-out"
+  loop
+&gt;&lt;/dotlottie-wc&gt;</code></pre>
+
+      <p><strong>Animation Properties:</strong></p>
+      <ul style="color: #fff;">
+        <li><code>autoplay</code> - Animation starts automatically</li>
+        <li><code>loop</code> - Animation repeats continuously</li>
+        <li><code>speed="1"</code> - Normal playback speed</li>
+        <li><code>transition="transform 0.3s ease-out, opacity 0.3s ease-out"</code> - Smooth transitions</li>
+      </ul>
+    </div>
+
+    <!-- ========================================
+         2. CSS TRANSITION ANIMATIONS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>2. Input Focus Animations</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Input field with transition animation */
+.form-group input {
+  width: 100%;
+  height: 42px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: transparent;
+  color: white;
+  transition: 0.3s; /* Smooth transition animation */
+  font-size: 17px;
+}
+
+/* Focus state with glow animation */
+.form-group input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4); /* Glow effect */
+  outline: none;
+}</code></pre>
+
+      <p><strong>Demo:</strong></p>
+      <input type="text" placeholder="Click to see focus animation" style="width: 100%; height: 42px; padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; background: transparent; color: white; transition: 0.3s; font-size: 17px;">
+    </div>
+
+    <!-- ========================================
+         3. BUTTON HOVER ANIMATIONS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>3. Button Hover Animations</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Login button with transition */
+.login-btn {
+  width: 60%;
+  height: 44px;
+  background: #7c3aed;
+  border-radius: 20px;
+  font-size: 15px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: 0.3s; /* Smooth color change animation */
+  cursor: pointer;
+}
+
+/* Hover state animation */
+.login-btn:hover {
+  background: #6926e8; /* Darker purple on hover */
+}
+
+/* Focus outline animation */
+.login-btn:focus {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}</code></pre>
+
+      <p><strong>Demo:</strong></p>
+      <button class="login-btn" style="display: block; margin: 10px auto;">Hover Over Me</button>
+    </div>
+
+    <!-- ========================================
+         4. SOCIAL BUTTON ANIMATIONS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>4. Social Button Animations</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Social login button */
+.social-btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  background: transparent;
+  color: white;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.3s; /* Border color animation */
+}
+
+/* Hover animation */
+.social-btn:hover {
+  border-color: #7c3aed; /* Purple border on hover */
+  background: transparent;
+}</code></pre>
+
+      <p><strong>Demo:</strong></p>
+      <div style="display: flex; gap: 10px;">
+        <button class="social-btn">Continue with Google</button>
+        <button class="social-btn">Continue with Facebook</button>
+      </div>
+    </div>
+
+    <!-- ========================================
+         5. FLOATING LABEL ANIMATION
+         ======================================== -->
+    <div class="demo-section">
+      <h2>5. Floating Label Animation (Register Page)</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Label positioned inside input */
+.form-group label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%); /* Centered vertically */
+  font-size: 15px;
+  color: rgba(255,255,255,.7);
+  transition: all 0.3s ease; /* Smooth movement */
+  pointer-events: none;
+}
+
+/* Label floats up when input is focused or has value */
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+  top: 10px;
+  font-size: 12px;
+  color: #7c3aed; /* Color change */
+  transform: translateY(0); /* Move up */
+}</code></pre>
+
+      <p><strong>Animation Effect:</strong> Label floats up and changes color when you focus or type in the input.</p>
+    </div>
+
+    <!-- ========================================
+         6. BACKDROP BLUR EFFECTS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>6. Backdrop Blur Effects</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Header with blur effect */
+header {
+  position: relative;
+  background: transparent;
+  backdrop-filter: blur(12px); /* Glass morphism effect */
+  z-index: 1000;
+}
+
+/* Footer with blur effect */
+footer {
+  background: rgba(20, 20, 40, 0.85);
+  backdrop-filter: blur(12px); /* Glass morphism effect */
+  padding: 10px 0;
+}</code></pre>
+
+      <p><strong>Effect:</strong> Creates a frosted glass effect with background blur.</p>
+    </div>
+
+    <!-- ========================================
+         7. BACKGROUND VIDEO SECTION
+         ======================================== -->
+    <div class="demo-section">
+      <h2>7. Background Video Animation</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Fixed fullscreen video background */
+#section-hero-login {
+  position: fixed;
+  inset: 0; /* Top, right, bottom, left all set to 0 */
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1; /* Behind all content */
+}
+
+/* HTML Structure */
+&lt;section id="section-hero-login" 
+         class="jarallax no-top no-bottom text-light" 
+         data-video-src="mp4:video.mp4"&gt;
+  &lt;div class="gradient-edge-top h-50"&gt;&lt;/div&gt;
+  &lt;div class="gradient-edge-bottom"&gt;&lt;/div&gt;
+  &lt;div class="sw-overlay"&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+      <p><strong>Effect:</strong> Full-screen video background that stays fixed while content scrolls.</p>
+    </div>
+
+    <!-- ========================================
+         8. TOGGLE BUTTON ANIMATION
+         ======================================== -->
+    <div class="demo-section">
+      <h2>8. Toggle Button Animation (Register Page)</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Toggle button base style */
+.toggle-btn {
+  flex: 1;
+  border-radius: 20px;
+  border: 1px solid #7c3aed;
+  background: transparent;
+  color: #fff;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth background change */
+}
+
+/* Active state animation */
+.toggle-btn.active {
+  background: #7c3aed; /* Fill with purple when active */
+}</code></pre>
+
+      <p><strong>Demo:</strong></p>
+      <div style="display: flex; gap: 10px;">
+        <button class="toggle-btn active">Student</button>
+        <button class="toggle-btn">Recruiter</button>
+      </div>
+    </div>
+
+    <!-- ========================================
+         9. LINK HOVER ANIMATION
+         ======================================== -->
+    <div class="demo-section">
+      <h2>9. Link Hover Animation</h2>
+      <pre style="background: #0f3460; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>/* Link with smooth color transition */
+.signup-link a {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s; /* Color change animation */
+}
+
+.signup-link a:hover {
+  color: #6926e8; /* Darker shade on hover */
+  text-decoration: underline;
+}</code></pre>
+
+      <p><strong>Demo:</strong></p>
+      <p class="signup-link">New to PlaceAI? <a href="#">Create an account</a></p>
+    </div>
+
+    <!-- ========================================
+         10. SUMMARY
+         ======================================== -->
+    <div class="demo-section">
+      <h2>📋 Animation Summary</h2>
+      <ul style="color: #fff; line-height: 1.8;">
+        <li><strong>Lottie Animations:</strong> JSON-based animated illustrations (Password Auth, Appointment Booking)</li>
+        <li><strong>CSS Transitions:</strong> All elements use <code>transition: 0.3s</code> for smooth animations</li>
+        <li><strong>Transform Animations:</strong> Labels and buttons use <code>transform</code> for position changes</li>
+        <li><strong>Shadow Animations:</strong> Inputs show glow effect on focus using <code>box-shadow</code></li>
+        <li><strong>Color Transitions:</strong> Buttons, links, and borders change color smoothly on hover</li>
+        <li><strong>Backdrop Blur:</strong> Header and footer use <code>backdrop-filter: blur(12px)</code></li>
+        <li><strong>Opacity Animations:</strong> Eye button uses opacity changes on hover</li>
+        <li><strong>Background Video:</strong> Fixed fullscreen video with parallax effect</li>
+      </ul>
+    </div>
+
+    <!-- ========================================
+         11. KEY ANIMATION TIMINGS
+         ======================================== -->
+    <div class="demo-section">
+      <h2>⏱️ Animation Timings</h2>
+      <table style="width: 100%; color: #fff; border-collapse: collapse;">
+        <tr style="background: #0f3460;">
+          <th style="padding: 10px; text-align: left; border: 1px solid #7c3aed;">Element</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #7c3aed;">Duration</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #7c3aed;">Easing</th>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #444;">Input Focus</td>
+          <td style="padding: 10px; border: 1px solid #444;">0.3s</td>
+          <td style="padding: 10px; border: 1px solid #444;">ease (default)</td>
+        </tr>
+        <tr style="background: #16213e;">
+          <td style="padding: 10px; border: 1px solid #444;">Button Hover</td>
+          <td style="padding: 10px; border: 1px solid #444;">0.3s</td>
+          <td style="padding: 10px; border: 1px solid #444;">ease (default)</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #444;">Floating Label</td>
+          <td style="padding: 10px; border: 1px solid #444;">0.3s</td>
+          <td style="padding: 10px; border: 1px solid #444;">ease</td>
+        </tr>
+        <tr style="background: #16213e;">
+          <td style="padding: 10px; border: 1px solid #444;">Lottie Transition</td>
+          <td style="padding: 10px; border: 1px solid #444;">0.3s</td>
+          <td style="padding: 10px; border: 1px solid #444;">ease-out</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #444;">Toggle Button</td>
+          <td style="padding: 10px; border: 1px solid #444;">0.3s</td>
+          <td style="padding: 10px; border: 1px solid #444;">ease</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="text-align: center; color: #7c3aed; font-size: 18px; margin-top: 40px;">
+      All animations use smooth 0.3s transitions for consistent user experience! ✨
+    </p>
+  </div>
+
+</body>
+</html>

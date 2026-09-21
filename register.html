@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Create Account - PlaceAI</title>
+
+  <!-- META -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create your PlaceAI account" />
+  <meta name="author" content="PlaceAI" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- ICON -->
+  <link rel="icon" href="images/icon.webp" type="image/webp" />
+
+  <!-- CSS -->
+   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/vendors.css" rel="stylesheet" type="text/css" />
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
+  <link id="colors" href="css/colors/scheme-01.css" rel="stylesheet" type="text/css" />
+  <link href="css/loading-animation.css" rel="stylesheet" type="text/css" />
+
+  <style>
+     html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Arial', sans-serif; /* Added for consistency */
+    }
+
+    #wrapper {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+    }
+    /* FULLSCREEN VIDEO BACKGROUND */
+#section-hero {
+  position: fixed !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+#section-hero .jarallax-container,
+#section-hero video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+
+    /* HERO VIDEO */
+   #section-hero-login {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+    /* MAIN */
+    .login-main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 🔥 THIS IS THE FIX */
+  padding-top: 120px;   /* height of navbar */
+  padding-bottom: 40px;
+
+  position: relative;
+  z-index: 2;
+}
+
+
+    .login-container {
+      max-width: 1167px;
+      width: 100%;
+    }
+
+    .login-box {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1200px;
+      background:transparent;
+      border-radius: 18px;
+      overflow: visible;
+      box-shadow: transparent;
+    }
+
+     .login-illustration {
+      flex: 0 0 50%;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: rgba(124, 58, 237, 0.05) !important;
+      min-height: 500px;
+      border-right: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    .login-illustration dotlottie-wc {
+      display: block !important;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    .login-form-section {
+      flex: 0 0 50%;
+      padding: 20px 25px;
+      background: transparent;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    h2 { font-size: 28px; font-weight: 700; }
+    h4 { font-size: 15px; opacity: .9; margin-bottom: 20px; }
+
+    /* TOGGLE */
+    .toggle-group {
+      display: none;
+    }
+
+    .toggle-btn {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      border-radius: 20px;
+      border: 1px solid #7c3aed;
+      background: transparent;
+      color: #fff;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-btn.active {
+      background: #7c3aed;
+    }
+
+    /* FLOATING INPUTS */
+  .form-group {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  text-align: right;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255,255,255,.9);
+  margin: 0;
+}
+
+.form-group input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #fff;
+}
+
+
+
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #7c3aed;
+      outline: none;
+      box-shadow: 0 0 8px rgba(124,58,237,.45);
+    }
+
+   .form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label,
+.form-group select:focus + label,
+.form-group select:not([value=""]) + label {
+  bottom: 10px;
+  font-size: 12px;
+  color: #7c3aed;
+}
+
+
+    /* PASSWORD */
+    .password-field { position: relative; }
+
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .eye-btn:hover {
+      opacity: 0.7;
+    }
+
+    /* BUTTON */
+    .login-btn {
+  width: 50%;
+  height: 44px;
+  background: #7c3aed;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 16px auto 0; /* ← centers horizontally */
+  display: block;      /* ← required */
+}
+
+
+    .login-btn:hover { background: #3e1094; }
+
+    .signup-link {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .signup-link a {
+      color: #7c3aed;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .hidden { display: none; }
+ footer {
+      background: rgba(20, 20, 40, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 10px 0;
+      margin-top: 0;
+    }
+   @media (max-width: 992px) {
+      .login-box {
+        flex-direction: column;
+        height: auto;
+        transition: all 0.3s ease;
+      }
+
+      .login-illustration {
+        padding: 25px;
+        min-height: 300px;
+        display: flex !important;
+      }
+
+      .login-illustration dotlottie-wc {
+        max-width: 400px;
+        max-height: 400px;
+      }
+
+      .login-form-section {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .login-form-section {
+        padding: 22px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .form-group input {
+        height: 38px;
+      }
+
+      .login-btn {
+        height: 40px;
+      }
+
+      .social-login {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body class="dark-scheme">
+
+<div id="wrapper">
+
+  <!-- ================= HEADER ================= -->
+  <header class="transparent">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="de-flex">
+            <div class="de-flex-col">
+              <div id="logo">
+                <a href="index.html">
+                  <img src="images/logo1.webp" alt="PlaceAI Logo" class="logo-main" />
+                </a>
+              </div>
+              <nav class="de-flex-col header-col-mid" aria-label="Main Navigation">
+                <ul id="mainmenu">
+                  <li><a href="index.html#section-about">About</a></li>
+                  <li><a href="index.html#section-features">Features</a></li>
+                  <li><a href="index.html#section-modules">Key Modules</a></li>
+                  <li><a href="index.html#section-benefits">Benefits</a></li>
+                  <li><a href="index.html#section-workflow">Workflow</a></li>
+                  <li><a href="index.html#section-faq">FAQ</a></li>
+                </ul>
+              </nav>
+            </div>
+            <div class="de-flex-col">
+              <a class="btn-main fx-slide" href="index.html"><span>Back to Home</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+<section
+        id="section-hero"
+        class="section-dark no-top no-bottom text-light jarallax relative mh-800"
+        data-video-src="mp4:video.mp4"
+      >
+      <div class="gradient-edge-top h-50"></div>
+<div class="gradient-edge-bottom"></div>
+<div class="sw-overlay"></div>
+</section>
+  <!-- ================= HERO VIDEO ================= -->
+  <!-- ================= MAIN ================= -->
+  <main class="login-main">
+    
+    <div class="login-container">
+      <div class="login-box">
+       
+        <!-- Illustration -->
+        <div class="login-illustration">
+          <script type="module"
+            src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js"></script>
+
+          <dotlottie-wc
+            src="Appointment booking with smartphone.json"
+            style="width: 600px;height: 600px"
+            autoplay
+            speed="1"
+            transition="transform 0.3s ease-out, opacity 0.3s ease-out"
+            loop
+          ></dotlottie-wc>
+        </div>
+
+        <!-- Form -->
+        <div class="login-form-section">
+          <h2>Start your journey with Place Wise🎓</h2>
+          <h3>Create Account</h3>
+
+          <form id="registerForm">
+
+            <div class="form-group">
+              <label style="text-align: left; font-size: 18px;">Email Address:</label>
+              <input type="email" id="emailInput" required placeholder="Enter Email Address" />
+            </div>
+
+            <div class="form-group">
+              <label style="text-align: left; font-size: 18px;">Mobile Number:</label>
+              <input type="tel" id="mobileInput" placeholder="Enter Mobile Number" />
+            </div>
+
+            <div class="form-group">
+              <label style="text-align: left; font-size: 18px;">First Name:</label>
+              <input type="text" id="firstNameInput" required placeholder="Enter First Name" />
+            </div>
+
+            <div class="form-group">
+              <label style="text-align: left; font-size: 18px;">Last Name:</label>
+              <input type="text" id="lastNameInput" required placeholder="Enter Last Name" />
+            </div>
+
+            <div class="form-group password-field">
+              <label style="text-align: left; font-size: 18px;">Create Password:</label>
+              <input type="password" id="password" required placeholder="Enter Password" />
+              <button type="button" class="eye-btn">👁</button>
+            </div>
+
+            <div class="form-group password-field">
+              <label style="text-align: left; font-size: 18px;">Confirm Password:</label>
+              <input type="password" id="confirmPassword" required placeholder="Confirm Password" />
+              <button type="button" class="eye-btn">👁</button>
+            </div>
+
+            <button class="login-btn" type="submit">Create Account</button>
+          </form>
+
+          <div class="signup-link">
+            Already have an account? <a href="login.html">Sign In</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <footer class="bg-dark text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <p>&copy; 2026 PlaceAI. All rights reserved. | AI-Driven Training & Placement Support</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+</div>
+
+<!-- JS -->
+ <script src="js/vendors.js"></script>
+  <script src="js/designesia.js"></script>
+
+<script>
+  const emailGroup = document.getElementById("emailGroup");
+  const mobileGroup = document.getElementById("mobileGroup");
+
+  document.querySelectorAll(".eye-btn").forEach(btn => {
+    btn.onclick = () => {
+      const input = btn.previousElementSibling;
+      input.type = input.type === "password" ? "text" : "password";
+    };
+  });
+
+  document.getElementById("password").addEventListener("input", e => {
+    const v = e.target.value;
+    const bars = document.querySelectorAll(".strength-meter span");
+    if (bars.length > 0) {
+      bars.forEach(b => b.classList.remove("active"));
+      let s = 0;
+      if (v.length >= 8) s++;
+      if (/[A-Z]/.test(v)) s++;
+      if (/[0-9]/.test(v)) s++;
+      if (/[^A-Za-z0-9]/.test(v)) s++;
+      for (let i = 0; i < s; i++) bars[i].classList.add("active");
+    }
+  });
+</script>
+
+<!-- Supabase Backend Integration -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="backend/supabase-init.js"></script>
+<script src="backend/auth-service.js"></script>
+<script src="backend/db-service.js"></script>
+<script src="backend/backend-integration.js"></script>
+
+<!-- Loading Animation -->
+<script src="js/loading-animation.js"></script>
+
+</body>
+</html>

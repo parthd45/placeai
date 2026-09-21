@@ -1,0 +1,4487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>My Profile - Place Wise</title>
+  <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Loading Animation -->
+  <link href="css/loading-animation.css" rel="stylesheet" type="text/css" />
+
+  <!-- PDF.js for Resume Text Extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: #1e293b;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      border-bottom: 1px solid #334155;
+    }
+
+    .sidebar-logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-menu {
+      padding: 16px 0;
+    }
+
+    .sidebar-section {
+      margin-bottom: 8px;
+    }
+
+    .sidebar-section-title {
+      padding: 12px 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-item {
+      padding: 14px 20px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: #334155;
+      color: white;
+      border-left-color: #764df0;
+    }
+
+    .sidebar-item.active {
+      background: #334155;
+      color: white;
+      border-left-color: #764df0;
+    }
+
+    .sidebar-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .sidebar-item-text {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sidebar-badge {
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sidebar-badge.coming-soon {
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hamburger-menu {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      border-radius: 6px;
+    }
+
+    .hamburger-menu:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: #1e293b;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      border-bottom: 1px solid #334155;
+    }
+
+    .sidebar-logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-menu {
+      padding: 16px 0;
+    }
+
+    .sidebar-section {
+      margin-bottom: 8px;
+    }
+
+    .sidebar-section-title {
+      padding: 12px 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-item {
+      padding: 14px 20px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: #334155;
+      color: white;
+      border-left-color: #764df0;
+    }
+
+    .sidebar-item.active {
+      background: #334155;
+      color: white;
+      border-left-color: #764df0;
+    }
+
+    .sidebar-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .sidebar-item-text {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sidebar-badge {
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sidebar-badge.coming-soon {
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hamburger-menu {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      border-radius: 6px;
+    }
+
+    .hamburger-menu:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Header */
+    .header {
+      background: transparent;
+      color: white;
+      padding: 20px 0;
+      position: relative;
+      z-index: 100;
+      box-shadow: none;
+      border-bottom: none;
+    }
+
+    .header-container {
+      max-width: 1208px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-section h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-mark {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #2C004C;
+      font-size: 20px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-recruiter-view {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F1E6F9;
+      color: #2C004C;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-logout {
+      padding: 8px 16px;
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1208px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 32% 67%;
+      gap: 16px;
+    }
+
+    /* Card Base */
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Profile Card */
+    .profile-card {
+      position: relative;
+    }
+
+    .profile-header-section {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar-large {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #764df0, #442490);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .profile-info-main {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .profile-role {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .profile-experience {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .profile-location {
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .profile-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .btn-edit-icon {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      color: #cbd5e1;
+    }
+
+    .profile-divider {
+      border: none;
+      border-top: 1px solid #334155;
+      margin: 20px 0;
+    }
+
+    .profile-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .profile-actions {
+      margin-top: 16px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #764df0, #442490);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(118, 77, 240, 0.5);
+    }
+
+    /* L1 Card (Quick Links) */
+    .quick-links {
+      padding: 16px;
+    }
+
+    .quick-link-btn {
+      width: 100%;
+      padding: 12px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    /* Contact Card */
+    .contact-info {
+      padding: 0;
+    }
+
+    .contact-header {
+      background: #0f172a;
+      padding: 12px 20px;
+      border-bottom: 1px solid #334155;
+      font-weight: 600;
+      border-radius: 12px 12px 0 0;
+      color: #f1f5f9;
+    }
+
+    .contact-details {
+      padding: 20px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .contact-icon {
+      color: #764df0;
+    }
+
+    /* Profile Score */
+    .profile-score-card {
+      position: sticky;
+      top: 100px;
+    }
+
+    .score-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .score-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: conic-gradient(#764df0 0% 75%, #334155 75% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .score-circle-inner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #764df0;
+    }
+
+    .score-text h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #f1f5f9;
+    }
+
+    .score-text p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .pending-actions-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      margin-top: 16px;
+      color: #f1f5f9;
+    }
+
+    .action-item {
+      padding: 10px 12px;
+      background: #fef3c7;
+      border-left: 3px solid #f59e0b;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #78350f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: thin;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 2px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 2px;
+    }
+
+    .nav-tab {
+      padding: 6px 12px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      position: relative;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .nav-tab:hover {
+      background: #475569;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, #764df0, #442490);
+      color: white;
+      border-color: #764df0;
+    }
+
+    .nav-tab .alert-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+    }
+
+    .nav-tab .badge-ai {
+      margin-left: 6px;
+      padding: 2px 6px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .btn-edit-section {
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      color: #cbd5e1;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Skills Tags */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-tag {
+      padding: 6px 16px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    /* Experience/Education Items */
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+
+    .timeline-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+      color: #764df0;
+    }
+
+    .timeline-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .timeline-meta {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .timeline-description {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: #64748b;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      border: 1px solid #334155;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #764df0;
+      box-shadow: 0 0 0 3px rgba(118, 77, 240, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #334155;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: #334155;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .btn-primary-modal {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #764df0, #442490);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(118, 77, 240, 0.3);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      background: #10b981;
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.error {
+      background: #ef4444;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Skill Gap Analysis Styles */
+    .analysis-empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-state-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-primary-large {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+    }
+
+    .analysis-loading {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #334155;
+      border-top: 4px solid #8b5cf6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .overall-score-card {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 32px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 12px;
+      border: 1px solid #334155;
+      margin-bottom: 24px;
+    }
+
+    .score-circle-large {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-number {
+      font-size: 48px;
+      font-weight: 800;
+      color: #8b5cf6;
+      line-height: 1;
+    }
+
+    .score-total {
+      font-size: 20px;
+      color: #64748b;
+    }
+
+    .score-info {
+      flex: 1;
+    }
+
+    .score-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-stat {
+      padding: 6px 12px;
+      background: #334155;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-stat i {
+      font-size: 12px;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .category-card {
+      padding: 20px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .category-header>div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category-icon {
+      font-size: 20px;
+    }
+
+    .category-header h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin: 0;
+    }
+
+    .category-score {
+      font-size: 20px;
+      font-weight: 700;
+      color: #8b5cf6;
+    }
+
+    .skill-progress-bar {
+      height: 8px;
+      background: #334155;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .skill-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #6366f1);
+      border-radius: 4px;
+      transition: width 1.5s ease;
+    }
+
+    .skill-progress-fill.green {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .skill-progress-fill.orange {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .skill-progress-fill.blue {
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+    }
+
+    .gap-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gap-item {
+      padding: 8px 12px;
+      background: #0f172a;
+      border-radius: 6px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 3px solid #ef4444;
+    }
+
+    .gap-item.weak {
+      border-left-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .gap-item.moderate {
+      border-left-color: #f59e0b;
+      color: #fcd34d;
+    }
+
+    .gap-item.strong {
+      border-left-color: #10b981;
+      color: #6ee7b7;
+    }
+
+    .gap-item i {
+      font-size: 12px;
+    }
+
+    .recommendations-section {
+      margin-bottom: 24px;
+    }
+
+    .recommendations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .recommendation-card {
+      padding: 20px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      border-left: 4px solid #8b5cf6;
+    }
+
+    .recommendation-card.priority-high {
+      border-left-color: #ef4444;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, #1e293b 100%);
+    }
+
+    .recommendation-card.priority-medium {
+      border-left-color: #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, #1e293b 100%);
+    }
+
+    .recommendation-card.priority-low {
+      border-left-color: #10b981;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, #1e293b 100%);
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #ef4444;
+      color: white;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .recommendation-card h4 {
+      color: #f1f5f9;
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recommendation-card p {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .recommendation-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .recommendation-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-plan {
+      margin-bottom: 24px;
+    }
+
+    .timeline-roadmap {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .roadmap-item {
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .roadmap-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 32px;
+      width: 2px;
+      height: calc(100% - 32px);
+      background: #334155;
+    }
+
+    .roadmap-marker {
+      position: absolute;
+      left: -40px;
+      top: 0;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 14px;
+    }
+
+    .roadmap-content {
+      padding: 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+    }
+
+    .roadmap-content h5 {
+      color: #f1f5f9;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .roadmap-content p {
+      color: #94a3b8;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .profile-score-card {
+        position: relative;
+        top: 0;
+      }
+
+      .header-actions {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+  <script>
+    // Sidebar toggle function - defined early so onclick can use it
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fas fa-brain"></i>
+        <span>AI Features</span>
+      </div>
+      <button class="sidebar-close" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="sidebar-menu">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <div class="sidebar-item"
+          onclick="toggleSidebar(); document.querySelector('.nav-tab[data-tab=profile]').click();">
+          <i class="fas fa-user"></i>
+          <span class="sidebar-item-text">Profile</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">AI-Powered Features</div>
+        <div class="sidebar-item" onclick="window.location.href='skill-analysis.html';">
+          <i class="fas fa-chart-line"></i>
+          <span class="sidebar-item-text">Skill Gap Analysis</span>
+          <span class="sidebar-badge">AI</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='career-recommendations.html';">
+          <i class="fas fa-lightbulb"></i>
+          <span class="sidebar-item-text">Career Recommendations</span>
+          <span class="sidebar-badge">AI</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='learning-paths.html';">
+          <i class="fas fa-route"></i>
+          <span class="sidebar-item-text">Learning Paths</span>
+          <span class="sidebar-badge">AI</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='resume-analyzer.html';">
+          <i class="fas fa-file-alt"></i>
+          <span class="sidebar-item-text">Resume Analyzer</span>
+          <span class="sidebar-badge">AI</span>
+        </div>
+        <div class="sidebar-item" style="opacity: 0.6; cursor: not-allowed;">
+          <i class="fas fa-handshake"></i>
+          <span class="sidebar-item-text">Job Matching</span>
+          <span class="sidebar-badge coming-soon">Soon</span>
+        </div>
+        <div class="sidebar-item" style="opacity: 0.6; cursor: not-allowed;">
+          <i class="fas fa-chart-pie"></i>
+          <span class="sidebar-item-text">Placement Insights</span>
+          <span class="sidebar-badge coming-soon">Soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-container">
+      <div class="logo-section">
+        <button class="hamburger-menu" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <img src="images/logo1.webp" alt="Place Wise"
+          style="height: 100px; width: auto; max-width: 250px; object-fit: contain;" />
+      </div>
+      <div class="header-actions">
+        <button class="btn-logout" id="logoutBtn">
+          <i class="fa fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <div class="dashboard-grid">
+      <!-- Left Sidebar -->
+      <div>
+        <!-- Profile Card -->
+        <div class="card profile-card">
+          <button class="btn-edit-icon" id="editProfileBtn">
+            <i class="fa fa-pen"></i>
+          </button>
+
+          <div class="profile-header-section">
+            <div class="profile-avatar-large" id="profileAvatar"
+              onclick="document.getElementById('profilePicInput').click()"
+              style="cursor: pointer; position: relative; background-size: cover; background-position: center;"
+              title="Click to change profile picture">
+              U
+              <div
+                style="position: absolute; bottom: 0; right: 0; background: #764df0; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 3px solid white; z-index: 10;">
+                <i class="fa fa-camera" style="color: white; font-size: 14px;"></i>
+              </div>
+              <div id="removeProfilePicBtn"
+                style="position: absolute; bottom: 0; left: 0; background: #ef4444; border-radius: 50%; width: 32px; height: 32px; display: none; align-items: center; justify-content: center; border: 3px solid white; cursor: pointer; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"
+                onclick="event.stopPropagation(); removeProfilePicture();" title="Remove profile picture">
+                <i class="fa fa-trash" style="color: white; font-size: 12px;"></i>
+              </div>
+            </div>
+            <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
+            <div class="profile-info-main">
+              <h2 class="profile-name" id="profileFullName">Loading...</h2>
+              <p class="profile-role" id="profileDesignation">Development Intern</p>
+              <p class="profile-experience" id="profileExperience" style="cursor: pointer;" onclick="editExperience()"
+                title="Click to edit">0 years 6 months</p>
+              <p class="profile-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <span id="profileLocation">Amravati</span>
+              </p>
+              <span class="profile-status" id="profileAvailability" style="cursor: pointer;"
+                onclick="editAvailability()" title="Click to edit">
+                <i class="fa fa-circle" style="font-size: 6px;"></i>
+                Available immediately
+              </span>
+            </div>
+          </div>
+
+          <hr class="profile-divider">
+
+          <div class="profile-stats-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="statViews">0</div>
+              <div class="stat-label">Profile views</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="statApplications">0</div>
+              <div class="stat-label">Applications</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="statSkills">0</div>
+              <div class="stat-label">Skills</div>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display: none;" />
+            <button class="btn-primary" id="resumeButton" onclick="handleResumeAction()">
+              <i class="fa fa-download"></i> Upload Resume
+            </button>
+          </div>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="card contact-info">
+          <div class="contact-header">
+            <i class="fa fa-address-book"></i> Contact information
+          </div>
+          <div class="contact-details">
+            <div class="contact-item">
+              <i class="fa fa-envelope contact-icon"></i>
+              <span id="contactEmail">Loading...</span>
+            </div>
+            <div class="contact-item">
+              <i class="fa fa-phone contact-icon"></i>
+              <span id="contactPhone">Not set</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Score -->
+        <div class="card profile-score-card">
+          <h3 style="font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; padding: 16px 16px 0;">
+            Profile Score</h3>
+          <div style="text-align: center; padding: 0 16px 24px;">
+            <div class="score-circle"
+              style="width: 100px; height: 100px; margin: 0 auto 16px; position: relative; border-radius: 50%; background: conic-gradient(#764df0 0% 75%, #334155 75% 100%);">
+              <div
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center;">
+                <div id="scoreValue" style="font-size: 28px; font-weight: 800; color: #8b5cf6;">75</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: #94a3b8; margin: 0;">Complete your profile to reach 100%</p>
+          </div>
+
+          <div style="border-top: 1px solid #334155; padding: 16px;">
+            <div style="font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px;">Pending actions</div>
+            <div id="pendingActions" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="action-item">
+                <i class="fa fa-plus-circle"></i> Add profile summary
+              </div>
+              <div class="action-item">
+                <i class="fa fa-plus-circle"></i> Add profile picture
+              </div>
+              <div class="action-item">
+                <i class="fa fa-plus-circle"></i> Add job preferences
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Content Area -->
+      <div>
+        <!-- Navigation Tabs -->
+        <div class="card" style="padding: 16px;">
+          <div class="nav-tabs">
+            <a class="nav-tab active" data-section="summary">Profile summary</a>
+            <a class="nav-tab" data-section="personal">Personal details</a>
+            <a class="nav-tab" data-section="experience">
+              Work experience
+              <span class="alert-dot"></span>
+            </a>
+            <a class="nav-tab" data-section="skills">Skills</a>
+            <a class="nav-tab" data-section="education">
+              Education
+              <span class="alert-dot"></span>
+            </a>
+            <a class="nav-tab" data-section="projects">Projects</a>
+            <a class="nav-tab" data-section="certifications">Certifications</a>
+            <a class="nav-tab" data-section="preferences">Job preferences</a>
+          </div>
+        </div>
+
+        <!-- Profile Summary Section -->
+        <div class="card" id="summary">
+          <div class="section-header">
+            <h3 class="section-title">Profile summary</h3>
+            <button class="btn-edit-section" onclick="editSummary()">
+              <i class="fa fa-pen"></i> Edit
+            </button>
+          </div>
+          <p id="profileSummary" class="timeline-description">
+            Add a brief summary about your skills, experience, and career goals to help recruiters understand your
+            profile better.
+          </p>
+        </div>
+
+        <!-- Personal Details Section -->
+        <div class="card" id="personal">
+          <div class="section-header">
+            <h3 class="section-title">Personal details</h3>
+            <button class="btn-edit-section" onclick="editPersonal()">
+              <i class="fa fa-pen"></i> Edit
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <div>
+              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Gender</p>
+              <p id="gender">Not set</p>
+            </div>
+            <div>
+              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Date of birth</p>
+              <p id="dob">Not set</p>
+            </div>
+            <div>
+              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Nationality</p>
+              <p id="nationality">Indian</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Work Experience Section -->
+        <div class="card" id="experience">
+          <div class="section-header">
+            <h3 class="section-title">Work experience</h3>
+            <button class="btn-edit-section" onclick="addExperience()">
+              <i class="fa fa-plus"></i> Add
+            </button>
+          </div>
+          <div id="experienceList">
+            <div class="empty-state">
+              <i class="fa fa-briefcase"></i>
+              <p>No work experience added yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="card" id="skills">
+          <div class="section-header">
+            <h3 class="section-title">Skills</h3>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-input" id="skillInput" placeholder="Add a skill (e.g., JavaScript, Python)"
+                style="flex: 1;" />
+              <button class="btn-edit-section" onclick="addSkill()" style="padding: 8px 16px;">
+                <i class="fa fa-plus"></i> Add
+              </button>
+            </div>
+          </div>
+          <div class="skills-grid" id="skillsList">
+            <div class="empty-state">
+              <i class="fa fa-code"></i>
+              <p>No skills added yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skill Gap Analysis moved to separate page: skill-analysis.html -->
+        <div class="card" id="skill-analysis" style="display: none;">
+          <div class="section-header">
+            <h3 class="section-title">
+              <i class="fa fa-chart-line" style="color: #8b5cf6; margin-right: 8px;"></i>
+              AI Skill Gap Analysis
+            </h3>
+            <button class="btn-primary" onclick="runSkillAnalysis()" id="analyzeBtn">
+              <i class="fa fa-magic"></i> Run Analysis
+            </button>
+          </div>
+
+          <!-- Analysis Not Run State -->
+          <div id="analysisEmptyState" class="analysis-empty-state">
+            <div class="empty-state-content">
+              <i class="fa fa-brain" style="font-size: 64px; color: #8b5cf6; opacity: 0.3; margin-bottom: 16px;"></i>
+              <h4 style="color: #f1f5f9; margin-bottom: 8px;">Ready to Analyze Your Skills?</h4>
+              <p style="color: #94a3b8; margin-bottom: 24px; max-width: 500px;">
+                Our AI will analyze your profile, skills, and experience to identify gaps and provide personalized
+                recommendations for your career growth.
+              </p>
+              <button class="btn-primary-large" onclick="runSkillAnalysis()">
+                <i class="fa fa-magic"></i> Start AI Analysis
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="analysisLoading" class="analysis-loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p style="color: #cbd5e1; margin-top: 16px;">Analyzing your skills with AI...</p>
+          </div>
+
+          <!-- Analysis Results -->
+          <div id="analysisResults" style="display: none;">
+            <!-- Overall Score Card -->
+            <div class="overall-score-card">
+              <div class="score-circle-large">
+                <svg width="160" height="160">
+                  <circle cx="80" cy="80" r="70" fill="none" stroke="#334155" stroke-width="12" />
+                  <circle id="scoreCircle" cx="80" cy="80" r="70" fill="none" stroke="url(#gradient)" stroke-width="12"
+                    stroke-dasharray="439.6" stroke-dashoffset="439.6" stroke-linecap="round"
+                    transform="rotate(-90 80 80)" style="transition: stroke-dashoffset 2s ease;" />
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="score-text">
+                  <span class="score-number" id="overallScore">0</span>
+                  <span class="score-total">/100</span>
+                </div>
+              </div>
+              <div class="score-info">
+                <h3 id="scoreStatus" style="color: #f1f5f9; margin-bottom: 8px;">Analyzing...</h3>
+                <p id="scoreDescription" style="color: #94a3b8; margin-bottom: 16px;">Please wait while we process your
+                  data</p>
+                <div class="score-badges">
+                  <span class="badge-stat" id="criticalGaps"><i class="fa fa-exclamation-triangle"></i> 0 Critical
+                    Gaps</span>
+                  <span class="badge-stat" id="moderateGaps"><i class="fa fa-info-circle"></i> 0 Moderate Gaps</span>
+                  <span class="badge-stat" id="strengths"><i class="fa fa-check-circle"></i> 0 Strengths</span>
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin-top: 12px;">
+                  <i class="fa fa-clock"></i> Last analyzed: <span id="lastAnalyzed">Just now</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="categories-grid">
+              <div class="category-card">
+                <div class="category-header">
+                  <div>
+                    <i class="fa fa-code category-icon" style="color: #8b5cf6;"></i>
+                    <h4>Technical Skills</h4>
+                  </div>
+                  <span class="category-score" id="techScore">0%</span>
+                </div>
+                <div class="skill-progress-bar">
+                  <div class="skill-progress-fill" id="techProgress" style="width: 0%;"></div>
+                </div>
+                <div class="gap-details" id="techGaps">
+                  <div class="gap-item weak">
+                    <i class="fa fa-arrow-down"></i>
+                    <span>Analyzing...</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-card">
+                <div class="category-header">
+                  <div>
+                    <i class="fa fa-users category-icon" style="color: #10b981;"></i>
+                    <h4>Soft Skills</h4>
+                  </div>
+                  <span class="category-score" id="softScore">0%</span>
+                </div>
+                <div class="skill-progress-bar">
+                  <div class="skill-progress-fill green" id="softProgress" style="width: 0%;"></div>
+                </div>
+                <div class="gap-details" id="softGaps">
+                  <div class="gap-item weak">
+                    <i class="fa fa-arrow-down"></i>
+                    <span>Analyzing...</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-card">
+                <div class="category-header">
+                  <div>
+                    <i class="fa fa-brain category-icon" style="color: #f59e0b;"></i>
+                    <h4>Aptitude & Reasoning</h4>
+                  </div>
+                  <span class="category-score" id="aptitudeScore">0%</span>
+                </div>
+                <div class="skill-progress-bar">
+                  <div class="skill-progress-fill orange" id="aptitudeProgress" style="width: 0%;"></div>
+                </div>
+                <div class="gap-details" id="aptitudeGaps">
+                  <div class="gap-item weak">
+                    <i class="fa fa-arrow-down"></i>
+                    <span>Analyzing...</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-card">
+                <div class="category-header">
+                  <div>
+                    <i class="fa fa-lightbulb category-icon" style="color: #3b82f6;"></i>
+                    <h4>Domain Knowledge</h4>
+                  </div>
+                  <span class="category-score" id="domainScore">0%</span>
+                </div>
+                <div class="skill-progress-bar">
+                  <div class="skill-progress-fill blue" id="domainProgress" style="width: 0%;"></div>
+                </div>
+                <div class="gap-details" id="domainGaps">
+                  <div class="gap-item weak">
+                    <i class="fa fa-arrow-down"></i>
+                    <span>Analyzing...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="recommendations-section">
+              <h3 style="color: #f1f5f9; margin-bottom: 16px;">
+                <i class="fa fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>
+                Personalized Recommendations
+              </h3>
+              <div class="recommendations-list" id="recommendationsList">
+                <div class="recommendation-card priority-high">
+                  <div class="priority-badge">High Priority</div>
+                  <h4><i class="fa fa-check-circle"></i> Analyzing your profile...</h4>
+                  <p>Please wait while we generate personalized recommendations for you.</p>
+                  <div class="recommendation-meta">
+                    <span><i class="fa fa-clock"></i> Calculating...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Plan -->
+            <div class="action-plan">
+              <h3 style="color: #f1f5f9; margin-bottom: 16px;">
+                <i class="fa fa-tasks" style="color: #8b5cf6; margin-right: 8px;"></i>
+                Your Action Plan
+              </h3>
+              <div class="timeline-roadmap" id="actionPlan">
+                <div class="roadmap-item">
+                  <div class="roadmap-marker">1</div>
+                  <div class="roadmap-content">
+                    <h5>Generating your personalized action plan...</h5>
+                    <p>This will show you step-by-step improvements to close your skill gaps.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education Section -->
+        <div class="card" id="education">
+          <div class="section-header">
+            <h3 class="section-title">Education</h3>
+            <button class="btn-edit-section" onclick="addEducation()">
+              <i class="fa fa-plus"></i> Add
+            </button>
+          </div>
+          <div id="educationList">
+            <div class="empty-state">
+              <i class="fa fa-graduation-cap"></i>
+              <p>No education details added yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="card" id="projects">
+          <div class="section-header">
+            <h3 class="section-title">Projects</h3>
+            <button class="btn-edit-section" onclick="addProject()">
+              <i class="fa fa-plus"></i> Add
+            </button>
+          </div>
+          <div id="projectsList">
+            <div class="empty-state">
+              <i class="fa fa-folder-open"></i>
+              <p>No projects added yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certifications Section -->
+        <div class="card" id="certifications">
+          <div class="section-header">
+            <h3 class="section-title">Certifications</h3>
+            <button class="btn-edit-section" onclick="addCertification()">
+              <i class="fa fa-plus"></i> Add
+            </button>
+          </div>
+          <div id="certificationsList">
+            <div class="empty-state">
+              <i class="fa fa-certificate"></i>
+              <p>No certifications added yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Preferences Section -->
+        <div class="card" id="preferences">
+          <div class="section-header">
+            <h3 class="section-title">Job preferences</h3>
+            <button class="btn-edit-section" onclick="editPreferences()">
+              <i class="fa fa-pen"></i> Edit
+            </button>
+          </div>
+          <div class="timeline-description">
+            <p><strong>Preferred roles:</strong> <span id="preferredRoles">Not set</span></p>
+            <p><strong>Preferred locations:</strong> <span id="preferredLocations">Not set</span></p>
+            <p><strong>Expected salary:</strong> <span id="expectedSalary">Not set</span></p>
+            <p><strong>Availability:</strong> <span id="availability">Available immediately</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Edit Profile</h3>
+        <button class="modal-close" onclick="closeModal()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary-modal" id="saveBtn">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="backend/supabase-init.js"></script>
+  <script src="backend/auth-service.js"></script>
+  <script src="backend/db-service.js"></script>
+
+  <script>
+    let currentUser = null;
+    let userProfile = null;
+
+    // Database wrapper functions
+    async function getUserProfile(userId) {
+      return await window.DBService.getUserProfile(userId);
+    }
+
+    async function updateUserProfile(userId, data) {
+      return await window.DBService.updateUserProfile(userId, data);
+    }
+
+    // Check for email confirmation or OAuth callback in URL
+    async function checkEmailConfirmation() {
+      // Check for Implicit flow (hash)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+
+      // Check for PKCE flow (query params)
+      const queryParams = new URLSearchParams(window.location.search);
+      const code = queryParams.get('code');
+
+      // Check if this is an email confirmation or OAuth callback
+      if (accessToken || code) {
+        console.log('Email confirmation/OAuth callback detected');
+
+        try {
+          // Wait for backend to initialize
+          await new Promise(resolve => {
+            const checkInit = () => {
+              if (window.SUPABASE_URL && window.AuthService && window.supabaseClient) {
+                resolve();
+              } else {
+                setTimeout(checkInit, 100);
+              }
+            };
+            checkInit();
+          });
+
+          console.log('Backend initialized, waiting for session to establish...');
+
+          // Supabase automatically processes the URL hash when detectSessionInUrl is true
+          // We need to wait for it to complete and establish the session
+          // Use a polling approach to check when session becomes available
+          let attempts = 0;
+          const maxAttempts = 30; // 30 attempts * 200ms = 6 seconds max
+
+          while (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const sessionResult = await window.AuthService.getCurrentSession();
+
+            if (sessionResult.success && sessionResult.session && sessionResult.session.user) {
+              console.log('✅ Session established after email confirmation:', sessionResult.session.user.email);
+
+              // Clean up the URL hash
+              if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+              }
+
+              return true; // Email confirmation successful
+            }
+
+            attempts++;
+            console.log(`Waiting for session... attempt ${attempts}/${maxAttempts}`);
+          }
+
+          console.error('Session not established after maximum attempts');
+        } catch (error) {
+          console.error('Email confirmation callback error:', error);
+        }
+      }
+
+      return false; // No email confirmation in URL
+    }
+
+    // Check Authentication
+    async function checkAuthentication() {
+      try {
+        // Wait for backend scripts to initialize
+        if (!window.AuthService || !window.DBService) {
+          console.log('Waiting for backend services to initialize...');
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        const sessionResult = await window.AuthService.getCurrentSession();
+
+        if (!sessionResult.success || !sessionResult.session) {
+          console.error('No active session');
+          alert('Please login first.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        currentUser = sessionResult.session.user;
+        console.log('User authenticated:', currentUser.email);
+
+        const profileResponse = await getUserProfile(currentUser.id);
+
+        if (!profileResponse.success || !profileResponse.profile) {
+          console.error('Profile not found');
+          alert('You need to complete registration first.');
+          await window.AuthService.logout();
+          window.location.href = 'register.html';
+          return;
+        }
+
+        await loadUserProfile();
+      } catch (error) {
+        console.error('Authentication failed:', error);
+        alert('Authentication error. Please login again.');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Load User Profile
+    async function loadUserProfile() {
+      try {
+        console.log('Loading user profile...');
+        const profileResponse = await getUserProfile(currentUser.id);
+
+        if (!profileResponse.success || !profileResponse.profile) {
+          console.error('Failed to load profile');
+          return;
+        }
+
+        userProfile = profileResponse.profile;
+        console.log('Profile loaded successfully:', userProfile);
+
+        const firstName = userProfile.first_name || 'User';
+        const lastName = userProfile.last_name || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        const initial = firstName.charAt(0).toUpperCase();
+
+        // Update profile avatar
+        const avatarEl = document.getElementById('profileAvatar');
+        const removeBtn = document.getElementById('removeProfilePicBtn');
+
+        // Use profile image if exists, otherwise use default avatar with initial
+        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=200&background=8b5cf6&color=fff&bold=true`;
+
+        if (userProfile.profile_image_url) {
+          avatarEl.style.backgroundImage = `url(${userProfile.profile_image_url})`;
+          avatarEl.textContent = '';
+          // Show remove button when custom profile picture exists
+          if (removeBtn) {
+            removeBtn.style.display = 'flex';
+          }
+        } else {
+          // Use default avatar image
+          avatarEl.style.backgroundImage = `url(${defaultAvatar})`;
+          avatarEl.textContent = '';
+          // Hide remove button when using default avatar
+          if (removeBtn) {
+            removeBtn.style.display = 'none';
+          }
+        }
+
+        // Update profile card
+        document.getElementById('profileFullName').textContent = fullName;
+        document.getElementById('profileDesignation').textContent = userProfile.current_designation || 'Development Intern';
+
+        // Update location in profile card
+        const locationElement = document.getElementById('profileLocation');
+        if (locationElement) {
+          locationElement.textContent = userProfile.city || userProfile.location || 'Not set';
+        }
+
+        // Update experience
+        const years = userProfile.experience_years || 0;
+        const months = userProfile.experience_months || 0;
+        const expText = years === 0 && months === 0
+          ? 'Fresher'
+          : `${years} ${years === 1 ? 'year' : 'years'} ${months} ${months === 1 ? 'month' : 'months'}`;
+        document.getElementById('profileExperience').textContent = expText;
+
+        // Update availability
+        const availability = userProfile.availability || 'Available immediately';
+        document.getElementById('profileAvailability').innerHTML = `
+          <i class="fa fa-circle" style="font-size: 6px;"></i>
+          ${availability}
+        `;
+
+        // Update contact
+        document.getElementById('contactEmail').textContent = userProfile.email || currentUser.email;
+        document.getElementById('contactPhone').textContent = userProfile.mobile || 'Not set';
+
+        // Update skills - always call to display or show empty state
+        if (userProfile.skills && userProfile.skills.length > 0) {
+          document.getElementById('statSkills').textContent = userProfile.skills.length;
+        }
+        displaySkills();
+
+        // Update bio
+        if (userProfile.bio) {
+          document.getElementById('profileSummary').textContent = userProfile.bio;
+        }
+
+        // Update education - always call to display or show empty state
+        displayEducation();
+
+        // Update experience
+        if (userProfile.experience && userProfile.experience.length > 0) {
+          displayExperience();
+        }
+
+        // Update projects
+        if (userProfile.projects && userProfile.projects.length > 0) {
+          displayProjects();
+        }
+
+        // Update certifications
+        if (userProfile.certifications && userProfile.certifications.length > 0) {
+          displayCertifications();
+        }
+
+        // Update job preferences
+        if (userProfile.preferred_roles) {
+          document.getElementById('preferredRoles').textContent = userProfile.preferred_roles;
+        }
+        if (userProfile.preferred_locations) {
+          document.getElementById('preferredLocations').textContent = userProfile.preferred_locations;
+        }
+        if (userProfile.expected_salary) {
+          document.getElementById('expectedSalary').textContent = userProfile.expected_salary;
+        }
+        if (userProfile.availability) {
+          document.getElementById('availability').textContent = userProfile.availability;
+        }
+
+        // Update resume button
+        updateResumeButton();
+
+        // Update personal details
+        if (userProfile.gender) {
+          document.getElementById('gender').textContent = userProfile.gender;
+        }
+        if (userProfile.dob) {
+          document.getElementById('dob').textContent = new Date(userProfile.dob).toLocaleDateString();
+        }
+        if (userProfile.nationality) {
+          document.getElementById('nationality').textContent = userProfile.nationality;
+        }
+
+        // Calculate score
+        calculateProfileScore();
+
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    // Display Skills
+    // Display Experience
+    function displayExperience() {
+      const container = document.getElementById('experienceList');
+
+      if (!userProfile.experience || userProfile.experience.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fa fa-briefcase"></i><p>No work experience added yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = userProfile.experience.map((exp, index) =>
+        `<div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fa fa-building"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>${exp.company}</h4>
+            <div class="timeline-meta">
+              ${exp.designation} ${exp.duration ? '• ' + exp.duration : ''}
+            </div>
+            ${exp.description ? `<p class="timeline-description">${exp.description}</p>` : ''}
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="btn-remove" onclick="editWorkExperience(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-edit"></i> Edit
+              </button>
+              <button class="btn-remove" onclick="removeWorkExperience(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    function removeWorkExperience(index) {
+      if (!confirm('Are you sure you want to remove this work experience?')) return;
+
+      const experienceArray = userProfile.experience || [];
+      experienceArray.splice(index, 1);
+
+      updateUserProfile(currentUser.id, { experience: experienceArray }).then(result => {
+        if (result.success) {
+          showToast('Work experience removed successfully!');
+          loadUserProfile();
+        } else {
+          showToast('Failed to remove experience: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function editWorkExperience(index) {
+      const exp = userProfile.experience[index];
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Company name</label>
+          <input type="text" class="form-input" id="expCompany" value="${exp.company || ''}" placeholder="e.g., Google, Microsoft" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Designation</label>
+          <input type="text" class="form-input" id="expDesignation" value="${exp.designation || ''}" placeholder="e.g., Software Engineer" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <input type="text" class="form-input" id="expDuration" value="${exp.duration || ''}" placeholder="e.g., Jan 2023 - Present" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="expDescription" placeholder="Describe your role and achievements...">${exp.description || ''}</textarea>
+        </div>
+      `;
+
+      openModal('Edit work experience', content, async () => {
+        const company = document.getElementById('expCompany').value.trim();
+        const designation = document.getElementById('expDesignation').value.trim();
+        const duration = document.getElementById('expDuration').value.trim();
+        const description = document.getElementById('expDescription').value.trim();
+
+        if (!company || !designation) {
+          showToast('Company and designation are required', 'error');
+          return;
+        }
+
+        const experienceArray = userProfile.experience || [];
+        experienceArray[index] = { company, designation, duration, description };
+
+        const result = await updateUserProfile(currentUser.id, { experience: experienceArray });
+
+        if (result.success) {
+          showToast('Experience updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update experience: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Display Education
+    function displayEducation() {
+      const container = document.getElementById('educationList');
+
+      if (!userProfile.education || userProfile.education.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fa fa-graduation-cap"></i><p>No education details added yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = userProfile.education.map((edu, index) =>
+        `<div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fa fa-graduation-cap"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>${edu.college || 'Not specified'}</h4>
+            <div class="timeline-meta">
+              ${edu.level || ''} ${edu.course ? '• ' + edu.course : ''}
+              ${edu.graduation_year ? '• ' + edu.graduation_year : ''}
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="btn-remove" onclick="editEducation(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-edit"></i> Edit
+              </button>
+              <button class="btn-remove" onclick="removeEducation(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    function editEducation(index) {
+      const edu = userProfile.education[index];
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Education level</label>
+          <select class="form-input" id="eduLevel">
+            <option value="">Select level</option>
+            <option value="High School" ${edu.level === 'High School' ? 'selected' : ''}>High School</option>
+            <option value="Diploma" ${edu.level === 'Diploma' ? 'selected' : ''}>Diploma</option>
+            <option value="Undergraduate" ${edu.level === 'Undergraduate' ? 'selected' : ''}>Undergraduate</option>
+            <option value="Postgraduate" ${edu.level === 'Postgraduate' ? 'selected' : ''}>Postgraduate</option>
+            <option value="PhD" ${edu.level === 'PhD' ? 'selected' : ''}>PhD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">College / University</label>
+          <input type="text" class="form-input" id="eduCollege" value="${edu.college || ''}" placeholder="e.g., IIT Delhi, MIT" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course / Branch</label>
+          <input type="text" class="form-input" id="eduCourse" value="${edu.course || ''}" placeholder="e.g., B.Tech Computer Science" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Graduation year</label>
+          <input type="number" class="form-input" id="eduYear" value="${edu.graduation_year || ''}" placeholder="e.g., 2026" min="2000" max="2040" />
+        </div>
+      `;
+
+      openModal('Edit education', content, async () => {
+        const level = document.getElementById('eduLevel').value;
+        const college = document.getElementById('eduCollege').value.trim();
+        const course = document.getElementById('eduCourse').value.trim();
+        const year = document.getElementById('eduYear').value.trim();
+
+        if (!level || !college) {
+          showToast('Education level and college are required', 'error');
+          return;
+        }
+
+        const educationArray = userProfile.education || [];
+        educationArray[index] = {
+          level: level,
+          college: college,
+          course: course,
+          graduation_year: year
+        };
+
+        const result = await updateUserProfile(currentUser.id, { education: educationArray });
+
+        if (result.success) {
+          showToast('Education updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update education: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function removeEducation(index) {
+      if (!confirm('Are you sure you want to remove this education?')) return;
+
+      const educationArray = userProfile.education || [];
+      educationArray.splice(index, 1);
+
+      updateUserProfile(currentUser.id, { education: educationArray }).then(result => {
+        if (result.success) {
+          showToast('Education removed successfully!');
+          loadUserProfile();
+        } else {
+          showToast('Failed to remove education: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Display Projects
+    function displayProjects() {
+      const container = document.getElementById('projectsList');
+
+      if (!userProfile.projects || userProfile.projects.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fa fa-folder-open"></i><p>No projects added yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = userProfile.projects.map((proj, index) =>
+        `<div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fa fa-code-branch"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>${proj.name}</h4>
+            ${proj.tech ? `<div class="timeline-meta">${proj.tech}</div>` : ''}
+            ${proj.description ? `<p class="timeline-description">${proj.description}</p>` : ''}
+            ${proj.url ? `<a href="${proj.url}" target="_blank" style="color: #764df0; font-size: 13px;"><i class="fa fa-external-link-alt"></i> View project</a>` : ''}
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="btn-remove" onclick="editProject(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-edit"></i> Edit
+              </button>
+              <button class="btn-remove" onclick="removeProject(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    // Display Certifications
+    function displayCertifications() {
+      const container = document.getElementById('certificationsList');
+
+      if (!userProfile.certifications || userProfile.certifications.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fa fa-certificate"></i><p>No certifications added yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = userProfile.certifications.map((cert, index) =>
+        `<div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fa fa-certificate"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>${cert.name}</h4>
+            <div class="timeline-meta">
+              ${cert.issuer || ''} ${cert.date ? '• ' + cert.date : ''}
+            </div>
+            ${cert.credential ? `<p class="timeline-description">Credential ID: ${cert.credential}</p>` : ''}
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="btn-remove" onclick="editCertification(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-edit"></i> Edit
+              </button>
+              <button class="btn-remove" onclick="removeCertification(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                <i class="fa fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    function removeProject(index) {
+      if (!confirm('Are you sure you want to remove this project?')) return;
+
+      const projectsArray = userProfile.projects || [];
+      projectsArray.splice(index, 1);
+
+      updateUserProfile(currentUser.id, { projects: projectsArray }).then(result => {
+        if (result.success) {
+          showToast('Project removed successfully!');
+          loadUserProfile();
+        } else {
+          showToast('Failed to remove project: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Certification management functions
+    function addCertification() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Certification name *</label>
+          <input type="text" class="form-input" id="certName" placeholder="e.g., AWS Certified Solutions Architect" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issuing organization *</label>
+          <input type="text" class="form-input" id="certIssuer" placeholder="e.g., Amazon Web Services" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issue date</label>
+          <input type="text" class="form-input" id="certDate" placeholder="e.g., January 2024" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Credential ID</label>
+          <input type="text" class="form-input" id="certCredential" placeholder="e.g., ABC123XYZ" />
+        </div>
+      `;
+
+      openModal('Add certification', content, async () => {
+        const name = document.getElementById('certName').value.trim();
+        const issuer = document.getElementById('certIssuer').value.trim();
+        const date = document.getElementById('certDate').value.trim();
+        const credential = document.getElementById('certCredential').value.trim();
+
+        if (!name || !issuer) {
+          showToast('Please fill in certification name and issuer', 'error');
+          return;
+        }
+
+        const certifications = userProfile.certifications || [];
+        certifications.push({ name, issuer, date, credential });
+
+        const result = await updateUserProfile(currentUser.id, { certifications });
+
+        if (result.success) {
+          showToast('Certification added successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to add certification: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function editCertification(index) {
+      const cert = userProfile.certifications[index];
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Certification name *</label>
+          <input type="text" class="form-input" id="certName" value="${cert.name || ''}" placeholder="e.g., AWS Certified Solutions Architect" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issuing organization *</label>
+          <input type="text" class="form-input" id="certIssuer" value="${cert.issuer || ''}" placeholder="e.g., Amazon Web Services" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issue date</label>
+          <input type="text" class="form-input" id="certDate" value="${cert.date || ''}" placeholder="e.g., January 2024" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Credential ID</label>
+          <input type="text" class="form-input" id="certCredential" value="${cert.credential || ''}" placeholder="e.g., ABC123XYZ" />
+        </div>
+      `;
+
+      openModal('Edit certification', content, async () => {
+        const name = document.getElementById('certName').value.trim();
+        const issuer = document.getElementById('certIssuer').value.trim();
+        const date = document.getElementById('certDate').value.trim();
+        const credential = document.getElementById('certCredential').value.trim();
+
+        if (!name || !issuer) {
+          showToast('Please fill in certification name and issuer', 'error');
+          return;
+        }
+
+        const certifications = userProfile.certifications || [];
+        certifications[index] = { name, issuer, date, credential };
+
+        const result = await updateUserProfile(currentUser.id, { certifications });
+
+        if (result.success) {
+          showToast('Certification updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update certification: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function removeCertification(index) {
+      if (!confirm('Are you sure you want to remove this certification?')) return;
+
+      const certifications = userProfile.certifications || [];
+      certifications.splice(index, 1);
+
+      updateUserProfile(currentUser.id, { certifications }).then(result => {
+        if (result.success) {
+          showToast('Certification removed successfully!');
+          loadUserProfile();
+        } else {
+          showToast('Failed to remove certification: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function editProject(index) {
+      const proj = userProfile.projects[index];
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Project name</label>
+          <input type="text" class="form-input" id="projName" value="${proj.name || ''}" placeholder="e.g., E-commerce Website" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Technologies used</label>
+          <input type="text" class="form-input" id="projTech" value="${proj.tech || ''}" placeholder="e.g., React, Node.js, MongoDB" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="projDescription" placeholder="Describe your project...">${proj.description || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project URL (optional)</label>
+          <input type="url" class="form-input" id="projUrl" value="${proj.url || ''}" placeholder="https://..." />
+        </div>
+      `;
+
+      openModal('Edit project', content, async () => {
+        const name = document.getElementById('projName').value.trim();
+        const tech = document.getElementById('projTech').value.trim();
+        const description = document.getElementById('projDescription').value.trim();
+        const url = document.getElementById('projUrl').value.trim();
+
+        if (!name) {
+          showToast('Project name is required', 'error');
+          return;
+        }
+
+        const projectsArray = userProfile.projects || [];
+        projectsArray[index] = { name, tech, description, url };
+
+        const result = await updateUserProfile(currentUser.id, { projects: projectsArray });
+
+        if (result.success) {
+          showToast('Project updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update project: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Display Skills
+    function displaySkills() {
+      const container = document.getElementById('skillsList');
+
+      if (!userProfile.skills || userProfile.skills.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fa fa-code"></i><p>No skills added yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = userProfile.skills.map((skill, index) =>
+        `<div class="skill-tag" style="display: inline-flex; align-items: center; gap: 6px; margin: 4px;">
+          ${skill}
+          <i class="fa fa-times" onclick="removeSkill(${index})" style="cursor: pointer; color: #dc2626; font-size: 12px;" title="Remove skill"></i>
+        </div>`
+      ).join('');
+    }
+
+    // Calculate Profile Score
+    function calculateProfileScore() {
+      let score = 0;
+      let pendingActions = [];
+
+      // Basic info (20 points)
+      if (userProfile.first_name && userProfile.last_name) score += 10;
+      if (userProfile.mobile) score += 5;
+      if (userProfile.location) score += 5;
+
+      // Profile picture (5 points)
+      if (userProfile.profile_image_url) {
+        score += 5;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add profile picture');
+      }
+
+      // Bio (10 points)
+      if (userProfile.bio) {
+        score += 10;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add profile summary');
+      }
+
+      // Skills (10 points) - Any skill added
+      if (userProfile.skills && userProfile.skills.length > 0) {
+        score += 10;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add skills');
+      }
+
+      // Education (15 points) - Any education added
+      if (userProfile.education && userProfile.education.length > 0) {
+        score += 15;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add education details');
+      }
+
+      // Experience (15 points) - Any experience added
+      if (userProfile.experience && userProfile.experience.length > 0) {
+        score += 15;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add work experience');
+      }
+
+      // Projects (10 points) - Any project added
+      if (userProfile.projects && userProfile.projects.length > 0) {
+        score += 10;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add projects');
+      }
+
+      // Certifications (5 points) - Any certification added
+      if (userProfile.certifications && userProfile.certifications.length > 0) {
+        score += 5;
+      }
+
+      // Job preferences (10 points)
+      if (userProfile.preferred_roles) {
+        score += 10;
+      } else {
+        pendingActions.push('<i class="fa fa-plus-circle"></i> Add job preferences');
+      }
+
+      document.getElementById('scoreValue').textContent = score;
+
+      // Update score circle gradient
+      const circle = document.querySelector('.score-circle');
+      if (circle) {
+        circle.style.background = `conic-gradient(#8b5cf6 0% ${score}%, #334155 ${score}% 100%)`;
+      }
+
+      // Update pending actions
+      const actionsContainer = document.getElementById('pendingActions');
+      if (pendingActions.length > 0) {
+        actionsContainer.innerHTML = pendingActions.map(action =>
+          `<div class="action-item">${action}</div>`
+        ).join('');
+      } else {
+        actionsContainer.innerHTML = '<div class="action-item" style="background: #dcfce7; border-color: #22c55e; color: #166534;"><i class="fa fa-check-circle"></i> Profile complete!</div>';
+      }
+    }
+
+    // Resume Functions
+    function updateResumeButton() {
+      const button = document.getElementById('resumeButton');
+      if (userProfile && userProfile.resume_url) {
+        button.innerHTML = '<i class="fa fa-file-pdf-o"></i> View Resume';
+        button.style.background = '#10b981';
+      } else {
+        button.innerHTML = '<i class="fa fa-upload"></i> Upload Resume';
+        button.style.background = '#764df0';
+      }
+    }
+
+    function handleResumeAction() {
+      if (userProfile && userProfile.resume_url) {
+        // Open resume in new tab
+        window.open(userProfile.resume_url, '_blank');
+      } else {
+        // Trigger file upload
+        document.getElementById('resumeFileInput').click();
+      }
+    }
+
+    // Modal Functions
+    function openModal(title, content, saveCallback) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = content;
+      document.getElementById('saveBtn').onclick = saveCallback;
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    // Edit Functions
+    function editSummary() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Profile summary</label>
+          <textarea class="form-textarea" id="editBio" placeholder="Write a brief summary about yourself...">${userProfile.bio || ''}</textarea>
+        </div>
+      `;
+
+      openModal('Edit profile summary', content, async () => {
+        const bio = document.getElementById('editBio').value.trim();
+        const result = await updateUserProfile(currentUser.id, { bio });
+
+        if (result.success) {
+          showToast('Summary updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update summary: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Global skills array for editing
+    // Add skill function
+    async function addSkill() {
+      const input = document.getElementById('skillInput');
+      const skill = input.value.trim();
+
+      if (!skill) {
+        showToast('Please enter a skill', 'error');
+        return;
+      }
+
+      const currentSkills = userProfile.skills || [];
+
+      if (currentSkills.includes(skill)) {
+        showToast('Skill already added', 'error');
+        return;
+      }
+
+      currentSkills.push(skill);
+
+      const result = await updateUserProfile(currentUser.id, { skills: currentSkills });
+
+      if (result.success) {
+        showToast('Skill added successfully!');
+        input.value = '';
+        await loadUserProfile();
+      } else {
+        showToast('Failed to add skill: ' + result.error, 'error');
+      }
+    }
+
+    // Remove skill function
+    async function removeSkill(index) {
+      if (!confirm('Are you sure you want to remove this skill?')) return;
+
+      const currentSkills = userProfile.skills || [];
+      currentSkills.splice(index, 1);
+
+      const result = await updateUserProfile(currentUser.id, { skills: currentSkills });
+
+      if (result.success) {
+        showToast('Skill removed successfully!');
+        await loadUserProfile();
+      } else {
+        showToast('Failed to remove skill: ' + result.error, 'error');
+      }
+    }
+
+    // Edit total experience
+    function editExperience() {
+      const years = userProfile.experience_years || 0;
+      const months = userProfile.experience_months || 0;
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Total experience</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Years</label>
+              <input type="number" class="form-input" id="expYears" min="0" max="50" value="${years}" placeholder="0" />
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Months</label>
+              <input type="number" class="form-input" id="expMonths" min="0" max="11" value="${months}" placeholder="0" />
+            </div>
+          </div>
+          <p style="color: #6b7280; font-size: 12px; margin-top: 6px;">Enter your total work experience</p>
+        </div>
+      `;
+
+      openModal('Edit experience', content, async () => {
+        const years = parseInt(document.getElementById('expYears').value) || 0;
+        const months = parseInt(document.getElementById('expMonths').value) || 0;
+
+        if (months > 11) {
+          showToast('Months should be between 0-11', 'error');
+          return;
+        }
+
+        const result = await updateUserProfile(currentUser.id, {
+          experience_years: years,
+          experience_months: months
+        });
+
+        if (result.success) {
+          showToast('Experience updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update experience: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Edit availability
+    function editAvailability() {
+      const currentAvailability = userProfile.availability || 'Available immediately';
+
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Availability status</label>
+          <select class="form-input" id="availabilitySelect">
+            <option value="Available immediately" ${currentAvailability === 'Available immediately' ? 'selected' : ''}>Available immediately</option>
+            <option value="Available in 15 days" ${currentAvailability === 'Available in 15 days' ? 'selected' : ''}>Available in 15 days</option>
+            <option value="Available in 1 month" ${currentAvailability === 'Available in 1 month' ? 'selected' : ''}>Available in 1 month</option>
+            <option value="Available in 2 months" ${currentAvailability === 'Available in 2 months' ? 'selected' : ''}>Available in 2 months</option>
+            <option value="Available in 3 months" ${currentAvailability === 'Available in 3 months' ? 'selected' : ''}>Available in 3 months</option>
+            <option value="Currently employed" ${currentAvailability === 'Currently employed' ? 'selected' : ''}>Currently employed</option>
+            <option value="Not looking for change" ${currentAvailability === 'Not looking for change' ? 'selected' : ''}>Not looking for change</option>
+          </select>
+        </div>
+      `;
+
+      openModal('Edit availability', content, async () => {
+        const availability = document.getElementById('availabilitySelect').value;
+
+        const result = await updateUserProfile(currentUser.id, { availability });
+
+        if (result.success) {
+          showToast('Availability updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update availability: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function addExperience() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Company name</label>
+          <input type="text" class="form-input" id="expCompany" placeholder="e.g., Google, Microsoft" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Designation</label>
+          <input type="text" class="form-input" id="expDesignation" placeholder="e.g., Software Engineer" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <input type="text" class="form-input" id="expDuration" placeholder="e.g., Jan 2023 - Present" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="expDescription" placeholder="Describe your role and achievements..."></textarea>
+        </div>
+      `;
+
+      openModal('Add work experience', content, async () => {
+        const company = document.getElementById('expCompany').value.trim();
+        const designation = document.getElementById('expDesignation').value.trim();
+        const duration = document.getElementById('expDuration').value.trim();
+        const description = document.getElementById('expDescription').value.trim();
+
+        if (!company || !designation) {
+          showToast('Company and designation are required', 'error');
+          return;
+        }
+
+        const experience = userProfile.experience || [];
+        experience.push({ company, designation, duration, description });
+
+        const result = await updateUserProfile(currentUser.id, { experience });
+
+        if (result.success) {
+          showToast('Experience added successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to add experience: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function addEducation() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Education level</label>
+          <select class="form-input" id="eduLevel">
+            <option value="">Select level</option>
+            <option value="High School">High School</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Postgraduate">Postgraduate</option>
+            <option value="PhD">PhD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">College / University</label>
+          <input type="text" class="form-input" id="eduCollege" placeholder="e.g., IIT Delhi, MIT" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course / Branch</label>
+          <input type="text" class="form-input" id="eduCourse" placeholder="e.g., B.Tech Computer Science" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Graduation year</label>
+          <input type="number" class="form-input" id="eduYear" placeholder="e.g., 2026" min="2000" max="2040" />
+        </div>
+      `;
+
+      openModal('Add education', content, async () => {
+        const level = document.getElementById('eduLevel').value;
+        const college = document.getElementById('eduCollege').value.trim();
+        const course = document.getElementById('eduCourse').value.trim();
+        const year = document.getElementById('eduYear').value.trim();
+
+        if (!level || !college) {
+          showToast('Education level and college are required', 'error');
+          return;
+        }
+
+        // Get existing education array
+        const educationArray = userProfile.education || [];
+
+        // Add new education
+        educationArray.push({
+          level: level,
+          college: college,
+          course: course,
+          graduation_year: year
+        });
+
+        const result = await updateUserProfile(currentUser.id, {
+          education: educationArray
+        });
+
+        if (result.success) {
+          showToast('Education added successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to add education: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function addProject() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Project name</label>
+          <input type="text" class="form-input" id="projName" placeholder="e.g., E-commerce Website" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Technologies used</label>
+          <input type="text" class="form-input" id="projTech" placeholder="e.g., React, Node.js, MongoDB" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project URL (optional)</label>
+          <input type="url" class="form-input" id="projUrl" placeholder="https://github.com/..." />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="projDescription" placeholder="Describe your project and your contributions..."></textarea>
+        </div>
+      `;
+
+      openModal('Add project', content, async () => {
+        const name = document.getElementById('projName').value.trim();
+        const tech = document.getElementById('projTech').value.trim();
+        const url = document.getElementById('projUrl').value.trim();
+        const description = document.getElementById('projDescription').value.trim();
+
+        if (!name) {
+          showToast('Project name is required', 'error');
+          return;
+        }
+
+        const projects = userProfile.projects || [];
+        projects.push({ name, tech, url, description });
+
+        const result = await updateUserProfile(currentUser.id, { projects });
+
+        if (result.success) {
+          showToast('Project added successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to add project: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function editPreferences() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Preferred roles (comma-separated)</label>
+          <input type="text" class="form-input" id="prefRoles" value="${userProfile.preferred_roles || ''}" placeholder="e.g., Software Engineer, Data Analyst" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred locations (comma-separated)</label>
+          <input type="text" class="form-input" id="prefLocations" value="${userProfile.preferred_locations || ''}" placeholder="e.g., Bangalore, Mumbai, Remote" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expected salary (Annual)</label>
+          <input type="text" class="form-input" id="prefSalary" value="${userProfile.expected_salary || ''}" placeholder="e.g., 6-8 LPA" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Availability</label>
+          <select class="form-select" id="prefAvailability">
+            <option value="Available immediately" ${userProfile.availability === 'Available immediately' ? 'selected' : ''}>Available immediately</option>
+            <option value="2 weeks notice" ${userProfile.availability === '2 weeks notice' ? 'selected' : ''}>2 weeks notice</option>
+            <option value="1 month notice" ${userProfile.availability === '1 month notice' ? 'selected' : ''}>1 month notice</option>
+            <option value="2 months notice" ${userProfile.availability === '2 months notice' ? 'selected' : ''}>2 months notice</option>
+          </select>
+        </div>
+      `;
+
+      openModal('Edit job preferences', content, async () => {
+        const result = await updateUserProfile(currentUser.id, {
+          preferred_roles: document.getElementById('prefRoles').value.trim(),
+          preferred_locations: document.getElementById('prefLocations').value.trim(),
+          expected_salary: document.getElementById('prefSalary').value.trim(),
+          availability: document.getElementById('prefAvailability').value
+        });
+
+        if (result.success) {
+          showToast('Job preferences updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update preferences: ' + result.error, 'error');
+        }
+      });
+    }
+
+    function editPersonal() {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-select" id="personalGender">
+            <option value="">Select gender</option>
+            <option value="Male" ${userProfile.gender === 'Male' ? 'selected' : ''}>Male</option>
+            <option value="Female" ${userProfile.gender === 'Female' ? 'selected' : ''}>Female</option>
+            <option value="Other" ${userProfile.gender === 'Other' ? 'selected' : ''}>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of birth</label>
+          <input type="date" class="form-input" id="personalDob" value="${userProfile.dob || ''}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nationality</label>
+          <input type="text" class="form-input" id="personalNationality" value="${userProfile.nationality || 'Indian'}" placeholder="e.g., Indian" />
+        </div>
+      `;
+
+      openModal('Edit personal details', content, async () => {
+        const result = await updateUserProfile(currentUser.id, {
+          gender: document.getElementById('personalGender').value,
+          dob: document.getElementById('personalDob').value,
+          nationality: document.getElementById('personalNationality').value.trim()
+        });
+
+        if (result.success) {
+          showToast('Personal details updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update personal details: ' + result.error, 'error');
+        }
+      });
+    }
+
+    // Toast
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="fa fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    // Scroll to section
+    function scrollToSection(sectionId) {
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Tab navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const section = tab.getAttribute('data-section');
+        scrollToSection(section);
+      });
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = async () => {
+      await window.AuthService.logout();
+      window.location.href = 'login.html';
+    };
+
+    // Edit profile button
+    document.getElementById('editProfileBtn').onclick = () => {
+      const content = `
+        <div class="form-group">
+          <label class="form-label">Profile Picture</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" onclick="document.getElementById('profilePicInput').click()" class="btn-primary" style="padding: 8px 16px; background: linear-gradient(135deg, #764df0, #442490); color: white; border: none; border-radius: 6px; cursor: pointer;">
+              <i class="fa fa-upload"></i> Upload Picture
+            </button>
+            ${userProfile.profile_image_url ? `
+              <button type="button" onclick="removeProfilePicture()" class="btn-primary" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                <i class="fa fa-trash"></i> Remove Picture
+              </button>
+            ` : ''}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input type="text" class="form-input" id="editFirstName" value="${userProfile.first_name || ''}" placeholder="Enter first name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input type="text" class="form-input" id="editLastName" value="${userProfile.last_name || ''}" placeholder="Enter last name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Designation</label>
+          <input type="text" class="form-input" id="editDesignation" value="${userProfile.current_designation || ''}" placeholder="e.g., Software Developer" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile</label>
+          <input type="tel" class="form-input" id="editMobile" value="${userProfile.mobile || ''}" placeholder="Enter mobile number" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-input" id="editLocation" value="${userProfile.city || userProfile.location || ''}" placeholder="Enter city" />
+        </div>
+      `;
+
+      openModal('Edit profile', content, async () => {
+        const firstName = document.getElementById('editFirstName').value.trim();
+        const lastName = document.getElementById('editLastName').value.trim();
+        const designation = document.getElementById('editDesignation').value.trim();
+        const mobile = document.getElementById('editMobile').value.trim();
+        const location = document.getElementById('editLocation').value.trim();
+
+        if (!firstName) {
+          showToast('First name is required', 'error');
+          return;
+        }
+
+        const result = await updateUserProfile(currentUser.id, {
+          first_name: firstName,
+          last_name: lastName,
+          current_designation: designation,
+          mobile: mobile,
+          city: location,
+          location: location
+        });
+
+        if (result.success) {
+          showToast('Profile updated successfully!');
+          await loadUserProfile();
+          closeModal();
+        } else {
+          showToast('Failed to update profile: ' + result.error, 'error');
+        }
+      });
+    };
+
+    // Profile picture upload handler
+    // Remove profile picture function
+    async function removeProfilePicture() {
+      if (!confirm('Are you sure you want to remove your profile picture?')) {
+        return;
+      }
+
+      showToast('Removing profile picture...', 'info');
+
+      try {
+        const result = await window.DBService.removeProfilePicture(currentUser.id);
+
+        if (result.success) {
+          showToast('Profile picture removed successfully!');
+          await loadUserProfile();
+        } else {
+          showToast('Failed to remove profile picture: ' + result.error, 'error');
+        }
+      } catch (error) {
+        showToast('Failed to remove profile picture: ' + error.message, 'error');
+      }
+    }
+
+    document.getElementById('profilePicInput').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image size must be less than 2MB', 'error');
+        event.target.value = '';
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        showToast('Please upload a valid image (JPG, PNG, WebP, or GIF)', 'error');
+        event.target.value = '';
+        return;
+      }
+
+      // Show loading state
+      showToast('Uploading profile picture...', 'info');
+
+      try {
+        const result = await window.DBService.uploadProfilePicture(currentUser.id, file);
+
+        if (result.success) {
+          showToast('Profile picture updated successfully!');
+          await loadUserProfile();
+        } else {
+          showToast('Failed to upload profile picture: ' + result.error, 'error');
+        }
+      } catch (error) {
+        showToast('Failed to upload profile picture: ' + error.message, 'error');
+      }
+
+      // Reset file input
+      event.target.value = '';
+    });
+
+    // Resume upload handler
+    document.getElementById('resumeFileInput').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('File size must be less than 5MB', 'error');
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        showToast('Please upload a PDF or Word document', 'error');
+        return;
+      }
+
+      // Show loading state
+      showToast('Uploading and extracting resume...', 'info');
+
+      try {
+        // Extract text from PDF
+        let resumeText = '';
+        if (file.type === 'application/pdf') {
+          resumeText = await extractTextFromPDF(file);
+          console.log('Extracted resume text:', resumeText.substring(0, 500) + '...');
+        }
+
+        // Upload the file
+        const result = await window.DBService.uploadResume(currentUser.id, file);
+
+        if (result.success) {
+          // Save extracted text to database
+          if (resumeText) {
+            await saveResumeText(currentUser.id, resumeText);
+          }
+          showToast('Resume uploaded successfully!');
+          await loadUserProfile();
+        } else {
+          showToast('Failed to upload resume: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('Resume upload error:', error);
+        showToast('Failed to upload resume: ' + error.message, 'error');
+      }
+
+      // Reset file input
+      event.target.value = '';
+    });
+
+    // Extract text from PDF using PDF.js
+    async function extractTextFromPDF(file) {
+      try {
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        let fullText = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ');
+          fullText += pageText + '\n';
+        }
+
+        return fullText.trim();
+      } catch (error) {
+        console.error('PDF extraction error:', error);
+        return '';
+      }
+    }
+
+    // Save extracted resume text to database
+    async function saveResumeText(userId, resumeText) {
+      try {
+        const supabase = window.supabase.createClient(
+          window.SUPABASE_URL,
+          window.SUPABASE_ANON_KEY
+        );
+
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ resume_text: resumeText })
+          .eq('user_id', userId);
+
+        if (error) {
+          console.error('Error saving resume text:', error);
+          // Don't throw - resume upload still succeeded
+        } else {
+          console.log('Resume text saved successfully!');
+        }
+      } catch (error) {
+        console.error('Error saving resume text:', error);
+      }
+    }
+
+    // Add Enter key support for skill input
+    document.addEventListener('DOMContentLoaded', () => {
+      const skillInput = document.getElementById('skillInput');
+      if (skillInput) {
+        skillInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkill();
+          }
+        });
+      }
+    });
+
+    // Skill Gap Analysis Functions
+    let analysisResults = null;
+
+    async function runSkillAnalysis() {
+      // Show loading state
+      document.getElementById('analysisEmptyState').style.display = 'none';
+      document.getElementById('analysisLoading').style.display = 'block';
+      document.getElementById('analysisResults').style.display = 'none';
+
+      // Disable analyze button
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Analyzing...';
+
+      // Simulate AI analysis (2-3 seconds)
+      setTimeout(() => {
+        performSkillAnalysis();
+      }, 2500);
+    }
+
+    function performSkillAnalysis() {
+      // Check if userProfile is loaded
+      if (!userProfile) {
+        console.error('User profile not loaded yet');
+        showToast('Please wait for profile to load', 'error');
+        document.getElementById('analysisLoading').style.display = 'none';
+        document.getElementById('analysisEmptyState').style.display = 'block';
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<i class="fa fa-magic"></i> Run Analysis';
+        return;
+      }
+
+      console.log('Running skill analysis for user:', userProfile.first_name);
+
+      // Collect user data for analysis
+      const skills = userProfile?.skills || [];
+      const education = userProfile?.education || [];
+      const experience = userProfile?.experience || [];
+      const projects = userProfile?.projects || [];
+      const certifications = userProfile?.certifications || [];
+
+      console.log('Analysis data:', { skills: skills.length, education: education.length, experience: experience.length, projects: projects.length });
+
+      // Calculate scores based on profile data
+      const analysis = calculateSkillGaps(skills, education, experience, projects, certifications);
+
+      // Store results
+      analysisResults = analysis;
+
+      // Display results
+      displayAnalysisResults(analysis);
+
+      // Hide loading, show results
+      document.getElementById('analysisLoading').style.display = 'none';
+      document.getElementById('analysisResults').style.display = 'block';
+
+      // Re-enable button
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.disabled = false;
+      analyzeBtn.innerHTML = '<i class="fa fa-sync"></i> Re-analyze';
+    }
+
+    function calculateSkillGaps(skills, education, experience, projects, certifications) {
+      // Define industry-standard skill categories
+      const skillCategories = {
+        // Programming Languages
+        programmingLanguages: ['JavaScript', 'Python', 'Java', 'C++', 'C#', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'C', 'R', 'Scala', 'Perl'],
+
+        // Web Development
+        webFrontend: ['React', 'Angular', 'Vue', 'HTML', 'CSS', 'jQuery', 'Bootstrap', 'Tailwind', 'Next.js', 'Svelte', 'Redux', 'Webpack'],
+        webBackend: ['Node.js', 'Express', 'Django', 'Flask', 'Spring', 'Laravel', 'Ruby on Rails', 'ASP.NET', 'FastAPI'],
+
+        // Databases
+        databases: ['SQL', 'MySQL', 'PostgreSQL', 'MongoDB', 'Oracle', 'Redis', 'Cassandra', 'SQLite', 'MariaDB', 'DynamoDB'],
+
+        // Cloud & DevOps
+        cloudDevOps: ['AWS', 'Azure', 'Google Cloud', 'GCP', 'Docker', 'Kubernetes', 'Jenkins', 'CI/CD', 'Terraform', 'Ansible'],
+
+        // Mobile Development
+        mobile: ['React Native', 'Flutter', 'Android', 'iOS', 'Xamarin', 'Ionic'],
+
+        // Data Science & AI
+        dataScience: ['Machine Learning', 'ML', 'Deep Learning', 'TensorFlow', 'PyTorch', 'Pandas', 'NumPy', 'Scikit-learn', 'Keras', 'NLP', 'Computer Vision'],
+
+        // Tools & Platforms
+        tools: ['Git', 'GitHub', 'GitLab', 'Jira', 'VS Code', 'IntelliJ', 'Postman', 'Linux', 'Unix'],
+
+        // Soft Skills
+        softSkills: ['Communication', 'Leadership', 'Teamwork', 'Problem Solving', 'Time Management', 'Critical Thinking', 'Agile', 'Scrum']
+      };
+
+      // Analyze user's skills
+      const userSkillsLower = skills.map(s => s.toLowerCase().trim().replace(/\s+/g, ''));
+      let foundSkills = {
+        programmingLanguages: [],
+        webFrontend: [],
+        webBackend: [],
+        databases: [],
+        cloudDevOps: [],
+        mobile: [],
+        dataScience: [],
+        tools: [],
+        softSkills: []
+      };
+
+      console.log('User skills (normalized):', userSkillsLower);
+
+      // Categorize user's skills with improved matching
+      userSkillsLower.forEach(userSkill => {
+        Object.keys(skillCategories).forEach(category => {
+          skillCategories[category].forEach(standardSkill => {
+            const standardLower = standardSkill.toLowerCase().replace(/\s+/g, '');
+
+            // Exact match or one contains the other (with minimum length to avoid false matches)
+            const minLength = Math.min(userSkill.length, standardLower.length);
+            let isMatch = false;
+
+            if (userSkill === standardLower) {
+              // Exact match
+              isMatch = true;
+            } else if (minLength >= 3) {
+              // Only allow partial matches if both are at least 3 chars
+              // and the shorter one is contained in the longer one
+              if (userSkill.length > standardLower.length) {
+                isMatch = userSkill === standardLower || userSkill.startsWith(standardLower) || userSkill.endsWith(standardLower);
+              } else {
+                isMatch = standardLower === userSkill || standardLower.startsWith(userSkill) || standardLower.endsWith(userSkill);
+              }
+            }
+
+            if (isMatch && !foundSkills[category].includes(standardSkill)) {
+              foundSkills[category].push(standardSkill);
+              console.log(`Matched: "${userSkill}" -> ${standardSkill} (${category})`);
+            }
+          });
+        });
+      });
+
+      // Calculate technical skill score based on breadth and depth
+      const totalTechSkills =
+        foundSkills.programmingLanguages.length +
+        foundSkills.webFrontend.length +
+        foundSkills.webBackend.length +
+        foundSkills.databases.length +
+        foundSkills.cloudDevOps.length +
+        foundSkills.mobile.length +
+        foundSkills.dataScience.length +
+        foundSkills.tools.length;
+
+      // Calculate diversity score (how many categories they have skills in)
+      const categoriesWithSkills = [
+        foundSkills.programmingLanguages.length > 0,
+        foundSkills.webFrontend.length > 0,
+        foundSkills.webBackend.length > 0,
+        foundSkills.databases.length > 0,
+        foundSkills.cloudDevOps.length > 0,
+        foundSkills.mobile.length > 0,
+        foundSkills.dataScience.length > 0,
+        foundSkills.tools.length > 0
+      ].filter(Boolean).length;
+
+      // Technical Score: 60% based on total skills (need 10 for max), 40% based on diversity (need 5 categories)
+      const skillDepthScore = Math.min(100, (totalTechSkills / 10) * 100);
+      const diversityScore = Math.min(100, (categoriesWithSkills / 5) * 100);
+      const techScore = Math.round((skillDepthScore * 0.6) + (diversityScore * 0.4));
+
+      // Soft Skills (based on soft skill keywords + profile completeness)
+      const softSkillCount = foundSkills.softSkills.length;
+      let softScore = Math.min(30, softSkillCount * 10); // Max 30% from actual soft skills
+      if (userProfile?.bio) softScore += 25;
+      if (experience.length > 0) softScore += 25;
+      if (projects.length > 0) softScore += 15;
+      if (certifications.length > 0) softScore += 5;
+      softScore = Math.min(100, softScore);
+
+      // Aptitude (based on education and career clarity)
+      let aptitudeScore = 0;
+      if (education.length > 0) aptitudeScore += 50;
+      if (userProfile?.preferred_roles) aptitudeScore += 30;
+      if (experience.length > 0) aptitudeScore += 20;
+      aptitudeScore = Math.min(100, aptitudeScore);
+
+      // Domain Knowledge (projects and certifications)
+      let domainScore = 0;
+      domainScore += Math.min(60, projects.length * 20); // Max 60% from projects
+      domainScore += Math.min(40, certifications.length * 20); // Max 40% from certifications
+      domainScore = Math.min(100, domainScore);
+
+      // Overall score (weighted average)
+      const overallScore = Math.round(
+        (techScore * 0.4) + (softScore * 0.25) + (aptitudeScore * 0.2) + (domainScore * 0.15)
+      );
+
+      // Identify gaps based on actual user skills
+      const gaps = {
+        critical: [],
+        moderate: [],
+        strengths: []
+      };
+
+      console.log('Skill analysis:', { totalTechSkills, categoriesWithSkills, techScore, softScore });
+
+      // Check for essential programming languages
+      if (foundSkills.programmingLanguages.length === 0) {
+        gaps.critical.push('No programming languages - Add Python, JavaScript, or C++');
+      } else if (foundSkills.programmingLanguages.length === 1) {
+        gaps.moderate.push(`Learn one more programming language (you have: ${foundSkills.programmingLanguages[0]})`);
+      } else {
+        gaps.strengths.push(`${foundSkills.programmingLanguages.length} languages: ${foundSkills.programmingLanguages.join(', ')}`);
+      }
+
+      // Web development skills
+      const hasWebSkills = foundSkills.webFrontend.length > 0 || foundSkills.webBackend.length > 0;
+      if (!hasWebSkills && foundSkills.programmingLanguages.some(lang => ['JavaScript', 'Python', 'Java', 'PHP'].includes(lang))) {
+        gaps.critical.push('Add web development frameworks (React, Node.js, Django, etc.)');
+      } else if (foundSkills.webFrontend.length > 0 && foundSkills.webBackend.length === 0) {
+        gaps.moderate.push('Add backend skills to become a Full Stack developer');
+      } else if (foundSkills.webFrontend.length === 0 && foundSkills.webBackend.length > 0) {
+        gaps.moderate.push('Add frontend framework skills (React, Angular, or Vue)');
+      } else if (hasWebSkills) {
+        gaps.strengths.push('Strong web development skills with both frontend and backend');
+      }
+
+      // Database skills
+      if (foundSkills.databases.length === 0) {
+        gaps.critical.push('Database skills missing - Add SQL, MongoDB, or PostgreSQL');
+      } else if (foundSkills.databases.length === 1) {
+        gaps.moderate.push('Learn both SQL and NoSQL databases for better opportunities');
+      } else {
+        gaps.strengths.push(`Database expertise in ${foundSkills.databases.join(', ')}`);
+      }
+
+      // Cloud & DevOps
+      if (foundSkills.cloudDevOps.length === 0) {
+        gaps.moderate.push('Cloud skills highly valued - Consider AWS, Docker, or Kubernetes');
+      } else {
+        gaps.strengths.push(`Cloud/DevOps skills: ${foundSkills.cloudDevOps.join(', ')}`);
+      }
+
+      // Version control
+      const hasGit = foundSkills.tools.some(tool => tool.toLowerCase().includes('git'));
+      if (!hasGit) {
+        gaps.critical.push('Git/GitHub - Essential for all developers');
+      } else {
+        gaps.strengths.push('Version control proficiency with Git');
+      }
+
+      // Data Science check
+      if (foundSkills.dataScience.length > 0) {
+        gaps.strengths.push(`Data Science/AI skills: ${foundSkills.dataScience.join(', ')}`);
+      }
+
+      // Mobile development
+      if (foundSkills.mobile.length > 0) {
+        gaps.strengths.push(`Mobile development: ${foundSkills.mobile.join(', ')}`);
+      }
+
+      // Overall technical assessment
+      if (techScore < 40) {
+        gaps.critical.push('Skill portfolio needs expansion - Aim for 8-10 diverse skills');
+      } else if (techScore < 70) {
+        gaps.moderate.push('Good foundation, add 3-4 more complementary skills');
+      }
+
+      // Soft skills gaps
+      if (foundSkills.softSkills.length === 0) {
+        gaps.moderate.push('Add soft skills like Communication, Leadership, Teamwork');
+      } else {
+        gaps.strengths.push(`Soft skills: ${foundSkills.softSkills.join(', ')}`);
+      }
+
+      // Profile completeness for soft skills
+      if (!userProfile?.bio && softScore < 50) {
+        gaps.moderate.push('Add profile summary to showcase yourself');
+      }
+
+      // Work experience
+      if (experience.length === 0) {
+        gaps.moderate.push('Gain internship or work experience');
+      } else {
+        gaps.strengths.push(`${experience.length} work experience(s)`);
+      }
+
+      // Projects
+      if (projects.length === 0) {
+        gaps.critical.push('Build projects to demonstrate practical skills');
+      } else if (projects.length < 3) {
+        gaps.moderate.push(`Add more projects (currently ${projects.length}, aim for 3-5)`);
+      } else {
+        gaps.strengths.push(`${projects.length} project(s) completed`);
+      }
+
+      // Certifications
+      if (certifications.length === 0) {
+        gaps.moderate.push('Earn certifications in your skill domain');
+      } else {
+        gaps.strengths.push(`${certifications.length} certification(s)`);
+      }
+
+      // Career clarity
+      if (!userProfile?.preferred_roles) {
+        gaps.moderate.push('Define career goals and target roles');
+      } else {
+        gaps.strengths.push('Career goals defined');
+      }
+
+      // Education
+      if (education.length > 0) {
+        gaps.strengths.push('Education background added');
+      }
+
+      // Generate recommendations
+      const recommendations = generateRecommendations(gaps, skills, overallScore);
+
+      return {
+        overall: overallScore,
+        skillBreakdown: foundSkills,
+        totalSkills: skills.length,
+        categorizedSkills: totalTechSkills,
+        categories: {
+          technical: Math.round(techScore),
+          soft: Math.round(softScore),
+          aptitude: Math.round(aptitudeScore),
+          domain: Math.round(domainScore)
+        },
+        gaps,
+        recommendations
+      };
+    }
+
+    function generateRecommendations(gaps, skills, overallScore) {
+      const recommendations = [];
+
+      // High priority recommendations (critical gaps)
+      if (gaps.critical.length > 0) {
+        gaps.critical.forEach((gap, index) => {
+          if (index < 3) { // Top 3 critical
+            recommendations.push({
+              priority: 'high',
+              title: gap,
+              description: getRecommendationDescription(gap),
+              timeframe: getTimeframe(gap),
+              action: 'Start Learning'
+            });
+          }
+        });
+      }
+
+      // Medium priority (moderate gaps)
+      if (gaps.moderate.length > 0) {
+        gaps.moderate.forEach((gap, index) => {
+          if (index < 2) { // Top 2 moderate
+            recommendations.push({
+              priority: 'medium',
+              title: gap,
+              description: getRecommendationDescription(gap),
+              timeframe: getTimeframe(gap),
+              action: 'Improve'
+            });
+          }
+        });
+      }
+
+      // Low priority (enhancement suggestions)
+      if (overallScore > 70) {
+        recommendations.push({
+          priority: 'low',
+          title: 'Specialize in emerging technologies',
+          description: 'Consider learning AI/ML, Blockchain, or Cloud Native technologies to stay ahead',
+          timeframe: '2-3 months',
+          action: 'Explore'
+        });
+      }
+
+      return recommendations;
+    }
+
+    function getRecommendationDescription(gap) {
+      const descriptions = {
+        'No programming languages listed - Add Python, JavaScript, or Java': 'Start with Python (easiest to learn) or JavaScript (web development). Complete a beginner course and practice daily.',
+        'Database skills missing - Add SQL, MongoDB, or PostgreSQL': 'Learn SQL fundamentals first (relational databases), then explore MongoDB (NoSQL) for modern applications.',
+        'Add web development frameworks (React, Node.js, Django, etc.)': 'Choose React for frontend or Node.js for backend. Build 2-3 real projects to solidify knowledge.',
+        'Git/GitHub - Essential for all developers': 'Learn Git basics (commit, push, pull, branches). Create a GitHub profile and upload your projects.',
+        'Add profile summary to showcase communication skills': 'Write a 3-4 sentence summary highlighting your skills, experience, and career goals.',
+        'Gain work experience or internships to boost profile': 'Apply for internships, contribute to open-source projects, or take freelance work to gain practical experience.',
+        'Add more projects (aim for 3-5) to demonstrate practical experience': 'Build diverse projects: a web app, mobile app, or data project. Document them well on GitHub.',
+        'Cloud skills highly valued - Consider AWS, Docker, or Kubernetes': 'Start with AWS basics or Docker containers. Many free tier options available for practice.',
+        'Build more projects to demonstrate domain expertise': 'Create 3-5 projects showcasing different aspects of your skills in your target domain.',
+        'Earn relevant certifications in your field': 'Complete industry-recognized certifications like AWS Certified, Google Cloud, or Microsoft Azure.',
+        'Learn at least one more programming language to increase versatility': 'If you know JavaScript, learn Python. If you know Python, learn Java or Go for backend development.',
+        'Add backend skills to become a Full Stack developer': 'Learn Node.js (if you know JavaScript) or Django/Flask (if you know Python).',
+        'Add frontend framework skills (React, Angular, or Vue)': 'React is most popular and in-demand. Complete a project-based course and build 2 applications.',
+        'Learn both SQL and NoSQL databases for better opportunities': 'Master PostgreSQL or MySQL for SQL, and MongoDB for NoSQL. Understand when to use each.',
+        'Add soft skills like Communication, Leadership, or Teamwork': 'Add skills that you\'ve demonstrated through projects, presentations, or team activities.',
+        'Good foundation, add 3-4 more complementary skills': 'Based on your current skills, add complementary technologies (e.g., if backend dev, add Docker, AWS, and testing frameworks).',
+        'Skill portfolio needs expansion - Aim for 8-10 diverse skills': 'Focus on building a T-shaped skill profile: depth in one area, breadth across related technologies.'
+      };
+
+      return descriptions[gap] || 'Focus on improving this area to enhance your employability and career prospects';
+    }
+
+    function getTimeframe(gap) {
+      if (gap.includes('programming language') && gap.includes('No programming')) return '8-12 weeks';
+      if (gap.includes('programming language') && gap.includes('one more')) return '6-8 weeks';
+      if (gap.includes('profile summary')) return '1 day';
+      if (gap.includes('Git/GitHub')) return '1-2 weeks';
+      if (gap.includes('Database')) return '4-6 weeks';
+      if (gap.includes('web development frameworks')) return '6-8 weeks';
+      if (gap.includes('backend skills')) return '6-10 weeks';
+      if (gap.includes('frontend framework')) return '6-8 weeks';
+      if (gap.includes('Cloud')) return '4-8 weeks';
+      if (gap.includes('certifications')) return '1-3 months';
+      if (gap.includes('projects') && gap.includes('more projects')) return '2-4 months';
+      if (gap.includes('projects') && gap.includes('Build more')) return '3-6 months';
+      if (gap.includes('experience') || gap.includes('internships')) return '3-6 months';
+      if (gap.includes('soft skills')) return '1-2 weeks';
+      if (gap.includes('complementary skills')) return '2-3 months';
+      if (gap.includes('Skill portfolio needs expansion')) return '3-6 months';
+      return '4-8 weeks';
+    }
+
+    function displayAnalysisResults(analysis) {
+      // Update overall score with animation
+      const scoreCircle = document.getElementById('scoreCircle');
+      const scoreNumber = document.getElementById('overallScore');
+      const circumference = 439.6;
+      const offset = circumference - (analysis.overall / 100) * circumference;
+
+      // Animate score
+      let currentScore = 0;
+      const targetScore = analysis.overall;
+      const duration = 2000;
+      const steps = 50;
+      const increment = targetScore / steps;
+      const stepDuration = duration / steps;
+
+      const scoreInterval = setInterval(() => {
+        currentScore += increment;
+        if (currentScore >= targetScore) {
+          currentScore = targetScore;
+          clearInterval(scoreInterval);
+        }
+        scoreNumber.textContent = Math.round(currentScore);
+      }, stepDuration);
+
+      // Animate circle
+      setTimeout(() => {
+        scoreCircle.style.strokeDashoffset = offset;
+      }, 100);
+
+      // Update status and description
+      const statusEl = document.getElementById('scoreStatus');
+      const descEl = document.getElementById('scoreDescription');
+
+      if (analysis.overall >= 80) {
+        statusEl.textContent = 'Excellent! Ready for Placements';
+        statusEl.style.color = '#10b981';
+        descEl.textContent = 'Your profile is strong and competitive. Focus on interview preparation.';
+      } else if (analysis.overall >= 60) {
+        statusEl.textContent = 'Good Progress';
+        statusEl.style.color = '#f59e0b';
+        descEl.textContent = 'You\'re on the right track. Address moderate gaps to boost your chances.';
+      } else {
+        statusEl.textContent = 'Needs Improvement';
+        statusEl.style.color = '#ef4444';
+        descEl.textContent = 'Focus on critical skill gaps to improve your employability significantly.';
+      }
+
+      // Update gap badges
+      document.getElementById('criticalGaps').innerHTML =
+        `<i class="fa fa-exclamation-triangle"></i> ${analysis.gaps.critical.length} Critical Gaps`;
+      document.getElementById('moderateGaps').innerHTML =
+        `<i class="fa fa-info-circle"></i> ${analysis.gaps.moderate.length} Moderate Gaps`;
+      document.getElementById('strengths').innerHTML =
+        `<i class="fa fa-check-circle"></i> ${analysis.gaps.strengths.length} Strengths`;
+
+      // Update last analyzed
+      document.getElementById('lastAnalyzed').textContent = 'Just now';
+
+      // Update category scores with animation - pass full analysis
+      updateCategoryScore('tech', analysis.categories.technical, analysis.gaps, analysis);
+      updateCategoryScore('soft', analysis.categories.soft, analysis.gaps, analysis);
+      updateCategoryScore('aptitude', analysis.categories.aptitude, analysis.gaps, analysis);
+      updateCategoryScore('domain', analysis.categories.domain, analysis.gaps, analysis);
+
+      // Display recommendations
+      displayRecommendations(analysis.recommendations);
+
+      // Display action plan
+      displayActionPlan(analysis.recommendations);
+    }
+
+    function updateCategoryScore(category, score, gaps, analysis) {
+      // Update score text
+      document.getElementById(`${category}Score`).textContent = `${score}%`;
+
+      // Animate progress bar
+      setTimeout(() => {
+        document.getElementById(`${category}Progress`).style.width = `${score}%`;
+      }, 300);
+
+      // Update gap details - pass the analysis object
+      const gapsContainer = document.getElementById(`${category}Gaps`);
+      const categoryGaps = getCategoryGaps(category, gaps, score, analysis);
+
+      if (categoryGaps.length > 0) {
+        gapsContainer.innerHTML = categoryGaps.map(gap =>
+          `<div class="gap-item ${gap.type}">
+            <i class="fa ${gap.icon}"></i>
+            <span>${gap.text}</span>
+          </div>`
+        ).join('');
+      } else {
+        gapsContainer.innerHTML =
+          `<div class="gap-item strong">
+            <i class="fa fa-check"></i>
+            <span>No major gaps identified</span>
+          </div>`;
+      }
+    }
+
+    function getCategoryGaps(category, gaps, score, analysis) {
+      const categoryGaps = [];
+
+      // Get skill breakdown from analysis
+      const skillBreakdown = analysis?.skillBreakdown || {};
+      const totalSkills = analysis?.totalSkills || 0;
+
+      if (category === 'tech') {
+        // Show what technical skills they have
+        if (skillBreakdown.programmingLanguages && skillBreakdown.programmingLanguages.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Languages: ${skillBreakdown.programmingLanguages.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.webFrontend && skillBreakdown.webFrontend.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Frontend: ${skillBreakdown.webFrontend.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.webBackend && skillBreakdown.webBackend.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Backend: ${skillBreakdown.webBackend.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.databases && skillBreakdown.databases.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Databases: ${skillBreakdown.databases.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.cloudDevOps && skillBreakdown.cloudDevOps.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Cloud/DevOps: ${skillBreakdown.cloudDevOps.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.tools && skillBreakdown.tools.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Tools: ${skillBreakdown.tools.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.dataScience && skillBreakdown.dataScience.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `AI/ML: ${skillBreakdown.dataScience.join(', ')}`
+          });
+        }
+
+        if (skillBreakdown.mobile && skillBreakdown.mobile.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Mobile: ${skillBreakdown.mobile.join(', ')}`
+          });
+        }
+
+        // Show missing core technical skills
+        if (!skillBreakdown.programmingLanguages || skillBreakdown.programmingLanguages.length === 0) {
+          categoryGaps.push({
+            type: 'weak',
+            icon: 'fa-exclamation-triangle',
+            text: 'Add programming languages (Python, JavaScript, Java)'
+          });
+        }
+
+        if (!skillBreakdown.webFrontend || skillBreakdown.webFrontend.length === 0) {
+          categoryGaps.push({
+            type: 'moderate',
+            icon: 'fa-plus-circle',
+            text: 'Add frontend skills (React, HTML/CSS, Vue)'
+          });
+        }
+
+        if (!skillBreakdown.webBackend || skillBreakdown.webBackend.length === 0) {
+          categoryGaps.push({
+            type: 'moderate',
+            icon: 'fa-plus-circle',
+            text: 'Add backend skills (Node.js, Django, Spring)'
+          });
+        }
+
+        if (!skillBreakdown.databases || skillBreakdown.databases.length === 0) {
+          categoryGaps.push({
+            type: 'weak',
+            icon: 'fa-exclamation-triangle',
+            text: 'Add database skills (SQL, MySQL, MongoDB)'
+          });
+        }
+
+        if (!skillBreakdown.tools || skillBreakdown.tools.length === 0) {
+          categoryGaps.push({
+            type: 'weak',
+            icon: 'fa-exclamation-triangle',
+            text: 'Add development tools (Git, GitHub)'
+          });
+        }
+
+        if (!skillBreakdown.cloudDevOps || skillBreakdown.cloudDevOps.length === 0) {
+          categoryGaps.push({
+            type: 'moderate',
+            icon: 'fa-plus-circle',
+            text: 'Add cloud skills (AWS, Docker, Kubernetes)'
+          });
+        }
+
+        // Show critical technical gaps
+        gaps.critical.forEach(gap => {
+          if (gap.includes('programming') || gap.includes('Database') || gap.includes('Git') ||
+            gap.includes('web development') || gap.includes('Skill portfolio')) {
+            categoryGaps.push({
+              type: 'weak',
+              icon: 'fa-exclamation-triangle',
+              text: gap
+            });
+          }
+        });
+
+        // Show moderate technical gaps
+        gaps.moderate.forEach(gap => {
+          if (gap.includes('programming language') || gap.includes('backend') || gap.includes('frontend') ||
+            gap.includes('Cloud') || gap.includes('databases') || gap.includes('complementary') ||
+            gap.includes('versatility')) {
+            categoryGaps.push({
+              type: 'moderate',
+              icon: 'fa-info-circle',
+              text: gap
+            });
+          }
+        });
+
+      } else if (category === 'soft') {
+        // Show soft skills they have
+        if (skillBreakdown.softSkills && skillBreakdown.softSkills.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `Skills: ${skillBreakdown.softSkills.join(', ')}`
+          });
+        }
+
+        // Profile completeness indicators
+        if (userProfile?.bio) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: 'Profile summary added'
+          });
+        }
+
+        if (userProfile?.experience && userProfile.experience.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `${userProfile.experience.length} work experience(s)`
+          });
+        }
+
+        if (userProfile?.projects && userProfile.projects.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `${userProfile.projects.length} project(s) completed`
+          });
+        }
+
+        // Show soft skill gaps
+        gaps.critical.forEach(gap => {
+          if (gap.includes('summary') || gap.includes('communication')) {
+            categoryGaps.push({
+              type: 'weak',
+              icon: 'fa-exclamation-triangle',
+              text: gap
+            });
+          }
+        });
+
+        gaps.moderate.forEach(gap => {
+          if (gap.includes('experience') || gap.includes('internships') || gap.includes('soft skills') ||
+            gap.includes('projects')) {
+            categoryGaps.push({
+              type: 'moderate',
+              icon: 'fa-info-circle',
+              text: gap
+            });
+          }
+        });
+
+      } else if (category === 'aptitude') {
+        // Education and preparation indicators
+        if (userProfile?.education && userProfile.education.length > 0) {
+          const edu = userProfile.education[0];
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `${edu.degree || 'Degree'} - ${edu.field || ''}`
+          });
+        }
+
+        if (userProfile?.preferred_roles) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: 'Career goals defined'
+          });
+        }
+
+        if (userProfile?.experience && userProfile.experience.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: 'Practical experience gained'
+          });
+        }
+
+        // Aptitude gaps
+        if (score < 50) {
+          categoryGaps.push({
+            type: 'weak',
+            icon: 'fa-exclamation-triangle',
+            text: 'Complete education details'
+          });
+          if (!userProfile?.preferred_roles) {
+            categoryGaps.push({
+              type: 'weak',
+              icon: 'fa-exclamation-triangle',
+              text: 'Define career preferences'
+            });
+          }
+        } else if (score < 70) {
+          categoryGaps.push({
+            type: 'moderate',
+            icon: 'fa-info-circle',
+            text: 'Add more experience for better preparation'
+          });
+        }
+
+      } else if (category === 'domain') {
+        // Projects showcase
+        if (userProfile?.projects && userProfile.projects.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `${userProfile.projects.length} project(s) in portfolio`
+          });
+        }
+
+        // Certifications
+        if (userProfile?.certifications && userProfile.certifications.length > 0) {
+          categoryGaps.push({
+            type: 'strong',
+            icon: 'fa-check',
+            text: `${userProfile.certifications.length} certification(s)`
+          });
+        }
+
+        // Domain knowledge gaps
+        gaps.critical.forEach(gap => {
+          if (gap.includes('projects') && gap.includes('Build more')) {
+            categoryGaps.push({
+              type: 'weak',
+              icon: 'fa-exclamation-triangle',
+              text: gap
+            });
+          }
+        });
+
+        gaps.moderate.forEach(gap => {
+          if (gap.includes('certifications') || gap.includes('projects') || gap.includes('specialized')) {
+            categoryGaps.push({
+              type: 'moderate',
+              icon: 'fa-info-circle',
+              text: gap
+            });
+          }
+        });
+
+        // Default message if no domain items
+        if (categoryGaps.length === 0) {
+          if (score < 40) {
+            categoryGaps.push({
+              type: 'weak',
+              icon: 'fa-exclamation-triangle',
+              text: 'Add projects to demonstrate expertise'
+            });
+            categoryGaps.push({
+              type: 'moderate',
+              icon: 'fa-info-circle',
+              text: 'Earn relevant certifications'
+            });
+          } else if (score < 70) {
+            categoryGaps.push({
+              type: 'moderate',
+              icon: 'fa-info-circle',
+              text: 'Add more specialized projects'
+            });
+          }
+        }
+      }
+
+      // Return max 5 items per category (prioritize showing what they have first)
+      return categoryGaps.slice(0, 5);
+    }
+
+    function displayRecommendations(recommendations) {
+      const container = document.getElementById('recommendationsList');
+
+      if (recommendations.length === 0) {
+        container.innerHTML =
+          `<div class="recommendation-card priority-low">
+            <div class="priority-badge" style="background: #10b981;">Excellent</div>
+            <h4><i class="fa fa-trophy"></i> Great Job!</h4>
+            <p>Your profile is comprehensive. Continue enhancing your skills and stay updated with industry trends.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = recommendations.map(rec => {
+        const badgeColor = rec.priority === 'high' ? '#ef4444' : rec.priority === 'medium' ? '#f59e0b' : '#10b981';
+        const badgeText = rec.priority === 'high' ? 'High Priority' : rec.priority === 'medium' ? 'Medium Priority' : 'Enhancement';
+
+        return `
+          <div class="recommendation-card priority-${rec.priority}">
+            <div class="priority-badge" style="background: ${badgeColor};">${badgeText}</div>
+            <h4><i class="fa fa-lightbulb"></i> ${rec.title}</h4>
+            <p>${rec.description}</p>
+            <div class="recommendation-meta">
+              <span><i class="fa fa-clock"></i> ${rec.timeframe}</span>
+              <span><i class="fa fa-target"></i> ${rec.action}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function displayActionPlan(recommendations) {
+      const container = document.getElementById('actionPlan');
+
+      if (recommendations.length === 0) {
+        container.innerHTML =
+          `<div class="roadmap-item">
+            <div class="roadmap-marker"><i class="fa fa-check"></i></div>
+            <div class="roadmap-content">
+              <h5>Keep up the excellent work!</h5>
+              <p>Your profile is well-optimized. Continue learning and stay active in your field.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // Sort by priority and create timeline
+      const sortedRecs = [...recommendations].sort((a, b) => {
+        const priority = { high: 3, medium: 2, low: 1 };
+        return priority[b.priority] - priority[a.priority];
+      });
+
+      container.innerHTML = sortedRecs.map((rec, index) => `
+        <div class="roadmap-item">
+          <div class="roadmap-marker">${index + 1}</div>
+          <div class="roadmap-content">
+            <h5>${rec.title}</h5>
+            <p>${rec.description}</p>
+            <div style="margin-top: 8px; display: flex; gap: 12px; font-size: 12px; color: #94a3b8;">
+              <span><i class="fa fa-clock"></i> ${rec.timeframe}</span>
+              <span><i class="fa fa-flag"></i> ${rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)} Priority</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Initialize
+    window.addEventListener('load', function () {
+      console.log('Page loaded, checking authentication...');
+      checkAuthentication();
+    });
+
+    // Sidebar toggle function
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    // Initialize with email confirmation check
+    async function initializeDashboard() {
+      // First check if this is an email confirmation callback
+      const isEmailConfirmation = await checkEmailConfirmation();
+
+      if (isEmailConfirmation) {
+        console.log('Email confirmed, proceeding to dashboard...');
+        // Small delay to ensure session is fully established
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // Then proceed with normal authentication check
+      await checkAuthentication();
+    }
+
+    // Also run on DOMContentLoaded as fallback
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(() => {
+          if (!currentUser) {
+            console.log('Fallback initialization...');
+            initializeDashboard();
+          }
+        }, 1000);
+      });
+    } else {
+      // DOM already loaded
+      initializeDashboard();
+    }
+  </script>
+</body>
+
+</html>

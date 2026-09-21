@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Career Recommendations - Place Wise</title>
+  <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Supabase Configuration (same as supabase-init.js) -->
+  <script src="backend/supabase-init.js"></script>
+
+  <!-- Backend Services -->
+  <script src="backend/auth-service.js"></script>
+  <script src="backend/db-service.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid #334155;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-section img {
+      height: 80px;
+      width: auto;
+      max-width: 200px;
+      object-fit: contain;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hamburger-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #334155;
+      color: #e2e8f0;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .hamburger-menu:hover {
+      background: #475569;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .hamburger-icon {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .hamburger-icon span {
+      width: 18px;
+      height: 2px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #334155;
+      color: #e2e8f0;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+      background: #475569;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-logout {
+      padding: 10px 20px;
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: #1e293b;
+      z-index: 1000;
+      transition: left 0.3s;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-header h3 {
+      color: white;
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 32px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .sidebar-content {
+      padding: 20px 16px;
+      overflow-y: auto;
+      height: calc(100vh - 88px);
+      flex-grow: 1;
+    }
+
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-section-title {
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      padding: 0 12px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: #334155;
+      color: #f1f5f9;
+    }
+
+    .sidebar-item.active {
+      background: #334155;
+      color: white;
+    }
+
+    .sidebar-item i {
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-item-text {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .sidebar-badge {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sidebar-badge.ai {
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      color: white;
+    }
+
+    .sidebar-badge.soon {
+      background: #475569;
+      color: #94a3b8;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(118, 77, 240, 0.1) 0%, rgba(91, 33, 182, 0.1) 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(118, 77, 240, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(118, 77, 240, 0.1) 0%, transparent 70%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(118, 77, 240, 0.4);
+    }
+
+    .hero-title {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Filter Section */
+    .filter-section {
+      background: #1e293b;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .filter-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-select {
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #e2e8f0;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-select:hover {
+      border-color: #764df0;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: #764df0;
+      box-shadow: 0 0 0 3px rgba(118, 77, 240, 0.1);
+    }
+
+    /* Recommendations Grid */
+    .recommendations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    /* Career Card */
+    .career-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 16px;
+      border: 1px solid #334155;
+      padding: 28px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .career-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #764df0, #5b21b6);
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .career-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .career-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(118, 77, 240, 0.2);
+      border-color: #764df0;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(118, 77, 240, 0.3);
+    }
+
+    .match-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .match-badge.high {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .match-badge.medium {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .match-badge.low {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .card-company {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-value i {
+      color: #764df0;
+      font-size: 14px;
+    }
+
+    .skills-section {
+      margin-bottom: 20px;
+    }
+
+    .skills-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .skills-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-tag {
+      padding: 6px 12px;
+      background: rgba(118, 77, 240, 0.1);
+      border: 1px solid rgba(118, 77, 240, 0.3);
+      border-radius: 6px;
+      font-size: 12px;
+      color: #c4b5fd;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .skill-tag.matched {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .skill-tag:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(118, 77, 240, 0.2);
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #764df0 0%, #5b21b6 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(118, 77, 240, 0.4);
+    }
+
+    .btn-icon {
+      padding: 12px;
+      background: #334155;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icon:hover {
+      background: #475569;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-icon.saved {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    /* AI Insights Section */
+    .ai-insights {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 16px;
+      border: 1px solid #334155;
+      padding: 32px;
+      margin-top: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .insights-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .insights-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .insights-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .insight-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+
+    .insight-card:hover {
+      border-color: #764df0;
+      transform: translateY(-4px);
+    }
+
+    .insight-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .insight-card-icon {
+      color: #764df0;
+      font-size: 20px;
+    }
+
+    .insight-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .insight-card-text {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Loading State */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      gap: 20px;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #334155;
+      border-top-color: #764df0;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 32px;
+      }
+
+      .hero-subtitle {
+        font-size: 16px;
+      }
+
+      .recommendations-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .card-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-icon {
+        width: 100%;
+      }
+
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn-back,
+      .btn-logout {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      color: #475569;
+      margin-bottom: 20px;
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: #94a3b8;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+  <script src="js/career-user-integration.js" defer></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-container">
+      <div class="logo-section">
+        <button class="hamburger-menu" onclick="toggleSidebar()">
+          <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          Menu
+        </button>
+        <img src="images/logo1.webp" alt="Place Wise" />
+      </div>
+      <div class="header-actions">
+        <button class="btn-logout" id="logoutBtn">
+          <i class="fa fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>
+        <i class="fas fa-sparkles"></i>
+        AI Features
+      </h3>
+      <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">MAIN</div>
+        <a href="dashboard.html" class="sidebar-item">
+          <i class="fas fa-user"></i>
+          <span class="sidebar-item-text">Profile</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">AI-POWERED FEATURES</div>
+        <a href="skill-analysis.html" class="sidebar-item">
+          <i class="fas fa-chart-line"></i>
+          <span class="sidebar-item-text">Skill Gap Analysis</span>
+          <span class="sidebar-badge ai">AI</span>
+        </a>
+        <a href="career-recommendations.html" class="sidebar-item active">
+          <i class="fas fa-lightbulb"></i>
+          <span class="sidebar-item-text">Career Recommendations</span>
+          <span class="sidebar-badge ai">AI</span>
+        </a>
+        <a href="learning-paths.html" class="sidebar-item">
+          <i class="fas fa-graduation-cap"></i>
+          <span class="sidebar-item-text">Learning Paths</span>
+          <span class="sidebar-badge ai">AI</span>
+        </a>
+        <a href="resume-analyzer.html" class="sidebar-item">
+          <i class="fas fa-file-alt"></i>
+          <span class="sidebar-item-text">Resume Analyzer</span>
+          <span class="sidebar-badge ai">AI</span>
+        </a>
+        <a href="mock-interview.html" class="sidebar-item">
+          <i class="fas fa-comments"></i>
+          <span class="sidebar-item-text">Mock Interview</span>
+          <span class="sidebar-badge ai">AI</span>
+        </a>
+        <div class="sidebar-item" style="opacity: 0.6; cursor: not-allowed;">
+          <i class="fas fa-handshake"></i>
+          <span class="sidebar-item-text">Job Matching</span>
+          <span class="sidebar-badge soon">SOON</span>
+        </div>
+        <div class="sidebar-item" style="opacity: 0.6; cursor: not-allowed;">
+          <i class="fas fa-chart-pie"></i>
+          <span class="sidebar-item-text">Placement Insights</span>
+          <span class="sidebar-badge soon">SOON</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-sparkles"></i>
+          AI-Powered Recommendations
+        </div>
+        <h1 class="hero-title" id="heroTitle">Your Career Path Awaits</h1>
+        <p class="hero-subtitle" id="heroSubtitle">
+          Discover personalized career opportunities tailored to your skills, experience, and aspirations.
+          Our AI analyzes your profile to match you with the best career paths.
+        </p>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="filter-header">
+        <h2 class="filter-title">
+          <i class="fas fa-sliders-h"></i>
+          Filter Recommendations
+        </h2>
+      </div>
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label class="filter-label">Industry</label>
+          <select class="filter-select" id="industryFilter">
+            <option value="all">All Industries</option>
+            <option value="technology">Technology</option>
+            <option value="finance">Finance</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="education">Education</option>
+            <option value="marketing">Marketing</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Experience Level</label>
+          <select class="filter-select" id="experienceFilter">
+            <option value="all">All Levels</option>
+            <option value="entry">Entry Level (0-2 years)</option>
+            <option value="mid">Mid Level (2-5 years)</option>
+            <option value="senior">Senior Level (5+ years)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Match Score</label>
+          <select class="filter-select" id="matchFilter">
+            <option value="all">All Matches</option>
+            <option value="high">High Match (80%+)</option>
+            <option value="medium">Medium Match (60-79%)</option>
+            <option value="low">Growing Potential (40-59%)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations Grid -->
+    <div class="recommendations-grid" id="recommendationsGrid">
+      <!-- Career cards will be dynamically inserted here -->
+    </div>
+
+    <!-- AI Insights Section -->
+    <div class="ai-insights">
+      <div class="insights-header">
+        <div class="insights-icon">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h2 class="insights-title">AI-Powered Insights</h2>
+      </div>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-card-header">
+            <i class="fas fa-chart-line insight-card-icon"></i>
+            <h3 class="insight-card-title">Growth Potential</h3>
+          </div>
+          <p class="insight-card-text">
+            Based on your current skills and market trends, you have strong potential in Data Science and AI/ML roles
+            with projected 35% salary growth over the next 3 years.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-card-header">
+            <i class="fas fa-graduation-cap insight-card-icon"></i>
+            <h3 class="insight-card-title">Skill Recommendations</h3>
+          </div>
+          <p class="insight-card-text">
+            Learning Python, Machine Learning, and Cloud Computing will open up 12 additional high-match career
+            opportunities in your target industries.
+          </p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-card-header">
+            <i class="fas fa-map-marked-alt insight-card-icon"></i>
+            <h3 class="insight-card-title">Market Demand</h3>
+          </div>
+          <p class="insight-card-text">
+            There are currently 1,247 open positions matching your profile across top companies, with the highest demand
+            in Bangalore, Pune, and Hyderabad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let currentUser = null;
+    let userProfile = null;
+    let userSkills = [];
+    let savedJobs = new Set();
+
+    // Sample career recommendations data (will be personalized based on user data)
+    const careerRecommendations = [
+      {
+        id: 1,
+        title: 'Data Analyst',
+        company: 'Technology Sector',
+        icon: 'fa-chart-bar',
+        match: 92,
+        matchLevel: 'high',
+        description: 'Analyze complex datasets to drive business decisions and create actionable insights using statistical methods and data visualization tools.',
+        salary: '₹6-12 LPA',
+        growth: 'High',
+        experience: '0-2 years',
+        industry: 'technology',
+        skills: ['Python', 'SQL', 'Excel', 'Tableau', 'Statistics'],
+        matchedSkills: ['Python', 'SQL', 'Excel']
+      },
+      {
+        id: 2,
+        title: 'Full Stack Developer',
+        company: 'Software Development',
+        icon: 'fa-code',
+        match: 88,
+        matchLevel: 'high',
+        description: 'Build end-to-end web applications using modern frameworks and technologies. Work on both frontend and backend development.',
+        salary: '₹8-15 LPA',
+        growth: 'Very High',
+        experience: '1-3 years',
+        industry: 'technology',
+        skills: ['JavaScript', 'React', 'Node.js', 'MongoDB', 'Git'],
+        matchedSkills: ['JavaScript', 'Git']
+      },
+      {
+        id: 3,
+        title: 'Business Analyst',
+        company: 'Consulting & Strategy',
+        icon: 'fa-briefcase',
+        match: 85,
+        matchLevel: 'high',
+        description: 'Bridge the gap between IT and business by analyzing processes, determining requirements, and delivering data-driven recommendations.',
+        salary: '₹7-13 LPA',
+        growth: 'High',
+        experience: '1-3 years',
+        industry: 'finance',
+        skills: ['Business Analysis', 'SQL', 'Excel', 'Agile', 'Communication'],
+        matchedSkills: ['SQL', 'Excel']
+      },
+      {
+        id: 4,
+        title: 'UI/UX Designer',
+        company: 'Design & Creative',
+        icon: 'fa-palette',
+        match: 78,
+        matchLevel: 'medium',
+        description: 'Create intuitive and visually appealing user interfaces. Conduct user research and design engaging digital experiences.',
+        salary: '₹5-10 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'technology',
+        skills: ['Figma', 'Adobe XD', 'User Research', 'Prototyping', 'Design Systems'],
+        matchedSkills: ['Figma']
+      },
+      {
+        id: 5,
+        title: 'Digital Marketing Specialist',
+        company: 'Marketing & Growth',
+        icon: 'fa-bullhorn',
+        match: 75,
+        matchLevel: 'medium',
+        description: 'Plan and execute digital marketing campaigns across multiple channels. Analyze metrics and optimize for better ROI.',
+        salary: '₹4-9 LPA',
+        growth: 'High',
+        experience: '0-2 years',
+        industry: 'marketing',
+        skills: ['SEO', 'Google Analytics', 'Content Marketing', 'Social Media', 'Email Marketing'],
+        matchedSkills: ['Google Analytics', 'Social Media']
+      },
+      {
+        id: 6,
+        title: 'Machine Learning Engineer',
+        company: 'AI & Data Science',
+        icon: 'fa-robot',
+        match: 72,
+        matchLevel: 'medium',
+        description: 'Develop and deploy machine learning models to solve complex business problems. Work with large datasets and cutting-edge AI technologies.',
+        salary: '₹10-20 LPA',
+        growth: 'Very High',
+        experience: '2-4 years',
+        industry: 'technology',
+        skills: ['Python', 'TensorFlow', 'Machine Learning', 'Deep Learning', 'Statistics'],
+        matchedSkills: ['Python']
+      },
+      {
+        id: 7,
+        title: 'Product Manager',
+        company: 'Product & Strategy',
+        icon: 'fa-lightbulb',
+        match: 68,
+        matchLevel: 'medium',
+        description: 'Define product vision and strategy. Work with cross-functional teams to deliver products that customers love.',
+        salary: '₹12-25 LPA',
+        growth: 'Very High',
+        experience: '3-5 years',
+        industry: 'technology',
+        skills: ['Product Strategy', 'Agile', 'User Stories', 'Analytics', 'Communication'],
+        matchedSkills: ['Agile', 'Analytics']
+      },
+      {
+        id: 8,
+        title: 'DevOps Engineer',
+        company: 'Infrastructure & Cloud',
+        icon: 'fa-server',
+        match: 65,
+        matchLevel: 'medium',
+        description: 'Automate and streamline operations and processes. Build and maintain tools for deployment, monitoring, and operations.',
+        salary: '₹8-16 LPA',
+        growth: 'High',
+        experience: '2-4 years',
+        industry: 'technology',
+        skills: ['Docker', 'Kubernetes', 'AWS', 'CI/CD', 'Linux'],
+        matchedSkills: ['AWS', 'Linux']
+      },
+      {
+        id: 9,
+        title: 'Content Writer',
+        company: 'Content & Communications',
+        icon: 'fa-pen-fancy',
+        match: 58,
+        matchLevel: 'low',
+        description: 'Create engaging content for various platforms including blogs, websites, and social media. Research and write on diverse topics.',
+        salary: '₹3-7 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'marketing',
+        skills: ['Writing', 'SEO', 'Research', 'Editing', 'Content Strategy'],
+        matchedSkills: ['SEO']
+      },
+      {
+        id: 10,
+        title: 'Cybersecurity Analyst',
+        company: 'Security & Risk',
+        icon: 'fa-shield-alt',
+        match: 55,
+        matchLevel: 'low',
+        description: 'Protect organization\'s computer systems and networks. Monitor for security breaches and investigate violations.',
+        salary: '₹6-14 LPA',
+        growth: 'Very High',
+        experience: '1-3 years',
+        industry: 'technology',
+        skills: ['Network Security', 'Ethical Hacking', 'Risk Assessment', 'Firewalls', 'Incident Response'],
+        matchedSkills: []
+      },
+      {
+        id: 11,
+        title: 'Financial Analyst',
+        company: 'Finance & Investment',
+        icon: 'fa-chart-pie',
+        match: 52,
+        matchLevel: 'low',
+        description: 'Analyze financial data and create models to support business decisions. Prepare reports and forecasts for management.',
+        salary: '₹5-11 LPA',
+        growth: 'Medium',
+        experience: '1-3 years',
+        industry: 'finance',
+        skills: ['Financial Modeling', 'Excel', 'Accounting', 'Data Analysis', 'Reporting'],
+        matchedSkills: ['Excel', 'Data Analysis']
+      },
+      {
+        id: 12,
+        title: 'HR Business Partner',
+        company: 'Human Resources',
+        icon: 'fa-users',
+        match: 48,
+        matchLevel: 'low',
+        description: 'Partner with business leaders to develop and implement HR strategies. Focus on talent management and organizational development.',
+        salary: '₹6-12 LPA',
+        growth: 'Medium',
+        experience: '2-5 years',
+        industry: 'education',
+        skills: ['HR Strategy', 'Talent Management', 'Employee Relations', 'Recruitment', 'Performance Management'],
+        matchedSkills: []
+      },
+      {
+        id: 13,
+        title: 'Cloud Architect',
+        company: 'Cloud & Infrastructure',
+        icon: 'fa-cloud',
+        match: 70,
+        matchLevel: 'medium',
+        description: 'Design and implement cloud-based solutions. Create architecture for scalable, secure, and cost-efficient cloud infrastructure.',
+        salary: '₹15-30 LPA',
+        growth: 'Very High',
+        experience: '4-7 years',
+        industry: 'technology',
+        skills: ['AWS', 'Azure', 'GCP', 'Cloud Architecture', 'Terraform'],
+        matchedSkills: []
+      },
+      {
+        id: 14,
+        title: 'Mobile App Developer',
+        company: 'Software Development',
+        icon: 'fa-mobile-alt',
+        match: 75,
+        matchLevel: 'medium',
+        description: 'Build native and cross-platform mobile applications for iOS and Android. Create smooth, responsive user experiences.',
+        salary: '₹6-14 LPA',
+        growth: 'High',
+        experience: '1-3 years',
+        industry: 'technology',
+        skills: ['React Native', 'Flutter', 'Swift', 'Kotlin', 'Mobile UI'],
+        matchedSkills: []
+      },
+      {
+        id: 15,
+        title: 'Backend Developer',
+        company: 'Software Engineering',
+        icon: 'fa-database',
+        match: 80,
+        matchLevel: 'high',
+        description: 'Design and develop server-side logic, APIs, and database schemas. Ensure high performance and responsiveness.',
+        salary: '₹7-15 LPA',
+        growth: 'High',
+        experience: '1-3 years',
+        industry: 'technology',
+        skills: ['Python', 'Node.js', 'SQL', 'REST APIs', 'PostgreSQL'],
+        matchedSkills: ['Python', 'SQL']
+      },
+      {
+        id: 16,
+        title: 'Frontend Developer',
+        company: 'Web Development',
+        icon: 'fa-laptop-code',
+        match: 65,
+        matchLevel: 'medium',
+        description: 'Create beautiful, responsive web interfaces using modern frontend technologies. Focus on user experience and performance.',
+        salary: '₹5-12 LPA',
+        growth: 'High',
+        experience: '0-2 years',
+        industry: 'technology',
+        skills: ['HTML', 'CSS', 'JavaScript', 'React', 'TypeScript'],
+        matchedSkills: []
+      },
+      {
+        id: 17,
+        title: 'QA Engineer',
+        company: 'Quality Assurance',
+        icon: 'fa-bug',
+        match: 60,
+        matchLevel: 'medium',
+        description: 'Design and execute test plans to ensure software quality. Automate testing processes and track bugs to resolution.',
+        salary: '₹4-10 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'technology',
+        skills: ['Selenium', 'Manual Testing', 'Automation', 'JIRA', 'Python'],
+        matchedSkills: ['Python']
+      },
+      {
+        id: 18,
+        title: 'Data Scientist',
+        company: 'Data & Analytics',
+        icon: 'fa-brain',
+        match: 85,
+        matchLevel: 'high',
+        description: 'Extract insights from complex datasets using statistical analysis and machine learning. Build predictive models.',
+        salary: '₹10-22 LPA',
+        growth: 'Very High',
+        experience: '2-4 years',
+        industry: 'technology',
+        skills: ['Python', 'R', 'Machine Learning', 'SQL', 'Statistics'],
+        matchedSkills: ['Python', 'SQL']
+      },
+      {
+        id: 19,
+        title: 'Blockchain Developer',
+        company: 'Web3 & Crypto',
+        icon: 'fa-link',
+        match: 50,
+        matchLevel: 'low',
+        description: 'Develop decentralized applications and smart contracts. Work with blockchain protocols and cryptocurrency systems.',
+        salary: '₹12-25 LPA',
+        growth: 'High',
+        experience: '2-4 years',
+        industry: 'technology',
+        skills: ['Solidity', 'Ethereum', 'Smart Contracts', 'Web3.js', 'Cryptography'],
+        matchedSkills: []
+      },
+      {
+        id: 20,
+        title: 'Technical Writer',
+        company: 'Documentation',
+        icon: 'fa-file-alt',
+        match: 45,
+        matchLevel: 'low',
+        description: 'Create clear technical documentation, user guides, and API references. Simplify complex concepts for diverse audiences.',
+        salary: '₹4-9 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'technology',
+        skills: ['Technical Writing', 'Documentation', 'Markdown', 'API Documentation', 'Communication'],
+        matchedSkills: []
+      },
+      {
+        id: 21,
+        title: 'Scrum Master',
+        company: 'Project Management',
+        icon: 'fa-tasks',
+        match: 55,
+        matchLevel: 'low',
+        description: 'Facilitate agile development processes. Remove impediments and help teams deliver high-quality products efficiently.',
+        salary: '₹8-16 LPA',
+        growth: 'Medium',
+        experience: '2-5 years',
+        industry: 'technology',
+        skills: ['Agile', 'Scrum', 'JIRA', 'Team Leadership', 'Communication'],
+        matchedSkills: []
+      },
+      {
+        id: 22,
+        title: 'Sales Executive',
+        company: 'Sales & Business Development',
+        icon: 'fa-handshake',
+        match: 40,
+        matchLevel: 'low',
+        description: 'Drive revenue growth by identifying and closing new business opportunities. Build relationships with clients.',
+        salary: '₹4-12 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'marketing',
+        skills: ['Sales', 'Negotiation', 'CRM', 'Communication', 'Lead Generation'],
+        matchedSkills: []
+      },
+      {
+        id: 23,
+        title: 'Graphic Designer',
+        company: 'Design & Creative',
+        icon: 'fa-paint-brush',
+        match: 35,
+        matchLevel: 'low',
+        description: 'Create visual concepts for branding, marketing, and digital platforms. Design graphics, logos, and illustrations.',
+        salary: '₹3-8 LPA',
+        growth: 'Medium',
+        experience: '0-2 years',
+        industry: 'marketing',
+        skills: ['Adobe Photoshop', 'Illustrator', 'Canva', 'Branding', 'Typography'],
+        matchedSkills: []
+      },
+      {
+        id: 24,
+        title: 'Video Editor',
+        company: 'Media & Entertainment',
+        icon: 'fa-video',
+        match: 30,
+        matchLevel: 'low',
+        description: 'Edit and produce video content for various platforms. Add effects, transitions, and optimize for different formats.',
+        salary: '₹3-8 LPA',
+        growth: 'High',
+        experience: '0-2 years',
+        industry: 'marketing',
+        skills: ['Premiere Pro', 'After Effects', 'DaVinci Resolve', 'Color Grading', 'Motion Graphics'],
+        matchedSkills: []
+      },
+      {
+        id: 25,
+        title: 'Operations Manager',
+        company: 'Operations',
+        icon: 'fa-cogs',
+        match: 45,
+        matchLevel: 'low',
+        description: 'Oversee daily operations and improve organizational efficiency. Manage resources, processes, and teams.',
+        salary: '₹8-18 LPA',
+        growth: 'Medium',
+        experience: '3-6 years',
+        industry: 'education',
+        skills: ['Operations', 'Process Improvement', 'Team Management', 'Excel', 'Supply Chain'],
+        matchedSkills: ['Excel']
+      },
+      {
+        id: 26,
+        title: 'Investment Banker',
+        company: 'Investment Banking',
+        icon: 'fa-coins',
+        match: 50,
+        matchLevel: 'low',
+        description: 'Advise clients on mergers, acquisitions, and capital raising. Analyze financial models and market trends.',
+        salary: '₹12-35 LPA',
+        growth: 'Medium',
+        experience: '2-5 years',
+        industry: 'finance',
+        skills: ['Financial Modeling', 'Valuation', 'M&A', 'Excel', 'PowerPoint'],
+        matchedSkills: ['Excel']
+      },
+      {
+        id: 27,
+        title: 'Data Engineer',
+        company: 'Data Infrastructure',
+        icon: 'fa-project-diagram',
+        match: 80,
+        matchLevel: 'high',
+        description: 'Build and maintain data pipelines and infrastructure. Transform raw data into usable formats for analysis.',
+        salary: '₹8-18 LPA',
+        growth: 'Very High',
+        experience: '1-4 years',
+        industry: 'technology',
+        skills: ['Python', 'SQL', 'Apache Spark', 'ETL', 'Data Warehousing'],
+        matchedSkills: ['Python', 'SQL']
+      },
+      {
+        id: 28,
+        title: 'AI Research Scientist',
+        company: 'AI Research',
+        icon: 'fa-microscope',
+        match: 60,
+        matchLevel: 'medium',
+        description: 'Conduct research to advance AI capabilities. Publish papers and develop novel algorithms for real-world applications.',
+        salary: '₹15-40 LPA',
+        growth: 'Very High',
+        experience: '3-6 years',
+        industry: 'technology',
+        skills: ['Python', 'Deep Learning', 'Research', 'PyTorch', 'Mathematics'],
+        matchedSkills: ['Python']
+      },
+      {
+        id: 29,
+        title: 'Customer Success Manager',
+        company: 'Client Services',
+        icon: 'fa-smile',
+        match: 40,
+        matchLevel: 'low',
+        description: 'Ensure customer satisfaction and drive product adoption. Build relationships and identify growth opportunities.',
+        salary: '₹5-12 LPA',
+        growth: 'High',
+        experience: '1-3 years',
+        industry: 'marketing',
+        skills: ['Customer Relations', 'Communication', 'CRM', 'Problem Solving', 'Analytics'],
+        matchedSkills: []
+      },
+      {
+        id: 30,
+        title: 'Database Administrator',
+        company: 'Database Management',
+        icon: 'fa-database',
+        match: 75,
+        matchLevel: 'medium',
+        description: 'Manage and maintain database systems. Ensure data integrity, security, and optimal performance.',
+        salary: '₹6-14 LPA',
+        growth: 'Medium',
+        experience: '1-4 years',
+        industry: 'technology',
+        skills: ['SQL', 'MySQL', 'PostgreSQL', 'Oracle', 'Database Optimization'],
+        matchedSkills: ['SQL']
+      }
+    ];
+
+    let currentRecommendations = [...careerRecommendations];
+
+    // Render career cards
+    function renderCareerCards(recommendations) {
+      const grid = document.getElementById('recommendationsGrid');
+
+      if (recommendations.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3 class="empty-title">No Recommendations Found</h3>
+            <p class="empty-text">
+              Try adjusting your filters to see more career opportunities that match your profile.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = recommendations.map(career => `
+        <div class="career-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas ${career.icon}"></i>
+            </div>
+            <div class="match-badge ${career.matchLevel}">
+              <i class="fas fa-check-circle"></i>
+              ${career.match}% Match
+            </div>
+          </div>
+          <h3 class="card-title">${career.title}</h3>
+          <div class="card-company">
+            <i class="fas fa-building"></i>
+            ${career.company}
+          </div>
+          <p class="card-description">${career.description}</p>
+          <div class="card-stats">
+            <div class="stat-item">
+              <span class="stat-label">Salary Range</span>
+              <span class="stat-value">
+                <i class="fas fa-rupee-sign"></i>
+                ${career.salary}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Growth</span>
+              <span class="stat-value">
+                <i class="fas fa-arrow-trend-up"></i>
+                ${career.growth}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Experience</span>
+              <span class="stat-value">
+                <i class="fas fa-briefcase"></i>
+                ${career.experience}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Industry</span>
+              <span class="stat-value">
+                <i class="fas fa-industry"></i>
+                ${career.industry.charAt(0).toUpperCase() + career.industry.slice(1)}
+              </span>
+            </div>
+          </div>
+          <div class="skills-section">
+            <div class="skills-header">Required Skills</div>
+            <div class="skills-tags">
+              ${career.skills.map(skill => `
+                <span class="skill-tag ${career.matchedSkills.includes(skill) ? 'matched' : ''}">
+                  ${skill}
+                  ${career.matchedSkills.includes(skill) ? '<i class="fas fa-check" style="margin-left: 4px; font-size: 10px;"></i>' : ''}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-primary" onclick="learnMore(${career.id})">
+              <i class="fas fa-info-circle"></i>
+              Learn More
+            </button>
+            <button class="btn-icon ${savedJobs.has(career.id) ? 'saved' : ''}" onclick="toggleSave(${career.id}, this)" title="${savedJobs.has(career.id) ? 'Saved' : 'Save'}">
+              <i class="fas fa-bookmark" style="font-weight: ${savedJobs.has(career.id) ? '900' : '400'}"></i>
+            </button>
+            <button class="btn-icon" onclick="applyNow(${career.id})" title="Apply Now">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Filter functionality
+    function applyFilters() {
+      const industry = document.getElementById('industryFilter').value;
+      const experience = document.getElementById('experienceFilter').value;
+      const match = document.getElementById('matchFilter').value;
+
+      let filtered = [...careerRecommendations];
+
+      if (industry !== 'all') {
+        filtered = filtered.filter(career => career.industry === industry);
+      }
+
+      if (experience !== 'all') {
+        filtered = filtered.filter(career => {
+          const expYears = parseInt(career.experience.split('-')[0]);
+          if (experience === 'entry') return expYears <= 2;
+          if (experience === 'mid') return expYears >= 2 && expYears <= 5;
+          if (experience === 'senior') return expYears >= 5;
+          return true;
+        });
+      }
+
+      if (match !== 'all') {
+        filtered = filtered.filter(career => {
+          if (match === 'high') return career.match >= 80;
+          if (match === 'medium') return career.match >= 60 && career.match < 80;
+          if (match === 'low') return career.match >= 40 && career.match < 60;
+          return true;
+        });
+      }
+
+      // Sort with bookmarked jobs at the top
+      currentRecommendations = sortWithBookmarksFirst(filtered);
+      renderCareerCards(currentRecommendations);
+    }
+
+    // Event listeners for filters
+    document.getElementById('industryFilter').addEventListener('change', applyFilters);
+    document.getElementById('experienceFilter').addEventListener('change', applyFilters);
+    document.getElementById('matchFilter').addEventListener('change', applyFilters);
+
+    // Action functions
+    function toggleSave(id, button) {
+      const career = careerRecommendations.find(c => c.id === id);
+      const icon = button.querySelector('i');
+
+      if (savedJobs.has(id)) {
+        savedJobs.delete(id);
+        button.classList.remove('saved');
+        button.title = 'Save';
+        icon.classList.remove('fa-bookmark');
+        icon.classList.add('fa-bookmark');
+        icon.style.fontWeight = '400'; // Regular (outline) icon
+        showToast(`${career.title} removed from saved jobs`, 'info');
+      } else {
+        savedJobs.add(id);
+        button.classList.add('saved');
+        button.title = 'Saved';
+        icon.classList.remove('fa-bookmark');
+        icon.classList.add('fa-bookmark');
+        icon.style.fontWeight = '900'; // Solid (filled) icon
+        showToast(`${career.title} saved to your bookmarks!`, 'success');
+      }
+
+      // Persist to localStorage
+      localStorage.setItem('savedJobs', JSON.stringify([...savedJobs]));
+
+      // Re-apply filters and re-render with new sorting
+      applyFilters();
+    }
+
+    // Sort recommendations with bookmarked jobs at top
+    function sortWithBookmarksFirst(recommendations) {
+      return [...recommendations].sort((a, b) => {
+        const aIsSaved = savedJobs.has(a.id);
+        const bIsSaved = savedJobs.has(b.id);
+
+        // If both are saved or both are not saved, maintain original order (by match score)
+        if (aIsSaved === bIsSaved) {
+          return b.match - a.match; // Higher match first
+        }
+
+        // Saved jobs come first
+        return aIsSaved ? -1 : 1;
+      });
+    }
+
+    // Load saved jobs from localStorage
+    function loadSavedJobs() {
+      const saved = localStorage.getItem('savedJobs');
+      if (saved) {
+        try {
+          const savedArray = JSON.parse(saved);
+          savedJobs = new Set(savedArray);
+        } catch (e) {
+          console.error('Error loading saved jobs:', e);
+          savedJobs = new Set();
+        }
+      }
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      // Remove existing toast
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) {
+        existingToast.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast-notification toast-${type}`;
+      toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+      `;
+
+      // Add toast styles if not already added
+      if (!document.getElementById('toastStyles')) {
+        const styles = document.createElement('style');
+        styles.id = 'toastStyles';
+        styles.textContent = `
+          .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          }
+          
+          .toast-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+          }
+          
+          .toast-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+          }
+          
+          .toast-info {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+          }
+          
+          @keyframes slideInRight {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          
+          @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+          }
+        `;
+        document.head.appendChild(styles);
+      }
+
+      document.body.appendChild(toast);
+
+      // Remove toast after 3 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 3000);
+    }
+
+    // Load saved jobs on page load
+    loadSavedJobs();
+
+    function learnMore(id) {
+      const career = careerRecommendations.find(c => c.id === id);
+
+      // Generate responsibilities based on career type
+      const responsibilities = getResponsibilities(career.title);
+      const qualifications = getQualifications(career);
+      const careerPath = getCareerPath(career.title);
+      const relatedCareers = getRelatedCareers(career, id);
+
+      const modalHtml = `
+        <div class="learn-modal-overlay" id="learnModal" onclick="closeLearnModal(event)">
+          <div class="learn-modal" onclick="event.stopPropagation()">
+            <button class="learn-modal-close" onclick="closeLearnModal()">&times;</button>
+            
+            <div class="learn-modal-header">
+              <div class="learn-modal-icon">
+                <i class="fas ${career.icon}"></i>
+              </div>
+              <div class="learn-modal-title-section">
+                <h2>${career.title}</h2>
+                <p class="learn-modal-company"><i class="fas fa-building"></i> ${career.company}</p>
+                <div class="learn-modal-badges">
+                  <span class="learn-badge match-${career.matchLevel}"><i class="fas fa-check-circle"></i> ${career.match}% Match</span>
+                  <span class="learn-badge salary"><i class="fas fa-rupee-sign"></i> ${career.salary}</span>
+                  <span class="learn-badge experience"><i class="fas fa-briefcase"></i> ${career.experience}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="learn-modal-body">
+              <div class="learn-section">
+                <h3><i class="fas fa-file-alt"></i> Overview</h3>
+                <p>${career.description}</p>
+              </div>
+              
+              <div class="learn-section">
+                <h3><i class="fas fa-tasks"></i> Key Responsibilities</h3>
+                <ul class="learn-list">
+                  ${responsibilities.map(r => `<li><i class="fas fa-check"></i> ${r}</li>`).join('')}
+                </ul>
+              </div>
+              
+              <div class="learn-section">
+                <h3><i class="fas fa-graduation-cap"></i> Required Qualifications</h3>
+                <ul class="learn-list">
+                  ${qualifications.map(q => `<li><i class="fas fa-certificate"></i> ${q}</li>`).join('')}
+                </ul>
+              </div>
+              
+              <div class="learn-section">
+                <h3><i class="fas fa-code"></i> Required Skills</h3>
+                <div class="learn-skills">
+                  ${career.skills.map(skill => `
+                    <span class="learn-skill-tag ${career.matchedSkills.includes(skill) ? 'matched' : ''}">
+                      ${skill}
+                      ${career.matchedSkills.includes(skill) ? '<i class="fas fa-check-circle"></i>' : ''}
+                    </span>
+                  `).join('')}
+                </div>
+                ${career.matchedSkills.length > 0 ? `
+                  <p class="skills-match-info"><i class="fas fa-star"></i> You already have ${career.matchedSkills.length} of ${career.skills.length} required skills!</p>
+                ` : ''}
+              </div>
+              
+              <div class="learn-section">
+                <h3><i class="fas fa-chart-line"></i> Career Growth Path</h3>
+                <div class="career-path">
+                  ${careerPath.map((step, index) => `
+                    <div class="path-step ${index === 0 ? 'current' : ''}">
+                      <div class="path-dot"></div>
+                      <div class="path-content">
+                        <span class="path-title">${step.title}</span>
+                        <span class="path-years">${step.years}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="learn-section">
+                <h3><i class="fas fa-info-circle"></i> Industry Insights</h3>
+                <div class="insights-grid">
+                  <div class="insight-item">
+                    <i class="fas fa-arrow-trend-up"></i>
+                    <span class="insight-label">Growth</span>
+                    <span class="insight-value">${career.growth}</span>
+                  </div>
+                  <div class="insight-item">
+                    <i class="fas fa-industry"></i>
+                    <span class="insight-label">Industry</span>
+                    <span class="insight-value">${career.industry.charAt(0).toUpperCase() + career.industry.slice(1)}</span>
+                  </div>
+                  <div class="insight-item">
+                    <i class="fas fa-users"></i>
+                    <span class="insight-label">Open Positions</span>
+                    <span class="insight-value">${Math.floor(Math.random() * 500 + 100)}+</span>
+                  </div>
+                  <div class="insight-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="insight-label">Avg. Hiring Time</span>
+                    <span class="insight-value">${Math.floor(Math.random() * 3 + 2)}-${Math.floor(Math.random() * 3 + 5)} weeks</span>
+                  </div>
+                </div>
+              </div>
+              
+              ${relatedCareers.length > 0 ? `
+                <div class="learn-section">
+                  <h3><i class="fas fa-link"></i> Related Careers</h3>
+                  <div class="related-careers">
+                    ${relatedCareers.map(rc => `
+                      <div class="related-career-item" onclick="closeLearnModal(); setTimeout(() => learnMore(${rc.id}), 300);">
+                        <i class="fas ${rc.icon}"></i>
+                        <span>${rc.title}</span>
+                        <span class="related-match">${rc.match}%</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="learn-modal-footer">
+              <button class="btn-secondary" onclick="closeLearnModal()">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn-primary" onclick="closeLearnModal(); setTimeout(() => applyNow(${id}), 300);">
+                <i class="fas fa-paper-plane"></i> Apply Now
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Add styles if not already added
+      if (!document.getElementById('learnModalStyles')) {
+        const styles = document.createElement('style');
+        styles.id = 'learnModalStyles';
+        styles.textContent = `
+          .learn-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+            padding: 20px;
+          }
+          
+          .learn-modal {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+          }
+          
+          .learn-modal::-webkit-scrollbar {
+            width: 8px;
+          }
+          
+          .learn-modal::-webkit-scrollbar-track {
+            background: #1e293b;
+          }
+          
+          .learn-modal::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+          }
+          
+          .learn-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 10;
+          }
+          
+          .learn-modal-close:hover {
+            color: #f43f5e;
+          }
+          
+          .learn-modal-header {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+          }
+          
+          .learn-modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            flex-shrink: 0;
+          }
+          
+          .learn-modal-title-section h2 {
+            color: #f1f5f9;
+            font-size: 24px;
+            margin: 0 0 8px;
+          }
+          
+          .learn-modal-company {
+            color: #94a3b8;
+            margin: 0 0 12px;
+            font-size: 14px;
+          }
+          
+          .learn-modal-company i {
+            margin-right: 6px;
+          }
+          
+          .learn-modal-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          
+          .learn-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          
+          .learn-badge.match-high {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+          }
+          
+          .learn-badge.match-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+          }
+          
+          .learn-badge.match-low {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+          }
+          
+          .learn-badge.salary {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+          }
+          
+          .learn-badge.experience {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+          }
+          
+          .learn-modal-body {
+            padding: 25px 30px;
+          }
+          
+          .learn-section {
+            margin-bottom: 25px;
+          }
+          
+          .learn-section:last-child {
+            margin-bottom: 0;
+          }
+          
+          .learn-section h3 {
+            color: #e2e8f0;
+            font-size: 16px;
+            margin: 0 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          
+          .learn-section h3 i {
+            color: #8b5cf6;
+          }
+          
+          .learn-section p {
+            color: #cbd5e1;
+            line-height: 1.7;
+            margin: 0;
+          }
+          
+          .learn-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+          }
+          
+          .learn-list li {
+            color: #cbd5e1;
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          
+          .learn-list li i {
+            color: #10b981;
+            margin-top: 4px;
+            font-size: 12px;
+          }
+          
+          .learn-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+          }
+          
+          .learn-skill-tag {
+            padding: 8px 14px;
+            background: rgba(118, 77, 240, 0.1);
+            border: 1px solid rgba(118, 77, 240, 0.3);
+            border-radius: 8px;
+            color: #c4b5fd;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          
+          .learn-skill-tag.matched {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+          }
+          
+          .learn-skill-tag i {
+            font-size: 10px;
+          }
+          
+          .skills-match-info {
+            color: #10b981;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          
+          .career-path {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+            padding-left: 20px;
+          }
+          
+          .path-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            padding: 12px 0;
+          }
+          
+          .path-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 28px;
+            width: 2px;
+            height: calc(100% - 10px);
+            background: #475569;
+          }
+          
+          .path-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #475569;
+            position: absolute;
+            left: -20px;
+            flex-shrink: 0;
+          }
+          
+          .path-step.current .path-dot {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+          }
+          
+          .path-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+          }
+          
+          .path-step.current .path-content {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+          }
+          
+          .path-title {
+            color: #e2e8f0;
+            font-weight: 500;
+          }
+          
+          .path-years {
+            color: #94a3b8;
+            font-size: 13px;
+          }
+          
+          .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          
+          .insight-item {
+            background: rgba(51, 65, 85, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          }
+          
+          .insight-item i {
+            color: #8b5cf6;
+            font-size: 18px;
+            margin-bottom: 5px;
+          }
+          
+          .insight-label {
+            color: #94a3b8;
+            font-size: 12px;
+          }
+          
+          .insight-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 15px;
+          }
+          
+          .related-careers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          
+          .related-career-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+          
+          .related-career-item:hover {
+            background: rgba(139, 92, 246, 0.15);
+            transform: translateX(5px);
+          }
+          
+          .related-career-item i {
+            color: #8b5cf6;
+            font-size: 16px;
+          }
+          
+          .related-career-item span:first-of-type {
+            color: #e2e8f0;
+            flex: 1;
+          }
+          
+          .related-match {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 13px;
+          }
+          
+          .learn-modal-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 20px 30px;
+            background: rgba(15, 23, 42, 0.5);
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+          }
+          
+          .btn-secondary {
+            padding: 12px 24px;
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+          }
+          
+          .btn-secondary:hover {
+            background: #475569;
+          }
+          
+          @media (max-width: 600px) {
+            .learn-modal-header {
+              flex-direction: column;
+              text-align: center;
+            }
+            
+            .learn-modal-icon {
+              margin: 0 auto;
+            }
+            
+            .learn-modal-badges {
+              justify-content: center;
+            }
+            
+            .insights-grid {
+              grid-template-columns: 1fr;
+            }
+            
+            .learn-modal-footer {
+              flex-direction: column;
+            }
+          }
+        `;
+        document.head.appendChild(styles);
+      }
+    }
+
+    // Helper functions for Learn More modal
+    function getResponsibilities(title) {
+      const responsibilitiesMap = {
+        'Machine Learning Engineer': [
+          'Design and implement machine learning models and algorithms',
+          'Process, clean, and verify data integrity for training datasets',
+          'Collaborate with data scientists to improve model performance',
+          'Deploy and maintain ML models in production environments',
+          'Stay updated with latest ML research and implement new techniques'
+        ],
+        'Full Stack Developer': [
+          'Develop and maintain both frontend and backend applications',
+          'Write clean, efficient, and well-documented code',
+          'Collaborate with designers to implement user interfaces',
+          'Optimize applications for maximum speed and scalability',
+          'Participate in code reviews and mentor junior developers'
+        ],
+        'Data Scientist': [
+          'Analyze large datasets to extract meaningful insights',
+          'Build predictive models using statistical techniques',
+          'Communicate findings to stakeholders through visualizations',
+          'Develop and implement data collection systems',
+          'Work with engineering teams to implement models'
+        ],
+        'default': [
+          'Complete assigned tasks within deadlines',
+          'Collaborate with team members across departments',
+          'Participate in meetings and provide regular updates',
+          'Continuously improve skills and stay updated with industry trends',
+          'Document work processes and create reports'
+        ]
+      };
+      return responsibilitiesMap[title] || responsibilitiesMap['default'];
+    }
+
+    function getQualifications(career) {
+      const baseQualifications = [
+        `${career.experience} of relevant experience`,
+        `Proficiency in ${career.skills.slice(0, 3).join(', ')}`,
+        'Strong problem-solving and analytical skills',
+        'Excellent communication and teamwork abilities'
+      ];
+
+      if (career.industry === 'technology') {
+        baseQualifications.push("Bachelor's degree in Computer Science or related field");
+      } else if (career.industry === 'finance') {
+        baseQualifications.push("Bachelor's degree in Finance, Economics, or related field");
+      } else {
+        baseQualifications.push("Bachelor's degree in relevant field");
+      }
+
+      return baseQualifications;
+    }
+
+    function getCareerPath(title) {
+      const pathMap = {
+        'Machine Learning Engineer': [
+          { title: 'ML Engineer', years: 'Current' },
+          { title: 'Senior ML Engineer', years: '2-4 years' },
+          { title: 'Lead ML Engineer', years: '4-6 years' },
+          { title: 'ML Architect / Director', years: '6+ years' }
+        ],
+        'Full Stack Developer': [
+          { title: 'Full Stack Developer', years: 'Current' },
+          { title: 'Senior Developer', years: '2-4 years' },
+          { title: 'Tech Lead', years: '4-6 years' },
+          { title: 'Engineering Manager / Architect', years: '6+ years' }
+        ],
+        'Data Scientist': [
+          { title: 'Data Scientist', years: 'Current' },
+          { title: 'Senior Data Scientist', years: '2-4 years' },
+          { title: 'Lead Data Scientist', years: '4-6 years' },
+          { title: 'Chief Data Officer', years: '8+ years' }
+        ],
+        'default': [
+          { title: title, years: 'Current' },
+          { title: 'Senior ' + title, years: '2-4 years' },
+          { title: 'Lead / Manager', years: '4-6 years' },
+          { title: 'Director / VP', years: '8+ years' }
+        ]
+      };
+      return pathMap[title] || pathMap['default'];
+    }
+
+    function getRelatedCareers(career, currentId) {
+      return careerRecommendations
+        .filter(c => c.id !== currentId && c.industry === career.industry)
+        .slice(0, 3);
+    }
+
+    function closeLearnModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('learnModal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    // Apply Now - Show modal with job platform links
+    function applyNow(id) {
+      const career = careerRecommendations.find(c => c.id === id);
+      const jobTitle = encodeURIComponent(career.title);
+
+      // Create modal HTML
+      const modalHtml = `
+        <div class="apply-modal-overlay" id="applyModal" onclick="closeApplyModal(event)">
+          <div class="apply-modal" onclick="event.stopPropagation()">
+            <button class="apply-modal-close" onclick="closeApplyModal()">&times;</button>
+            
+            <div class="apply-modal-header">
+              <div class="apply-modal-icon">
+                <i class="fas ${career.icon}"></i>
+              </div>
+              <h2>Apply for ${career.title}</h2>
+              <p class="apply-modal-subtitle">${career.company}</p>
+            </div>
+            
+            <div class="apply-modal-body">
+              <p class="apply-modal-text">Find and apply to ${career.title} positions on these job platforms:</p>
+              
+              <div class="job-platform-links">
+                <a href="https://www.linkedin.com/jobs/search/?keywords=${jobTitle}&location=India" 
+                   target="_blank" class="platform-btn linkedin" onclick="trackApplication(${id}, 'LinkedIn')">
+                  <i class="fab fa-linkedin"></i>
+                  <span>LinkedIn Jobs</span>
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                
+                <a href="https://www.naukri.com/${career.title.toLowerCase().replace(/\s+/g, '-')}-jobs" 
+                   target="_blank" class="platform-btn naukri" onclick="trackApplication(${id}, 'Naukri')">
+                  <i class="fas fa-search-dollar"></i>
+                  <span>Naukri</span>
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                
+                <a href="https://in.indeed.com/jobs?q=${jobTitle}" 
+                   target="_blank" class="platform-btn indeed" onclick="trackApplication(${id}, 'Indeed')">
+                  <i class="fas fa-briefcase"></i>
+                  <span>Indeed</span>
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                
+                <a href="https://www.glassdoor.co.in/Job/${career.title.toLowerCase().replace(/\s+/g, '-')}-jobs-SRCH_KO0,${career.title.length}.htm" 
+                   target="_blank" class="platform-btn glassdoor" onclick="trackApplication(${id}, 'Glassdoor')">
+                  <i class="fas fa-door-open"></i>
+                  <span>Glassdoor</span>
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
+              
+              <div class="apply-modal-tips">
+                <h4><i class="fas fa-lightbulb"></i> Pro Tips:</h4>
+                <ul>
+                  <li>Tailor your resume to match the job description</li>
+                  <li>Include keywords from the required skills</li>
+                  <li>Write a personalized cover letter</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="apply-modal-footer">
+              <p><i class="fas fa-check-circle"></i> We'll track this application for you</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to page
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Add modal styles if not already added
+      if (!document.getElementById('applyModalStyles')) {
+        const styles = document.createElement('style');
+        styles.id = 'applyModalStyles';
+        styles.textContent = `
+          .apply-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+          }
+          
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          .apply-modal {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+          }
+          
+          @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+          
+          .apply-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.2s;
+          }
+          
+          .apply-modal-close:hover {
+            color: #f43f5e;
+          }
+          
+          .apply-modal-header {
+            text-align: center;
+            padding: 30px 30px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%);
+          }
+          
+          .apply-modal-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            color: white;
+          }
+          
+          .apply-modal-header h2 {
+            color: #f1f5f9;
+            font-size: 22px;
+            margin: 0;
+          }
+          
+          .apply-modal-subtitle {
+            color: #94a3b8;
+            margin: 5px 0 0;
+            font-size: 14px;
+          }
+          
+          .apply-modal-body {
+            padding: 25px 30px;
+          }
+          
+          .apply-modal-text {
+            color: #cbd5e1;
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          
+          .job-platform-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+          
+          .platform-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s;
+          }
+          
+          .platform-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+          }
+          
+          .platform-btn span {
+            flex: 1;
+          }
+          
+          .platform-btn .fa-external-link-alt {
+            font-size: 12px;
+            opacity: 0.7;
+          }
+          
+          .platform-btn.linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+          }
+          
+          .platform-btn.naukri {
+            background: linear-gradient(135deg, #4285f4, #2962ff);
+          }
+          
+          .platform-btn.indeed {
+            background: linear-gradient(135deg, #2164f3, #1a4fc9);
+          }
+          
+          .platform-btn.glassdoor {
+            background: linear-gradient(135deg, #0caa41, #088f36);
+          }
+          
+          .apply-modal-tips {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+          }
+          
+          .apply-modal-tips h4 {
+            color: #10b981;
+            margin: 0 0 10px;
+            font-size: 14px;
+          }
+          
+          .apply-modal-tips ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #94a3b8;
+            font-size: 13px;
+          }
+          
+          .apply-modal-tips li {
+            margin: 5px 0;
+          }
+          
+          .apply-modal-footer {
+            padding: 15px 30px;
+            background: rgba(139, 92, 246, 0.1);
+            text-align: center;
+          }
+          
+          .apply-modal-footer p {
+            margin: 0;
+            color: #a78bfa;
+            font-size: 13px;
+          }
+          
+          .apply-modal-footer i {
+            margin-right: 5px;
+          }
+        `;
+        document.head.appendChild(styles);
+      }
+    }
+
+    // Close apply modal
+    function closeApplyModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('applyModal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    // Track application in database
+    async function trackApplication(careerId, platform) {
+      const career = careerRecommendations.find(c => c.id === careerId);
+      console.log(`Application tracked: ${career.title} via ${platform}`);
+
+      // If user is logged in, save to database
+      if (currentUser && window.DBService) {
+        try {
+          const result = await window.DBService.createPlacement({
+            user_id: currentUser.id,
+            company_name: career.company,
+            job_title: career.title,
+            status: 'applied',
+            platform: platform,
+            applied_date: new Date().toISOString()
+          });
+
+          if (result.success) {
+            console.log('Application saved to database');
+          }
+        } catch (error) {
+          console.error('Error saving application:', error);
+        }
+      }
+    }
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Initial render with bookmark sorting
+    applyFilters();
+  </script>
+  <script src="js/career-bookmarks.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+  </script>
+</body>
+
+</html>

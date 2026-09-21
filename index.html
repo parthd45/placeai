@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Place Wise- AI-Driven Training and Placement Support System</title>
+  <link rel="icon" href="images/icon.webp" type="image/gif" sizes="16x16" />
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="Place Wise - AI-Driven Training and Placement Support System" name="description" />
+  <meta content="" name="keywords" />
+  <meta content="" name="author" />
+  <!-- CSS Files
+    ================================================== -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap" />
+  <link href="css/vendors.css" rel="stylesheet" type="text/css" />
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
+  <!-- color scheme -->
+  <link id="colors" href="css/colors/scheme-01.css" rel="stylesheet" type="text/css" />
+  <!-- Loading Animation -->
+  <link href="css/loading-animation.css" rel="stylesheet" type="text/css" />
+  <style>
+    /* Hero Section Gradient Adjustment */
+    #section-hero .gradient-edge-bottom {
+      top: 60% !important;
+    }
+
+    #section-hero .abs-centered {
+      z-index: 10 !important;
+    }
+
+    /* Push bottom box lower */
+    #section-hero .abs.bottom-0 {
+      bottom: -100px !important;
+    }
+
+    @media (max-width: 768px) {
+      #section-hero .abs.bottom-0 {
+        bottom: -50px !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="dark-scheme">
+  <div id="wrapper">
+    <div class="float-text show-on-scroll">
+      <span><a href="#">Scroll to top</a></span>
+    </div>
+    <div class="scrollbar-v show-on-scroll"></div>
+
+    <!-- page preloader begin -->
+    <div id="de-loader"></div>
+    <!-- page preloader close -->
+
+    <header class="transparent">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="de-flex">
+              <div class="de-flex-col">
+                <!-- logo begin -->
+                <div id="logo">
+                  <a href="index.html">
+                    <img class="logo-main" src="images/logo1.webp" alt="" />
+                    <img class="logo-scroll" src="images/logo1.webp" alt="" />
+                    <img class="logo-mobile" src="images/logo1.webp" alt="" />
+                  </a>
+                </div>
+                <!-- logo close -->
+              </div>
+
+              <div class="de-flex-col">
+                <div class="de-flex-col header-col-mid">
+                  <ul id="mainmenu">
+                    <li>
+                      <a class="menu-item active" href="#section-hero">Home</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-about">About</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-features">Features</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-modules">Key Modules</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-benefits">Benefits</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-workflow">Workflow</a>
+                    </li>
+                    <li>
+                      <a class="menu-item" href="#section-faq">FAQ</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="de-flex-col">
+                <a class="btn-main fx-slide w-100" href="login.html"><span>Get Started</span></a>
+
+                <div class="menu_side_area">
+                  <span id="menu-btn"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="section-hero" class="section-dark no-top no-bottom text-light jarallax relative mh-800"
+      data-video-src="mp4:video.mp4">
+      <div class="gradient-edge-top op-6 h-50 color"></div>
+      <div class="gradient-edge-bottom"></div>
+      <div class="sw-overlay op-8"></div>
+      <div class="abs abs-centered z-2 w-80">
+        <div class="container wow scaleIn" data-wow-duration="3s">
+          <div class="row">
+            <div class="col-lg-12 text-center">
+              <div class="subtitle">Empowering Future Careers</div>
+              <h1 class="fs-120 text-uppercase fs-sm-12vw mb-4 lh-1">
+                Place Wise <img src="images/emoji.png" alt="🎓" class="grad-cap-icon">
+              </h1>
+
+              <div class="d-block d-md-flex justify-content-center">
+                <div class="d-flex justify-content-center align-items-center mx-4">
+                  <i class="fa fa-graduation-cap id-color me-3"></i>
+                  <h4 class="mb-0">For Educational Institutions</h4>
+                </div>
+
+                <div class="d-flex justify-content-center align-items-center mx-4">
+                  <i class="fa fa-rocket id-color me-3"></i>
+                  <h4 class="mb-0">AI-Powered Solutions</h4>
+                </div>
+              </div>
+
+              <div class="spacer-double"></div>
+
+              <a class="btn-main mx-2 fx-slide" href="#section-modules"><span>Explore Features</span></a>
+              <a class="btn-main btn-line mx-2 fx-slide" href="#section-workflow"><span>How It Works</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="abs w-100 start-0 bottom-0 z-3">
+        <div class="container">
+          <div class="sm-hide border-white-op-3 p-40 py-4 rounded-1 bg-blur relative overflow-hidden wow fadeInUp">
+            <div class="gradient-edge-bottom color start-0 h-50 op-5"></div>
+            <div class="row g-4 justify-content-between align-items-center relative z-2">
+              <div class="col-lg-3">
+                <h2 class="mb-0">Smart Placements</h2>
+                <h4 class="mb-0">AI-Driven Success</h4>
+              </div>
+              <div class="col-lg-4">
+                <div class="pt-2">
+                  <h3 class="mb-0">Data-Driven Insights</h3>
+                  <p class="mb-0">Analyze student skills and predict career paths</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="d-flex">
+                  <i class="fs-60 icofont-google-map id-color"></i>
+                  <div class="ms-3">
+                    <h4 class="mb-0">
+                      Cloud-Based Platform<br />Secure & Scalable
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-about" class="bg-dark section-dark text-light">
+      <div class="container">
+        <div class="row gx-5 align-items-center justify-content-between">
+          <div class="col-lg-6">
+            <div class="me-lg-5 pe-lg-5 py-5 my-5">
+              <div class="subtitle wow fadeInUp" data-wow-delay=".2s">
+                About Place Wise 🎓
+              </div>
+              <h2 class="wow fadeInUp" data-wow-delay=".4s">
+                Transform Student Placements with AI
+              </h2>
+              <p class="wow fadeInUp" data-wow-delay=".6s">
+                Place Wise 🎓 is an end-to-end solution that uses Artificial Intelligence and Machine Learning to
+                automate, analyze, and optimize the training and placement process. We help educational institutions
+                increase placement rates through data-driven insights and personalized student preparation.
+              </p>
+
+              <ul class="ul-check">
+                <li class="wow fadeInUp" data-wow-delay=".8s">
+                  Automated skill gap analysis for students
+                </li>
+                <li class="wow fadeInUp" data-wow-delay=".9s">
+                  AI-powered job role recommendations
+                </li>
+                <li class="wow fadeInUp" data-wow-delay="1s">
+                  Real-time candidate-job matching engine
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="wow scaleIn">
+              <img src="images/misc/c1.webp" class="w-100 rotate-animation" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-dark p-0" aria-label="section">
+      <div class="bg-color text-light d-flex py-4 lh-1 rot-2">
+        <div class="de-marquee-list-1 wow fadeInLeft" data-wow-duration="3s">
+          <span class="fs-60 mx-3">Smart Insights</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Career Success</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Skill Development</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Better Outcomes</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">AI-Powered</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Predictive Analytics</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+        </div>
+      </div>
+
+      <div class="bg-color-2 text-light d-flex py-4 lh-1 rot-min-1 mt-min-20">
+        <div class="de-marquee-list-2 wow fadeInRight" data-wow-duration="3s">
+          <span class="fs-60 mx-3">Data Analytics</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Machine Learning</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">NLP Technology</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Cloud Integration</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Real-Time Matching</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+          <span class="fs-60 mx-3">Automation</span>
+          <span class="fs-60 mx-3 op-2">/</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-benefits" class="bg-dark section-dark text-light">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-6 offset-lg-3 text-center">
+            <div class="subtitle wow fadeInUp mb-3">Key Benefits</div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">
+              Why Choose Place Wise 🎓
+            </h2>
+            <p class="lead mb-0 wow fadeInUp">
+              Leverage advanced AI and machine learning to transform your placement outcomes and empower students for
+              career success.
+            </p>
+          </div>
+        </div>
+
+        <div class="spacer-single"></div>
+
+        <div class="row g-4">
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>For Students</h4>
+                    <p class="mb-0">
+                      Get personalized career paths, skill recommendations, and interview prep tailored to your
+                      strengths.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s3.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>For Placement Officers</h4>
+                    <p class="mb-0">
+                      Access actionable dashboards, analytics, and predictions to streamline the placement process and
+                      increase success rates.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s4.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>For Institutions</h4>
+                    <p class="mb-0">
+                      Improve placement statistics, reduce manual workload, and gain data-driven insights for better
+                      academic planning.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s5.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>Automated Analysis</h4>
+                    <p class="mb-0">
+                      AI-powered skill gap analysis and resume evaluation save time and provide accurate, unbiased
+                      assessments.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s6.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>Real-Time Matching</h4>
+                    <p class="mb-0">
+                      Connect students with suitable job opportunities using advanced machine learning algorithms in
+                      real-time.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s7.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="hover">
+              <div
+                class="bg-dark-2 relative rounded-1 overflow-hidden hover-bg-color hover-text-light wow scale-in-mask">
+                <div class="abs p-40 bottom-0 z-2">
+                  <div class="relative wow fadeInUp">
+                    <h4>Predictive Analytics</h4>
+                    <p class="mb-0">
+                      Forecast employment trends, predict student employability, and optimize placement strategy with
+                      confidence.
+                    </p>
+                  </div>
+                </div>
+                <div class="gradient-edge-bottom h-100"></div>
+                <img src="images/misc/s8.webp" class="w-100 hover-scale-1-1" alt="" />
+                <div class="abs w-100 h-100 start-0 top-0 hover-op-1 radial-gradient-color"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-features" class="bg-dark section-dark text-light">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-6 offset-lg-3 text-center">
+            <div class="subtitle wow fadeInUp mb-3">Core Features</div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">
+              Powerful Capabilities
+            </h2>
+            <p class="lead mb-0 wow fadeInUp">
+              Place Wise combines AI, machine learning, and data analytics to deliver comprehensive placement solutions.
+            </p>
+          </div>
+        </div>
+
+        <div class="spacer-single"></div>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6">
+            <div class="ps-lg-4">
+              <div class="d-flex mb-4 wow fadeInUp">
+                <div>
+                  <i class="fa fa-bar-chart id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>Skill Gap Analysis</h5>
+                  <p class="mb-0">
+                    Automatically analyze student performance across academics, coding tests, and aptitude assessments
+                    to identify strengths and weaknesses.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex mb-4 wow fadeInUp" data-wow-delay=".1s">
+                <div>
+                  <i class="fa fa-brain id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>AI Career Recommendation</h5>
+                  <p class="mb-0">
+                    ML algorithms recommend ideal job roles and target companies based on student profiles and market
+                    demand.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex mb-4 wow fadeInUp" data-wow-delay=".2s">
+                <div>
+                  <i class="fa fa-book id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>Personalized Learning Paths</h5>
+                  <p class="mb-0">
+                    Custom learning plans with courses, study materials, and mock tests tailored to fill each student's
+                    skill gaps.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex mb-4 wow fadeInUp" data-wow-delay=".3s">
+                <div>
+                  <i class="fa fa-file-text id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>Resume Analyzer</h5>
+                  <p class="mb-0">
+                    NLP-powered resume evaluation with keyword optimization, semantic scoring, and job description
+                    alignment checks.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex mb-4 wow fadeInUp" data-wow-delay=".4s">
+                <div>
+                  <i class="fa fa-link id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>Candidate-Job Matching</h5>
+                  <p class="mb-0">
+                    AI matchmaking engine connects students with real-time job opportunities from LinkedIn, Internshala,
+                    and more.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex wow fadeInUp" data-wow-delay=".5s">
+                <div>
+                  <i class="fa fa-dashboard id-color fs-40 me-4 mt-1"></i>
+                </div>
+                <div>
+                  <h5>Placement Insights Dashboard</h5>
+                  <p class="mb-0">
+                    Real-time analytics for placement officers tracking progress, trends, and outcomes at a glance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <img src="" class="w-100" alt="" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-modules" class="bg-dark section-dark text-light">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-6 offset-lg-3 text-center">
+            <div class="subtitle wow fadeInUp mb-3">System Architecture</div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">
+              Key Modules
+            </h2>
+            <p class="lead mb-0 wow fadeInUp">
+              Six powerful modules working together to optimize the entire placement journey.
+            </p>
+          </div>
+        </div>
+
+        <div class="spacer-single"></div>
+
+        <div class="row gx-5">
+          <div class="col-lg-6">
+            <div class="relative">
+              <div class="row g-4" data-cue="slideInUp" data-duration="1000">
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Skill Gap Analysis</h5>
+                    <p class="mb-0 fs-14">
+                      Identify competency levels and knowledge gaps across technical and soft skills.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Career Recommendations</h5>
+                    <p class="mb-0 fs-14">
+                      Suggest ideal job roles and target companies using predictive ML models.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Learning Paths</h5>
+                    <p class="mb-0 fs-14">
+                      Generate customized training plans with resources and assessments.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Resume Analysis</h5>
+                    <p class="mb-0 fs-14">
+                      Parse and evaluate resumes with NLP for optimization and alignment.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Job Matching Engine</h5>
+                    <p class="mb-0 fs-14">
+                      Real-time matching between student profiles and live job opportunities.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="box border-white-op-3 bg-dark-2 p-4 rounded-1">
+                    <h5 class="mb-3">Analytics Dashboard</h5>
+                    <p class="mb-0 fs-14">
+                      Comprehensive insights and predictions for placement officers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <img src="images/logo-big-white.webp" class="w-100" alt="" style="padding-top: 128px;" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-workflow" class="bg-dark section-dark text-light pt-80">
+      <div class="container">
+        <div class="row g-4 justify-content-center mb-5">
+          <div class="col-lg-6 text-center">
+            <div class="subtitle s2 mb-3 wow fadeInUp" data-wow-delay=".0s">
+              Process Overview
+            </div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">
+              How Place Wise 🎓 Works
+            </h2>
+            <p class="lead wow fadeInUp" data-wow-delay=".4s">
+              Our system follows a streamlined workflow to transform student preparation and placement outcomes.
+            </p>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-12">
+            <div class="row g-4 align-items-center">
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp">
+                  <h4 class="mb-3">1. Data Collection</h4>
+                  <p class="mb-0">
+                    Gather student data including academic records, skill assessments, test results, and resume
+                    information into a centralized system.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp" data-wow-delay=".1s">
+                  <h4 class="mb-3">2. Skill Analysis</h4>
+                  <p class="mb-0">
+                    AI analyzes competency levels, identifies knowledge gaps, and assesses student readiness across
+                    technical and soft skills.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp" data-wow-delay=".2s">
+                  <h4 class="mb-3">3. Recommendations</h4>
+                  <p class="mb-0">
+                    ML models recommend suitable job roles, target companies, and personalized learning resources based
+                    on skill analysis.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp" data-wow-delay=".3s">
+                  <h4 class="mb-3">4. Resume Optimization</h4>
+                  <p class="mb-0">
+                    NLP engine enhances resumes by optimizing keywords, improving formatting, and aligning with target
+                    job descriptions.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp" data-wow-delay=".4s">
+                  <h4 class="mb-3">5. Job Matching</h4>
+                  <p class="mb-0">
+                    AI compares student profiles with live job postings, considering skills, location, preferences, and
+                    market fit for best matches.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="box border-white-op-3 bg-dark-2 p-40 rounded-1 wow fadeInUp" data-wow-delay=".5s">
+                  <h4 class="mb-3">6. Insights & Analytics</h4>
+                  <p class="mb-0">
+                    Placement officers access comprehensive dashboards with analytics, predictions, and insights to
+                    monitor progress and outcomes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!------- FAQ Section Begin ------>
+
+    <section id="section-faq" class="bg-dark section-dark text-light pt-80 pb-80">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 offset-lg-3 text-center">
+            <div class="subtitle wow fadeInUp mb-3">Questions</div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">FAQ</h2>
+            <p class="lead mb-0 wow fadeInUp" data-wow-delay=".4s">
+              Have questions about Place Wise 🎓? Find answers to common questions below.
+            </p>
+          </div>
+        </div>
+
+        <div class="spacer-single"></div>
+
+        <div class="row">
+          <div class="col-lg-8 offset-lg-2">
+
+            <!-- FAQ 1 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">How does Place Wise 🎓 analyze student skills?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Place Wise 🎓 uses advanced AI algorithms to analyze student performance across academics, coding
+                  tests, aptitude assessments, and real-world projects. The system identifies strengths, weaknesses, and
+                  skill gaps, then provides actionable recommendations for improvement.</p>
+              </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">Can Place Wise 🎓 integrate with existing systems?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Yes! Place Wise 🎓 is designed with integration in mind. It can connect with your institution's
+                  existing LMS, ERP, and student information systems via APIs. The platform also integrates with job
+                  boards like LinkedIn and Internshala for real-time opportunity matching.</p>
+              </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">How does the resume analyzer work?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Our NLP-powered analyzer automatically parses resumes, evaluates content, suggests keyword
+                  improvements, and checks alignment with target job descriptions. It provides a semantic score and
+                  specific recommendations to enhance resume effectiveness for each application.</p>
+              </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">What kind of insights do placement officers get?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Placement officers access dashboards showing employable student counts per domain, predicted hiring
+                  trends, training progress tracking, average skill improvement rates, and placement predictions. These
+                  insights enable data-driven decisions for targeted training drives and improved outcomes.</p>
+              </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">Is my student data secure?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Absolutely. Place Wise 🎓 is deployed on secure cloud infrastructure (AWS/Google Cloud) with
+                  industry-standard encryption, regular security audits, and GDPR compliance. Student data is protected
+                  with role-based access controls and comprehensive privacy policies.</p>
+              </div>
+            </div>
+
+            <!-- FAQ 6 -->
+            <div class="faq-item mb-4">
+              <div class="faq-question" onclick="toggleFaq(this)">
+                <h5 class="mb-0">How quickly can we see results?</h5>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>Results vary by institution, but most see improvements within 2–3 months. Initial skill analysis
+                  takes days, personalized learning paths are generated immediately, and job matching begins within the
+                  first week. Long-term outcomes like placement rate improvements typically manifest within a semester.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function toggleFaq(element) {
+        const faqItem = element.parentElement;
+        const answer = faqItem.querySelector('.faq-answer');
+        const icon = element.querySelector('.faq-icon');
+
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(item => {
+          if (item !== faqItem) {
+            item.classList.remove('active');
+            item.querySelector('.faq-answer').style.maxHeight = null;
+            item.querySelector('.faq-icon').textContent = '+';
+          }
+        });
+
+        // Toggle current FAQ
+        faqItem.classList.toggle('active');
+        if (faqItem.classList.contains('active')) {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+          icon.textContent = '−';
+        } else {
+          answer.style.maxHeight = null;
+          icon.textContent = '+';
+        }
+      }
+    </script>
+
+    <!-- FAQ ENDS HERE ------->
+    <section id="section-contact" class="bg-color section-dark text-light pt-80 pb-80">
+      <div class="container">
+        <div class="row g-4 justify-content-center">
+          <div class="col-lg-6 text-center">
+            <div class="subtitle mb-3 wow fadeInUp">Get Started Today</div>
+            <h2 class="wow fadeInUp" data-wow-delay=".2s">
+              Ready to Transform Your Placement Strategy?
+            </h2>
+            <p class="lead mb-4 wow fadeInUp" data-wow-delay=".4s">
+              Join educational institutions already using Place Wise 🎓 to improve placement outcomes and student career
+              success.
+            </p>
+            <a class="btn-main mx-2 fx-slide wow fadeInUp" href="register.html" data-wow-delay=".6s"><span>Get
+                Register</span></a>
+            <a class="btn-main btn-line mx-2 fx-slide wow fadeInUp" href="contactus.html"
+              data-wow-delay=".6s"><span>Contact Us</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-dark pt-40 pb-40 text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="spacer-single"></div>
+            <h6>
+              &copy; 2026 Place Wise 🎓. All rights reserved. | AI-Driven Training and Placement Support System
+            </h6>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Page Transition Loader -->
+  <div class="page-transition-loader" id="pageTransitionLoader">
+    <div class="transition-spinner">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Java Script
+    ================================================== -->
+  <script src="js/vendors.js"></script>
+  <script src="js/designesia.js"></script>
+  <script src="js/countdown-custom.js"></script>
+  <script src="js/custom-marquee.js"></script>
+  <script>
+    // Global Page Transition Loading
+    const transitionLoader = document.getElementById('pageTransitionLoader');
+
+    // Show loader on link click
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a');
+      if (link && link.href && !link.target && link.hostname === window.location.hostname) {
+        // External or same-domain links only
+        if (!link.href.includes('#')) {
+          transitionLoader.classList.add('active');
+        }
+      }
+    });
+
+    // Show loader on page unload
+    window.addEventListener('beforeunload', function () {
+      transitionLoader.classList.add('active');
+    });
+
+    // Show loader on back/forward navigation
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        transitionLoader.classList.add('active');
+        setTimeout(() => {
+          transitionLoader.classList.remove('active');
+        }, 500);
+      }
+    });
+
+    window.addEventListener('pagehide', function (event) {
+      if (event.persisted) {
+        transitionLoader.classList.add('active');
+      }
+    });
+
+    // Remove loader when page fully loads
+    window.addEventListener('load', function () {
+      setTimeout(() => {
+        transitionLoader.classList.remove('active');
+      }, 300);
+    });
+  </script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Backend Integration Scripts -->
+  <script src="backend/supabase-init.js"></script>
+  <script src="backend/auth-service.js"></script>
+  <script src="backend/db-service.js"></script>
+  <script src="backend/backend-integration.js"></script>
+
+  <!-- OAuth Callback Handler -->
+  <script>
+    // Check for OAuth login callback
+    async function checkOAuthLogin() {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+
+      if (accessToken) {
+        console.log('OAuth callback detected on homepage');
+
+        try {
+          // Wait for backend to initialize
+          await new Promise(resolve => {
+            if (window.SUPABASE_URL && window.AuthService) {
+              resolve();
+            } else {
+              setTimeout(resolve, 1000);
+            }
+          });
+
+          // Get the current session using AuthService
+          const sessionResult = await window.AuthService.getCurrentSession();
+
+          if (!sessionResult.success || !sessionResult.session) {
+            console.error('Session error');
+            return;
+          }
+
+          const session = sessionResult.session;
+
+          if (session && session.user) {
+            console.log('User authenticated via OAuth:', session.user.email);
+
+            // Check if profile exists for this user
+            const profileResult = await getUserProfile(session.user.id);
+            let profile = profileResult.success ? profileResult.profile : null;
+
+            // If no profile found by user_id, check by email
+            if (!profile) {
+              console.log('No profile found for user_id, checking by email...');
+              const supabase = window.supabase.createClient(
+                window.SUPABASE_URL,
+                window.SUPABASE_ANON_KEY
+              );
+
+              const { data: existingProfiles } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('email', session.user.email)
+                .limit(1);
+
+              if (existingProfiles && existingProfiles.length > 0) {
+                console.log('Found existing profile with same email, linking...');
+                // Update the existing profile with the new user_id
+                const { error: updateError } = await supabase
+                  .from('user_profiles')
+                  .update({ user_id: session.user.id })
+                  .eq('email', session.user.email);
+
+                if (!updateError) {
+                  console.log('Profile linked successfully');
+                  profile = existingProfiles[0];
+                }
+              }
+            }
+
+            // Redirect to dashboard
+            console.log('Redirecting to dashboard...');
+            window.location.href = 'dashboard.html';
+          }
+        } catch (error) {
+          console.error('OAuth callback error:', error);
+        }
+      }
+    }
+
+    // Run OAuth check when page loads
+    window.addEventListener('load', function () {
+      if (window.location.hash.includes('access_token')) {
+        // Wait a bit for backend scripts to initialize
+        setTimeout(() => {
+          checkOAuthLogin();
+        }, 500);
+      }
+    });
+  </script>
+</body>
+
+</html>
