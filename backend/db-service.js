@@ -6,16 +6,24 @@
  */
 
 /**
+ * Get Supabase client instance (reuses persistent authenticated client)
+ * @returns {Object} Supabase client
+ */
+function getSupabaseClient() {
+  return window.supabaseClient || window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+}
+
+/**
  * Get user profile by user ID
  * @param {string} userId - User's unique ID
  * @returns {Promise<Object>} User profile data
  */
 async function getUserProfile(userId) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('user_profiles')
@@ -45,10 +53,7 @@ async function getUserProfile(userId) {
  */
 async function getUserProfileByMobile(mobile) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('user_profiles')
@@ -79,10 +84,7 @@ async function getUserProfileByMobile(mobile) {
  */
 async function createUserProfile(userId, profileData) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('user_profiles')
@@ -122,10 +124,7 @@ async function createUserProfile(userId, profileData) {
  */
 async function updateUserProfile(userId, updates) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('user_profiles')
@@ -159,10 +158,7 @@ async function updateUserProfile(userId, updates) {
  */
 async function createTraining(trainingData) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('trainings')
@@ -202,10 +198,7 @@ async function createTraining(trainingData) {
  */
 async function getUserTrainings(userId) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('trainings')
@@ -235,10 +228,7 @@ async function getUserTrainings(userId) {
  */
 async function createPlacement(placementData) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('placements')
@@ -279,10 +269,7 @@ async function createPlacement(placementData) {
  */
 async function getUserPlacements(userId) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('placements')
@@ -313,10 +300,7 @@ async function getUserPlacements(userId) {
  */
 async function updatePlacementStatus(placementId, status) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('placements')
@@ -350,10 +334,7 @@ async function updatePlacementStatus(placementId, status) {
  */
 async function createAIInteraction(interactionData) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('ai_interactions')
@@ -392,10 +373,7 @@ async function createAIInteraction(interactionData) {
  */
 async function getAIInteractionHistory(userId, limit = 50) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
       .from('ai_interactions')
@@ -427,10 +405,7 @@ async function getAIInteractionHistory(userId, limit = 50) {
  */
 async function uploadResume(userId, file) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const fileExt = file.name.split('.').pop();
     const fileName = `resume_${Date.now()}.${fileExt}`;
@@ -485,10 +460,7 @@ async function uploadResume(userId, file) {
  */
 async function uploadProfilePicture(userId, file) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     const fileExt = file.name.split('.').pop();
     const fileName = `profile_${Date.now()}.${fileExt}`;
@@ -542,10 +514,7 @@ async function uploadProfilePicture(userId, file) {
  */
 async function removeProfilePicture(userId) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     // Get current profile to find the image URL
     const { data: profile, error: fetchError } = await supabase
@@ -607,10 +576,7 @@ async function removeProfilePicture(userId) {
  */
 async function getUserStatistics(userId) {
   try {
-    const supabase = window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     // Get counts in parallel
     const [trainingsResult, placementsResult, interactionsResult] = await Promise.all([

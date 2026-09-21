@@ -83,7 +83,25 @@
           }, 1500);
         } else {
           // Show error message
-          showNotification('error', result.error || 'Login failed. Please try again.');
+          const errorMsg = result.error || 'Login failed. Please try again.';
+          showNotification('error', errorMsg);
+
+          // If email is not confirmed, prompt user to resend verification email
+          if (errorMsg.toLowerCase().includes('not confirmed') || errorMsg.toLowerCase().includes('not verified')) {
+            const isEmail = emailOrMobile.includes('@');
+            if (isEmail) {
+              const shouldResend = confirm(errorMsg + '\n\nWould you like us to resend the confirmation email to ' + emailOrMobile + '?');
+              if (shouldResend) {
+                const resendResult = await window.AuthService.resendConfirmationEmail(emailOrMobile);
+                if (resendResult.success) {
+                  showNotification('success', resendResult.message);
+                } else {
+                  showNotification('error', resendResult.error || 'Failed to resend confirmation email.');
+                }
+              }
+            }
+          }
+
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
@@ -176,13 +194,22 @@
         const result = await window.AuthService.registerWithEmail(email, password, metadata);
 
         if (result.success) {
-          // Show success message
-          showNotification('success', result.message);
+          if (result.session) {
+            // Show verification success message
+            showNotification('success', 'Account created & verified! Logging you in automatically in 3 seconds...');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Redirecting to Dashboard...';
 
-          // Redirect to login
-          setTimeout(() => {
-            window.location.href = 'login.html';
-          }, 2000);
+            // Automatically redirect to dashboard after 3 seconds
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 3000);
+          } else {
+            showNotification('success', result.message || 'Registration successful! Redirecting in 3 seconds...');
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 3000);
+          }
         } else {
           // Show error message
           const errorMsg = result.error || 'Registration failed. Please try again.';

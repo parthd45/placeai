@@ -431,7 +431,7 @@
 <h2 style="text-align:start;">Sign In</h2>
               <h4 style="text-align:start;">Welcome back ! login to Place Wise🎓.</h4>
 
-            <form id="loginForm" method="POST" action="/login" novalidate>
+            <form id="loginForm" action="javascript:void(0);" novalidate>
               <div class="form-group">
                 <label for="emailOrMobile">Email / Mobile Number :</label>
                 <input type="text" id="emailOrMobile" name="emailOrMobile" placeholder="Enter email or mobile" required aria-describedby="emailError" />
@@ -510,7 +510,7 @@
             console.log('No profile found for user_id, checking by email...');
             
             // No profile with this user_id - check if email already has a profile
-            const supabase = window.supabase.createClient(
+            const supabase = window.supabaseClient || window.supabase.createClient(
               window.SUPABASE_URL,
               window.SUPABASE_ANON_KEY
             );

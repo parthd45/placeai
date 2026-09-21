@@ -104,7 +104,9 @@ async function registerWithEmail(email, password, metadata = {}) {
       success: true,
       user: data.user,
       session: data.session,
-      message: 'Registration successful! Please check your email to verify your account.'
+      message: data.session 
+        ? 'Account created and verified! Redirecting to your dashboard...' 
+        : 'Registration successful! Please check your email to verify your account.'
     };
   } catch (error) {
     console.error('Registration error:', error);
@@ -114,6 +116,14 @@ async function registerWithEmail(email, password, metadata = {}) {
       return {
         success: false,
         error: 'This email is already registered. Please login or use password reset if you forgot your password.'
+      };
+    }
+
+    // Handle case where email provider is disabled
+    if (error.message && (error.message.includes('disabled') || error.code === 'email_provider_disabled')) {
+      return {
+        success: false,
+        error: 'Email signups are disabled in your Supabase project. Please enable the Email provider in your Supabase Dashboard under Authentication > Providers > Email.'
       };
     }
 
@@ -237,9 +247,18 @@ async function login(identifier, password) {
     };
   } catch (error) {
     console.error('Login error:', error);
+    let errorMessage = error.message || 'Invalid credentials';
+    if (errorMessage.toLowerCase().includes('email logins are disabled') || error.code === 'email_provider_disabled') {
+      errorMessage = 'Email logins are disabled in your Supabase project. Please enable the Email provider in your Supabase Dashboard under Authentication > Providers > Email.';
+    } else if (errorMessage.toLowerCase().includes('email not confirmed')) {
+      errorMessage = 'Your email is not verified yet. Please check your inbox for the confirmation link, or confirm this user in your Supabase Auth dashboard.';
+    } else if (errorMessage.toLowerCase().includes('invalid login credentials')) {
+      errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+    }
     return {
       success: false,
-      error: error.message || 'Invalid credentials'
+      error: errorMessage,
+      rawError: error
     };
   }
 }
