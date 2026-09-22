@@ -557,19 +557,14 @@
                 <label for="loginPhoneInput">Mobile Number :</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                   <input type="tel" id="loginPhoneInput" placeholder="Enter 10-digit mobile number" style="flex: 1;" />
-                  <button type="button" id="sendLoginPhoneOtpBtn" class="verify-phone-btn" style="background: #25D366; white-space: nowrap;">Send OTP</button>
+                  <button type="button" id="sendLoginPhoneOtpBtn" class="verify-phone-btn" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); white-space: nowrap;">Send OTP</button>
                 </div>
                 <div id="loginPhoneError" class="error-message" role="alert">Please enter a valid mobile number.</div>
               </div>
 
               <div id="loginOtpVerifySection" style="display: none; margin-top: 15px; text-align: center;">
-                <div style="font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">
-                  Enter 6-digit OTP sent to your WhatsApp at <span id="loginPhoneDisplay" style="color: #4ade80; font-weight: 600;"></span>
-                </div>
-                <div style="margin: 6px auto 10px auto; max-width: 380px; font-size: 11px; background: rgba(37, 211, 102, 0.12); border: 1px solid rgba(37, 211, 102, 0.35); border-radius: 6px; padding: 6px 10px; color: #dcfce7; line-height: 1.4; text-align: left;">
-                  💬 <strong>First time?</strong> Send <em>"Hi"</em> on WhatsApp to 
-                  <a href="https://wa.me/15551877419?text=Hi" target="_blank" rel="noopener noreferrer" style="color: #4ade80; font-weight: 700; text-decoration: underline;">+1 555 187-7419</a> 
-                  so WhatsApp allows incoming messages to your phone.
+                <div style="font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 8px;">
+                  Enter 6-digit verification code for <span id="loginPhoneDisplay" style="color: #c4b5fd; font-weight: 600;"></span>
                 </div>
                 <div class="otp-digit-group" id="loginOtpInputs">
                   <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="0" inputmode="numeric" autocomplete="off" />
@@ -581,7 +576,7 @@
                 </div>
                 <div id="loginOtpCodeError" class="error-message" role="alert" style="margin-bottom: 10px;"></div>
 
-                <button type="button" id="verifyLoginPhoneOtpBtn" class="login-btn" style="background: #25D366; width: 70%; margin: 10px auto;">Verify & Sign In</button>
+                <button type="button" id="verifyLoginPhoneOtpBtn" class="login-btn" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); width: 70%; margin: 10px auto;">Verify & Sign In</button>
 
                 <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 10px;">
                   Didn't receive code? 

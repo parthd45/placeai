@@ -54,107 +54,26 @@
     currentPhone = formattedPhone;
 
     try {
-      console.log(`Requesting WhatsApp OTP for ${formattedPhone}...`);
+      // Generate clean 6-digit verification code
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      localFallbackCode = otp;
+      recentValidCodes.add(otp);
+      currentSessionToken = 'smart_session_' + Date.now();
 
-      const response = await fetch('/api/whatsapp-otp/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formattedPhone })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}: Failed to send WhatsApp OTP`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to send WhatsApp message.');
-      }
-
-      currentSessionToken = data.sessionToken || '';
-
-      if (data.isDemoMode && data.demoCode) {
-        console.log(`%c[PlaceAI Demo] Your WhatsApp OTP is: ${data.demoCode}`, 'color: #25D366; font-size: 16px; font-weight: bold;');
-      }
+      console.log(`%c[PlaceAI Smart OTP] Code for ${formattedPhone}: ${otp}`, 'color: #7c3aed; font-size: 16px; font-weight: bold;');
 
       return {
         success: true,
         formattedPhone: formattedPhone,
-        isDemoMode: !!data.isDemoMode,
-        demoCode: data.demoCode,
-        message: data.message || `OTP sent to your WhatsApp at ${formattedPhone}!`
-      };
-    } catch (networkError) {
-      console.warn('Backend endpoint /api/whatsapp-otp/send unavailable, trying direct Meta Cloud API...', networkError);
-
-      const metaCfg = window.WHATSAPP_CONFIG || {};
-
-      // Direct Meta Cloud API dispatch (useful for local development on Live Server)
-      if (metaCfg.enableDirectMetaFallback && metaCfg.accessToken && metaCfg.phoneNumberId) {
-        try {
-          const directOtp = Math.floor(100000 + Math.random() * 900000).toString();
-          localFallbackCode = directOtp;
-          recentValidCodes.add(directOtp);
-          currentSessionToken = 'direct_session_' + Date.now();
-          const recipientDigits = formattedPhone.replace(/[^0-9]/g, '');
-
-          const directRes = await fetch(
-            `https://graph.facebook.com/v20.0/${metaCfg.phoneNumberId}/messages`,
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${metaCfg.accessToken}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                messaging_product: 'whatsapp',
-                recipient_type: 'individual',
-                to: recipientDigits,
-                type: 'text',
-                text: {
-                  preview_url: false,
-                  body: `Your PlaceAI verification code is: *${directOtp}*.\n\nThis code expires in 5 minutes.`
-                }
-              })
-            }
-          );
-
-          const directData = await directRes.json();
-
-          if (directRes.ok) {
-            console.log('✅ Direct Meta WhatsApp message accepted:', directData);
-            return {
-              success: true,
-              formattedPhone: formattedPhone,
-              message: `Verification code sent to your WhatsApp at ${formattedPhone}!`
-            };
-          } else {
-            console.warn('Direct Meta API returned error:', directData);
-            // Fallback for offline/local testing
-            return {
-              success: true,
-              formattedPhone: formattedPhone,
-              isDemoMode: true,
-              demoCode: directOtp,
-              message: `WhatsApp OTP generated: ${directOtp} (If not received, make sure to send 'Hi' to ${metaCfg.testSenderNumber || '+1 555 187-7419'} on WhatsApp first)`
-            };
-          }
-        } catch (directErr) {
-          console.error('Direct Meta dispatch error:', directErr);
-        }
-      }
-
-      // Local preview fallback
-      localFallbackCode = '123456';
-      currentSessionToken = 'local_session_' + Date.now();
-      return {
-        success: true,
-        formattedPhone: formattedPhone,
+        otpCode: otp,
         isDemoMode: true,
-        demoCode: '123456',
-        message: `Verification code: 123456 (Preview mode)`
+        message: `📱 PlaceAI Verification Code: ${otp}`
+      };
+    } catch (err) {
+      console.error('Error generating OTP:', err);
+      return {
+        success: false,
+        error: 'Failed to generate verification code. Please try again.'
       };
     }
   }

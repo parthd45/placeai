@@ -616,7 +616,7 @@
         showNotification('error', result.error || 'Failed to send OTP.');
       }
       sendOtpBtn.disabled = false;
-      sendOtpBtn.textContent = 'Verify WhatsApp';
+      sendOtpBtn.innerHTML = '<span>📱</span> Verify via OTP';
     });
 
     if (cancelOtpBtn) {
@@ -753,7 +753,7 @@
           clearInterval(resendInterval);
           if (resendBtn) {
             resendBtn.disabled = false;
-            resendBtn.innerHTML = 'Resend SMS';
+            resendBtn.innerHTML = 'Resend Code';
           }
         }
       }, 1000);
