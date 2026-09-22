@@ -156,7 +156,8 @@
 
       // Get form values by ID
       const email = document.getElementById('emailInput').value.trim();
-      const mobile = document.getElementById('mobileInput').value.trim();
+      const mobileInput = document.getElementById('mobileInput');
+      const mobile = mobileInput ? mobileInput.value.trim() : '';
       const firstName = document.getElementById('firstNameInput').value.trim();
       const lastName = document.getElementById('lastNameInput').value.trim();
       const password = document.getElementById('password').value;
@@ -180,15 +181,7 @@
         return;
       }
 
-      // Show loading state
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating Account...';
-
       // Check if mobile number is entered and verified
-      const mobileInput = document.getElementById('mobileInput');
-      const mobile = mobileInput ? mobileInput.value.trim() : '';
       const isMobileVerified = mobileInput && mobileInput.dataset.verified === 'true';
 
       if (mobile && !isMobileVerified) {
@@ -198,11 +191,15 @@
         if (proceedWithoutVerification) {
           const sendBtn = document.getElementById('sendMobileOtpBtn');
           if (sendBtn) sendBtn.click();
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
           return;
         }
       }
+
+      // Show loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating Account...';
 
       try {
         const metadata = {
