@@ -10,9 +10,9 @@ const crypto = require('crypto');
 // Secret key for signing OTP tokens (set in Vercel Environment Variables or defaults to fallback)
 const OTP_SECRET = process.env.OTP_SECRET || 'placeai_whatsapp_otp_secret_key_2026';
 
-// Meta WhatsApp Cloud API credentials (set in Vercel Environment Variables or fallback to config)
-const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || '';
-const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+// Meta WhatsApp Cloud API credentials (set in Vercel Environment Variables or fallback to active credentials)
+const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || 'EABDMDZCECsSwBSjgHOJQcM9o2yZAtO7rDGrZCZAX07PcDugWbFZBwbvAajHqSA6mDr4pXWbN9judwfwTczxOtggRne4V7mIZAaaV2tWf9zoq9duKYMQUaHg3PwmfhMrpJn674ZA35kd6CpgJsyK4xzZByhxvFYbD4H7pB1RpHRuJtOJjZAKVmZCUnVafdZA3kSOoW9iRcjVVZCBIJaCo8wYx80Jl6ReFcjJDl47S8nM4yNUPexN2YjZBYIwTfmZADJDAi92PqHeU52yboLQNIlBKDBg5tPfLuwZBAZDZD';
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '1386808957839795';
 const WHATSAPP_TEMPLATE_NAME = process.env.WHATSAPP_TEMPLATE_NAME || '';
 
 module.exports = async (req, res) => {
