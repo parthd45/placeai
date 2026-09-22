@@ -526,7 +526,7 @@
             <!-- Login Mode Switcher Tabs -->
             <div class="auth-toggle-group" style="display: flex; gap: 8px; margin-bottom: 20px;">
               <button type="button" id="tabPasswordLogin" class="auth-toggle-tab active" style="flex: 1; padding: 9px; border-radius: 20px; border: 1px solid #7c3aed; background: #7c3aed; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 13px;">🔑 Password</button>
-              <button type="button" id="tabPhoneOtpLogin" class="auth-toggle-tab" style="flex: 1; padding: 9px; border-radius: 20px; border: 1px solid #7c3aed; background: transparent; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 13px;">📱 Mobile OTP</button>
+              <button type="button" id="tabPhoneOtpLogin" class="auth-toggle-tab" style="flex: 1; padding: 9px; border-radius: 20px; border: 1px solid #25D366; background: transparent; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 13px;">💬 WhatsApp OTP</button>
             </div>
 
             <!-- Standard Password Login Form -->
@@ -551,20 +551,20 @@
               <button type="submit" class="login-btn">Sign In</button>
             </form>
 
-            <!-- Mobile OTP Sign In Form -->
+            <!-- WhatsApp OTP Sign In Form -->
             <form id="phoneOtpLoginForm" action="javascript:void(0);" style="display: none;" novalidate>
               <div class="form-group" style="margin-bottom: 14px;">
                 <label for="loginPhoneInput">Mobile Number :</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                   <input type="tel" id="loginPhoneInput" placeholder="Enter 10-digit mobile number" style="flex: 1;" />
-                  <button type="button" id="sendLoginPhoneOtpBtn" class="verify-phone-btn">Send OTP</button>
+                  <button type="button" id="sendLoginPhoneOtpBtn" class="verify-phone-btn" style="background: #25D366; white-space: nowrap;">Send OTP</button>
                 </div>
                 <div id="loginPhoneError" class="error-message" role="alert">Please enter a valid mobile number.</div>
               </div>
 
               <div id="loginOtpVerifySection" style="display: none; margin-top: 15px; text-align: center;">
                 <div style="font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">
-                  Enter 6-digit SMS OTP sent to <span id="loginPhoneDisplay" style="color: #c4b5fd; font-weight: 600;"></span>
+                  Enter 6-digit OTP sent to your WhatsApp at <span id="loginPhoneDisplay" style="color: #4ade80; font-weight: 600;"></span>
                 </div>
                 <div class="otp-digit-group" id="loginOtpInputs">
                   <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="0" inputmode="numeric" autocomplete="off" />
@@ -576,11 +576,11 @@
                 </div>
                 <div id="loginOtpCodeError" class="error-message" role="alert" style="margin-bottom: 10px;"></div>
 
-                <button type="button" id="verifyLoginPhoneOtpBtn" class="login-btn" style="width: 70%; margin: 10px auto;">Verify & Sign In</button>
+                <button type="button" id="verifyLoginPhoneOtpBtn" class="login-btn" style="background: #25D366; width: 70%; margin: 10px auto;">Verify & Sign In</button>
 
                 <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 10px;">
-                  Didn't receive SMS? 
-                  <button id="resendLoginOtpBtn" type="button" style="background: none; border: none; color: #a78bfa; cursor: pointer; font-weight: 600; font-size: 13px;" disabled>
+                  Didn't receive code? 
+                  <button id="resendLoginOtpBtn" type="button" style="background: none; border: none; color: #4ade80; cursor: pointer; font-weight: 600; font-size: 13px;" disabled>
                     Resend in <span id="loginResendTimer">60</span>s
                   </button>
                 </div>
@@ -627,6 +627,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="backend/firebase-config.js"></script>
   <script src="backend/phone-auth-service.js"></script>
+
+  <!-- WhatsApp OTP Authentication (Meta Cloud API) -->
+  <script src="backend/whatsapp-config.js"></script>
+  <script src="backend/whatsapp-auth-service.js"></script>
   <div id="recaptcha-container"></div>
 
   <!-- Supabase Backend Integration -->

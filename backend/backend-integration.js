@@ -598,22 +598,25 @@
       }
 
       sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = 'Sending SMS...';
+      sendOtpBtn.textContent = 'Sending OTP...';
       if (otpError) otpError.style.display = 'none';
 
-      const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      const result = window.WhatsAppAuthService
+        ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
+        : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+
       if (result.success) {
-        showNotification('success', result.message || 'SMS OTP sent successfully!');
+        showNotification('success', result.message || 'OTP sent successfully to your WhatsApp!');
         if (mobileOtpDisplay) mobileOtpDisplay.textContent = result.formattedPhone || phone;
         if (mobileOtpBox) mobileOtpBox.style.display = 'block';
         digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
         if (digitInputs[0]) digitInputs[0].focus();
         startTimer(60);
       } else {
-        showNotification('error', result.error || 'Failed to send SMS OTP.');
+        showNotification('error', result.error || 'Failed to send OTP.');
       }
       sendOtpBtn.disabled = false;
-      sendOtpBtn.textContent = 'Verify via OTP';
+      sendOtpBtn.textContent = 'Verify WhatsApp';
     });
 
     if (cancelOtpBtn) {
@@ -627,12 +630,14 @@
         resendBtn.disabled = true;
         resendBtn.textContent = 'Sending...';
         const phone = mobileInput.value.trim();
-        const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        const result = window.WhatsAppAuthService
+          ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
+          : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
         if (result.success) {
-          showNotification('success', 'New SMS OTP sent!');
+          showNotification('success', 'New verification code sent!');
           startTimer(60);
         } else {
-          showNotification('error', result.error || 'Failed to resend SMS.');
+          showNotification('error', result.error || 'Failed to resend code.');
           resendBtn.disabled = false;
           resendBtn.textContent = 'Resend Code';
         }
@@ -646,7 +651,7 @@
 
         if (code.length !== 6) {
           if (otpError) {
-            otpError.textContent = 'Please enter all 6 digits of the SMS code.';
+            otpError.textContent = 'Please enter all 6 digits of the verification code.';
             otpError.style.display = 'block';
           }
           if (mobileOtpBox) {
@@ -660,7 +665,9 @@
         confirmOtpBtn.textContent = 'Verifying...';
         if (otpError) otpError.style.display = 'none';
 
-        const result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        const result = window.WhatsAppAuthService
+          ? await window.WhatsAppAuthService.verifyWhatsAppOTP(code)
+          : await window.PhoneAuthService.verifyPhoneOTP(code);
         if (result.success) {
           digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
           showNotification('success', '✅ Mobile number verified successfully!');
@@ -769,9 +776,12 @@
       sendOtpBtn.disabled = true;
       sendOtpBtn.textContent = 'Sending...';
 
-      const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      const result = window.WhatsAppAuthService
+        ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
+        : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+
       if (result.success) {
-        showNotification('success', result.message || 'SMS OTP sent successfully!');
+        showNotification('success', result.message || 'OTP sent successfully!');
         if (phoneDisplay) phoneDisplay.textContent = result.formattedPhone || phone;
         if (verifySection) verifySection.style.display = 'block';
         digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
@@ -782,7 +792,7 @@
           phoneError.textContent = result.error || 'Failed to send OTP.';
           phoneError.style.display = 'block';
         }
-        showNotification('error', result.error || 'Failed to send SMS OTP.');
+        showNotification('error', result.error || 'Failed to send OTP.');
       }
       sendOtpBtn.disabled = false;
       sendOtpBtn.textContent = 'Send OTP';
@@ -793,14 +803,16 @@
         resendBtn.disabled = true;
         resendBtn.textContent = 'Sending...';
         const phone = phoneInput.value.trim();
-        const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        const result = window.WhatsAppAuthService
+          ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
+          : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
         if (result.success) {
-          showNotification('success', 'New SMS OTP sent!');
+          showNotification('success', 'New verification code sent!');
           startTimer(60);
         } else {
-          showNotification('error', result.error || 'Failed to resend SMS.');
+          showNotification('error', result.error || 'Failed to resend code.');
           resendBtn.disabled = false;
-          resendBtn.textContent = 'Resend SMS';
+          resendBtn.textContent = 'Resend Code';
         }
       });
     }
@@ -826,7 +838,9 @@
         verifyBtn.textContent = 'Verifying & Signing In...';
         if (codeError) codeError.style.display = 'none';
 
-        const result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        const result = window.WhatsAppAuthService
+          ? await window.WhatsAppAuthService.verifyWhatsAppOTP(code)
+          : await window.PhoneAuthService.verifyPhoneOTP(code);
         if (result.success) {
           digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
           showNotification('success', '✅ Verified! Logging you in...');
