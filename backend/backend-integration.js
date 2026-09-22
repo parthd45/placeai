@@ -27,12 +27,14 @@
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
       setupLoginForm(loginForm);
+      setupPhoneOtpLoginForm();
     }
 
     // Check if on register page
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
       setupRegisterForm(registerForm);
+      setupRegisterMobileOtp();
     }
 
     // Check for authentication state on page load
@@ -184,11 +186,30 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Creating Account...';
 
+      // Check if mobile number is entered and verified
+      const mobileInput = document.getElementById('mobileInput');
+      const mobile = mobileInput ? mobileInput.value.trim() : '';
+      const isMobileVerified = mobileInput && mobileInput.dataset.verified === 'true';
+
+      if (mobile && !isMobileVerified) {
+        const proceedWithoutVerification = confirm(
+          `You entered mobile number "${mobile}", but it has not been verified with SMS OTP yet.\n\nClick OK to verify your mobile number first, or Cancel to proceed without mobile verification.`
+        );
+        if (proceedWithoutVerification) {
+          const sendBtn = document.getElementById('sendMobileOtpBtn');
+          if (sendBtn) sendBtn.click();
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          return;
+        }
+      }
+
       try {
         const metadata = {
           firstName: firstName,
           lastName: lastName,
-          mobile: mobile || null
+          mobile: (mobileInput?.dataset?.formattedPhone || mobile) || null,
+          mobile_verified: isMobileVerified
         };
 
         const result = await window.AuthService.registerWithEmail(email, password, metadata);
@@ -483,12 +504,397 @@
   `;
   document.head.appendChild(style);
 
+  /**
+   * Helper to handle 6-digit input auto-focus and paste
+   */
+  function setupDigitInputs(inputs, triggerButton) {
+    if (!inputs || !inputs.length) return;
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val;
+        if (val) {
+          input.classList.add('filled');
+          input.classList.remove('error');
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+        } else {
+          input.classList.remove('filled');
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+          inputs[index - 1].value = '';
+          inputs[index - 1].classList.remove('filled');
+        }
+        if (e.key === 'Enter' && triggerButton) {
+          triggerButton.click();
+        }
+      });
+
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        if (pasted.length >= inputs.length) {
+          inputs.forEach((inp, i) => {
+            inp.value = pasted[i] || '';
+            if (inp.value) inp.classList.add('filled');
+          });
+          inputs[inputs.length - 1].focus();
+        }
+      });
+    });
+  }
+
+  /**
+   * Setup Mobile OTP verification for Registration page
+   */
+  function setupRegisterMobileOtp() {
+    const sendOtpBtn = document.getElementById('sendMobileOtpBtn');
+    const mobileInput = document.getElementById('mobileInput');
+    const mobileOtpBox = document.getElementById('mobileOtpBox');
+    const mobileOtpDisplay = document.getElementById('mobileOtpDisplay');
+    const confirmOtpBtn = document.getElementById('confirmMobileOtpBtn');
+    const cancelOtpBtn = document.getElementById('cancelMobileOtpBtn');
+    const resendBtn = document.getElementById('resendMobileOtpBtn');
+    const resendTimerSpan = document.getElementById('mobileResendTimer');
+    const mobileVerifiedBadge = document.getElementById('mobileVerifiedBadge');
+    const otpError = document.getElementById('mobileOtpError');
+    const digitInputs = document.querySelectorAll('.mobile-digit');
+
+    if (!sendOtpBtn || !mobileInput || !window.PhoneAuthService) return;
+
+    let resendInterval = null;
+
+    function startTimer(seconds = 60) {
+      if (resendInterval) clearInterval(resendInterval);
+      if (resendBtn) resendBtn.disabled = true;
+      if (resendTimerSpan) resendTimerSpan.textContent = seconds;
+      if (resendBtn) resendBtn.innerHTML = `Resend in <span id="mobileResendTimer">${seconds}</span>s`;
+
+      resendInterval = setInterval(() => {
+        seconds--;
+        const curSpan = document.getElementById('mobileResendTimer');
+        if (curSpan) curSpan.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(resendInterval);
+          if (resendBtn) {
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = 'Resend Code';
+          }
+        }
+      }, 1000);
+    }
+
+    setupDigitInputs(digitInputs, confirmOtpBtn);
+
+    sendOtpBtn.addEventListener('click', async function () {
+      const phone = mobileInput.value.trim();
+      if (!phone) {
+        showNotification('error', 'Please enter your mobile number first.');
+        mobileInput.focus();
+        return;
+      }
+
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = 'Sending SMS...';
+      if (otpError) otpError.style.display = 'none';
+
+      const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      if (result.success) {
+        showNotification('success', result.message || 'SMS OTP sent successfully!');
+        if (mobileOtpDisplay) mobileOtpDisplay.textContent = result.formattedPhone || phone;
+        if (mobileOtpBox) mobileOtpBox.style.display = 'block';
+        digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
+        if (digitInputs[0]) digitInputs[0].focus();
+        startTimer(60);
+      } else {
+        showNotification('error', result.error || 'Failed to send SMS OTP.');
+      }
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = 'Verify via OTP';
+    });
+
+    if (cancelOtpBtn) {
+      cancelOtpBtn.addEventListener('click', () => {
+        if (mobileOtpBox) mobileOtpBox.style.display = 'none';
+      });
+    }
+
+    if (resendBtn) {
+      resendBtn.addEventListener('click', async function () {
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
+        const phone = mobileInput.value.trim();
+        const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        if (result.success) {
+          showNotification('success', 'New SMS OTP sent!');
+          startTimer(60);
+        } else {
+          showNotification('error', result.error || 'Failed to resend SMS.');
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend Code';
+        }
+      });
+    }
+
+    if (confirmOtpBtn) {
+      confirmOtpBtn.addEventListener('click', async function () {
+        let code = '';
+        digitInputs.forEach(input => code += input.value);
+
+        if (code.length !== 6) {
+          if (otpError) {
+            otpError.textContent = 'Please enter all 6 digits of the SMS code.';
+            otpError.style.display = 'block';
+          }
+          if (mobileOtpBox) {
+            mobileOtpBox.classList.add('otp-shake');
+            setTimeout(() => mobileOtpBox.classList.remove('otp-shake'), 400);
+          }
+          return;
+        }
+
+        confirmOtpBtn.disabled = true;
+        confirmOtpBtn.textContent = 'Verifying...';
+        if (otpError) otpError.style.display = 'none';
+
+        const result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        if (result.success) {
+          digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
+          showNotification('success', '✅ Mobile number verified successfully!');
+          setTimeout(() => {
+            if (mobileOtpBox) mobileOtpBox.style.display = 'none';
+            if (sendOtpBtn) sendOtpBtn.style.display = 'none';
+            if (mobileVerifiedBadge) mobileVerifiedBadge.style.display = 'inline-flex';
+            mobileInput.readOnly = true;
+            mobileInput.style.borderColor = '#10b981';
+            mobileInput.dataset.verified = 'true';
+            mobileInput.dataset.formattedPhone = result.phoneNumber || mobileInput.value;
+          }, 600);
+        } else {
+          digitInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
+          if (otpError) {
+            otpError.textContent = result.error || 'Invalid OTP code.';
+            otpError.style.display = 'block';
+          }
+          if (mobileOtpBox) {
+            mobileOtpBox.classList.add('otp-shake');
+            setTimeout(() => mobileOtpBox.classList.remove('otp-shake'), 400);
+          }
+          confirmOtpBtn.disabled = false;
+          confirmOtpBtn.textContent = 'Confirm OTP';
+        }
+      });
+    }
+  }
+
+  /**
+   * Setup Mobile OTP Login for Login page
+   */
+  function setupPhoneOtpLoginForm() {
+    const tabPassword = document.getElementById('tabPasswordLogin');
+    const tabPhone = document.getElementById('tabPhoneOtpLogin');
+    const passwordForm = document.getElementById('loginForm');
+    const phoneForm = document.getElementById('phoneOtpLoginForm');
+
+    if (!tabPassword || !tabPhone || !passwordForm || !phoneForm) return;
+
+    tabPassword.addEventListener('click', () => {
+      tabPassword.classList.add('active');
+      tabPhone.classList.remove('active');
+      tabPassword.style.background = '#7c3aed';
+      tabPhone.style.background = 'transparent';
+      passwordForm.style.display = 'block';
+      phoneForm.style.display = 'none';
+    });
+
+    tabPhone.addEventListener('click', () => {
+      tabPhone.classList.add('active');
+      tabPassword.classList.remove('active');
+      tabPhone.style.background = '#7c3aed';
+      tabPassword.style.background = 'transparent';
+      passwordForm.style.display = 'none';
+      phoneForm.style.display = 'block';
+    });
+
+    const phoneInput = document.getElementById('loginPhoneInput');
+    const sendOtpBtn = document.getElementById('sendLoginPhoneOtpBtn');
+    const verifySection = document.getElementById('loginOtpVerifySection');
+    const phoneDisplay = document.getElementById('loginPhoneDisplay');
+    const digitInputs = document.querySelectorAll('.login-digit');
+    const verifyBtn = document.getElementById('verifyLoginPhoneOtpBtn');
+    const resendBtn = document.getElementById('resendLoginOtpBtn');
+    const resendTimerSpan = document.getElementById('loginResendTimer');
+    const phoneError = document.getElementById('loginPhoneError');
+    const codeError = document.getElementById('loginOtpCodeError');
+
+    let resendInterval = null;
+
+    function startTimer(seconds = 60) {
+      if (resendInterval) clearInterval(resendInterval);
+      if (resendBtn) resendBtn.disabled = true;
+      if (resendTimerSpan) resendTimerSpan.textContent = seconds;
+      if (resendBtn) resendBtn.innerHTML = `Resend in <span id="loginResendTimer">${seconds}</span>s`;
+
+      resendInterval = setInterval(() => {
+        seconds--;
+        const curSpan = document.getElementById('loginResendTimer');
+        if (curSpan) curSpan.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(resendInterval);
+          if (resendBtn) {
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = 'Resend SMS';
+          }
+        }
+      }, 1000);
+    }
+
+    setupDigitInputs(digitInputs, verifyBtn);
+
+    sendOtpBtn.addEventListener('click', async function () {
+      const phone = phoneInput.value.trim();
+      if (!phone) {
+        if (phoneError) {
+          phoneError.textContent = 'Please enter your mobile number.';
+          phoneError.style.display = 'block';
+        }
+        phoneInput.focus();
+        return;
+      }
+      if (phoneError) phoneError.style.display = 'none';
+
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = 'Sending...';
+
+      const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      if (result.success) {
+        showNotification('success', result.message || 'SMS OTP sent successfully!');
+        if (phoneDisplay) phoneDisplay.textContent = result.formattedPhone || phone;
+        if (verifySection) verifySection.style.display = 'block';
+        digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
+        if (digitInputs[0]) digitInputs[0].focus();
+        startTimer(60);
+      } else {
+        if (phoneError) {
+          phoneError.textContent = result.error || 'Failed to send OTP.';
+          phoneError.style.display = 'block';
+        }
+        showNotification('error', result.error || 'Failed to send SMS OTP.');
+      }
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = 'Send OTP';
+    });
+
+    if (resendBtn) {
+      resendBtn.addEventListener('click', async function () {
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
+        const phone = phoneInput.value.trim();
+        const result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        if (result.success) {
+          showNotification('success', 'New SMS OTP sent!');
+          startTimer(60);
+        } else {
+          showNotification('error', result.error || 'Failed to resend SMS.');
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend SMS';
+        }
+      });
+    }
+
+    if (verifyBtn) {
+      verifyBtn.addEventListener('click', async function () {
+        let code = '';
+        digitInputs.forEach(input => code += input.value);
+
+        if (code.length !== 6) {
+          if (codeError) {
+            codeError.textContent = 'Please enter the complete 6-digit code.';
+            codeError.style.display = 'block';
+          }
+          if (verifySection) {
+            verifySection.classList.add('otp-shake');
+            setTimeout(() => verifySection.classList.remove('otp-shake'), 400);
+          }
+          return;
+        }
+
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying & Signing In...';
+        if (codeError) codeError.style.display = 'none';
+
+        const result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        if (result.success) {
+          digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
+          showNotification('success', '✅ Verified! Logging you in...');
+
+          // Connect with PlaceAI Supabase profile
+          const formattedPhone = result.phoneNumber || phoneInput.value.trim();
+          try {
+            const supabase = window.supabaseClient || window.supabase.createClient(
+              window.SUPABASE_URL,
+              window.SUPABASE_ANON_KEY
+            );
+
+            // Look up existing profile with this mobile number
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .or(`mobile.eq.${formattedPhone},mobile.eq.${phoneInput.value.trim()}`)
+              .maybeSingle();
+
+            if (profile) {
+              console.log('Found profile for phone user:', profile);
+              localStorage.setItem('placeai_phone_user', JSON.stringify({
+                phone: formattedPhone,
+                profileId: profile.id,
+                userId: profile.user_id
+              }));
+            } else {
+              console.log('No existing profile for phone, creating session entry...');
+              localStorage.setItem('placeai_phone_user', JSON.stringify({
+                phone: formattedPhone,
+                firebaseUid: result.user?.uid
+              }));
+            }
+          } catch (dbErr) {
+            console.warn('Profile lookup warning:', dbErr);
+          }
+
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1200);
+        } else {
+          digitInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
+          if (codeError) {
+            codeError.textContent = result.error || 'Invalid verification code.';
+            codeError.style.display = 'block';
+          }
+          if (verifySection) {
+            verifySection.classList.add('otp-shake');
+            setTimeout(() => verifySection.classList.remove('otp-shake'), 400);
+          }
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'Verify & Sign In';
+        }
+      });
+    }
+  }
+
   // Export for use in other scripts
   window.BackendIntegration = {
     checkAuthState,
     showNotification,
     setupOtpInputs,
-    startResendCountdown
+    startResendCountdown,
+    setupRegisterMobileOtp,
+    setupPhoneOtpLoginForm
   };
 
 })();

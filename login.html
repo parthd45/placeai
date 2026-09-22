@@ -385,6 +385,80 @@
       margin-top: 5px;
       display: none;
     }
+
+    /* Mobile OTP and Tab Styles */
+    .auth-toggle-tab.active {
+      background: #7c3aed !important;
+      color: #fff !important;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
+    }
+    .auth-toggle-tab:not(.active):hover {
+      background: rgba(124, 58, 237, 0.15) !important;
+    }
+    .verify-phone-btn {
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 14px;
+      height: 44px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    .verify-phone-btn:hover {
+      background: #6d28d9;
+    }
+    .verify-phone-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .otp-digit-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 12px 0;
+    }
+    .otp-digit-input {
+      width: 42px;
+      height: 46px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    .otp-digit-input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+      background: rgba(124, 58, 237, 0.15);
+      outline: none;
+    }
+    .otp-digit-input.filled {
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, 0.2);
+    }
+    .otp-digit-input.error {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .otp-digit-input.success {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+    }
+    @keyframes otpShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .otp-shake {
+      animation: otpShake 0.4s ease;
+    }
   </style>
 </head>
 
@@ -449,6 +523,13 @@
 <h2 style="text-align:start;">Sign In</h2>
               <h4 style="text-align:start;">Welcome back ! login to Place Wise🎓.</h4>
 
+            <!-- Login Mode Switcher Tabs -->
+            <div class="auth-toggle-group" style="display: flex; gap: 8px; margin-bottom: 20px;">
+              <button type="button" id="tabPasswordLogin" class="auth-toggle-tab active" style="flex: 1; padding: 9px; border-radius: 20px; border: 1px solid #7c3aed; background: #7c3aed; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 13px;">🔑 Password</button>
+              <button type="button" id="tabPhoneOtpLogin" class="auth-toggle-tab" style="flex: 1; padding: 9px; border-radius: 20px; border: 1px solid #7c3aed; background: transparent; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 13px;">📱 Mobile OTP</button>
+            </div>
+
+            <!-- Standard Password Login Form -->
             <form id="loginForm" action="javascript:void(0);" novalidate>
               <div class="form-group">
                 <label for="emailOrMobile">Email / Mobile Number :</label>
@@ -468,6 +549,42 @@
               </div>
 
               <button type="submit" class="login-btn">Sign In</button>
+            </form>
+
+            <!-- Mobile OTP Sign In Form -->
+            <form id="phoneOtpLoginForm" action="javascript:void(0);" style="display: none;" novalidate>
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label for="loginPhoneInput">Mobile Number :</label>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                  <input type="tel" id="loginPhoneInput" placeholder="Enter 10-digit mobile number" style="flex: 1;" />
+                  <button type="button" id="sendLoginPhoneOtpBtn" class="verify-phone-btn">Send OTP</button>
+                </div>
+                <div id="loginPhoneError" class="error-message" role="alert">Please enter a valid mobile number.</div>
+              </div>
+
+              <div id="loginOtpVerifySection" style="display: none; margin-top: 15px; text-align: center;">
+                <div style="font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">
+                  Enter 6-digit SMS OTP sent to <span id="loginPhoneDisplay" style="color: #c4b5fd; font-weight: 600;"></span>
+                </div>
+                <div class="otp-digit-group" id="loginOtpInputs">
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="0" inputmode="numeric" autocomplete="off" />
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="1" inputmode="numeric" autocomplete="off" />
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="2" inputmode="numeric" autocomplete="off" />
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="3" inputmode="numeric" autocomplete="off" />
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="4" inputmode="numeric" autocomplete="off" />
+                  <input type="text" maxlength="1" class="otp-digit-input login-digit" data-idx="5" inputmode="numeric" autocomplete="off" />
+                </div>
+                <div id="loginOtpCodeError" class="error-message" role="alert" style="margin-bottom: 10px;"></div>
+
+                <button type="button" id="verifyLoginPhoneOtpBtn" class="login-btn" style="width: 70%; margin: 10px auto;">Verify & Sign In</button>
+
+                <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 10px;">
+                  Didn't receive SMS? 
+                  <button id="resendLoginOtpBtn" type="button" style="background: none; border: none; color: #a78bfa; cursor: pointer; font-weight: 600; font-size: 13px;" disabled>
+                    Resend in <span id="loginResendTimer">60</span>s
+                  </button>
+                </div>
+              </div>
             </form>
 
             <div class="divider"><span>OR</span></div>
@@ -504,6 +621,13 @@
 
   <script src="js/vendors.js"></script>
   <script src="js/designesia.js"></script>
+
+  <!-- Firebase Phone Authentication (Free Mobile OTP) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="backend/firebase-config.js"></script>
+  <script src="backend/phone-auth-service.js"></script>
+  <div id="recaptcha-container"></div>
 
   <!-- Supabase Backend Integration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

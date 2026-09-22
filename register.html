@@ -364,6 +364,107 @@
         flex-direction: column;
       }
     }
+
+    /* Mobile OTP Styles */
+    .mobile-input-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+    }
+    .mobile-input-container input {
+      flex: 1;
+    }
+    .verify-phone-btn {
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 14px;
+      height: 44px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    .verify-phone-btn:hover {
+      background: #6d28d9;
+    }
+    .verify-phone-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .phone-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .mobile-otp-box {
+      background: rgba(30, 27, 75, 0.7);
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      text-align: center;
+      animation: fadeInDown 0.3s ease;
+    }
+    .otp-digit-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .otp-digit-input {
+      width: 40px;
+      height: 44px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    .otp-digit-input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+      background: rgba(124, 58, 237, 0.15);
+      outline: none;
+    }
+    .otp-digit-input.filled {
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, 0.2);
+    }
+    .otp-digit-input.error {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .otp-digit-input.success {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes otpShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .otp-shake {
+      animation: otpShake 0.4s ease;
+    }
   </style>
 </head>
 
@@ -445,9 +546,37 @@
               <input type="email" id="emailInput" required placeholder="Enter Email Address" />
             </div>
 
-            <div class="form-group">
-              <label style="text-align: left; font-size: 18px;">Mobile Number:</label>
-              <input type="tel" id="mobileInput" placeholder="Enter Mobile Number" />
+            <div class="form-group" style="align-items: start;">
+              <label style="text-align: left; font-size: 18px; margin-top: 10px;">Mobile Number:</label>
+              <div style="display: flex; flex-direction: column; width: 100%;">
+                <div class="mobile-input-container">
+                  <input type="tel" id="mobileInput" placeholder="Enter 10-digit Mobile Number" />
+                  <button type="button" id="sendMobileOtpBtn" class="verify-phone-btn">Verify via OTP</button>
+                  <span id="mobileVerifiedBadge" class="phone-status-badge" style="display: none;">✓ Verified</span>
+                </div>
+                <!-- Inline Mobile OTP container -->
+                <div id="mobileOtpBox" class="mobile-otp-box" style="display: none;">
+                  <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 4px;">
+                    Enter 6-digit SMS OTP sent to <span id="mobileOtpDisplay" style="color: #c4b5fd; font-weight: 600;"></span>
+                  </div>
+                  <div class="otp-digit-group" id="mobileOtpInputs">
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="0" inputmode="numeric" autocomplete="off" />
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="1" inputmode="numeric" autocomplete="off" />
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="2" inputmode="numeric" autocomplete="off" />
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="3" inputmode="numeric" autocomplete="off" />
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="4" inputmode="numeric" autocomplete="off" />
+                    <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="5" inputmode="numeric" autocomplete="off" />
+                  </div>
+                  <div id="mobileOtpError" style="color: #ef4444; font-size: 12px; margin-bottom: 8px; display: none;"></div>
+                  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                    <button type="button" id="confirmMobileOtpBtn" class="verify-phone-btn" style="height: 36px; padding: 0 16px;">Confirm OTP</button>
+                    <button type="button" id="cancelMobileOtpBtn" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 8px; height: 36px; padding: 0 12px; font-size: 12px; cursor: pointer;">Cancel</button>
+                  </div>
+                  <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.6);">
+                    Didn't get code? <button type="button" id="resendMobileOtpBtn" style="background: none; border: none; color: #a78bfa; cursor: pointer; text-decoration: underline; font-size: 12px;" disabled>Resend in <span id="mobileResendTimer">60</span>s</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
@@ -559,6 +688,13 @@
     }
   });
 </script>
+
+<!-- Firebase Phone Authentication (Free Mobile OTP) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="backend/firebase-config.js"></script>
+<script src="backend/phone-auth-service.js"></script>
+<div id="recaptcha-container"></div>
 
 <!-- Supabase Backend Integration -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

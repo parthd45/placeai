@@ -54,12 +54,15 @@ async function getUserProfile(userId) {
 async function getUserProfileByMobile(mobile) {
   try {
     const supabase = getSupabaseClient();
+    const rawDigits = mobile.replace(/[^0-9]/g, '');
+    const formattedWithPlus = '+' + rawDigits;
+    const with91 = rawDigits.length === 10 ? '+91' + rawDigits : formattedWithPlus;
 
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('mobile', mobile)
-      .single();
+      .or(`mobile.eq.${mobile},mobile.eq.${rawDigits},mobile.eq.${formattedWithPlus},mobile.eq.${with91}`)
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -604,8 +607,10 @@ async function getUserStatistics(userId) {
 
 // Export functions for use in other files
 if (typeof window !== 'undefined') {
+  window.getUserProfileByMobile = getUserProfileByMobile;
   window.DBService = {
     getUserProfile,
+    getUserProfileByMobile,
     createUserProfile,
     updateUserProfile,
     createTraining,

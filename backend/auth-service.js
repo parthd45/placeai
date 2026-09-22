@@ -221,7 +221,8 @@ async function login(identifier, password) {
 
     if (!isEmail) {
       // It's a mobile number - look up the email from database
-      const profileResult = await getUserProfileByMobile(identifier);
+      const fetcher = window.getUserProfileByMobile || (window.DBService && window.DBService.getUserProfileByMobile);
+      const profileResult = fetcher ? await fetcher(identifier) : { success: false };
 
       if (!profileResult.success || !profileResult.profile) {
         throw new Error('No account found with this mobile number');
@@ -397,6 +398,7 @@ async function logout() {
   try {
     const supabase = getSupabaseClient();
 
+    localStorage.removeItem('placeai_phone_user');
     const { error } = await supabase.auth.signOut();
 
     if (error) throw error;
@@ -428,9 +430,44 @@ async function getCurrentSession() {
 
     console.log('getCurrentSession result:', { hasSession: !!data.session, session: data.session });
 
+    if (data.session) {
+      return {
+        success: true,
+        session: data.session
+      };
+    }
+
+    // Phone OTP session fallback
+    const phoneUserData = localStorage.getItem('placeai_phone_user');
+    if (phoneUserData) {
+      try {
+        const parsed = JSON.parse(phoneUserData);
+        if (parsed && parsed.phone) {
+          const mockUser = {
+            id: parsed.userId || parsed.firebaseUid || 'phone-' + parsed.phone.replace(/[^0-9]/g, ''),
+            email: `${parsed.phone.replace(/[^0-9]/g, '')}@placeai.app`,
+            phone: parsed.phone,
+            user_metadata: {
+              mobile: parsed.phone,
+              full_name: 'PlaceAI User'
+            }
+          };
+          return {
+            success: true,
+            session: {
+              user: mockUser,
+              access_token: 'phone_token_' + Date.now()
+            }
+          };
+        }
+      } catch (parseErr) {
+        console.warn('Failed to parse phone user session:', parseErr);
+      }
+    }
+
     return {
       success: true,
-      session: data.session
+      session: null
     };
   } catch (error) {
     console.error('Session error:', error);
