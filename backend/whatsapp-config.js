@@ -21,12 +21,16 @@
 (function () {
   'use strict';
 
-  // Client-side endpoint configuration
+  // WhatsApp Cloud API Configuration
   const config = {
     sendEndpoint: '/api/whatsapp-otp/send',
     verifyEndpoint: '/api/whatsapp-otp/verify',
-    // Fallback demo enabled when no backend API is reachable
-    enableLocalDemoFallback: true
+    // Direct Meta Cloud API fallback for local testing without serverless runtime
+    phoneNumberId: '1386808957839795',
+    accessToken: 'EABDMDZCECsSwBSjgHOJQcM9o2yZAtO7rDGrZCZAX07PcDugWbFZBwbvAajHqSA6mDr4pXWbN9judwfwTczxOtggRne4V7mIZAaaV2tWf9zoq9duKYMQUaHg3PwmfhMrpJn674ZA35kd6CpgJsyK4xzZByhxvFYbD4H7pB1RpHRuJtOJjZAKVmZCUnVafdZA3kSOoW9iRcjVVZCBIJaCo8wYx80Jl6ReFcjJDl47S8nM4yNUPexN2YjZBYIwTfmZADJDAi92PqHeU52yboLQNIlBKDBg5tPfLuwZBAZDZD',
+    testSenderNumber: '+1 (555) 187-7419',
+    activateChatUrl: 'https://wa.me/15551877419?text=Hi',
+    enableDirectMetaFallback: true
   };
 
   window.WHATSAPP_CONFIG = config;
