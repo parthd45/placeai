@@ -82,20 +82,19 @@
     }
 
     try {
+      // If verifier already exists, reuse it
       if (recaptchaVerifier) {
-        try {
-          recaptchaVerifier.clear();
-        } catch (e) {
-          // ignore clear error
-        }
-        recaptchaVerifier = null;
+        return recaptchaVerifier;
       }
 
-      // Ensure container exists in DOM
-      let container = document.getElementById(containerId);
-      if (!container) {
-        container = document.createElement('div');
-        container.id = containerId;
+      // Ensure fresh container exists in DOM (replaces old node to prevent "already rendered" error)
+      let oldContainer = document.getElementById(containerId);
+      let container = document.createElement('div');
+      container.id = containerId;
+
+      if (oldContainer && oldContainer.parentNode) {
+        oldContainer.parentNode.replaceChild(container, oldContainer);
+      } else {
         document.body.appendChild(container);
       }
 
@@ -106,18 +105,46 @@
         },
         'expired-callback': function () {
           console.warn('reCAPTCHA expired. Resetting...');
-          if (recaptchaVerifier) {
-            recaptchaVerifier.render().then(widgetId => {
-              grecaptcha.reset(widgetId);
-            });
-          }
+          resetRecaptcha();
         }
       });
 
       return recaptchaVerifier;
     } catch (error) {
       console.error('Error creating RecaptchaVerifier:', error);
+      // Fallback: forcefully replace container and recreate
+      try {
+        let oldContainer = document.getElementById(containerId);
+        if (oldContainer && oldContainer.parentNode) {
+          let fresh = document.createElement('div');
+          fresh.id = containerId;
+          oldContainer.parentNode.replaceChild(fresh, oldContainer);
+          recaptchaVerifier = new firebase.auth.RecaptchaVerifier(containerId, { size: size });
+          return recaptchaVerifier;
+        }
+      } catch (innerErr) {
+        console.error('Fallback container creation failed:', innerErr);
+      }
       return null;
+    }
+  }
+
+  /**
+   * Reset reCAPTCHA widget safely
+   */
+  function resetRecaptcha() {
+    if (recaptchaVerifier) {
+      try {
+        recaptchaVerifier.render().then(widgetId => {
+          if (window.grecaptcha && typeof grecaptcha.reset === 'function') {
+            grecaptcha.reset(widgetId);
+          }
+        }).catch(() => {
+          recaptchaVerifier = null;
+        });
+      } catch (e) {
+        recaptchaVerifier = null;
+      }
     }
   }
 
@@ -171,11 +198,7 @@
       console.error('Error sending SMS OTP:', error);
       
       // Reset reCAPTCHA on failure
-      if (window.grecaptcha && recaptchaVerifier) {
-        try {
-          recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
-        } catch (e) {}
-      }
+      resetRecaptcha();
 
       let errorMsg = error.message || 'Failed to send OTP.';
       if (error.code === 'auth/invalid-phone-number') {
