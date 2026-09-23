@@ -1060,10 +1060,223 @@
 
     .hint-block.open .hint-body { display: block; }
     .hint-block.open .hint-toggle i { transform: rotate(90deg); }
+
+    /* ===== PROCTOR & EXAM INTEGRITY ===== */
+    .proctor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--accent-green);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .proctor-badge.warning {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--accent-amber);
+    }
+    .proctor-badge.danger {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.6);
+      color: var(--accent-red);
+      animation: proctorPulse 1.2s infinite;
+    }
+    @keyframes proctorPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    }
+    .proctor-badge .violation-pill {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+    .btn-fullscreen-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-fullscreen-toggle:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+    .btn-fullscreen-toggle.active {
+      color: var(--accent-blue);
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.1);
+    }
+    /* Anti-cheat Toast Warning */
+    .cheat-warning-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      z-index: 9999;
+      background: linear-gradient(135deg, #1e1124, #2a0808);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(239, 68, 68, 0.3);
+      color: #fecaca;
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 90vw;
+    }
+    .cheat-warning-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cheat-warning-toast i {
+      font-size: 18px;
+      color: var(--accent-red);
+      flex-shrink: 0;
+    }
+    /* Screen Blur Overlay when tab is inactive */
+    .proctor-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 14, 26, 0.94);
+      backdrop-filter: blur(12px);
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .proctor-overlay.active {
+      display: flex;
+    }
+    .proctor-modal-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(239, 68, 68, 0.2);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+    }
+    .proctor-log-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .proctor-log-modal.show {
+      display: flex;
+    }
+    .proctor-log-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+    .proctor-log-pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .proctor-log-pill.green {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: var(--easy);
+    }
+    .proctor-log-pill.red {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: var(--accent-red);
+    }
   </style>
 </head>
 
 <body>
+  <!-- Proctor Anti-Cheat Toast Alert -->
+  <div class="cheat-warning-toast" id="cheatWarningToast">
+    <i class="fas fa-shield-alt" id="cheatWarningIcon"></i>
+    <span id="cheatWarningText">Security Alert</span>
+  </div>
+
+  <!-- Tab Departure Warning Overlay -->
+  <div class="proctor-overlay" id="proctorOverlay">
+    <div class="proctor-modal-card">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(239,68,68,0.15);border:2px solid rgba(239,68,68,0.5);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="fas fa-exclamation-triangle" style="font-size:28px;color:var(--accent-red);"></i>
+      </div>
+      <h3 style="font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Proctor Alert: Tab Switch Logged</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+        You navigated away from the code editor environment. In strict practice mode, all tab departures, minimizing, and window switches are logged.
+      </p>
+      <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#fca5a5;font-weight:600;">
+        <i class="fas fa-flag" style="margin-right:6px;"></i> Total Session Flags: <span id="proctorOverlayFlags">1</span>
+      </div>
+      <button onclick="closeProctorOverlay()" style="width:100%;padding:10px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;transition:all 0.2s;">
+        I Understand & Resume Practice
+      </button>
+    </div>
+  </div>
+
+  <!-- Integrity Incident Log Modal -->
+  <div class="proctor-log-modal" id="proctorLogModal" onclick="if(event.target===this)closeIntegrityLog()">
+    <div class="proctor-log-box">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <i class="fas fa-shield-alt" style="color:var(--accent-purple);font-size:18px;"></i>
+          <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);">Exam Integrity & Proctor Log</h3>
+        </div>
+        <button onclick="closeIntegrityLog()" style="background:transparent;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="padding:16px 20px;overflow-y:auto;flex:1;">
+        <div id="proctorLogSummary"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Session Incident Log</div>
+        <div id="proctorLogList"></div>
+      </div>
+      <div style="padding:12px 20px;border-top:1px solid var(--border);text-align:right;">
+        <button onclick="closeIntegrityLog()" style="padding:8px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;font-size:13px;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Header -->
   <div class="header">
     <div class="header-inner">
@@ -1223,6 +1436,13 @@
             </select>
           </div>
           <div class="editor-actions">
+            <div class="proctor-badge" id="proctorBadge" onclick="showIntegrityLog()" title="Exam Proctor Mode Active: Click to view violations and incidents">
+              <i class="fas fa-shield-alt"></i> <span id="proctorStatusText">Proctor Clean</span>
+              <span class="violation-pill" id="violationCountBadge">0 Flags</span>
+            </div>
+            <button class="btn-fullscreen-toggle" id="btnFullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen Exam Focus">
+              <i class="fas fa-expand"></i>
+            </button>
             <div class="font-size-ctrl">
               <button onclick="changeFontSize(-1)"><i class="fas fa-minus"></i></button>
               <button onclick="changeFontSize(1)"><i class="fas fa-plus"></i></button>
@@ -1859,6 +2079,17 @@
     let timerInterval = null;
     let timerSeconds = 0;
     let editorFontSize = 14;
+    let isEditorActive = false;
+    let cheatToastTimer = null;
+    let integritySession = {
+      flags: 0,
+      tabSwitches: 0,
+      pasteAttempts: 0,
+      shortcutBlocks: 0,
+      focusLostCount: 0,
+      fullscreenExits: 0,
+      incidents: []
+    };
 
     // ============================================
     // NAVIGATION
@@ -1868,16 +2099,19 @@
       document.querySelectorAll('.header-nav-btn').forEach(b => b.classList.remove('active'));
 
       if (view === 'problems') {
+        isEditorActive = false;
         document.getElementById('viewProblems').classList.add('active');
         document.getElementById('viewProblems').style.display = 'block';
         document.getElementById('navProblems').classList.add('active');
         renderProblems();
       } else if (view === 'leaderboard') {
+        isEditorActive = false;
         document.getElementById('viewLeaderboard').classList.add('active');
         document.getElementById('viewLeaderboard').style.display = 'block';
         document.getElementById('navLeaderboard').classList.add('active');
         renderLeaderboard();
       } else if (view === 'editor') {
+        isEditorActive = true;
         document.getElementById('viewEditor').classList.add('active');
         document.getElementById('viewEditor').style.display = 'flex';
       }
@@ -2000,6 +2234,7 @@
       currentProblem = PROBLEMS.find(p => p.id === id);
       if (!currentProblem) return;
 
+      resetIntegritySession();
       showView('editor');
       renderProblemDesc();
       loadCode();
@@ -2051,15 +2286,22 @@
       const problemSubs = subs[currentProblem.id] || [];
       document.getElementById('submissionsContent').innerHTML = problemSubs.length === 0
         ? '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px;"></i>No submissions yet</div>'
-        : problemSubs.map(s => `
+        : problemSubs.map(s => {
+          const proctorTag = s.flags === undefined
+            ? ''
+            : (s.flags === 0
+              ? '<span style="font-size:11px;color:var(--easy);background:rgba(34,197,94,0.1);padding:2px 8px;border-radius:4px;margin-left:8px;"><i class="fas fa-shield-alt"></i> 100% Clean</span>'
+              : `<span style="font-size:11px;color:var(--hard);background:rgba(239,68,68,0.1);padding:2px 8px;border-radius:4px;margin-left:8px;"><i class="fas fa-flag"></i> ${s.flags} Flags</span>`);
+          return `
           <div style="padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
             <div>
               <span style="font-weight:700;color:${s.status === 'Accepted' ? 'var(--easy)' : 'var(--hard)'};">${s.status}</span>
               <span style="font-size:12px;color:var(--text-muted);margin-left:10px;">${s.lang}</span>
+              ${proctorTag}
             </div>
             <span style="font-size:12px;color:var(--text-muted);">${s.time}</span>
-          </div>
-        `).join('');
+          </div>`;
+        }).join('');
     }
 
     function loadCode() {
@@ -2187,15 +2429,24 @@
           }
           document.getElementById('streakCount').textContent = streak;
 
-          // Save submission
+          // Save submission with proctor audit
           const subs = JSON.parse(localStorage.getItem('placeai_submissions') || '{}');
           if (!subs[currentProblem.id]) subs[currentProblem.id] = [];
           subs[currentProblem.id].unshift({
             status: 'Accepted',
             lang: currentLang,
-            time: new Date().toLocaleString()
+            time: new Date().toLocaleString(),
+            flags: integritySession.flags,
+            tabSwitches: integritySession.tabSwitches,
+            pasteAttempts: integritySession.pasteAttempts,
+            shortcutBlocks: integritySession.shortcutBlocks,
+            clean: integritySession.flags === 0
           });
           localStorage.setItem('placeai_submissions', JSON.stringify(subs));
+
+          const integrityBox = integritySession.flags === 0
+            ? `<div style="margin-top:12px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--easy);font-weight:600;"><i class="fas fa-shield-alt" style="font-size:16px;"></i> Proctor Verification: 100% Clean • 0 Integrity Flags Detected</div>`
+            : `<div style="margin-top:12px;padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#fca5a5;font-weight:600;"><i class="fas fa-exclamation-triangle" style="font-size:16px;color:var(--hard);"></i> Proctor Warning: Flagged with ${integritySession.flags} Violation(s) (${integritySession.tabSwitches} Tab Switches, ${integritySession.pasteAttempts} Paste Attempts, ${integritySession.shortcutBlocks} Blocked Shortcuts)</div>`;
 
           resultPanel.innerHTML = `
             <div class="result-banner accepted"><i class="fas fa-check-circle"></i> Accepted</div>
@@ -2203,6 +2454,7 @@
               <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Runtime:</strong> ${Math.floor(Math.random() * 80 + 20)} ms</div>
               <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Memory:</strong> ${(Math.random() * 10 + 40).toFixed(1)} MB</div>
             </div>
+            ${integrityBox}
             <div style="margin-top:12px;">
               ${tc.map((t, i) => `<div style="padding:8px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:6px;margin-bottom:6px;font-size:12.5px;color:var(--easy);font-weight:600;"><i class="fas fa-check" style="margin-right:6px;"></i>Test Case ${i + 1} Passed</div>`).join('')}
             </div>
@@ -2363,6 +2615,267 @@
         editor.selectionStart = editor.selectionEnd = start + 4;
         saveCode();
       }
+    });
+
+    // ============================================
+    // PROCTORING & EXAM INTEGRITY ENGINE
+    // ============================================
+    function resetIntegritySession() {
+      integritySession = {
+        flags: 0,
+        tabSwitches: 0,
+        pasteAttempts: 0,
+        shortcutBlocks: 0,
+        focusLostCount: 0,
+        fullscreenExits: 0,
+        incidents: []
+      };
+      updateProctorBadge();
+    }
+
+    function updateProctorBadge() {
+      const badge = document.getElementById('proctorBadge');
+      const countEl = document.getElementById('violationCountBadge');
+      const statusText = document.getElementById('proctorStatusText');
+      if (!badge || !countEl) return;
+
+      const f = integritySession.flags;
+      countEl.textContent = `${f} Flag${f === 1 ? '' : 's'}`;
+
+      badge.classList.remove('warning', 'danger');
+      if (f === 0) {
+        statusText.textContent = 'Proctor Clean';
+      } else if (f < 3) {
+        badge.classList.add('warning');
+        statusText.textContent = 'Proctor Warning';
+      } else {
+        badge.classList.add('danger');
+        statusText.textContent = 'Exam Flagged';
+      }
+    }
+
+    function triggerViolation(type, message, severity = 'warning') {
+      if (!isEditorActive) return;
+
+      integritySession.flags++;
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      if (type === 'paste') integritySession.pasteAttempts++;
+      else if (type === 'tab_switch') integritySession.tabSwitches++;
+      else if (type === 'shortcut') integritySession.shortcutBlocks++;
+      else if (type === 'focus_lost') integritySession.focusLostCount++;
+      else if (type === 'fullscreen_exit') integritySession.fullscreenExits++;
+
+      integritySession.incidents.unshift({
+        type,
+        message,
+        time: timeStr,
+        severity
+      });
+
+      updateProctorBadge();
+      showCheatToast(type, message);
+    }
+
+    function showCheatToast(type, message) {
+      const toast = document.getElementById('cheatWarningToast');
+      const textEl = document.getElementById('cheatWarningText');
+      const iconEl = document.getElementById('cheatWarningIcon');
+      if (!toast || !textEl) return;
+
+      clearTimeout(cheatToastTimer);
+
+      if (type === 'paste') {
+        iconEl.className = 'fas fa-paste';
+      } else if (type === 'tab_switch') {
+        iconEl.className = 'fas fa-window-restore';
+      } else if (type === 'shortcut') {
+        iconEl.className = 'fas fa-keyboard';
+      } else {
+        iconEl.className = 'fas fa-exclamation-triangle';
+      }
+
+      textEl.innerHTML = `<strong>Security Alert:</strong> ${message}`;
+      toast.classList.add('show');
+
+      cheatToastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    function showIntegrityLog() {
+      const modal = document.getElementById('proctorLogModal');
+      const list = document.getElementById('proctorLogList');
+      const summaryEl = document.getElementById('proctorLogSummary');
+      if (!modal || !list) return;
+
+      summaryEl.innerHTML = `
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+          <span class="proctor-log-pill ${integritySession.flags > 0 ? 'red' : 'green'}"><i class="fas fa-flag"></i> Total Flags: ${integritySession.flags}</span>
+          <span class="proctor-log-pill"><i class="fas fa-window-restore"></i> Tab Switches: ${integritySession.tabSwitches}</span>
+          <span class="proctor-log-pill"><i class="fas fa-paste"></i> Paste Attempts: ${integritySession.pasteAttempts}</span>
+          <span class="proctor-log-pill"><i class="fas fa-ban"></i> Shortcut Blocks: ${integritySession.shortcutBlocks}</span>
+          <span class="proctor-log-pill"><i class="fas fa-desktop"></i> Focus Lost: ${integritySession.focusLostCount}</span>
+        </div>
+      `;
+
+      if (integritySession.incidents.length === 0) {
+        list.innerHTML = `
+          <div style="text-align:center;padding:30px 20px;color:var(--easy);">
+            <i class="fas fa-shield-alt" style="font-size:36px;margin-bottom:10px;display:block;"></i>
+            <strong>Clean Integrity Record!</strong>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">No clipboard tampering, tab switches, or blocked shortcuts detected.</p>
+          </div>
+        `;
+      } else {
+        list.innerHTML = integritySession.incidents.map(inc => `
+          <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:${inc.severity === 'danger' ? 'var(--accent-red)' : 'var(--accent-amber)'};">
+                <i class="fas fa-circle" style="font-size:7px;margin-right:6px;vertical-align:middle;"></i>${inc.message}
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Category: ${inc.type.replace('_', ' ').toUpperCase()}</div>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;font-family:'JetBrains Mono',monospace;">${inc.time}</span>
+          </div>
+        `).join('');
+      }
+
+      modal.classList.add('show');
+    }
+
+    function closeIntegrityLog() {
+      const modal = document.getElementById('proctorLogModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function closeProctorOverlay() {
+      document.getElementById('proctorOverlay').classList.remove('active');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // ============================================
+    // CLIPBOARD & SHORTCUT RESTRICTIONS
+    // ============================================
+    const codeEditorEl = document.getElementById('codeEditor');
+
+    // Prevent direct copy/cut/paste on editor
+    codeEditorEl.addEventListener('copy', (e) => {
+      e.preventDefault();
+      triggerViolation('paste', 'Copying code from editor is restricted!', 'warning');
+    });
+
+    codeEditorEl.addEventListener('cut', (e) => {
+      e.preventDefault();
+      triggerViolation('paste', 'Cutting code from editor is restricted!', 'warning');
+    });
+
+    codeEditorEl.addEventListener('paste', (e) => {
+      e.preventDefault();
+      triggerViolation('paste', 'Direct paste from clipboard is strictly blocked!', 'danger');
+    });
+
+    codeEditorEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      triggerViolation('shortcut', 'Right-click context menu is restricted in editor!', 'warning');
+    });
+
+    // Global shortcut interceptions in Editor View
+    window.addEventListener('keydown', (e) => {
+      if (!isEditorActive) return;
+
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+
+      // Block Ctrl+C, Ctrl+V, Ctrl+X
+      if (isCmdOrCtrl && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || e.key === 'x' || e.key === 'X')) {
+        e.preventDefault();
+        const action = e.key.toUpperCase() === 'V' ? 'Paste (Ctrl+V)' : 'Copy/Cut (Ctrl+' + e.key.toUpperCase() + ')';
+        triggerViolation('paste', `${action} shortcut is blocked in Strict Mode!`, 'danger');
+        return false;
+      }
+
+      // Block F12 (DevTools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        triggerViolation('shortcut', 'F12 Developer Tools shortcut is blocked!', 'danger');
+        return false;
+      }
+
+      // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (DevTools Inspect)
+      if (isCmdOrCtrl && e.shiftKey && ['I','i','J','j','C','c'].includes(e.key)) {
+        e.preventDefault();
+        triggerViolation('shortcut', 'Developer Tools inspect shortcut is blocked!', 'danger');
+        return false;
+      }
+
+      // Block Ctrl+U (View Source)
+      if (isCmdOrCtrl && (e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+        triggerViolation('shortcut', 'View Page Source shortcut is blocked!', 'danger');
+        return false;
+      }
+
+      // Block Ctrl+P (Print)
+      if (isCmdOrCtrl && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        triggerViolation('shortcut', 'Print shortcut is blocked!', 'warning');
+        return false;
+      }
+    }, true);
+
+    // Tab visibility & departure monitor
+    document.addEventListener('visibilitychange', () => {
+      if (!isEditorActive) return;
+      if (document.hidden) {
+        triggerViolation('tab_switch', 'Tab departure detected! Navigated away from practice session.', 'danger');
+        const overlay = document.getElementById('proctorOverlay');
+        const flagsEl = document.getElementById('proctorOverlayFlags');
+        if (overlay) overlay.classList.add('active');
+        if (flagsEl) flagsEl.textContent = integritySession.flags;
+      }
+    });
+
+    // Window focus loss detection (blur)
+    window.addEventListener('blur', () => {
+      if (!isEditorActive || document.hidden) return;
+      triggerViolation('focus_lost', 'Window focus lost! Interacting with external application.', 'warning');
+    });
+
+    // Fullscreen state listener
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.getElementById('btnFullscreen');
+      if (document.fullscreenElement) {
+        if (btn) btn.classList.add('active');
+      } else {
+        if (btn) btn.classList.remove('active');
+        if (isEditorActive) {
+          triggerViolation('fullscreen_exit', 'Exited fullscreen exam mode!', 'warning');
+        }
+      }
+    });
+
+    // Screen resize / layout change monitor
+    let lastWinW = window.innerWidth;
+    let lastWinH = window.innerHeight;
+    window.addEventListener('resize', () => {
+      if (!isEditorActive) return;
+      const dW = Math.abs(window.innerWidth - lastWinW);
+      const dH = Math.abs(window.innerHeight - lastWinH);
+      if (dW > 180 || dH > 180) {
+        triggerViolation('screen_change', 'Display or window layout resized significantly!', 'warning');
+      }
+      lastWinW = window.innerWidth;
+      lastWinH = window.innerHeight;
     });
 
     // ============================================
