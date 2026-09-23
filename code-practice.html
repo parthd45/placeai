@@ -1227,6 +1227,236 @@
       border-color: rgba(239, 68, 68, 0.35);
       color: var(--accent-red);
     }
+  
+    /* ===== EXTREME PROCTORING & EVIDENCE DOSSIER ===== */
+    .proctor-hud {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(139, 92, 246, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      user-select: none;
+      cursor: pointer;
+    }
+    .proctor-hud:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.6);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(139, 92, 246, 0.3);
+    }
+    .proctor-hud.warning {
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+    }
+    .proctor-hud.danger {
+      border-color: rgba(239, 68, 68, 0.9);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+      animation: proctorPulse 1s infinite;
+    }
+    .hud-rec-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      display: inline-block;
+      animation: recBlink 1.2s infinite;
+      box-shadow: 0 0 8px #ef4444;
+    }
+    @keyframes recBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.25; transform: scale(0.8); }
+    }
+    .hud-cam-box {
+      width: 52px;
+      height: 38px;
+      background: #0b1120;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-cam-scanline {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, #22c55e, transparent);
+      animation: scanMove 2s linear infinite;
+    }
+    @keyframes scanMove {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    .hud-face-reticle {
+      width: 22px;
+      height: 22px;
+      border: 1.5px dashed #22c55e;
+      border-radius: 4px;
+      position: absolute;
+    }
+    .hud-stat-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hud-stat-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-stat-subtitle {
+      font-size: 10.5px;
+      color: #94a3b8;
+    }
+    .hud-evidence-badge {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 1px 7px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    /* Lockdown Toggle Button in Toolbar */
+    .btn-lockdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: #c4b5fd;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-lockdown:hover {
+      background: rgba(139, 92, 246, 0.22);
+      border-color: rgba(139, 92, 246, 0.6);
+      color: #fff;
+    }
+    .btn-lockdown.active {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+    .btn-lockdown.active:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* Evidence Dossier Cards */
+    .evidence-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    .evidence-card:hover {
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.03);
+    }
+    .evidence-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .evidence-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .evidence-card-time {
+      font-size: 11px;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+    .evidence-body-split {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .evidence-thumb-wrapper {
+      position: relative;
+      width: 140px;
+      height: 80px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      cursor: pointer;
+      flex-shrink: 0;
+      background: #000;
+    }
+    .evidence-thumb-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s;
+    }
+    .evidence-thumb-wrapper:hover img {
+      transform: scale(1.08);
+    }
+    .evidence-zoom-hint {
+      position: absolute;
+      bottom: 3px; right: 3px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .evidence-reason-box {
+      flex: 1;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .evidence-reason-box strong {
+      color: #f87171;
+      font-weight: 700;
+    }
+    .evidence-tip-box {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #94a3b8;
+      border-top: 1px dashed rgba(239, 68, 68, 0.2);
+      padding-top: 4px;
+    }
+
   </style>
 </head>
 
@@ -1274,6 +1504,92 @@
       <div style="padding:12px 20px;border-top:1px solid var(--border);text-align:right;">
         <button onclick="closeIntegrityLog()" style="padding:8px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;font-size:13px;cursor:pointer;">Close</button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- Fullscreen Breach Countdown Modal (Extreme Mode) -->
+  <div class="proctor-overlay" id="fullscreenBreachModal" style="z-index: 10002;">
+    <div class="proctor-modal-card" style="border-color: #ef4444; max-width: 520px; text-align: center;">
+      <div style="width:74px;height:74px;border-radius:50%;background:rgba(239,68,68,0.2);border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:proctorPulse 1s infinite;">
+        <span id="breachCountdown" style="font-size:34px;font-weight:800;color:#ef4444;">5</span>
+      </div>
+      <h3 style="font-size:21px;font-weight:800;color:#fecaca;margin-bottom:8px;">🚨 CRITICAL: FULLSCREEN EXITED</h3>
+      <p style="font-size:13.5px;color:#cbd5e1;line-height:1.6;margin-bottom:16px;">
+        You departed fullscreen exam lockdown! Return to fullscreen within <strong id="breachSecondsLeft" style="color:#ef4444;font-size:16px;">5 seconds</strong> or your test session will be <strong>PERMANENTLY TERMINATED & DISQUALIFIED</strong>.
+      </p>
+      <div style="background:rgba(0,0,0,0.45);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:10px;text-align:left;">
+        <i class="fas fa-camera" style="color:#ef4444;font-size:18px;flex-shrink:0;"></i>
+        <span><strong>Forensic Snapshot Captured:</strong> A visual evidence record of your code and departure timestamp has been generated.</span>
+      </div>
+      <button onclick="restoreFullscreen()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 18px rgba(220,38,38,0.45);transition:all 0.2s;">
+        <i class="fas fa-expand" style="margin-right:8px;"></i> Return to Fullscreen Immediately
+      </button>
+    </div>
+  </div>
+
+  <!-- Test Session Terminated & Disqualified Modal -->
+  <div class="proctor-overlay" id="sessionTerminatedModal" style="z-index: 10005;">
+    <div class="proctor-modal-card" style="border-color: #ef4444; max-width: 660px; text-align: left; max-height: 90vh; display: flex; flex-direction: column;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;border-bottom:1px solid rgba(239,68,68,0.3);padding-bottom:14px;flex-shrink:0;">
+        <div style="width:52px;height:52px;border-radius:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="fas fa-ban" style="font-size:26px;color:#ef4444;"></i>
+        </div>
+        <div>
+          <h3 style="font-size:20px;font-weight:800;color:#fecaca;margin-bottom:2px;">Test Session Disqualified & Terminated</h3>
+          <p style="font-size:12.5px;color:#94a3b8;" id="terminatedReasonText">Reason: Fullscreen security breach</p>
+        </div>
+      </div>
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:12px 14px;margin-bottom:14px;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:700;color:#f87171;margin-bottom:4px;"><i class="fas fa-shield-alt" style="margin-right:6px;"></i> PlaceAI Integrity Evaluation Protocol</div>
+        <p style="font-size:12px;color:#cbd5e1;line-height:1.5;">
+          Your attempt was disqualified because an unpermitted action occurred during strict examination lockdown. Below is your complete forensic evidence dossier explaining exactly <strong>why you were flagged</strong> with visual screenshot captures.
+        </p>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;flex-shrink:0;">Forensic Evidence & Violation Dossier</div>
+      <div id="terminatedEvidenceList" style="max-height: 280px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px; flex: 1;"></div>
+      <div style="display:flex;gap:10px;flex-shrink:0;">
+        <button onclick="exitTerminatedSession()" style="width:100%;padding:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;transition:all 0.2s;">
+          <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Exit to Problem Catalog
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- High-Res Evidence Snapshot Viewer Modal -->
+  <div class="proctor-log-modal" id="evidencePreviewModal" onclick="if(event.target===this)closeEvidencePreview()" style="z-index: 10010;">
+    <div class="proctor-log-box" style="max-width: 820px;">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="fas fa-camera" style="color:var(--accent-red);"></i>
+          <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);" id="previewEvidenceTitle">Forensic Snapshot Evidence</h3>
+        </div>
+        <button onclick="closeEvidencePreview()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="padding:16px;background:#05070f;text-align:center;">
+        <img id="previewEvidenceImg" style="width:100%;border-radius:8px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.8);" />
+        <div id="previewEvidenceDesc" style="margin-top:12px;font-size:12.5px;color:#cbd5e1;text-align:left;background:var(--bg-card);padding:10px 14px;border-radius:6px;border:1px solid var(--border);line-height:1.5;"></div>
+      </div>
+      <div style="padding:10px 18px;border-top:1px solid var(--border);text-align:right;">
+        <button onclick="closeEvidencePreview()" style="padding:6px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;font-size:12.5px;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Proctor AI Eye HUD (Active in Problem Editor) -->
+  <div class="proctor-hud" id="proctorHud" style="display:none;" onclick="showIntegrityLog()" title="AI Proctor Live: Click to view evidence dossier">
+    <span class="hud-rec-dot"></span>
+    <div class="hud-cam-box">
+      <i class="fas fa-user" style="color:#64748b;font-size:16px;"></i>
+      <div class="hud-face-reticle"></div>
+      <div class="hud-cam-scanline"></div>
+    </div>
+    <div class="hud-stat-group">
+      <div class="hud-stat-title">
+        <span>AI Proctor Active</span>
+        <span class="hud-evidence-badge" id="hudFlagCount">0 Flags</span>
+      </div>
+      <div class="hud-stat-subtitle" id="hudStatusDetail">Lockdown Active • Fullscreen</div>
     </div>
   </div>
 
@@ -1436,6 +1752,10 @@
             </select>
           </div>
           <div class="editor-actions">
+
+            <button class="btn-lockdown active" id="btnLockdown" onclick="toggleStrictLockdown()" title="Strict Exam Lockdown: Exiting fullscreen triggers 5s countdown termination">
+              <i class="fas fa-shield-alt"></i> <span id="lockdownBtnText">Strict Exam Mode: ON</span>
+            </button>
             <div class="proctor-badge" id="proctorBadge" onclick="showIntegrityLog()" title="Exam Proctor Mode Active: Click to view violations and incidents">
               <i class="fas fa-shield-alt"></i> <span id="proctorStatusText">Proctor Clean</span>
               <span class="violation-pill" id="violationCountBadge">0 Flags</span>
@@ -2100,12 +2420,14 @@
 
       if (view === 'problems') {
         isEditorActive = false;
+        updateHud();
         document.getElementById('viewProblems').classList.add('active');
         document.getElementById('viewProblems').style.display = 'block';
         document.getElementById('navProblems').classList.add('active');
         renderProblems();
       } else if (view === 'leaderboard') {
         isEditorActive = false;
+        updateHud();
         document.getElementById('viewLeaderboard').classList.add('active');
         document.getElementById('viewLeaderboard').style.display = 'block';
         document.getElementById('navLeaderboard').classList.add('active');
@@ -2236,6 +2558,8 @@
 
       resetIntegritySession();
       showView('editor');
+      updateHud();
+      if (isStrictExamMode && !document.fullscreenElement) { toggleFullscreen(); }
       renderProblemDesc();
       loadCode();
       renderTestCases();
@@ -2620,6 +2944,51 @@
     // ============================================
     // PROCTORING & EXAM INTEGRITY ENGINE
     // ============================================
+    let isStrictExamMode = true; // Extreme security enabled by default
+    let breachTimer = null;
+    let breachSecondsLeft = 5;
+    let isSessionTerminated = false;
+
+    // Student-friendly pedagogical & security explanations
+    const STUDENT_VIOLATION_REASONS = {
+      fullscreen_exit: {
+        title: "Fullscreen Lockdown Departure",
+        why: "Continuous fullscreen mode is strictly mandatory for proctored sessions. Exiting fullscreen allows opening secondary browser windows, notes, or overlay cheat applications.",
+        evidence: "Fullscreen departure event logged with active code lines and timestamp.",
+        tip: "Remain in full screen throughout your practice exam. Do not press Escape or click away."
+      },
+      tab_switch: {
+        title: "Browser Tab Switch / Window Departure",
+        why: "You navigated away from the exam tab or minimized the browser window. Leaving the active exam tab is prohibited to prevent searching for solutions or querying AI assistance.",
+        evidence: "Page visibility departure event logged with exact timestamp.",
+        tip: "Keep the problem editor active. Never switch tabs or minimize the test window."
+      },
+      paste: {
+        title: "Clipboard Tampering / Paste Attempt",
+        why: "External clipboard paste or copy attempt detected in the code editor. All code must be authored directly to verify authentic problem-solving skills.",
+        evidence: "Clipboard event intercepted and editor state snapshot archived.",
+        tip: "Type your code logic natively in the editor instead of pasting from external sources."
+      },
+      shortcut: {
+        title: "Prohibited Keyboard Shortcut",
+        why: "A prohibited developer keyboard shortcut was pressed (e.g. F12, Ctrl+Shift+I, Ctrl+U, Ctrl+P). Developer tools and source inspection are blocked during exams.",
+        evidence: "Key combination interception event logged.",
+        tip: "Avoid pressing developer hotkeys, right-click inspect, or page-source shortcuts."
+      },
+      focus_lost: {
+        title: "Window Focus Lost",
+        why: "Browser window lost operating system focus, indicating interaction with an external desktop app, split-screen window, or second monitor.",
+        evidence: "Operating system window blur event recorded.",
+        tip: "Keep mouse and keyboard focus locked exclusively onto the PlaceAI window."
+      },
+      screen_change: {
+        title: "Display / Geometry Resize Detected",
+        why: "Screen resolution or window dimensions changed drastically, indicating possible monitor unplugging, screen sharing setup, or window tiling.",
+        evidence: "Display dimension delta recorded.",
+        tip: "Do not resize your browser or plug/unplug monitors during the exam."
+      }
+    };
+
     function resetIntegritySession() {
       integritySession = {
         flags: 0,
@@ -2630,7 +2999,40 @@
         fullscreenExits: 0,
         incidents: []
       };
+      isSessionTerminated = false;
+      clearInterval(breachTimer);
+      hideBreachModal();
+      hideSessionTerminatedModal();
+
+      const codeEditor = document.getElementById('codeEditor');
+      if (codeEditor) {
+        codeEditor.disabled = false;
+        codeEditor.style.filter = 'none';
+      }
+
       updateProctorBadge();
+      updateHud();
+    }
+
+    function toggleStrictLockdown() {
+      isStrictExamMode = !isStrictExamMode;
+      const btn = document.getElementById('btnLockdown');
+      const text = document.getElementById('lockdownBtnText');
+      if (isStrictExamMode) {
+        if (btn) btn.classList.add('active');
+        if (text) text.textContent = 'Strict Exam Mode: ON';
+        showCheatToast('shortcut', 'Strict Exam Lockdown Active: Exiting fullscreen triggers immediate 5s termination countdown!');
+        if (!document.fullscreenElement) {
+          toggleFullscreen();
+        }
+      } else {
+        if (btn) btn.classList.remove('active');
+        if (text) text.textContent = 'Strict Exam Mode: OFF';
+        showCheatToast('shortcut', 'Strict Exam Mode disabled. Fullscreen departure will only log warnings.');
+        clearInterval(breachTimer);
+        hideBreachModal();
+      }
+      updateHud();
     }
 
     function updateProctorBadge() {
@@ -2640,7 +3042,7 @@
       if (!badge || !countEl) return;
 
       const f = integritySession.flags;
-      countEl.textContent = `${f} Flag${f === 1 ? '' : 's'}`;
+      countEl.textContent = f + ' Flag' + (f === 1 ? '' : 's');
 
       badge.classList.remove('warning', 'danger');
       if (f === 0) {
@@ -2654,8 +3056,128 @@
       }
     }
 
+    function updateHud() {
+      const hud = document.getElementById('proctorHud');
+      const countEl = document.getElementById('hudFlagCount');
+      const detailEl = document.getElementById('hudStatusDetail');
+      if (!hud) return;
+
+      if (!isEditorActive) {
+        hud.style.display = 'none';
+        return;
+      }
+      hud.style.display = 'flex';
+
+      const f = integritySession.flags;
+      if (countEl) countEl.textContent = f + ' Flag' + (f === 1 ? '' : 's');
+
+      hud.classList.remove('warning', 'danger');
+      if (f === 0) {
+        if (detailEl) detailEl.textContent = isStrictExamMode ? 'Strict Lockdown • Fullscreen' : 'Standard Proctoring Active';
+      } else if (f < 3) {
+        hud.classList.add('warning');
+        if (detailEl) detailEl.textContent = f + ' Warning' + (f === 1 ? '' : 's') + ' Detected';
+      } else {
+        hud.classList.add('danger');
+        if (detailEl) detailEl.textContent = 'CRITICAL: Multiple Violations';
+      }
+    }
+
+    // Capture visual canvas forensic snapshot with active code & violation details
+    function captureEvidenceSnapshot(type, reason) {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 450;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+
+        // Dark IDE Background
+        ctx.fillStyle = '#0a0e17';
+        ctx.fillRect(0, 0, 800, 450);
+
+        // Header bar
+        ctx.fillStyle = '#161e2e';
+        ctx.fillRect(0, 0, 800, 44);
+
+        // Alert Header
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        ctx.fillText('🚨 PLACEAI FORENSIC AUDIT • SECURITY VIOLATION EVIDENCE', 18, 28);
+
+        const now = new Date();
+        const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px "JetBrains Mono", monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(timeStr, 782, 28);
+        ctx.textAlign = 'left';
+
+        // Problem & Target Metadata
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(18, 54, 764, 46);
+        ctx.strokeStyle = '#334155';
+        ctx.strokeRect(18, 54, 764, 46);
+
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = 'bold 13px -apple-system, sans-serif';
+        const pTitle = currentProblem ? currentProblem.id + '. ' + currentProblem.title + ' (' + currentLang.toUpperCase() + ')' : 'Practice Session';
+        ctx.fillText('Target: ' + pTitle, 30, 75);
+
+        ctx.fillStyle = '#f87171';
+        ctx.font = 'bold 12px "JetBrains Mono", monospace';
+        ctx.fillText('VIOLATION: ' + type.toUpperCase(), 30, 91);
+
+        // Code Editor Frame
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(18, 110, 764, 270);
+        ctx.strokeStyle = '#27354a';
+        ctx.strokeRect(18, 110, 764, 270);
+
+        // Watermark
+        ctx.save();
+        ctx.translate(400, 245);
+        ctx.rotate(-Math.PI / 14);
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
+        ctx.font = 'bold 44px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('FLAGGED INTEGRITY BREACH', 0, 0);
+        ctx.restore();
+
+        // Editor Code lines preview
+        const codeEditorEl = document.getElementById('codeEditor');
+        const codeLines = (codeEditorEl ? codeEditorEl.value : '').split('\n').slice(0, 11);
+        ctx.font = '12px "JetBrains Mono", monospace';
+        codeLines.forEach((line, idx) => {
+          ctx.fillStyle = '#475569';
+          ctx.fillText(String(idx + 1).padStart(3, ' '), 28, 136 + (idx * 21));
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillText(line.substring(0, 85), 65, 136 + (idx * 21));
+        });
+
+        // Bottom Reason Banner
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.18)';
+        ctx.fillRect(18, 390, 764, 46);
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+        ctx.strokeRect(18, 390, 764, 46);
+
+        ctx.fillStyle = '#fca5a5';
+        ctx.font = 'bold 12px -apple-system, sans-serif';
+        ctx.fillText('Reason: ' + reason, 30, 410);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px -apple-system, sans-serif';
+        ctx.fillText('Certified PlaceAI Proctor Snapshot • Forensic ID #' + Math.random().toString(36).substring(2, 10).toUpperCase(), 30, 426);
+
+        return canvas.toDataURL('image/png');
+      } catch (e) {
+        console.warn('Canvas snapshot failed:', e);
+        return '';
+      }
+    }
+
     function triggerViolation(type, message, severity = 'warning') {
-      if (!isEditorActive) return;
+      if (!isEditorActive || isSessionTerminated) return;
 
       integritySession.flags++;
       const now = new Date();
@@ -2667,15 +3189,186 @@
       else if (type === 'focus_lost') integritySession.focusLostCount++;
       else if (type === 'fullscreen_exit') integritySession.fullscreenExits++;
 
-      integritySession.incidents.unshift({
+      // Capture screenshot snapshot
+      const snapshotUrl = captureEvidenceSnapshot(type, message);
+
+      const info = STUDENT_VIOLATION_REASONS[type] || {
+        title: type.toUpperCase(),
+        why: message,
+        evidence: 'System event log',
+        tip: 'Adhere to proctored session rules.'
+      };
+
+      const incident = {
+        id: 'INC-' + Date.now().toString(36).toUpperCase(),
         type,
+        title: info.title,
         message,
+        why: info.why,
+        evidence: info.evidence,
+        tip: info.tip,
         time: timeStr,
-        severity
-      });
+        severity,
+        snapshotUrl
+      };
+
+      integritySession.incidents.unshift(incident);
 
       updateProctorBadge();
+      updateHud();
       showCheatToast(type, message);
+
+      // In Strict Exam Mode, exiting fullscreen launches immediate 5s termination countdown
+      if (type === 'fullscreen_exit' && isStrictExamMode) {
+        startBreachCountdown();
+      }
+
+      // If flags exceed extreme threshold (e.g. 5 flags total or 3 tab departures), terminate
+      if (integritySession.flags >= 6) {
+        terminateSession('flag_limit', 'Exceeded maximum allowable integrity flags (' + integritySession.flags + ' violations)');
+      }
+    }
+
+    function startBreachCountdown() {
+      clearInterval(breachTimer);
+      breachSecondsLeft = 5;
+
+      const modal = document.getElementById('fullscreenBreachModal');
+      const countEl = document.getElementById('breachCountdown');
+      const secEl = document.getElementById('breachSecondsLeft');
+
+      if (countEl) countEl.textContent = '5';
+      if (secEl) secEl.textContent = '5 seconds';
+      if (modal) modal.classList.add('active');
+
+      breachTimer = setInterval(() => {
+        breachSecondsLeft--;
+        if (countEl) countEl.textContent = breachSecondsLeft;
+        if (secEl) secEl.textContent = breachSecondsLeft + ' second' + (breachSecondsLeft === 1 ? '' : 's');
+
+        if (breachSecondsLeft <= 0) {
+          clearInterval(breachTimer);
+          hideBreachModal();
+          terminateSession('fullscreen_exit', 'Departed fullscreen lockdown and did not return within 5 seconds');
+        }
+      }, 1000);
+    }
+
+    function restoreFullscreen() {
+      clearInterval(breachTimer);
+      hideBreachModal();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function hideBreachModal() {
+      const modal = document.getElementById('fullscreenBreachModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function terminateSession(reasonType, reasonDesc) {
+      if (isSessionTerminated) return;
+      isSessionTerminated = true;
+      clearInterval(breachTimer);
+      hideBreachModal();
+
+      // Disable and freeze editor
+      const codeEditor = document.getElementById('codeEditor');
+      if (codeEditor) {
+        codeEditor.disabled = true;
+        codeEditor.style.filter = 'blur(1.5px) grayscale(80%)';
+      }
+
+      // Record disqualified submission
+      if (currentProblem) {
+        const subs = JSON.parse(localStorage.getItem('placeai_submissions') || '{}');
+        if (!subs[currentProblem.id]) subs[currentProblem.id] = [];
+        subs[currentProblem.id].unshift({
+          status: 'Disqualified',
+          lang: currentLang,
+          time: new Date().toLocaleString(),
+          flags: integritySession.flags,
+          reason: reasonDesc,
+          clean: false
+        });
+        localStorage.setItem('placeai_submissions', JSON.stringify(subs));
+      }
+
+      // Populate Terminated Evidence Dossier
+      const termModal = document.getElementById('sessionTerminatedModal');
+      const reasonEl = document.getElementById('terminatedReasonText');
+      const listEl = document.getElementById('terminatedEvidenceList');
+
+      if (reasonEl) reasonEl.textContent = 'Disqualification Reason: ' + reasonDesc;
+      if (listEl) {
+        listEl.innerHTML = renderEvidenceCardsHtml(integritySession.incidents);
+      }
+
+      if (termModal) termModal.classList.add('active');
+    }
+
+    function hideSessionTerminatedModal() {
+      const modal = document.getElementById('sessionTerminatedModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function exitTerminatedSession() {
+      hideSessionTerminatedModal();
+      showView('problems');
+    }
+
+    // Helper: render visual evidence cards with screenshot & reason why flagged
+    function renderEvidenceCardsHtml(incidents) {
+      if (!incidents || incidents.length === 0) {
+        return '<div style="text-align:center;padding:24px;color:var(--text-muted);">No recorded incidents.</div>';
+      }
+
+      return incidents.map((inc, idx) => {
+        const snapshotImg = inc.snapshotUrl
+          ? '<div class="evidence-thumb-wrapper" onclick="openEvidencePreview(\'' + inc.snapshotUrl + '\', \'' + inc.title.replace(/'/g, "\\'") + '\', \'' + inc.why.replace(/'/g, "\\'") + '\')">' +
+            '<img src="' + inc.snapshotUrl + '" alt="Forensic snapshot" />' +
+            '<div class="evidence-zoom-hint"><i class="fas fa-search-plus"></i> View SS</div>' +
+            '</div>'
+          : '';
+
+        return '<div class="evidence-card">' +
+          '<div class="evidence-card-header">' +
+            '<div>' +
+              '<div class="evidence-card-title">' +
+                '<i class="fas fa-exclamation-circle" style="color:var(--accent-red);"></i>' +
+                '<span>#' + (idx + 1) + ' ' + inc.title + '</span>' +
+              '</div>' +
+              '<div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">' + inc.message + '</div>' +
+            '</div>' +
+            '<div class="evidence-card-time">' + inc.time + '</div>' +
+          '</div>' +
+          '<div class="evidence-body-split">' +
+            snapshotImg +
+            '<div class="evidence-reason-box">' +
+              '<div><strong>Why We Flagged This:</strong> ' + inc.why + '</div>' +
+              '<div class="evidence-tip-box"><i class="fas fa-lightbulb" style="color:var(--accent-amber);margin-right:4px;"></i><strong>Guideline:</strong> ' + inc.tip + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function openEvidencePreview(imgSrc, title, desc) {
+      const modal = document.getElementById('evidencePreviewModal');
+      const img = document.getElementById('previewEvidenceImg');
+      const titleEl = document.getElementById('previewEvidenceTitle');
+      const descEl = document.getElementById('previewEvidenceDesc');
+
+      if (img) img.src = imgSrc;
+      if (titleEl) titleEl.textContent = 'Forensic Evidence: ' + title;
+      if (descEl) descEl.innerHTML = '<strong>Violation Rationale:</strong> ' + desc + '<div style="margin-top:6px;font-size:11.5px;color:#94a3b8;">Captured automatically by PlaceAI Anti-Cheat Monitor with code snapshot.</div>';
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeEvidencePreview() {
+      const modal = document.getElementById('evidencePreviewModal');
+      if (modal) modal.classList.remove('show');
     }
 
     function showCheatToast(type, message) {
@@ -2692,11 +3385,13 @@
         iconEl.className = 'fas fa-window-restore';
       } else if (type === 'shortcut') {
         iconEl.className = 'fas fa-keyboard';
+      } else if (type === 'fullscreen_exit') {
+        iconEl.className = 'fas fa-compress';
       } else {
         iconEl.className = 'fas fa-exclamation-triangle';
       }
 
-      textEl.innerHTML = `<strong>Security Alert:</strong> ${message}`;
+      textEl.innerHTML = '<strong>Security Alert:</strong> ' + message;
       toast.classList.add('show');
 
       cheatToastTimer = setTimeout(() => {
@@ -2713,6 +3408,7 @@
       summaryEl.innerHTML = `
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
           <span class="proctor-log-pill ${integritySession.flags > 0 ? 'red' : 'green'}"><i class="fas fa-flag"></i> Total Flags: ${integritySession.flags}</span>
+          <span class="proctor-log-pill"><i class="fas fa-compress"></i> Fullscreen Exits: ${integritySession.fullscreenExits}</span>
           <span class="proctor-log-pill"><i class="fas fa-window-restore"></i> Tab Switches: ${integritySession.tabSwitches}</span>
           <span class="proctor-log-pill"><i class="fas fa-paste"></i> Paste Attempts: ${integritySession.pasteAttempts}</span>
           <span class="proctor-log-pill"><i class="fas fa-ban"></i> Shortcut Blocks: ${integritySession.shortcutBlocks}</span>
@@ -2729,17 +3425,7 @@
           </div>
         `;
       } else {
-        list.innerHTML = integritySession.incidents.map(inc => `
-          <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-            <div>
-              <div style="font-size:12.5px;font-weight:600;color:${inc.severity === 'danger' ? 'var(--accent-red)' : 'var(--accent-amber)'};">
-                <i class="fas fa-circle" style="font-size:7px;margin-right:6px;vertical-align:middle;"></i>${inc.message}
-              </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Category: ${inc.type.replace('_', ' ').toUpperCase()}</div>
-            </div>
-            <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;font-family:'JetBrains Mono',monospace;">${inc.time}</span>
-          </div>
-        `).join('');
+        list.innerHTML = renderEvidenceCardsHtml(integritySession.incidents);
       }
 
       modal.classList.add('show');
@@ -2772,17 +3458,17 @@
     // Prevent direct copy/cut/paste on editor
     codeEditorEl.addEventListener('copy', (e) => {
       e.preventDefault();
-      triggerViolation('paste', 'Copying code from editor is restricted!', 'warning');
+      triggerViolation('paste', 'Copying code from editor is restricted in Exam Mode!', 'warning');
     });
 
     codeEditorEl.addEventListener('cut', (e) => {
       e.preventDefault();
-      triggerViolation('paste', 'Cutting code from editor is restricted!', 'warning');
+      triggerViolation('paste', 'Cutting code from editor is restricted in Exam Mode!', 'warning');
     });
 
     codeEditorEl.addEventListener('paste', (e) => {
       e.preventDefault();
-      triggerViolation('paste', 'Direct paste from clipboard is strictly blocked!', 'danger');
+      triggerViolation('paste', 'Direct paste from clipboard is strictly blocked! Type code directly.', 'danger');
     });
 
     codeEditorEl.addEventListener('contextmenu', (e) => {
@@ -2792,7 +3478,7 @@
 
     // Global shortcut interceptions in Editor View
     window.addEventListener('keydown', (e) => {
-      if (!isEditorActive) return;
+      if (!isEditorActive || isSessionTerminated) return;
 
       const isCmdOrCtrl = e.ctrlKey || e.metaKey;
 
@@ -2800,7 +3486,7 @@
       if (isCmdOrCtrl && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || e.key === 'x' || e.key === 'X')) {
         e.preventDefault();
         const action = e.key.toUpperCase() === 'V' ? 'Paste (Ctrl+V)' : 'Copy/Cut (Ctrl+' + e.key.toUpperCase() + ')';
-        triggerViolation('paste', `${action} shortcut is blocked in Strict Mode!`, 'danger');
+        triggerViolation('paste', action + ' shortcut is blocked in Strict Mode!', 'danger');
         return false;
       }
 
@@ -2835,9 +3521,9 @@
 
     // Tab visibility & departure monitor
     document.addEventListener('visibilitychange', () => {
-      if (!isEditorActive) return;
+      if (!isEditorActive || isSessionTerminated) return;
       if (document.hidden) {
-        triggerViolation('tab_switch', 'Tab departure detected! Navigated away from practice session.', 'danger');
+        triggerViolation('tab_switch', 'Tab departure detected! Navigated away from practice exam.', 'danger');
         const overlay = document.getElementById('proctorOverlay');
         const flagsEl = document.getElementById('proctorOverlayFlags');
         if (overlay) overlay.classList.add('active');
@@ -2847,7 +3533,7 @@
 
     // Window focus loss detection (blur)
     window.addEventListener('blur', () => {
-      if (!isEditorActive || document.hidden) return;
+      if (!isEditorActive || document.hidden || isSessionTerminated) return;
       triggerViolation('focus_lost', 'Window focus lost! Interacting with external application.', 'warning');
     });
 
@@ -2856,10 +3542,11 @@
       const btn = document.getElementById('btnFullscreen');
       if (document.fullscreenElement) {
         if (btn) btn.classList.add('active');
+        hideBreachModal();
       } else {
         if (btn) btn.classList.remove('active');
-        if (isEditorActive) {
-          triggerViolation('fullscreen_exit', 'Exited fullscreen exam mode!', 'warning');
+        if (isEditorActive && !isSessionTerminated) {
+          triggerViolation('fullscreen_exit', 'Exited fullscreen exam mode!', 'danger');
         }
       }
     });
@@ -2868,7 +3555,7 @@
     let lastWinW = window.innerWidth;
     let lastWinH = window.innerHeight;
     window.addEventListener('resize', () => {
-      if (!isEditorActive) return;
+      if (!isEditorActive || isSessionTerminated) return;
       const dW = Math.abs(window.innerWidth - lastWinW);
       const dH = Math.abs(window.innerHeight - lastWinH);
       if (dW > 180 || dH > 180) {
@@ -2878,7 +3565,6 @@
       lastWinH = window.innerHeight;
     });
 
-    // ============================================
     // INIT
     // ============================================
     renderProblems();
