@@ -3302,10 +3302,8 @@
           displayExperience();
         }
 
-        // Update projects
-        if (userProfile.projects && userProfile.projects.length > 0) {
-          displayProjects();
-        }
+        // Update projects - always call to display or show empty state
+        displayProjects();
 
         // Update certifications
         if (userProfile.certifications && userProfile.certifications.length > 0) {
@@ -3466,12 +3464,22 @@
     function displayEducation() {
       const container = document.getElementById('educationList');
 
-      if (!userProfile.education || userProfile.education.length === 0) {
+      let edus = userProfile.education;
+      if ((!edus || edus.length === 0) && (userProfile.college_name || userProfile.course)) {
+        edus = [{
+          college: userProfile.college_name || 'College / University',
+          course: userProfile.course || 'Degree',
+          level: userProfile.education_level || 'Postgraduate',
+          graduation_year: userProfile.graduation_year || 2025
+        }];
+      }
+
+      if (!edus || edus.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fa fa-graduation-cap"></i><p>No education details added yet</p></div>';
         return;
       }
 
-      container.innerHTML = userProfile.education.map((edu, index) =>
+      container.innerHTML = edus.map((edu, index) =>
         `<div class="timeline-item">
           <div class="timeline-icon">
             <i class="fa fa-graduation-cap"></i>
@@ -3580,16 +3588,19 @@
         return;
       }
 
-      container.innerHTML = userProfile.projects.map((proj, index) =>
-        `<div class="timeline-item">
+      container.innerHTML = userProfile.projects.map((proj, index) => {
+        const title = proj.name || proj.title || 'Project';
+        const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
+        const url = proj.url || proj.project_url || '';
+        return `<div class="timeline-item">
           <div class="timeline-icon">
             <i class="fa fa-code-branch"></i>
           </div>
           <div class="timeline-content">
-            <h4>${proj.name}</h4>
-            ${proj.tech ? `<div class="timeline-meta">${proj.tech}</div>` : ''}
+            <h4>${title}</h4>
+            ${tech ? `<div class="timeline-meta">${tech}</div>` : ''}
             ${proj.description ? `<p class="timeline-description">${proj.description}</p>` : ''}
-            ${proj.url ? `<a href="${proj.url}" target="_blank" style="color: #764df0; font-size: 13px;"><i class="fa fa-external-link-alt"></i> View project</a>` : ''}
+            ${url ? `<a href="${url}" target="_blank" style="color: #38bdf8; font-size: 13px;"><i class="fa fa-external-link-alt"></i> View project</a>` : ''}
             <div style="display: flex; gap: 8px; margin-top: 8px;">
               <button class="btn-remove" onclick="editProject(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
                 <i class="fa fa-edit"></i> Edit
@@ -3599,8 +3610,8 @@
               </button>
             </div>
           </div>
-        </div>`
-      ).join('');
+        </div>`;
+      }).join('');
     }
 
     // Display Certifications
