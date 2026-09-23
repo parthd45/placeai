@@ -111,57 +111,34 @@
       // Calculate real activity points from actual user data
       let basePoints = 0;
 
-      // 1. Account registration milestone (on actual creation date)
+      // 1. Account registration milestone (on actual creation date, NOT today)
       if (!map[accountDate]) {
         map[accountDate] = 2; // Real registration contribution
+      } else if (accountDate !== today && basePoints > 0) {
+        // Attribute initial profile setup actions to the account creation date
+        map[accountDate] = Math.max(map[accountDate], Math.min(basePoints, 8));
       }
 
-      // 2. Real Profile completeness
-      if (profile) {
-        if (profile.bio && profile.bio.trim().length > 10) {
-          basePoints += 2; // Profile summary
-        }
-        if (profile.mobile) {
-          basePoints += 1; // Verified contact
-        }
-        if (profile.skills && Array.isArray(profile.skills)) {
-          // 1 real point for every skill
-          basePoints += profile.skills.length;
-        }
-        if (profile.experience && Array.isArray(profile.experience)) {
-          // 3 real points per real work experience entry
-          basePoints += profile.experience.length * 3;
-        }
-        if (profile.education && Array.isArray(profile.education)) {
-          // 2 real points per real education entry
-          basePoints += profile.education.length * 2;
-        }
-        if (profile.projects && Array.isArray(profile.projects)) {
-          // 3 real points per real project
-          basePoints += profile.projects.length * 3;
-        }
-        if (profile.certifications && Array.isArray(profile.certifications)) {
-          // 2 real points per real certification
-          basePoints += profile.certifications.length * 2;
-        }
-        if (profile.resume_url) {
-          basePoints += 5; // Real uploaded resume
-        }
-        if (profile.github_url) {
-          basePoints += 5; // Real connected GitHub profile
-        }
-      }
+      // 2. Accurately compute TODAY'S contributions based on actual actions performed today
+      const todayLogs = this.getStoredLogs().filter(log => {
+        const logDate = log.timestamp ? log.timestamp.split('T')[0] : '';
+        return logDate === today;
+      });
+      const todayLoggedPoints = todayLogs.reduce((sum, l) => sum + (Number(l.points) || 1), 0);
 
-      // Ensure today reflects real accumulated profile actions if map was empty
-      if (basePoints > 0) {
-        map[today] = Math.max(map[today] || 0, basePoints);
+      if (todayLoggedPoints > 0) {
+        map[today] = todayLoggedPoints;
+      } else {
+        // Daily active session check-in = 1 contribution point
+        // This also sanitizes any legacy inflated/fake values (e.g. 95) back to an authentic 1
+        map[today] = 1;
       }
 
       this.saveStoredMap(map);
 
       // Dispatch event to update the heatmap
       window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
-        detail: { date: today, count: map[today] || 0 }
+        detail: { date: today, count: map[today] || 1 }
       }));
     }
 

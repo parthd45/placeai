@@ -2829,50 +2829,14 @@
         </div>
 
         <!-- AI Competency Matrix Card -->
-        <div class="card" style="padding: 16px;">
+        <div class="card" style="padding: 16px;" id="competencyMatrixCard">
           <h3 style="font-size: 14.5px; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
             <span><i class="fas fa-brain" style="color: #38bdf8; margin-right: 6px;"></i> Competency Matrix</span>
-            <span class="github-stat-pill" style="color: #4ade80; border-color: rgba(34, 197, 94, 0.4);">Top 5%</span>
+            <span class="github-stat-pill" id="competencyPercentilePill" style="color: #4ade80; border-color: rgba(34, 197, 94, 0.4);">Verified</span>
           </h3>
 
-          <div class="competency-item">
-            <div class="competency-header">
-              <span>Full-Stack & Web Systems</span>
-              <strong style="color: #38bdf8;">92%</strong>
-            </div>
-            <div class="competency-bar-track">
-              <div class="competency-bar-fill" style="width: 92%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
-            </div>
-          </div>
-
-          <div class="competency-item">
-            <div class="competency-header">
-              <span>Data Analytics & Python</span>
-              <strong style="color: #818cf8;">88%</strong>
-            </div>
-            <div class="competency-bar-track">
-              <div class="competency-bar-fill" style="width: 88%; background: linear-gradient(90deg, #6366f1, #818cf8);"></div>
-            </div>
-          </div>
-
-          <div class="competency-item">
-            <div class="competency-header">
-              <span>Database Architecture (SQL)</span>
-              <strong style="color: #c084fc;">85%</strong>
-            </div>
-            <div class="competency-bar-track">
-              <div class="competency-bar-fill" style="width: 85%; background: linear-gradient(90deg, #9333ea, #c084fc);"></div>
-            </div>
-          </div>
-
-          <div class="competency-item" style="margin-bottom: 14px;">
-            <div class="competency-header">
-              <span>Algorithms & Problem Solving</span>
-              <strong style="color: #34d399;">82%</strong>
-            </div>
-            <div class="competency-bar-track">
-              <div class="competency-bar-fill" style="width: 82%; background: linear-gradient(90deg, #059669, #34d399);"></div>
-            </div>
+          <div id="competencyMatrixList">
+            <!-- Dynamically populated from user's actual skills -->
           </div>
 
           <div style="display: flex; gap: 8px; margin-top: 14px;">
@@ -3073,67 +3037,19 @@
                 <i class="fa fa-pen"></i> Edit Bio
               </button>
             </div>
-            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px;">
-              Data Science & Analytics enthusiast and Full-Stack Developer with comprehensive background in MCA (IMCC Pune) and BCA (University of Pune). Proven track record in building complex software platforms like DCPE ERP and digitized college workflows.
+            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #94a3b8; font-style: italic; margin-bottom: 16px;">
+              No bio added yet. Click "Edit Bio" above to share your background, skills, and aspirations.
             </p>
 
-            <!-- Spotlight Showcase: DCPE ERP Platform -->
-            <div class="spotlight-card">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-                <div style="flex: 1; min-width: 0;">
-                  <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fas fa-star" style="color: #eab308;"></i> Featured Enterprise Project
-                  </span>
-                  <h4 style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 4px 0 6px 0;">
-                    DCPE ERP Platform
-                  </h4>
-                  <p style="font-size: 13px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.55;">
-                    A comprehensive college ERP platform designed to simplify and automate academic, administrative, and student life-cycle workflows.
-                  </p>
-                </div>
-                <a href="https://dcpe-erp.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 8px 16px; font-size: 12.5px; flex-shrink: 0; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 7px; border-radius: 8px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);">
-                  <i class="fas fa-external-link-alt"></i> Live Demo
-                </a>
-              </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid rgba(48, 54, 61, 0.7); padding-top: 10px; margin-top: 6px;">
-                <span class="github-stat-pill"><span class="skill-dot" style="background: #61dafb;"></span> React</span>
-                <span class="github-stat-pill"><span class="skill-dot" style="background: #38bdf8;"></span> Web Architecture</span>
-                <span class="github-stat-pill"><span class="skill-dot" style="background: #4ade80;"></span> ERP Workflows</span>
-                <span class="github-stat-pill"><span class="skill-dot" style="background: #a855f7;"></span> Vercel Live</span>
-              </div>
-            </div>
+            <!-- Spotlight Showcase: Dynamic Featured Project -->
+            <div id="spotlightProjectContainer"></div>
 
             <!-- Career & Academic Milestones -->
             <div style="margin-top: 20px; border-top: 1px solid #30363d; padding-top: 16px;">
               <h4 style="font-size: 13.5px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
                 <i class="fas fa-route" style="color: #38bdf8;"></i> Career & Education Milestones
               </h4>
-              <div class="milestone-timeline">
-                <div class="milestone-node">
-                  <div class="milestone-dot completed"></div>
-                  <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
-                    Postgraduate - MCA (Master of Computer Applications)
-                    <span class="github-stat-pill" style="margin-left: 6px; color: #38bdf8;">2023 - 2025 • IMCC Pune</span>
-                  </div>
-                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Specialization in Software Development, Advanced Algorithms & Data Systems.</p>
-                </div>
-                <div class="milestone-node">
-                  <div class="milestone-dot completed"></div>
-                  <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
-                    Undergraduate - BCA (Bachelor of Computer Applications)
-                    <span class="github-stat-pill" style="margin-left: 6px; color: #4ade80;">2020 - 2023 • University of Pune</span>
-                  </div>
-                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Graduated with distinction. Built Automated Paperless College System.</p>
-                </div>
-                <div class="milestone-node" style="margin-bottom: 0;">
-                  <div class="milestone-dot completed"></div>
-                  <div style="font-size: 13px; font-weight: 600; color: #58a6ff;">
-                    Placement Ready • SDE & Data Analyst Candidate
-                    <span class="github-stat-pill" style="margin-left: 6px; color: #fbbf24;"><i class="fas fa-bolt"></i> Active</span>
-                  </div>
-                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Targeting high-impact engineering roles across Pune & Remote locations.</p>
-                </div>
-              </div>
+              <div class="milestone-timeline" id="milestonesContainer"></div></div>
             </div>
           </div>
 
@@ -4061,6 +3977,223 @@
     }
 
     // Load User Profile
+    
+    // ============================================
+    // DYNAMIC CANDIDATE PROFILE RENDERING
+    // ============================================
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderSpotlightProject() {
+      const container = document.getElementById('spotlightProjectContainer');
+      if (!container) return;
+
+      const projects = (userProfile && userProfile.projects) ? userProfile.projects : [];
+
+      if (!projects || projects.length === 0) {
+        container.innerHTML = `
+          <div class="spotlight-card" style="border-style: dashed; border-color: rgba(148, 163, 184, 0.25); background: rgba(15, 23, 42, 0.5); text-align: center; padding: 22px 20px;">
+            <i class="fas fa-rocket" style="font-size: 26px; color: #38bdf8; opacity: 0.6; margin-bottom: 8px; display: block;"></i>
+            <h4 style="font-size: 14.5px; font-weight: 600; color: #cbd5e1; margin-bottom: 4px;">No Featured Project Added Yet</h4>
+            <p style="font-size: 12.5px; color: #94a3b8; max-width: 440px; margin: 0 auto 12px auto; line-height: 1.5;">
+              Spotlight your best web app, software platform, or AI project right here on your profile.
+            </p>
+            <button type="button" class="btn-primary" onclick="addProject()" style="width: auto !important; padding: 7px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; margin: 0 auto;">
+              <i class="fas fa-plus"></i> Add Project
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // Select featured project: first with URL or first in list
+      const proj = projects.find(p => p.url || p.project_url) || projects[0];
+      const title = proj.name || proj.title || 'Featured Project';
+      const desc = proj.description || 'Verified student engineering platform.';
+      const url = proj.url || proj.project_url || '';
+      const techStr = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
+      const techList = techStr ? techStr.split(/[•,]/).map(t => t.trim()).filter(Boolean) : [];
+      const techColors = ['#61dafb', '#38bdf8', '#4ade80', '#a855f7', '#fb923c', '#f43f5e'];
+
+      container.innerHTML = `
+        <div class="spotlight-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1; min-width: 0;">
+              <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fas fa-star" style="color: #eab308;"></i> Featured Project
+              </span>
+              <h4 style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 4px 0 6px 0;">
+                ${escapeHtml(title)}
+              </h4>
+              <p style="font-size: 13px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.55;">
+                ${escapeHtml(desc)}
+              </p>
+            </div>
+            ${url ? `
+              <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 8px 16px; font-size: 12.5px; flex-shrink: 0; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 7px; border-radius: 8px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);">
+                <i class="fas fa-external-link-alt"></i> Live Demo
+              </a>
+            ` : `
+              <button type="button" class="btn-primary" onclick="document.querySelector('.nav-tab[data-section=projects]').click();" style="width: auto !important; padding: 8px 16px; font-size: 12.5px; flex-shrink: 0; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: inline-flex; align-items: center; gap: 7px; border-radius: 8px;">
+                <i class="fas fa-folder-open"></i> View Projects
+              </button>
+            `}
+          </div>
+          ${techList.length > 0 ? `
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid rgba(48, 54, 61, 0.7); padding-top: 10px; margin-top: 6px;">
+              ${techList.map((t, idx) => `
+                <span class="github-stat-pill"><span class="skill-dot" style="background: ${techColors[idx % techColors.length]};"></span> ${escapeHtml(t)}</span>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderMilestones() {
+      const container = document.getElementById('milestonesContainer');
+      if (!container) return;
+
+      const edus = (userProfile && userProfile.education) ? userProfile.education : [];
+      const desig = userProfile ? (userProfile.current_designation || (userProfile.preferred_roles ? userProfile.preferred_roles.split(',')[0].trim() : 'Software Engineer Candidate')) : 'Software Engineer Candidate';
+      const loc = userProfile ? (userProfile.preferred_locations || userProfile.city || userProfile.location || 'Open to Opportunities') : 'Open to Opportunities';
+
+      let html = '';
+
+      if (edus.length > 0) {
+        html += edus.map((edu, idx) => {
+          const title = edu.course || edu.degree || edu.level || 'Degree';
+          const year = edu.graduation_year || edu.year || '';
+          const college = edu.college || edu.institution || 'College / University';
+          const field = edu.specialization || edu.field || edu.level || 'Academic Program';
+          const badgeColor = idx === 0 ? '#38bdf8' : '#4ade80';
+
+          return `
+            <div class="milestone-node">
+              <div class="milestone-dot completed"></div>
+              <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
+                ${escapeHtml(title)}
+                ${(year || college) ? `<span class="github-stat-pill" style="margin-left: 6px; color: ${badgeColor};">${escapeHtml(year ? `${year} • ` : '')}${escapeHtml(college)}</span>` : ''}
+              </div>
+              <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">${escapeHtml(field)}</p>
+            </div>
+          `;
+        }).join('');
+      } else {
+        html += `
+          <div class="milestone-node">
+            <div class="milestone-dot" style="background:#475569;border-color:#334155;"></div>
+            <div style="font-size: 13px; font-weight: 500; color: #94a3b8;">
+              No education milestones added yet.
+              <button type="button" onclick="addEducation()" style="margin-left:6px;background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline;">+ Add Education</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Active candidate status milestone
+      html += `
+        <div class="milestone-node" style="margin-bottom: 0;">
+          <div class="milestone-dot completed"></div>
+          <div style="font-size: 13px; font-weight: 600; color: #58a6ff;">
+            Placement Ready • ${escapeHtml(desig)}
+            <span class="github-stat-pill" style="margin-left: 6px; color: #fbbf24;"><i class="fas fa-bolt"></i> Active</span>
+          </div>
+          <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Targeting opportunities across ${escapeHtml(loc)}.</p>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function renderCompetencyMatrix() {
+      const container = document.getElementById('competencyMatrixList');
+      const pill = document.getElementById('competencyPercentilePill');
+      if (!container) return;
+
+      const rawSkills = (userProfile && userProfile.skills) ? userProfile.skills : [];
+      const skills = rawSkills.map(s => (typeof s === 'string' ? s : (s.name || s.skill || '')).toLowerCase());
+
+      const categories = [
+        {
+          name: 'Full-Stack & Web Systems',
+          keywords: ['react', 'javascript', 'html', 'css', 'node', 'express', 'vue', 'angular', 'web', 'frontend', 'backend', 'php', 'django', 'next.js', 'typescript', 'tailwind', 'bootstrap'],
+          color: 'linear-gradient(90deg, #0284c7, #38bdf8)',
+          textColor: '#38bdf8'
+        },
+        {
+          name: 'Data Analytics & Python',
+          keywords: ['python', 'pandas', 'numpy', 'data analytics', 'machine learning', 'ai', 'data science', 'r', 'powerbi', 'tableau', 'deep learning', 'statistics'],
+          color: 'linear-gradient(90deg, #6366f1, #818cf8)',
+          textColor: '#818cf8'
+        },
+        {
+          name: 'Database Architecture (SQL)',
+          keywords: ['sql', 'mysql', 'postgresql', 'mongodb', 'database', 'supabase', 'firebase', 'redis', 'oracle', 'sqlite', 'nosql', 'prisma'],
+          color: 'linear-gradient(90deg, #9333ea, #c084fc)',
+          textColor: '#c084fc'
+        },
+        {
+          name: 'Algorithms & Problem Solving',
+          keywords: ['dsa', 'data structures', 'algorithms', 'c++', 'java', 'c', 'problem solving', 'oop', 'system design', 'git', 'github'],
+          color: 'linear-gradient(90deg, #059669, #34d399)',
+          textColor: '#34d399'
+        }
+      ];
+
+      const renderedItems = categories.map(cat => {
+        const matches = skills.filter(s => cat.keywords.some(k => s.includes(k) || k.includes(s)));
+
+        let pct = 0;
+        if (matches.length >= 4) pct = 90 + Math.min(matches.length, 5);
+        else if (matches.length === 3) pct = 85;
+        else if (matches.length === 2) pct = 75;
+        else if (matches.length === 1) pct = 60;
+        else pct = skills.length > 0 ? 30 : 15;
+
+        return `
+          <div class="competency-item" style="margin-bottom: 10px;">
+            <div class="competency-header" style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px;">
+              <span>${cat.name}</span>
+              <strong style="color: ${cat.textColor};">${pct}%</strong>
+            </div>
+            <div class="competency-bar-track" style="height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+              <div class="competency-bar-fill" style="width: ${pct}%; height: 100%; background: ${cat.color}; border-radius: 4px; transition: width 0.6s ease;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = renderedItems;
+
+      if (pill) {
+        if (skills.length >= 15) {
+          pill.textContent = 'Top 5%';
+          pill.style.color = '#4ade80';
+          pill.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+        } else if (skills.length >= 8) {
+          pill.textContent = 'Top 15%';
+          pill.style.color = '#38bdf8';
+          pill.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        } else if (skills.length >= 3) {
+          pill.textContent = 'Active';
+          pill.style.color = '#f59e0b';
+          pill.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        } else {
+          pill.textContent = 'Building';
+          pill.style.color = '#94a3b8';
+          pill.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+        }
+      }
+    }
+
     async function loadUserProfile() {
       try {
         console.log('Loading user profile...');
@@ -4156,8 +4289,14 @@
         displaySkills();
 
         // Update bio
-        if (userProfile.bio) {
+        if (userProfile.bio && userProfile.bio.trim().length > 0) {
           document.getElementById('profileSummary').textContent = userProfile.bio;
+          document.getElementById('profileSummary').style.fontStyle = 'normal';
+          document.getElementById('profileSummary').style.color = '#cbd5e1';
+        } else {
+          document.getElementById('profileSummary').textContent = 'No bio added yet. Click "Edit Bio" above to share your background, skills, and goals.';
+          document.getElementById('profileSummary').style.fontStyle = 'italic';
+          document.getElementById('profileSummary').style.color = '#94a3b8';
         }
 
         // Update education - always call to display or show empty state
@@ -4168,6 +4307,11 @@
 
         // Update projects - always call to display or show empty state
         displayProjects();
+
+        // Render dynamic spotlight project, milestones, and competency matrix
+        renderSpotlightProject();
+        renderMilestones();
+        renderCompetencyMatrix();
 
         // Update certifications
         displayCertifications();
@@ -6923,6 +7067,7 @@ ${projStr}
           </div>
         </div>
       `).join('');
+      renderMilestones();
     }
 
     // Initialize
