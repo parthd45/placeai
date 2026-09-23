@@ -557,7 +557,15 @@
 
             <div class="form-group">
               <label style="text-align: left; font-size: 18px;">Mobile Number:</label>
-              <input type="tel" id="mobileInput" placeholder="Enter 10-digit Mobile Number" maxlength="10" autocomplete="tel" />
+              <div style="display: flex; gap: 8px; width: 100%; align-items: center;">
+                <div style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-weight: 600; color: #f1f5f9; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                  <span>🇮🇳</span> +91
+                </div>
+                <div style="position: relative; flex: 1;">
+                  <input type="tel" id="mobileInput" placeholder="Enter 10-digit Mobile Number" maxlength="10" autocomplete="tel" style="width: 100%; padding-right: 36px;" />
+                  <span id="mobileValidIcon" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: none; color: #10b981; font-weight: bold; font-size: 18px;">✓</span>
+                </div>
+              </div>
               <div id="mobileError" class="error-message" role="alert" style="display: none; color: #ef4444; font-size: 12px; margin-top: 4px; text-align: left;">Please enter a valid 10-digit mobile number.</div>
             </div>
 

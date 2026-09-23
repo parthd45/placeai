@@ -154,9 +154,20 @@
 
     // Real-time 10-digit mobile number formatting & validation
     if (mobileInput) {
+      const mobileValidIcon = document.getElementById('mobileValidIcon');
       mobileInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '').slice(0, 10);
+        let val = e.target.value.replace(/\D/g, '');
+        // Auto-strip country code 91 if 12 digits, or leading 0 if 11 digits (e.g. from copy-paste)
+        if (val.length === 12 && val.startsWith('91')) val = val.slice(2);
+        else if (val.length === 11 && val.startsWith('0')) val = val.slice(1);
+        val = val.slice(0, 10);
         e.target.value = val;
+
+        const isValid = /^[6-9]\d{9}$/.test(val);
+        if (mobileValidIcon) {
+          mobileValidIcon.style.display = isValid ? 'block' : 'none';
+        }
+
         if (mobileError) {
           if (val.length > 0 && !/^[6-9]/.test(val)) {
             mobileError.textContent = 'Mobile number must start with 6, 7, 8, or 9';

@@ -1618,9 +1618,14 @@
               <i class="fa fa-envelope contact-icon"></i>
               <span id="contactEmail">Loading...</span>
             </div>
-            <div class="contact-item">
-              <i class="fa fa-phone contact-icon"></i>
-              <span id="contactPhone">Not set</span>
+            <div class="contact-item" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa fa-phone contact-icon"></i>
+                <span id="contactPhone">Not set</span>
+              </div>
+              <button type="button" id="quickEditPhoneBtn" title="Update Mobile Number" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.35); color: #c4b5fd; cursor: pointer; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;">
+                <i class="fa fa-pencil"></i> Update
+              </button>
             </div>
           </div>
         </div>
@@ -2220,7 +2225,8 @@
 
         // Update contact
         document.getElementById('contactEmail').textContent = userProfile.email || currentUser.email;
-        document.getElementById('contactPhone').textContent = userProfile.mobile || 'Not set';
+        const phoneFormatted = userProfile.mobile ? (userProfile.mobile.startsWith('+') ? userProfile.mobile : '+91 ' + userProfile.mobile) : 'Not set';
+        document.getElementById('contactPhone').textContent = phoneFormatted;
 
         // Update skills - always call to display or show empty state
         if (userProfile.skills && userProfile.skills.length > 0) {
@@ -3315,7 +3321,16 @@
         </div>
         <div class="form-group">
           <label class="form-label">Mobile Number</label>
-          <input type="tel" class="form-input" id="editMobile" value="${userProfile.mobile || ''}" placeholder="Enter 10-digit mobile number" maxlength="10" />
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 10px 12px; font-size: 14px; font-weight: 600; color: #f1f5f9; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <span>🇮🇳</span> +91
+            </div>
+            <div style="position: relative; flex: 1;">
+              <input type="tel" class="form-input" id="editMobile" value="${userProfile.mobile || ''}" placeholder="Enter 10-digit mobile number" maxlength="10" autocomplete="tel" style="width: 100%; padding-right: 32px;" />
+              <span id="editMobileCheck" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: ${/^[6-9]\d{9}$/.test(userProfile.mobile || '') ? 'block' : 'none'}; color: #10b981; font-weight: bold;">✓</span>
+            </div>
+          </div>
+          <div id="editMobileError" style="display: none; color: #ef4444; font-size: 12px; margin-top: 4px;"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Location</label>
@@ -3328,7 +3343,10 @@
         const lastName = document.getElementById('editLastName').value.trim();
         const designation = document.getElementById('editDesignation').value.trim();
         const rawMobile = document.getElementById('editMobile').value.trim();
-        const mobile = rawMobile ? rawMobile.replace(/\D/g, '') : '';
+        let mobile = rawMobile ? rawMobile.replace(/\D/g, '') : '';
+        if (mobile.length === 12 && mobile.startsWith('91')) mobile = mobile.slice(2);
+        else if (mobile.length === 11 && mobile.startsWith('0')) mobile = mobile.slice(1);
+        mobile = mobile.slice(0, 10);
         const location = document.getElementById('editLocation').value.trim();
 
         if (!firstName) {
@@ -3358,7 +3376,128 @@
           showToast('Failed to update profile: ' + result.error, 'error');
         }
       });
+
+      // Real-time mobile input formatting in modal
+      setTimeout(() => {
+        const mInput = document.getElementById('editMobile');
+        const mCheck = document.getElementById('editMobileCheck');
+        const mErr = document.getElementById('editMobileError');
+        if (mInput) {
+          mInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length === 12 && val.startsWith('91')) val = val.slice(2);
+            else if (val.length === 11 && val.startsWith('0')) val = val.slice(1);
+            val = val.slice(0, 10);
+            e.target.value = val;
+            const isValid = /^[6-9]\d{9}$/.test(val);
+            if (mCheck) mCheck.style.display = isValid ? 'block' : 'none';
+            if (mErr) {
+              if (val.length > 0 && !/^[6-9]/.test(val)) {
+                mErr.textContent = 'Mobile number must start with 6, 7, 8, or 9';
+                mErr.style.display = 'block';
+              } else if (val.length > 0 && val.length < 10) {
+                mErr.textContent = `${10 - val.length} more digits needed (10 digits)`;
+                mErr.style.display = 'block';
+              } else {
+                mErr.style.display = 'none';
+              }
+            }
+          });
+        }
+      }, 100);
     };
+
+    // Quick Edit Phone Button from Contact Card
+    const quickPhoneBtn = document.getElementById('quickEditPhoneBtn');
+    if (quickPhoneBtn) {
+      quickPhoneBtn.onclick = () => {
+        const curMob = userProfile.mobile || '';
+        const modalContent = `
+          <div style="text-align: left; margin-bottom: 16px;">
+            <p style="color: #94a3b8; font-size: 13.5px; margin-bottom: 14px; line-height: 1.5;">
+              Ensure your mobile number is accurate so placement officers and recruiters can reach you for interviews and placement updates.
+            </p>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600;">10-Digit Mobile Number</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600; color: #f1f5f9; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                  <span>🇮🇳</span> +91
+                </div>
+                <div style="position: relative; flex: 1;">
+                  <input type="tel" class="form-input" id="quickMobileInput" value="${curMob}" placeholder="Enter 10-digit mobile number" maxlength="10" autocomplete="tel" style="width: 100%; padding-right: 32px;" />
+                  <span id="quickMobileCheck" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: ${/^[6-9]\d{9}$/.test(curMob) ? 'block' : 'none'}; color: #10b981; font-weight: bold;">✓</span>
+                </div>
+              </div>
+              <div id="quickMobileError" style="display: none; color: #ef4444; font-size: 12px; margin-top: 6px;"></div>
+            </div>
+          </div>
+        `;
+
+        openModal('Update Mobile Number', modalContent, async () => {
+          const rawMobile = document.getElementById('quickMobileInput').value.trim();
+          let cleanMobile = rawMobile ? rawMobile.replace(/\D/g, '') : '';
+          if (cleanMobile.length === 12 && cleanMobile.startsWith('91')) cleanMobile = cleanMobile.slice(2);
+          else if (cleanMobile.length === 11 && cleanMobile.startsWith('0')) cleanMobile = cleanMobile.slice(1);
+          cleanMobile = cleanMobile.slice(0, 10);
+
+          if (cleanMobile && !/^[6-9]\d{9}$/.test(cleanMobile)) {
+            const errEl = document.getElementById('quickMobileError');
+            if (errEl) {
+              errEl.textContent = 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.';
+              errEl.style.display = 'block';
+            }
+            showToast('Invalid 10-digit mobile number', 'error');
+            return;
+          }
+
+          const result = await updateUserProfile(currentUser.id, {
+            mobile: cleanMobile || null
+          });
+
+          if (result.success) {
+            showToast('Mobile number updated successfully!');
+            userProfile.mobile = cleanMobile;
+            const phoneEl = document.getElementById('contactPhone');
+            if (phoneEl) {
+              phoneEl.textContent = cleanMobile ? '+91 ' + cleanMobile : 'Not set';
+            }
+            closeModal();
+          } else {
+            showToast('Failed to update mobile number: ' + result.error, 'error');
+          }
+        });
+
+        // Add real-time input listener inside modal
+        setTimeout(() => {
+          const qInput = document.getElementById('quickMobileInput');
+          const qCheck = document.getElementById('quickMobileCheck');
+          const qErr = document.getElementById('quickMobileError');
+          if (qInput) {
+            qInput.focus();
+            qInput.addEventListener('input', (e) => {
+              let val = e.target.value.replace(/\D/g, '');
+              if (val.length === 12 && val.startsWith('91')) val = val.slice(2);
+              else if (val.length === 11 && val.startsWith('0')) val = val.slice(1);
+              val = val.slice(0, 10);
+              e.target.value = val;
+              const isValid = /^[6-9]\d{9}$/.test(val);
+              if (qCheck) qCheck.style.display = isValid ? 'block' : 'none';
+              if (qErr) {
+                if (val.length > 0 && !/^[6-9]/.test(val)) {
+                  qErr.textContent = 'Mobile number must start with 6, 7, 8, or 9';
+                  qErr.style.display = 'block';
+                } else if (val.length > 0 && val.length < 10) {
+                  qErr.textContent = `${10 - val.length} more digits needed (10-digit number)`;
+                  qErr.style.display = 'block';
+                } else {
+                  qErr.style.display = 'none';
+                }
+              }
+            });
+          }
+        }, 100);
+      };
+    }
 
     // Profile picture upload handler
     // Remove profile picture function
