@@ -249,17 +249,37 @@
             await window.AuthService.logout();
           }
 
-          // Show OTP verification section
-          showNotification('success', 'Account created! Please check your email for the 6-digit verification code.');
+          // Show OTP verification section on SAME SCREEN
+          showNotification('success', 'Account created! Please check your email for the 8-digit verification code.');
           
-          // Hide the register form
-          form.style.display = 'none';
-          
-          // Show OTP section
+          // Keep form visible on the same screen, lock fields while verifying
+          const inputsToLock = form.querySelectorAll('input:not(.otp-input)');
+          inputsToLock.forEach(inp => inp.disabled = true);
+          submitBtn.disabled = true;
+          submitBtn.textContent = '✓ Verification Code Sent!';
+
+          // Show OTP section inline
           const otpSection = document.getElementById('otpSection');
           if (otpSection) {
             otpSection.style.display = 'block';
             document.getElementById('otpEmail').textContent = email;
+
+            // Setup edit details button to unlock fields if needed
+            const editBtn = document.getElementById('editFormBtn');
+            if (editBtn) {
+              editBtn.onclick = () => {
+                inputsToLock.forEach(inp => inp.disabled = false);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                otpSection.style.display = 'none';
+                document.getElementById('emailInput').focus();
+              };
+            }
+
+            // Smoothly scroll to the verification box on the same screen
+            setTimeout(() => {
+              otpSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
 
             // Setup OTP inputs
             setupOtpInputs();
@@ -270,8 +290,8 @@
               let otpCode = '';
               otpInputs.forEach(input => otpCode += input.value.trim());
 
-              if (otpCode.length !== 6) {
-                document.getElementById('otpError').textContent = 'Please enter the complete 6-digit verification code.';
+              if (otpCode.length < 6) {
+                document.getElementById('otpError').textContent = 'Please enter the complete verification code.';
                 document.getElementById('otpError').style.display = 'block';
                 document.getElementById('otpInputContainer').classList.add('otp-shake');
                 setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
@@ -293,7 +313,7 @@
                 
                 setTimeout(() => {
                   window.location.href = 'dashboard.html';
-                }, 2000);
+                }, 1500);
               } else {
                 otpInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
                 document.getElementById('otpError').textContent = verifyResult.error;
@@ -301,7 +321,7 @@
                 document.getElementById('otpInputContainer').classList.add('otp-shake');
                 setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
                 verifyBtn.disabled = false;
-                verifyBtn.textContent = 'Verify & Continue';
+                verifyBtn.textContent = 'Verify & Complete Account';
               }
             };
 
@@ -438,6 +458,12 @@
         } else {
           e.target.classList.remove('filled');
         }
+
+        // Auto trigger when final digit is entered
+        if (e.target.value && index === inputs.length - 1) {
+          const verifyBtn = document.getElementById('verifyOtpBtn');
+          if (verifyBtn) setTimeout(() => verifyBtn.click(), 150);
+        }
       });
 
       // On backspace, go to previous input
@@ -453,7 +479,7 @@
         }
       });
 
-      // Handle paste (paste full 6-digit code)
+      // Handle paste (paste 8-digit or 6-digit code)
       input.addEventListener('paste', (e) => {
         e.preventDefault();
         const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
@@ -462,9 +488,12 @@
             inp.value = pastedData[i] || '';
             if (inp.value) inp.classList.add('filled');
           });
-          inputs[inputs.length - 1].focus();
+          const lastIdx = Math.min(pastedData.length - 1, inputs.length - 1);
+          inputs[lastIdx].focus();
           const verifyBtn = document.getElementById('verifyOtpBtn');
-          if (verifyBtn) setTimeout(() => verifyBtn.click(), 200);
+          if (verifyBtn && (pastedData.length === 6 || pastedData.length >= 8)) {
+            setTimeout(() => verifyBtn.click(), 200);
+          }
         }
       });
     });
