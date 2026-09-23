@@ -15,15 +15,28 @@
 
     /**
      * Clean and extract username handle from LinkedIn URL
+     * Strips https://, linkedin.com/in/, etc., returning just the username handle
      * @param {string} url - LinkedIn profile URL or handle
-     * @returns {string} - Clean username
+     * @returns {string} - Clean username handle
      */
     extractHandle(url) {
       if (!url) return '';
       let clean = url.trim();
-      clean = clean.replace(/\/+$/, '');
-      const match = clean.match(/(?:linkedin\.com\/in\/)?([a-zA-Z0-9_-]+)/i);
+      clean = clean.replace(/^https?:\/\//i, '');
+      clean = clean.replace(/^www\./i, '');
+      clean = clean.replace(/^linkedin\.com\/in\//i, '');
+      clean = clean.replace(/^in\//i, '');
+      clean = clean.split('?')[0].split('#')[0].replace(/\/+$/, '');
+      const match = clean.match(/([a-zA-Z0-9_\-\.]+)/);
       return match ? match[1] : clean;
+    }
+
+    /**
+     * Build standard LinkedIn profile URL from handle
+     */
+    buildProfileUrl(handleOrUrl) {
+      const handle = this.extractHandle(handleOrUrl);
+      return handle ? `https://www.linkedin.com/in/${handle}/` : '';
     }
 
     /**

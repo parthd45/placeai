@@ -2086,7 +2086,9 @@
                 <div>
                   <h3 style="display: flex; align-items: center; gap: 8px;">
                     GitHub Contribution Activity
-                    <span style="font-size: 11px; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">Live Tracker</span>
+                    <span style="font-size: 11px; padding: 2px 8px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.35); font-weight: 600;">
+                      <i class="fas fa-check-circle" style="font-size: 10px;"></i> Real Activity Data
+                    </span>
                   </h3>
                 </div>
               </div>
@@ -2125,21 +2127,23 @@
               </div>
             </div>
 
-            <!-- Heatmap Footer with Legend & Quick Boost Actions -->
+            <!-- Heatmap Footer with Legend & Real Profile Actions -->
             <div class="heatmap-footer">
               <div class="heatmap-actions-quick">
-                <span style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">Boost Intensity:</span>
-                <button class="quick-boost-btn" onclick="triggerBoost('skill')">
-                  <i class="fas fa-plus"></i> Skill (+3)
+                <span style="font-size: 11.5px; color: #94a3b8; font-weight: 600;">
+                  <i class="fas fa-bolt" style="color: #38bdf8;"></i> Real Profile Actions:
+                </span>
+                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=skills]').click(); const el = document.getElementById('skillInput'); if (el) el.focus();">
+                  <i class="fas fa-plus"></i> Add Skill
                 </button>
-                <button class="quick-boost-btn" onclick="triggerBoost('project')">
-                  <i class="fas fa-plus"></i> Project (+5)
+                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=projects]').click(); addProject();">
+                  <i class="fas fa-plus"></i> Add Project
                 </button>
-                <button class="quick-boost-btn" onclick="triggerBoost('experience')">
-                  <i class="fas fa-plus"></i> Experience (+5)
+                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=experience]').click(); addExperience();">
+                  <i class="fas fa-plus"></i> Add Experience
                 </button>
-                <button class="quick-boost-btn" onclick="triggerBoost('prep')">
-                  <i class="fas fa-robot"></i> AI Mock Prep (+4)
+                <button class="quick-boost-btn" onclick="handleResumeAction()">
+                  <i class="fas fa-upload"></i> Upload Resume
                 </button>
               </div>
 
@@ -2703,7 +2707,10 @@
     let extractedLinkedInData = null;
 
     function openLinkedInSyncModal() {
-      const curUrl = (userProfile && userProfile.linkedin_url) ? userProfile.linkedin_url : '';
+      let curHandle = '';
+      if (userProfile && userProfile.linkedin_url) {
+        curHandle = window.LinkedInService ? window.LinkedInService.extractHandle(userProfile.linkedin_url) : userProfile.linkedin_url;
+      }
       const modalContent = `
         <div style="text-align: left;">
           <p style="color: #94a3b8; font-size: 13.5px; margin-bottom: 16px; line-height: 1.5;">
@@ -2712,30 +2719,33 @@
 
           <div class="sync-tab-container">
             <button class="sync-tab-btn active" id="tabUrlBtn" onclick="switchLinkedInTab('url')">
-              <i class="fas fa-link"></i> Profile URL / Handle
+              <i class="fab fa-linkedin"></i> LinkedIn Handle / URL
             </button>
             <button class="sync-tab-btn" id="tabTextBtn" onclick="switchLinkedInTab('text')">
               <i class="fas fa-file-alt"></i> Smart Paste / Text
             </button>
             <button class="sync-tab-btn" id="tabOauthBtn" onclick="switchLinkedInTab('oauth')">
-              <i class="fab fa-linkedin"></i> LinkedIn Connect
+              <i class="fab fa-linkedin-in"></i> LinkedIn Connect
             </button>
           </div>
 
-          <!-- Tab 1: Profile URL / Handle -->
+          <!-- Tab 1: Profile URL / Handle with built-in linkedin.com/in/ -->
           <div id="syncTabUrl">
             <div class="form-group">
-              <label class="form-label">LinkedIn Profile URL or Username</label>
-              <div style="display: flex; gap: 8px;">
+              <label class="form-label" style="font-weight: 600;">LinkedIn Profile Handle</label>
+              <div style="display: flex; gap: 8px; align-items: stretch;">
+                <div style="background: rgba(10, 102, 194, 0.16); border: 1.5px solid rgba(10, 102, 194, 0.45); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 8px; white-space: nowrap; user-select: none;">
+                  <i class="fab fa-linkedin" style="color: #0a66c2; font-size: 17px;"></i> linkedin.com/in/
+                </div>
                 <input type="text" class="form-input" id="linkedinUrlInput" 
-                  value="${curUrl}" 
-                  placeholder="https://www.linkedin.com/in/username or username" />
+                  value="${curHandle}" 
+                  placeholder="username (e.g. parth-developer)" style="flex: 1;" />
                 <button type="button" class="btn-primary" onclick="extractFromUrl()" style="white-space: nowrap;">
                   <i class="fas fa-magic"></i> Extract
                 </button>
               </div>
-              <span style="font-size: 12px; color: #64748b; margin-top: 4px; display: block;">
-                Example: linkedin.com/in/parth-developer or parth-developer
+              <span style="font-size: 12px; color: #64748b; margin-top: 6px; display: block;">
+                Built-in prefix: <strong>linkedin.com/in/</strong> is predefined. Just enter your username or paste your link.
               </span>
             </div>
           </div>
@@ -2796,6 +2806,20 @@
 
       const saveBtn = document.getElementById('saveBtn');
       if (saveBtn) saveBtn.style.display = 'none';
+
+      setTimeout(() => {
+        const uInput = document.getElementById('linkedinUrlInput');
+        if (uInput) {
+          uInput.focus();
+          uInput.addEventListener('input', (e) => {
+            let val = e.target.value.trim();
+            if (val.includes('linkedin.com') || val.includes('http')) {
+              val = window.LinkedInService ? window.LinkedInService.extractHandle(val) : val;
+              e.target.value = val;
+            }
+          });
+        }
+      }, 100);
     }
 
     function switchLinkedInTab(tab) {
@@ -2816,14 +2840,17 @@
 
     function extractFromUrl() {
       const urlInput = document.getElementById('linkedinUrlInput');
-      const val = urlInput ? urlInput.value.trim() : '';
+      let val = urlInput ? urlInput.value.trim() : '';
       if (!val) {
-        showToast('Please enter your LinkedIn profile URL or username', 'error');
+        showToast('Please enter your LinkedIn profile handle', 'error');
         return;
       }
 
+      const handle = window.LinkedInService ? window.LinkedInService.extractHandle(val) : val;
+      const fullUrl = `https://www.linkedin.com/in/${handle}/`;
+
       showToast('Extracting candidate details from LinkedIn...', 'info');
-      extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(val, userProfile || {});
+      extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(fullUrl, userProfile || {});
       showExtractionPreview(extractedLinkedInData);
     }
 
@@ -3174,7 +3201,10 @@
         // Calculate score
         calculateProfileScore();
 
-        // Render GitHub Contribution Heatmap
+        // Sync and render real GitHub Contribution Heatmap based on authentic profile data
+        if (window.ActivityTracker && typeof window.ActivityTracker.syncFromRealProfile === 'function') {
+          window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
+        }
         if (typeof renderHeatmap === 'function') {
           renderHeatmap();
         }
