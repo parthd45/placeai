@@ -1444,6 +1444,395 @@
         flex-wrap: wrap;
       }
     }
+
+    /* =========================================================
+       LINKEDIN & GITHUB MIX DASHBOARD COMPONENTS
+       ========================================================= */
+    .mix-dashboard-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* LinkedIn Auto-Sync Hero Banner */
+    .linkedin-hero-card {
+      background: linear-gradient(135deg, rgba(10, 102, 194, 0.16) 0%, rgba(30, 41, 59, 0.9) 60%, rgba(15, 23, 42, 0.98) 100%);
+      border: 1px solid rgba(10, 102, 194, 0.45);
+      border-radius: 14px;
+      padding: 18px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .linkedin-hero-card::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 130px;
+      height: 130px;
+      background: radial-gradient(circle, rgba(10, 102, 194, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .linkedin-hero-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .linkedin-icon-box {
+      width: 48px;
+      height: 48px;
+      background: #0a66c2;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 26px;
+      box-shadow: 0 4px 14px rgba(10, 102, 194, 0.45);
+      flex-shrink: 0;
+    }
+
+    .linkedin-hero-content h3 {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .linkedin-hero-content p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .linkedin-badge-sync {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .linkedin-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-linkedin-sync {
+      background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(10, 102, 194, 0.35);
+      white-space: nowrap;
+    }
+
+    .btn-linkedin-sync:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(10, 102, 194, 0.55);
+      background: linear-gradient(135deg, #0077b5 0%, #0a66c2 100%);
+    }
+
+    /* GitHub Contribution Heatmap Card */
+    .github-heatmap-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .heatmap-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .heatmap-header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .heatmap-header-title i {
+      font-size: 22px;
+      color: #f1f5f9;
+    }
+
+    .heatmap-header-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0;
+    }
+
+    .heatmap-stats-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .heatmap-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    .heatmap-stat-item strong {
+      color: #38bdf8;
+      font-size: 14px;
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(249, 115, 22, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .heatmap-scroll {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .heatmap-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .heatmap-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+      border-radius: 4px;
+    }
+    .heatmap-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    .heatmap-wrapper {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 680px;
+    }
+
+    .heatmap-months-row {
+      display: flex;
+      font-size: 10px;
+      color: #64748b;
+      margin-left: 28px;
+      margin-bottom: 2px;
+      position: relative;
+      height: 14px;
+    }
+
+    .heatmap-body {
+      display: flex;
+      gap: 6px;
+    }
+
+    .heatmap-days-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 98px;
+      font-size: 10px;
+      color: #64748b;
+      width: 22px;
+      text-align: right;
+      padding-right: 4px;
+      user-select: none;
+    }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 11px);
+      grid-auto-flow: column;
+      grid-auto-columns: 11px;
+      gap: 3px;
+    }
+
+    .heatmap-cell {
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+      background: #161b22;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: transform 0.15s ease, outline 0.15s ease, background 0.3s ease;
+      position: relative;
+    }
+
+    .heatmap-cell:hover {
+      outline: 1.5px solid #38bdf8;
+      transform: scale(1.35);
+      z-index: 5;
+    }
+
+    /* Cell Activity Intensity Levels */
+    .heatmap-cell.lvl-0 { background: #161b22; }
+    .heatmap-cell.lvl-1 { background: #0e4429; border-color: rgba(14, 68, 41, 0.4); }
+    .heatmap-cell.lvl-2 { background: #006d32; border-color: rgba(0, 109, 50, 0.4); }
+    .heatmap-cell.lvl-3 { background: #26a641; border-color: rgba(38, 166, 65, 0.5); }
+    .heatmap-cell.lvl-4 { 
+      background: #39d353; 
+      border-color: rgba(57, 211, 83, 0.7);
+      box-shadow: 0 0 6px rgba(57, 211, 83, 0.5); 
+    }
+
+    .heatmap-cell.today-cell {
+      box-shadow: 0 0 0 1.5px #60a5fa, 0 0 8px rgba(96, 165, 250, 0.6);
+      animation: pulseToday 2s infinite;
+    }
+
+    @keyframes pulseToday {
+      0%, 100% { outline: 1px solid #60a5fa; }
+      50% { outline: 2px solid #93c5fd; }
+    }
+
+    .heatmap-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .legend-box {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .heatmap-actions-quick {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-boost-btn {
+      background: rgba(38, 166, 65, 0.12);
+      border: 1px solid rgba(38, 166, 65, 0.35);
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-boost-btn:hover {
+      background: rgba(38, 166, 65, 0.25);
+      border-color: #39d353;
+      transform: translateY(-1px);
+      color: #86efac;
+    }
+
+    /* Heatmap floating tooltip */
+    #heatmapTooltip {
+      position: fixed;
+      background: #090d16;
+      color: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      font-size: 11.5px;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    /* LinkedIn Modal Tabs & UI */
+    .sync-tab-container {
+      display: flex;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .sync-tab-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sync-tab-btn.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+    }
+
+    .extracted-preview-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 14px;
+    }
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -1664,6 +2053,109 @@
 
       <!-- Right Content Area -->
       <div>
+        <!-- Mix Dashboard: LinkedIn Auto-Sync & GitHub Activity Matrix -->
+        <div class="mix-dashboard-grid">
+          <!-- LinkedIn Hero Sync Card -->
+          <div class="linkedin-hero-card">
+            <div class="linkedin-hero-left">
+              <div class="linkedin-icon-box">
+                <i class="fab fa-linkedin-in"></i>
+              </div>
+              <div class="linkedin-hero-content">
+                <h3>
+                  LinkedIn Profile Auto-Sync & Extraction
+                  <span class="linkedin-badge-sync"><i class="fas fa-bolt"></i> 1-Click Sync</span>
+                </h3>
+                <p>
+                  Connect your LinkedIn or paste your profile URL/text to automatically extract headline, bio, experience, education & skills into PlaceAI.
+                </p>
+              </div>
+            </div>
+            <div class="linkedin-hero-actions">
+              <button class="btn-linkedin-sync" onclick="openLinkedInSyncModal()">
+                <i class="fab fa-linkedin"></i> Connect & Auto-Extract
+              </button>
+            </div>
+          </div>
+
+          <!-- GitHub Activity Contribution Heatmap Card -->
+          <div class="github-heatmap-card">
+            <div class="heatmap-header">
+              <div class="heatmap-header-title">
+                <i class="fab fa-github"></i>
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 8px;">
+                    GitHub Contribution Activity
+                    <span style="font-size: 11px; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">Live Tracker</span>
+                  </h3>
+                </div>
+              </div>
+              <div class="heatmap-stats-group">
+                <div class="heatmap-stat-item">
+                  <i class="fas fa-calendar-check" style="color: #38bdf8;"></i>
+                  Total: <strong id="heatmapTotalCount">0</strong>
+                </div>
+                <div class="streak-badge">
+                  <i class="fas fa-fire"></i>
+                  <span id="heatmapCurrentStreak">0</span> Days Streak
+                </div>
+                <div class="heatmap-stat-item">
+                  <i class="fas fa-bolt" style="color: #eab308;"></i>
+                  Best: <strong id="heatmapLongestStreak">0</strong>d
+                </div>
+              </div>
+            </div>
+
+            <!-- Heatmap Calendar Matrix -->
+            <div class="heatmap-scroll">
+              <div class="heatmap-wrapper">
+                <div class="heatmap-months-row" id="heatmapMonths">
+                  <!-- Dynamic month labels -->
+                </div>
+                <div class="heatmap-body">
+                  <div class="heatmap-days-col">
+                    <span>Mon</span>
+                    <span>Wed</span>
+                    <span>Fri</span>
+                  </div>
+                  <div class="heatmap-grid" id="heatmapGrid">
+                    <!-- 52 columns x 7 rows cells rendered dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Heatmap Footer with Legend & Quick Boost Actions -->
+            <div class="heatmap-footer">
+              <div class="heatmap-actions-quick">
+                <span style="font-size: 11.5px; color: #94a3b8; font-weight: 500;">Boost Intensity:</span>
+                <button class="quick-boost-btn" onclick="triggerBoost('skill')">
+                  <i class="fas fa-plus"></i> Skill (+3)
+                </button>
+                <button class="quick-boost-btn" onclick="triggerBoost('project')">
+                  <i class="fas fa-plus"></i> Project (+5)
+                </button>
+                <button class="quick-boost-btn" onclick="triggerBoost('experience')">
+                  <i class="fas fa-plus"></i> Experience (+5)
+                </button>
+                <button class="quick-boost-btn" onclick="triggerBoost('prep')">
+                  <i class="fas fa-robot"></i> AI Mock Prep (+4)
+                </button>
+              </div>
+
+              <div class="heatmap-legend">
+                <span>Less</span>
+                <div class="legend-box lvl-0"></div>
+                <div class="legend-box lvl-1"></div>
+                <div class="legend-box lvl-2"></div>
+                <div class="legend-box lvl-3"></div>
+                <div class="legend-box lvl-4"></div>
+                <span>More</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Navigation Tabs -->
         <div class="card" style="padding: 16px;">
           <div class="nav-tabs">
@@ -2033,11 +2525,16 @@
     </div>
   </div>
 
+  <!-- Floating Heatmap Tooltip -->
+  <div id="heatmapTooltip"></div>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="backend/supabase-init.js"></script>
   <script src="backend/auth-service.js"></script>
   <script src="backend/db-service.js"></script>
+  <script src="backend/activity-tracker.js"></script>
+  <script src="backend/linkedin-service.js"></script>
 
   <script>
     let currentUser = null;
@@ -2050,6 +2547,379 @@
 
     async function updateUserProfile(userId, data) {
       return await window.DBService.updateUserProfile(userId, data);
+    }
+
+    // =========================================================
+    // GITHUB CONTRIBUTION HEATMAP LOGIC
+    // =========================================================
+    function renderHeatmap() {
+      const grid = document.getElementById('heatmapGrid');
+      const monthsRow = document.getElementById('heatmapMonths');
+      const tooltip = document.getElementById('heatmapTooltip');
+      if (!grid || !window.ActivityTracker) return;
+
+      const tracker = window.ActivityTracker;
+      const activityMap = tracker.getStoredMap();
+      const stats = tracker.getStats();
+
+      // Update counters
+      const totalEl = document.getElementById('heatmapTotalCount');
+      const streakEl = document.getElementById('heatmapCurrentStreak');
+      const longestEl = document.getElementById('heatmapLongestStreak');
+      if (totalEl) totalEl.textContent = stats.totalContributions;
+      if (streakEl) streakEl.textContent = stats.currentStreak;
+      if (longestEl) longestEl.textContent = stats.longestStreak;
+
+      // 52 weeks (364 days). End on upcoming Saturday of current week
+      const today = new Date();
+      const todayKey = tracker.getTodayKey();
+      const todayDayOfWeek = today.getDay(); // 0 is Sun, 6 is Sat
+
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + (6 - todayDayOfWeek));
+
+      // Start date is 52 weeks prior (Sunday)
+      const startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - (52 * 7 - 1));
+
+      grid.innerHTML = '';
+      monthsRow.innerHTML = '';
+
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      let lastMonthAdded = -1;
+
+      // Render 52 columns x 7 rows
+      for (let col = 0; col < 52; col++) {
+        // Month label placement
+        const colDate = new Date(startDate);
+        colDate.setDate(startDate.getDate() + col * 7);
+        const m = colDate.getMonth();
+
+        if (m !== lastMonthAdded && colDate.getDate() <= 7) {
+          const mSpan = document.createElement('span');
+          mSpan.textContent = monthNames[m];
+          mSpan.style.position = 'absolute';
+          mSpan.style.left = `${(col / 52) * 100}%`;
+          monthsRow.appendChild(mSpan);
+          lastMonthAdded = m;
+        }
+
+        for (let row = 0; row < 7; row++) {
+          const cellDate = new Date(startDate);
+          cellDate.setDate(startDate.getDate() + (col * 7 + row));
+
+          const y = cellDate.getFullYear();
+          const monthStr = String(cellDate.getMonth() + 1).padStart(2, '0');
+          const dayStr = String(cellDate.getDate()).padStart(2, '0');
+          const dateKey = `${y}-${monthStr}-${dayStr}`;
+
+          const cell = document.createElement('div');
+          cell.className = 'heatmap-cell';
+
+          // Zero out time for comparison
+          const cellMidnight = new Date(y, cellDate.getMonth(), cellDate.getDate());
+          const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+          const isFuture = cellMidnight > todayMidnight;
+          if (isFuture) {
+            cell.style.opacity = '0.15';
+            cell.style.pointerEvents = 'none';
+          } else {
+            const count = activityMap[dateKey] || 0;
+            const lvl = tracker.getLevel(count);
+            cell.classList.add(`lvl-${lvl}`);
+
+            if (dateKey === todayKey) {
+              cell.classList.add('today-cell');
+            }
+
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+            const formattedDate = cellDate.toLocaleDateString('en-US', options);
+
+            cell.addEventListener('mouseenter', (e) => {
+              if (tooltip) {
+                tooltip.innerHTML = `<strong>${count} contribution${count === 1 ? '' : 's'}</strong> on ${formattedDate}`;
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${e.clientX + 12}px`;
+                tooltip.style.top = `${e.clientY - 28}px`;
+              }
+            });
+
+            cell.addEventListener('mousemove', (e) => {
+              if (tooltip) {
+                tooltip.style.left = `${e.clientX + 12}px`;
+                tooltip.style.top = `${e.clientY - 28}px`;
+              }
+            });
+
+            cell.addEventListener('mouseleave', () => {
+              if (tooltip) tooltip.style.display = 'none';
+            });
+          }
+
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    // Quick boost action from buttons
+    function triggerBoost(type) {
+      if (!window.ActivityTracker) return;
+      let pts = 3;
+      let label = 'Skill practice';
+
+      if (type === 'skill') {
+        pts = 3;
+        label = 'Added placement skill';
+        const skillsTab = document.querySelector('[data-section=skills]');
+        if (skillsTab) skillsTab.click();
+      } else if (type === 'project') {
+        pts = 5;
+        label = 'Added project work';
+        const projTab = document.querySelector('[data-section=projects]');
+        if (projTab) projTab.click();
+      } else if (type === 'experience') {
+        pts = 5;
+        label = 'Updated work experience';
+        const expTab = document.querySelector('[data-section=experience]');
+        if (expTab) expTab.click();
+      } else if (type === 'prep') {
+        pts = 4;
+        label = 'AI Mock Interview Prep completed';
+      }
+
+      window.ActivityTracker.recordActivity(type, pts, label);
+      showToast(`🔥 +${pts} Activity recorded! Heatmap turns greener.`, 'success');
+    }
+
+    // Listen for activity updates reactively
+    window.addEventListener('placeai:activity-recorded', () => {
+      renderHeatmap();
+    });
+
+    // =========================================================
+    // LINKEDIN PROFILE SYNC & EXTRACTION LOGIC
+    // =========================================================
+    let extractedLinkedInData = null;
+
+    function openLinkedInSyncModal() {
+      const curUrl = (userProfile && userProfile.linkedin_url) ? userProfile.linkedin_url : '';
+      const modalContent = `
+        <div style="text-align: left;">
+          <p style="color: #94a3b8; font-size: 13.5px; margin-bottom: 16px; line-height: 1.5;">
+            Sync candidate information from LinkedIn to automatically update your PlaceAI profile, headline, work experience, education, and skills.
+          </p>
+
+          <div class="sync-tab-container">
+            <button class="sync-tab-btn active" id="tabUrlBtn" onclick="switchLinkedInTab('url')">
+              <i class="fas fa-link"></i> Profile URL / Handle
+            </button>
+            <button class="sync-tab-btn" id="tabTextBtn" onclick="switchLinkedInTab('text')">
+              <i class="fas fa-file-alt"></i> Smart Paste / Text
+            </button>
+            <button class="sync-tab-btn" id="tabOauthBtn" onclick="switchLinkedInTab('oauth')">
+              <i class="fab fa-linkedin"></i> LinkedIn Connect
+            </button>
+          </div>
+
+          <!-- Tab 1: Profile URL / Handle -->
+          <div id="syncTabUrl">
+            <div class="form-group">
+              <label class="form-label">LinkedIn Profile URL or Username</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-input" id="linkedinUrlInput" 
+                  value="${curUrl}" 
+                  placeholder="https://www.linkedin.com/in/username or username" />
+                <button type="button" class="btn-primary" onclick="extractFromUrl()" style="white-space: nowrap;">
+                  <i class="fas fa-magic"></i> Extract
+                </button>
+              </div>
+              <span style="font-size: 12px; color: #64748b; margin-top: 4px; display: block;">
+                Example: linkedin.com/in/parth-developer or parth-developer
+              </span>
+            </div>
+          </div>
+
+          <!-- Tab 2: Smart Paste / PDF Text -->
+          <div id="syncTabText" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Paste LinkedIn Profile / Resume Text</label>
+              <textarea class="form-textarea" id="linkedinTextInput" rows="5" 
+                placeholder="Copy and paste text from your LinkedIn profile (About, Experience, Skills, Education)..."></textarea>
+              <button type="button" class="btn-primary" onclick="extractFromText()" style="margin-top: 8px; width: 100%; justify-content: center;">
+                <i class="fas fa-brain"></i> Parse & Extract Profile Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 3: OAuth Connect -->
+          <div id="syncTabOauth" style="display: none; text-align: center; padding: 20px;">
+            <i class="fab fa-linkedin" style="font-size: 48px; color: #0a66c2; margin-bottom: 12px;"></i>
+            <h4 style="color: #f1f5f9; margin-bottom: 8px;">Connect LinkedIn with PlaceAI</h4>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
+              Authenticate via LinkedIn OpenID to link your account verified badge and credentials.
+            </p>
+            <button type="button" class="btn-linkedin-sync" onclick="connectLinkedIn()" style="font-size: 14px; padding: 10px 24px;">
+              <i class="fab fa-linkedin"></i> Sign in with LinkedIn
+            </button>
+          </div>
+
+          <!-- Extraction Preview Section -->
+          <div id="linkedinPreviewArea" style="display: none;" class="extracted-preview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 style="color: #38bdf8; font-size: 14px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-check-circle" style="color: #34d399;"></i> Extracted Profile Data
+              </h4>
+              <span class="linkedin-badge-sync"><i class="fas fa-sparkles"></i> Ready to Apply</span>
+            </div>
+
+            <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+              <div style="margin-bottom: 6px;"><strong>Name:</strong> <span id="prevName"></span></div>
+              <div style="margin-bottom: 6px;"><strong>Headline:</strong> <span id="prevHeadline" style="color: #94a3b8;"></span></div>
+              <div style="margin-bottom: 6px;"><strong>Bio / Summary:</strong> <span id="prevBio" style="color: #94a3b8;"></span></div>
+              <div style="margin-bottom: 6px;"><strong>Work Experience:</strong> <span id="prevExpCount" style="color: #38bdf8;"></span></div>
+              <div style="margin-bottom: 6px;"><strong>Education:</strong> <span id="prevEduCount" style="color: #38bdf8;"></span></div>
+              <div style="margin-bottom: 6px;">
+                <strong>Detected Skills:</strong>
+                <div id="prevSkills" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;"></div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="applyLinkedInToProfile()" style="width: 100%; margin-top: 14px; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #0a66c2 0%, #2563eb 100%);">
+              <i class="fas fa-cloud-upload-alt"></i> Apply to PlaceAI Profile (+10 Activity Points)
+            </button>
+          </div>
+        </div>
+      `;
+
+      openModal('LinkedIn Profile Integration & Extraction', modalContent, null);
+
+      const saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) saveBtn.style.display = 'none';
+    }
+
+    function switchLinkedInTab(tab) {
+      const uEl = document.getElementById('syncTabUrl');
+      const tEl = document.getElementById('syncTabText');
+      const oEl = document.getElementById('syncTabOauth');
+      if (uEl) uEl.style.display = tab === 'url' ? 'block' : 'none';
+      if (tEl) tEl.style.display = tab === 'text' ? 'block' : 'none';
+      if (oEl) oEl.style.display = tab === 'oauth' ? 'block' : 'none';
+
+      const uBtn = document.getElementById('tabUrlBtn');
+      const tBtn = document.getElementById('tabTextBtn');
+      const oBtn = document.getElementById('tabOauthBtn');
+      if (uBtn) uBtn.classList.toggle('active', tab === 'url');
+      if (tBtn) tBtn.classList.toggle('active', tab === 'text');
+      if (oBtn) oBtn.classList.toggle('active', tab === 'oauth');
+    }
+
+    function extractFromUrl() {
+      const urlInput = document.getElementById('linkedinUrlInput');
+      const val = urlInput ? urlInput.value.trim() : '';
+      if (!val) {
+        showToast('Please enter your LinkedIn profile URL or username', 'error');
+        return;
+      }
+
+      showToast('Extracting candidate details from LinkedIn...', 'info');
+      extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(val, userProfile || {});
+      showExtractionPreview(extractedLinkedInData);
+    }
+
+    function extractFromText() {
+      const textInput = document.getElementById('linkedinTextInput');
+      const rawText = textInput ? textInput.value.trim() : '';
+      if (!rawText) {
+        showToast('Please paste LinkedIn profile text to extract', 'error');
+        return;
+      }
+
+      showToast('Analyzing and extracting candidate details...', 'info');
+      extractedLinkedInData = window.LinkedInService.parseLinkedInText(rawText);
+
+      if (userProfile) {
+        if (!extractedLinkedInData.first_name && userProfile.first_name) {
+          extractedLinkedInData.first_name = userProfile.first_name;
+          extractedLinkedInData.last_name = userProfile.last_name;
+        }
+        if (!extractedLinkedInData.current_designation && userProfile.current_designation) {
+          extractedLinkedInData.current_designation = userProfile.current_designation;
+        }
+        if (userProfile.linkedin_url) {
+          extractedLinkedInData.linkedin_url = userProfile.linkedin_url;
+        }
+      }
+
+      showExtractionPreview(extractedLinkedInData);
+    }
+
+    async function connectLinkedIn() {
+      showToast('Redirecting to LinkedIn OAuth...', 'info');
+      const res = await window.LinkedInService.connectLinkedInOAuth();
+      if (!res.success) {
+        showToast('LinkedIn OAuth: ' + res.error, 'error');
+      }
+    }
+
+    function showExtractionPreview(data) {
+      if (!data) return;
+      const previewArea = document.getElementById('linkedinPreviewArea');
+      if (!previewArea) return;
+      previewArea.style.display = 'block';
+
+      const prevName = document.getElementById('prevName');
+      const prevHead = document.getElementById('prevHeadline');
+      const prevBio = document.getElementById('prevBio');
+      const prevExp = document.getElementById('prevExpCount');
+      const prevEdu = document.getElementById('prevEduCount');
+      const prevSkills = document.getElementById('prevSkills');
+
+      if (prevName) prevName.textContent = `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'Candidate';
+      if (prevHead) prevHead.textContent = data.current_designation || 'Software Developer';
+      if (prevBio) prevBio.textContent = (data.bio && data.bio.length > 140) ? (data.bio.slice(0, 140) + '...') : (data.bio || 'Profile summary');
+
+      const expCount = (data.experience || []).length;
+      if (prevExp) prevExp.textContent = expCount > 0 ? `${expCount} role(s) ready to sync` : 'Will preserve existing';
+
+      const eduCount = (data.education || []).length;
+      if (prevEdu) prevEdu.textContent = eduCount > 0 ? `${eduCount} qualification(s) ready to sync` : 'Will preserve existing';
+
+      if (prevSkills) {
+        if (data.skills && data.skills.length > 0) {
+          prevSkills.innerHTML = data.skills.slice(0, 10).map(s =>
+            `<span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 12px; font-size: 11px;">${s}</span>`
+          ).join('') + (data.skills.length > 10 ? `<span style="font-size: 11px; color: #94a3b8;">+${data.skills.length - 10} more</span>` : '');
+        } else {
+          prevSkills.innerHTML = '<span style="font-size: 12px; color: #94a3b8;">No new skills detected</span>';
+        }
+      }
+    }
+
+    async function applyLinkedInToProfile() {
+      if (!extractedLinkedInData) {
+        showToast('No extracted LinkedIn data to apply', 'error');
+        return;
+      }
+
+      showToast('Applying LinkedIn details to PlaceAI profile...', 'info');
+      try {
+        const result = await window.LinkedInService.syncToUserProfile(currentUser.id, extractedLinkedInData);
+        if (result.success) {
+          showToast('🎉 PlaceAI profile successfully updated from LinkedIn! +10 Points awarded.', 'success');
+          closeModal();
+
+          const saveBtn = document.getElementById('saveBtn');
+          if (saveBtn) saveBtn.style.display = 'block';
+
+          await loadUserProfile();
+        } else {
+          showToast('Failed to apply LinkedIn profile: ' + result.error, 'error');
+        }
+      } catch (err) {
+        console.error('applyLinkedInToProfile error:', err);
+        showToast('Error syncing LinkedIn profile: ' + err.message, 'error');
+      }
     }
 
     // Check for email confirmation or OAuth callback in URL
@@ -2304,6 +3174,11 @@
         // Calculate score
         calculateProfileScore();
 
+        // Render GitHub Contribution Heatmap
+        if (typeof renderHeatmap === 'function') {
+          renderHeatmap();
+        }
+
       } catch (error) {
         console.error('Error loading profile:', error);
       }
@@ -2398,6 +3273,7 @@
         const result = await updateUserProfile(currentUser.id, { experience: experienceArray });
 
         if (result.success) {
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('experience', 5, 'Updated work experience at ' + company);
           showToast('Experience updated successfully!');
           await loadUserProfile();
           closeModal();
@@ -2635,6 +3511,7 @@
         const result = await updateUserProfile(currentUser.id, { certifications });
 
         if (result.success) {
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('certification', 4, 'Added certification: ' + name);
           showToast('Certification added successfully!');
           await loadUserProfile();
           closeModal();
@@ -2888,6 +3765,8 @@
 
     function closeModal() {
       document.getElementById('editModal').classList.remove('active');
+      const saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) saveBtn.style.display = 'block';
     }
 
     // Edit Functions
@@ -2904,6 +3783,7 @@
         const result = await updateUserProfile(currentUser.id, { bio });
 
         if (result.success) {
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('summary', 3, 'Updated profile summary');
           showToast('Summary updated successfully!');
           await loadUserProfile();
           closeModal();
@@ -2936,6 +3816,7 @@
       const result = await updateUserProfile(currentUser.id, { skills: currentSkills });
 
       if (result.success) {
+        if (window.ActivityTracker) window.ActivityTracker.recordActivity('skill', 3, 'Added skill: ' + skill);
         showToast('Skill added successfully!');
         input.value = '';
         await loadUserProfile();
@@ -3141,6 +4022,7 @@
         });
 
         if (result.success) {
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('education', 4, 'Added education: ' + college);
           showToast('Education added successfully!');
           await loadUserProfile();
           closeModal();
@@ -3187,6 +4069,7 @@
         const result = await updateUserProfile(currentUser.id, { projects });
 
         if (result.success) {
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('project', 5, 'Added project: ' + name);
           showToast('Project added successfully!');
           await loadUserProfile();
           closeModal();
@@ -3614,6 +4497,7 @@
           if (resumeText) {
             await saveResumeText(currentUser.id, resumeText);
           }
+          if (window.ActivityTracker) window.ActivityTracker.recordActivity('resume', 10, 'Uploaded & parsed resume');
           showToast('Resume uploaded successfully!');
           await loadUserProfile();
         } else {
