@@ -2036,6 +2036,130 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* Unified Repository Card Aesthetic across Entire Dashboard */
+    .repo-style-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .repo-style-card {
+      background: rgba(13, 17, 23, 0.92);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .repo-style-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .repo-action-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 11.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .repo-action-btn:hover {
+      border-color: #58a6ff;
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.1);
+    }
+
+    .repo-action-btn.delete:hover {
+      border-color: #f85149;
+      color: #f85149;
+      background: rgba(248, 81, 73, 0.1);
+    }
+
+    .skill-repo-pill {
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12.5px;
+      color: #e6edf3;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+
+    .skill-repo-pill:hover {
+      border-color: #58a6ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(88, 166, 255, 0.25);
+    }
+
+    .skill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38bdf8;
+      display: inline-block;
+    }
+
+    /* Tab Panel Transition - Zero Endless Scroll */
+    .profile-section-panel {
+      animation: panelFadeIn 0.2s ease-out;
+    }
+
+    @keyframes panelFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .nav-tab-badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: #21262d;
+      color: #8b949e;
+      border: 1px solid #30363d;
+      margin-left: 4px;
+      font-weight: 600;
+    }
+
+    .nav-tab.active .nav-tab-badge {
+      background: #38bdf8;
+      color: #0d1117;
+      border-color: #38bdf8;
+    }
+
+    .personal-grid-card {
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 12px 14px;
+      transition: border-color 0.2s;
+    }
+
+    .personal-grid-card:hover {
+      border-color: #58a6ff;
+    }
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -2366,13 +2490,13 @@
                 <span style="font-size: 11.5px; color: #94a3b8; font-weight: 600;">
                   <i class="fas fa-bolt" style="color: #38bdf8;"></i> Real Profile Actions:
                 </span>
-                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=skills]').click(); const el = document.getElementById('skillInput'); if (el) el.focus();">
+                <button class="quick-boost-btn" onclick="switchProfileTab('skills'); const el = document.getElementById('skillInput'); if (el) el.focus();">
                   <i class="fas fa-plus"></i> Add Skill (+1 pt)
                 </button>
-                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=projects]').click(); addProject();">
+                <button class="quick-boost-btn" onclick="switchProfileTab('projects'); addProject();">
                   <i class="fas fa-plus"></i> Add Project (+3 pts)
                 </button>
-                <button class="quick-boost-btn" onclick="document.querySelector('[data-section=experience]').click(); addExperience();">
+                <button class="quick-boost-btn" onclick="switchProfileTab('experience'); addExperience();">
                   <i class="fas fa-plus"></i> Add Experience (+3 pts)
                 </button>
                 <button class="quick-boost-btn" onclick="handleResumeAction()">
@@ -2418,350 +2542,185 @@
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="card" style="padding: 16px;">
-          <div class="nav-tabs">
-            <a class="nav-tab active" data-section="summary">Profile summary</a>
-            <a class="nav-tab" data-section="personal">Personal details</a>
-            <a class="nav-tab" data-section="experience">
-              Work experience
-              <span class="alert-dot"></span>
-            </a>
-            <a class="nav-tab" data-section="skills">Skills</a>
-            <a class="nav-tab" data-section="education">
-              Education
-              <span class="alert-dot"></span>
-            </a>
-            <a class="nav-tab" data-section="projects">Projects</a>
-            <a class="nav-tab" data-section="certifications">Certifications</a>
-            <a class="nav-tab" data-section="preferences">Job preferences</a>
+        <!-- Navigation Tabs: Instant zero-scroll workspace tabs -->
+        <div class="card" style="padding: 12px 16px; margin-bottom: 16px;">
+          <div class="nav-tabs" id="profileWorkspaceTabs">
+            <a class="nav-tab active" data-section="summary"><i class="fas fa-id-badge"></i> Profile Summary</a>
+            <a class="nav-tab" data-section="projects"><i class="fas fa-code-branch"></i> Projects <span class="nav-tab-badge" id="tabProjectsCount">0</span></a>
+            <a class="nav-tab" data-section="skills"><i class="fas fa-layer-group"></i> Skills <span class="nav-tab-badge" id="tabSkillsCount">0</span></a>
+            <a class="nav-tab" data-section="education"><i class="fas fa-graduation-cap"></i> Education <span class="nav-tab-badge" id="tabEducationCount">0</span></a>
+            <a class="nav-tab" data-section="experience"><i class="fas fa-briefcase"></i> Experience</a>
+            <a class="nav-tab" data-section="personal"><i class="fas fa-user-circle"></i> Personal & Preferences</a>
+            <a class="nav-tab" data-section="all"><i class="fas fa-border-all"></i> All Sections</a>
           </div>
         </div>
 
-        <!-- Profile Summary Section -->
-        <div class="card" id="summary">
-          <div class="section-header">
-            <h3 class="section-title">Profile summary</h3>
-            <button class="btn-edit-section" onclick="editSummary()">
-              <i class="fa fa-pen"></i> Edit
-            </button>
-          </div>
-          <p id="profileSummary" class="timeline-description">
-            Add a brief summary about your skills, experience, and career goals to help recruiters understand your
-            profile better.
-          </p>
-        </div>
-
-        <!-- Personal Details Section -->
-        <div class="card" id="personal">
-          <div class="section-header">
-            <h3 class="section-title">Personal details</h3>
-            <button class="btn-edit-section" onclick="editPersonal()">
-              <i class="fa fa-pen"></i> Edit
-            </button>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-            <div>
-              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Gender</p>
-              <p id="gender">Not set</p>
-            </div>
-            <div>
-              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Date of birth</p>
-              <p id="dob">Not set</p>
-            </div>
-            <div>
-              <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Nationality</p>
-              <p id="nationality">Indian</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Work Experience Section -->
-        <div class="card" id="experience">
-          <div class="section-header">
-            <h3 class="section-title">Work experience</h3>
-            <button class="btn-edit-section" onclick="addExperience()">
-              <i class="fa fa-plus"></i> Add
-            </button>
-          </div>
-          <div id="experienceList">
-            <div class="empty-state">
-              <i class="fa fa-briefcase"></i>
-              <p>No work experience added yet</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Skills Section -->
-        <div class="card" id="skills">
-          <div class="section-header">
-            <h3 class="section-title">Skills</h3>
-          </div>
-          <div class="form-group" style="margin-bottom: 16px;">
-            <div style="display: flex; gap: 8px;">
-              <input type="text" class="form-input" id="skillInput" placeholder="Add a skill (e.g., JavaScript, Python)"
-                style="flex: 1;" />
-              <button class="btn-edit-section" onclick="addSkill()" style="padding: 8px 16px;">
-                <i class="fa fa-plus"></i> Add
+        <!-- Profile Tab Panels Wrapper -->
+        <div id="profileTabPanels">
+          <!-- Profile Summary Section -->
+          <div class="card profile-section-panel" id="summary">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-id-badge" style="color: #38bdf8; margin-right: 6px;"></i> Profile Summary</h3>
+              <button class="btn-edit-section" onclick="editSummary()">
+                <i class="fa fa-pen"></i> Edit
               </button>
             </div>
-          </div>
-          <div class="skills-grid" id="skillsList">
-            <div class="empty-state">
-              <i class="fa fa-code"></i>
-              <p>No skills added yet</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Skill Gap Analysis moved to separate page: skill-analysis.html -->
-        <div class="card" id="skill-analysis" style="display: none;">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="fa fa-chart-line" style="color: #8b5cf6; margin-right: 8px;"></i>
-              AI Skill Gap Analysis
-            </h3>
-            <button class="btn-primary" onclick="runSkillAnalysis()" id="analyzeBtn">
-              <i class="fa fa-magic"></i> Run Analysis
-            </button>
+            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1;">
+              Add a brief summary about your skills, experience, and career goals to help recruiters understand your
+              profile better.
+            </p>
           </div>
 
-          <!-- Analysis Not Run State -->
-          <div id="analysisEmptyState" class="analysis-empty-state">
-            <div class="empty-state-content">
-              <i class="fa fa-brain" style="font-size: 64px; color: #8b5cf6; opacity: 0.3; margin-bottom: 16px;"></i>
-              <h4 style="color: #f1f5f9; margin-bottom: 8px;">Ready to Analyze Your Skills?</h4>
-              <p style="color: #94a3b8; margin-bottom: 24px; max-width: 500px;">
-                Our AI will analyze your profile, skills, and experience to identify gaps and provide personalized
-                recommendations for your career growth.
-              </p>
-              <button class="btn-primary-large" onclick="runSkillAnalysis()">
-                <i class="fa fa-magic"></i> Start AI Analysis
+          <!-- Personal Details Section -->
+          <div class="card profile-section-panel" id="personal" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-user-circle" style="color: #a855f7; margin-right: 6px;"></i> Personal Details & Preferences</h3>
+              <button class="btn-edit-section" onclick="editPersonal()">
+                <i class="fa fa-pen"></i> Edit
               </button>
             </div>
-          </div>
-
-          <!-- Loading State -->
-          <div id="analysisLoading" class="analysis-loading" style="display: none;">
-            <div class="loading-spinner"></div>
-            <p style="color: #cbd5e1; margin-top: 16px;">Analyzing your skills with AI...</p>
-          </div>
-
-          <!-- Analysis Results -->
-          <div id="analysisResults" style="display: none;">
-            <!-- Overall Score Card -->
-            <div class="overall-score-card">
-              <div class="score-circle-large">
-                <svg width="160" height="160">
-                  <circle cx="80" cy="80" r="70" fill="none" stroke="#334155" stroke-width="12" />
-                  <circle id="scoreCircle" cx="80" cy="80" r="70" fill="none" stroke="url(#gradient)" stroke-width="12"
-                    stroke-dasharray="439.6" stroke-dashoffset="439.6" stroke-linecap="round"
-                    transform="rotate(-90 80 80)" style="transition: stroke-dashoffset 2s ease;" />
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div class="score-text">
-                  <span class="score-number" id="overallScore">0</span>
-                  <span class="score-total">/100</span>
-                </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+              <div class="personal-grid-card">
+                <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;"><i class="fas fa-venus-mars"></i> Gender</p>
+                <p id="gender" style="font-size: 13.5px; font-weight: 600; color: #f0f6fc; margin: 0;">Not set</p>
               </div>
-              <div class="score-info">
-                <h3 id="scoreStatus" style="color: #f1f5f9; margin-bottom: 8px;">Analyzing...</h3>
-                <p id="scoreDescription" style="color: #94a3b8; margin-bottom: 16px;">Please wait while we process your
-                  data</p>
-                <div class="score-badges">
-                  <span class="badge-stat" id="criticalGaps"><i class="fa fa-exclamation-triangle"></i> 0 Critical
-                    Gaps</span>
-                  <span class="badge-stat" id="moderateGaps"><i class="fa fa-info-circle"></i> 0 Moderate Gaps</span>
-                  <span class="badge-stat" id="strengths"><i class="fa fa-check-circle"></i> 0 Strengths</span>
-                </div>
-                <p style="font-size: 12px; color: #64748b; margin-top: 12px;">
-                  <i class="fa fa-clock"></i> Last analyzed: <span id="lastAnalyzed">Just now</span>
-                </p>
+              <div class="personal-grid-card">
+                <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;"><i class="fas fa-birthday-cake"></i> Date of birth</p>
+                <p id="dob" style="font-size: 13.5px; font-weight: 600; color: #f0f6fc; margin: 0;">Not set</p>
+              </div>
+              <div class="personal-grid-card">
+                <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;"><i class="fas fa-flag"></i> Nationality</p>
+                <p id="nationality" style="font-size: 13.5px; font-weight: 600; color: #f0f6fc; margin: 0;">Indian</p>
               </div>
             </div>
 
-            <!-- Category Breakdown -->
-            <div class="categories-grid">
-              <div class="category-card">
-                <div class="category-header">
-                  <div>
-                    <i class="fa fa-code category-icon" style="color: #8b5cf6;"></i>
-                    <h4>Technical Skills</h4>
-                  </div>
-                  <span class="category-score" id="techScore">0%</span>
-                </div>
-                <div class="skill-progress-bar">
-                  <div class="skill-progress-fill" id="techProgress" style="width: 0%;"></div>
-                </div>
-                <div class="gap-details" id="techGaps">
-                  <div class="gap-item weak">
-                    <i class="fa fa-arrow-down"></i>
-                    <span>Analyzing...</span>
-                  </div>
-                </div>
+            <!-- Embedded Preferences in Personal view -->
+            <div style="border-top: 1px solid #30363d; padding-top: 14px; margin-top: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 style="font-size: 14px; color: #cbd5e1; margin: 0;"><i class="fas fa-briefcase" style="color: #38bdf8;"></i> Career & Job Preferences</h4>
+                <button class="btn-edit-section" onclick="editPreferences()"><i class="fa fa-pen"></i> Edit</button>
               </div>
-
-              <div class="category-card">
-                <div class="category-header">
-                  <div>
-                    <i class="fa fa-users category-icon" style="color: #10b981;"></i>
-                    <h4>Soft Skills</h4>
-                  </div>
-                  <span class="category-score" id="softScore">0%</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;">
+                <div class="personal-grid-card">
+                  <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;">Preferred Roles</p>
+                  <p id="preferredRoles" style="font-size: 13px; font-weight: 600; color: #58a6ff; margin: 0;">Not set</p>
                 </div>
-                <div class="skill-progress-bar">
-                  <div class="skill-progress-fill green" id="softProgress" style="width: 0%;"></div>
+                <div class="personal-grid-card">
+                  <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;">Preferred Locations</p>
+                  <p id="preferredLocations" style="font-size: 13px; font-weight: 600; color: #f0f6fc; margin: 0;">Not set</p>
                 </div>
-                <div class="gap-details" id="softGaps">
-                  <div class="gap-item weak">
-                    <i class="fa fa-arrow-down"></i>
-                    <span>Analyzing...</span>
-                  </div>
+                <div class="personal-grid-card">
+                  <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;">Expected Salary</p>
+                  <p id="expectedSalary" style="font-size: 13px; font-weight: 600; color: #4ade80; margin: 0;">Not set</p>
                 </div>
-              </div>
-
-              <div class="category-card">
-                <div class="category-header">
-                  <div>
-                    <i class="fa fa-brain category-icon" style="color: #f59e0b;"></i>
-                    <h4>Aptitude & Reasoning</h4>
-                  </div>
-                  <span class="category-score" id="aptitudeScore">0%</span>
-                </div>
-                <div class="skill-progress-bar">
-                  <div class="skill-progress-fill orange" id="aptitudeProgress" style="width: 0%;"></div>
-                </div>
-                <div class="gap-details" id="aptitudeGaps">
-                  <div class="gap-item weak">
-                    <i class="fa fa-arrow-down"></i>
-                    <span>Analyzing...</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="category-card">
-                <div class="category-header">
-                  <div>
-                    <i class="fa fa-lightbulb category-icon" style="color: #3b82f6;"></i>
-                    <h4>Domain Knowledge</h4>
-                  </div>
-                  <span class="category-score" id="domainScore">0%</span>
-                </div>
-                <div class="skill-progress-bar">
-                  <div class="skill-progress-fill blue" id="domainProgress" style="width: 0%;"></div>
-                </div>
-                <div class="gap-details" id="domainGaps">
-                  <div class="gap-item weak">
-                    <i class="fa fa-arrow-down"></i>
-                    <span>Analyzing...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recommendations Section -->
-            <div class="recommendations-section">
-              <h3 style="color: #f1f5f9; margin-bottom: 16px;">
-                <i class="fa fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>
-                Personalized Recommendations
-              </h3>
-              <div class="recommendations-list" id="recommendationsList">
-                <div class="recommendation-card priority-high">
-                  <div class="priority-badge">High Priority</div>
-                  <h4><i class="fa fa-check-circle"></i> Analyzing your profile...</h4>
-                  <p>Please wait while we generate personalized recommendations for you.</p>
-                  <div class="recommendation-meta">
-                    <span><i class="fa fa-clock"></i> Calculating...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Plan -->
-            <div class="action-plan">
-              <h3 style="color: #f1f5f9; margin-bottom: 16px;">
-                <i class="fa fa-tasks" style="color: #8b5cf6; margin-right: 8px;"></i>
-                Your Action Plan
-              </h3>
-              <div class="timeline-roadmap" id="actionPlan">
-                <div class="roadmap-item">
-                  <div class="roadmap-marker">1</div>
-                  <div class="roadmap-content">
-                    <h5>Generating your personalized action plan...</h5>
-                    <p>This will show you step-by-step improvements to close your skill gaps.</p>
-                  </div>
+                <div class="personal-grid-card">
+                  <p style="font-size: 11.5px; color: #8b949e; margin-bottom: 4px;">Availability</p>
+                  <p id="availability" style="font-size: 13px; font-weight: 600; color: #f0f6fc; margin: 0;">Available immediately</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Education Section -->
-        <div class="card" id="education">
-          <div class="section-header">
-            <h3 class="section-title">Education</h3>
-            <button class="btn-edit-section" onclick="addEducation()">
-              <i class="fa fa-plus"></i> Add
-            </button>
-          </div>
-          <div id="educationList">
-            <div class="empty-state">
-              <i class="fa fa-graduation-cap"></i>
-              <p>No education details added yet</p>
+          <!-- Work Experience Section -->
+          <div class="card profile-section-panel" id="experience" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-briefcase" style="color: #a855f7; margin-right: 6px;"></i> Work Experience</h3>
+              <button class="btn-edit-section" onclick="addExperience()">
+                <i class="fa fa-plus"></i> Add Experience
+              </button>
+            </div>
+            <div id="experienceList">
+              <div class="empty-state">
+                <i class="fa fa-briefcase"></i>
+                <p>No work experience added yet</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Projects Section -->
-        <div class="card" id="projects">
-          <div class="section-header">
-            <h3 class="section-title">Projects</h3>
-            <button class="btn-edit-section" onclick="addProject()">
-              <i class="fa fa-plus"></i> Add
-            </button>
-          </div>
-          <div id="projectsList">
-            <div class="empty-state">
-              <i class="fa fa-folder-open"></i>
-              <p>No projects added yet</p>
+          <!-- Skills Section -->
+          <div class="card profile-section-panel" id="skills" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-layer-group" style="color: #38bdf8; margin-right: 6px;"></i> Core Technical Skills</h3>
+            </div>
+            <div class="form-group" style="margin-bottom: 14px;">
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-input" id="skillInput" placeholder="Add a skill (e.g., Python, React, MySQL, Machine Learning)"
+                  style="flex: 1; background: #0d1117; border: 1px solid #30363d; color: #f0f6fc;" />
+                <button class="btn-edit-section" onclick="addSkill()" style="padding: 8px 16px;">
+                  <i class="fa fa-plus"></i> Add Skill
+                </button>
+              </div>
+            </div>
+            <div class="skills-grid" id="skillsList">
+              <div class="empty-state">
+                <i class="fa fa-code"></i>
+                <p>No skills added yet</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Certifications Section -->
-        <div class="card" id="certifications">
-          <div class="section-header">
-            <h3 class="section-title">Certifications</h3>
-            <button class="btn-edit-section" onclick="addCertification()">
-              <i class="fa fa-plus"></i> Add
-            </button>
-          </div>
-          <div id="certificationsList">
-            <div class="empty-state">
-              <i class="fa fa-certificate"></i>
-              <p>No certifications added yet</p>
+          <!-- Education Section -->
+          <div class="card profile-section-panel" id="education" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-graduation-cap" style="color: #38bdf8; margin-right: 6px;"></i> Academic Credentials & Education</h3>
+              <button class="btn-edit-section" onclick="addEducation()">
+                <i class="fa fa-plus"></i> Add Education
+              </button>
+            </div>
+            <div id="educationList">
+              <div class="empty-state">
+                <i class="fa fa-graduation-cap"></i>
+                <p>No education details added yet</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Job Preferences Section -->
-        <div class="card" id="preferences">
-          <div class="section-header">
-            <h3 class="section-title">Job preferences</h3>
-            <button class="btn-edit-section" onclick="editPreferences()">
-              <i class="fa fa-pen"></i> Edit
-            </button>
+          <!-- Projects Section -->
+          <div class="card profile-section-panel" id="projects" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-code-branch" style="color: #58a6ff; margin-right: 6px;"></i> Featured Projects & Portfolio</h3>
+              <button class="btn-edit-section" onclick="addProject()">
+                <i class="fa fa-plus"></i> Add Project
+              </button>
+            </div>
+            <div id="projectsList">
+              <div class="empty-state">
+                <i class="fa fa-folder-open"></i>
+                <p>No projects added yet</p>
+              </div>
+            </div>
           </div>
-          <div class="timeline-description">
-            <p><strong>Preferred roles:</strong> <span id="preferredRoles">Not set</span></p>
-            <p><strong>Preferred locations:</strong> <span id="preferredLocations">Not set</span></p>
-            <p><strong>Expected salary:</strong> <span id="expectedSalary">Not set</span></p>
-            <p><strong>Availability:</strong> <span id="availability">Available immediately</span></p>
+
+          <!-- Certifications Section -->
+          <div class="card profile-section-panel" id="certifications" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-certificate" style="color: #eab308; margin-right: 6px;"></i> Certifications & Badges</h3>
+              <button class="btn-edit-section" onclick="addCertification()">
+                <i class="fa fa-plus"></i> Add Certification
+              </button>
+            </div>
+            <div id="certificationsList">
+              <div class="empty-state">
+                <i class="fa fa-certificate"></i>
+                <p>No certifications added yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Job Preferences Section -->
+          <div class="card profile-section-panel" id="preferences" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title"><i class="fas fa-briefcase" style="color: #38bdf8; margin-right: 6px;"></i> Job Preferences</h3>
+              <button class="btn-edit-section" onclick="editPreferences()">
+                <i class="fa fa-pen"></i> Edit
+              </button>
+            </div>
+            <div class="timeline-description">
+              <p><strong>Preferred roles:</strong> <span id="preferredRoles">Not set</span></p>
+              <p><strong>Preferred locations:</strong> <span id="preferredLocations">Not set</span></p>
+              <p><strong>Expected salary:</strong> <span id="expectedSalary">Not set</span></p>
+              <p><strong>Availability:</strong> <span id="availability">Available immediately</span></p>
+            </div>
           </div>
         </div>
       </div>
@@ -3611,17 +3570,13 @@
         displayEducation();
 
         // Update experience
-        if (userProfile.experience && userProfile.experience.length > 0) {
-          displayExperience();
-        }
+        displayExperience();
 
         // Update projects - always call to display or show empty state
         displayProjects();
 
         // Update certifications
-        if (userProfile.certifications && userProfile.certifications.length > 0) {
-          displayCertifications();
-        }
+        displayCertifications();
 
         // Update job preferences
         if (userProfile.preferred_roles) {
@@ -3678,34 +3633,55 @@
     // Display Experience
     function displayExperience() {
       const container = document.getElementById('experienceList');
+      const exps = userProfile.experience || [];
 
-      if (!userProfile.experience || userProfile.experience.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fa fa-briefcase"></i><p>No work experience added yet</p></div>';
+      if (!exps || exps.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px; text-align: center;">
+            <i class="fas fa-briefcase" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
+            <p style="color: #8b949e; margin-bottom: 12px;">No work experience added yet</p>
+            <button class="btn-primary" onclick="addExperience()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add Experience</button>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = userProfile.experience.map((exp, index) =>
-        `<div class="timeline-item">
-          <div class="timeline-icon">
-            <i class="fa fa-building"></i>
-          </div>
-          <div class="timeline-content">
-            <h4>${exp.company}</h4>
-            <div class="timeline-meta">
-              ${exp.designation} ${exp.duration ? '• ' + exp.duration : ''}
+      container.innerHTML = `
+        <div class="repo-style-grid">
+          ${exps.map((exp, index) => `
+            <div class="repo-style-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div class="github-repo-name" style="color: #f0f6fc;">
+                    <i class="fas fa-briefcase" style="color: #a855f7; font-size: 13px;"></i>
+                    <span>${exp.designation || 'Software Engineer'}</span>
+                  </div>
+                  ${exp.duration ? `<span class="github-stat-pill" style="flex-shrink: 0;"><i class="fas fa-clock"></i> ${exp.duration}</span>` : ''}
+                </div>
+                <div style="font-size: 12.5px; color: #58a6ff; font-weight: 500; margin: 8px 0 6px 0; display: flex; align-items: center; gap: 5px;">
+                  <i class="fas fa-building" style="font-size: 11px; opacity: 0.8;"></i>
+                  <span>${exp.company || 'Company'}</span>
+                </div>
+                ${exp.description ? `<div class="github-repo-desc">${exp.description}</div>` : ''}
+              </div>
+
+              <div class="github-repo-footer" style="margin-top: 14px;">
+                <span class="github-stat-pill" style="border-color: rgba(34, 197, 94, 0.3); color: #4ade80;">
+                  <i class="fas fa-check-circle"></i> Verified Experience
+                </span>
+                <div style="display: flex; gap: 6px;">
+                  <button class="repo-action-btn edit" onclick="editWorkExperience(${index})" title="Edit experience">
+                    <i class="fas fa-pen"></i> Edit
+                  </button>
+                  <button class="repo-action-btn delete" onclick="removeWorkExperience(${index})" title="Remove experience">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
             </div>
-            ${exp.description ? `<p class="timeline-description">${exp.description}</p>` : ''}
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-              <button class="btn-remove" onclick="editWorkExperience(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-edit"></i> Edit
-              </button>
-              <button class="btn-remove" onclick="removeWorkExperience(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        </div>`
-      ).join('');
+          `).join('')}
+        </div>
+      `;
     }
 
     function removeWorkExperience(index) {
@@ -3776,6 +3752,7 @@
     // Display Education
     function displayEducation() {
       const container = document.getElementById('educationList');
+      const countEl = document.getElementById('tabEducationCount');
 
       let edus = userProfile.education;
       if ((!edus || edus.length === 0) && (userProfile.college_name || userProfile.course)) {
@@ -3787,33 +3764,54 @@
         }];
       }
 
+      if (countEl) countEl.textContent = (edus || []).length;
+
       if (!edus || edus.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fa fa-graduation-cap"></i><p>No education details added yet</p></div>';
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px; text-align: center;">
+            <i class="fas fa-graduation-cap" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
+            <p style="color: #8b949e; margin-bottom: 12px;">No education details added yet</p>
+            <button class="btn-primary" onclick="addEducation()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add Education</button>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = edus.map((edu, index) =>
-        `<div class="timeline-item">
-          <div class="timeline-icon">
-            <i class="fa fa-graduation-cap"></i>
-          </div>
-          <div class="timeline-content">
-            <h4>${edu.college || 'Not specified'}</h4>
-            <div class="timeline-meta">
-              ${edu.level || ''} ${edu.course ? '• ' + edu.course : ''}
-              ${edu.graduation_year ? '• ' + edu.graduation_year : ''}
+      container.innerHTML = `
+        <div class="repo-style-grid">
+          ${edus.map((edu, index) => `
+            <div class="repo-style-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div class="github-repo-name" style="color: #f0f6fc;">
+                    <i class="fas fa-graduation-cap" style="color: #38bdf8; font-size: 13px;"></i>
+                    <span>${edu.course || edu.level || 'Degree Program'}</span>
+                  </div>
+                  <span class="github-stat-pill" style="flex-shrink: 0;"><i class="fas fa-calendar-alt"></i> ${edu.graduation_year || 2025}</span>
+                </div>
+                <div style="font-size: 12.5px; color: #58a6ff; font-weight: 500; margin: 8px 0 6px 0; display: flex; align-items: center; gap: 5px;">
+                  <i class="fas fa-university" style="font-size: 11px; opacity: 0.8;"></i>
+                  <span>${edu.college || 'University of Pune'}</span>
+                </div>
+              </div>
+
+              <div class="github-repo-footer" style="margin-top: 14px;">
+                <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.3); color: #38bdf8;">
+                  <i class="fas fa-award"></i> ${edu.level || 'Postgraduate'}
+                </span>
+                <div style="display: flex; gap: 6px;">
+                  <button class="repo-action-btn edit" onclick="editEducation(${index})" title="Edit education">
+                    <i class="fas fa-pen"></i> Edit
+                  </button>
+                  <button class="repo-action-btn delete" onclick="removeEducation(${index})" title="Remove education">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
             </div>
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-              <button class="btn-remove" onclick="editEducation(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-edit"></i> Edit
-              </button>
-              <button class="btn-remove" onclick="removeEducation(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        </div>`
-      ).join('');
+          `).join('')}
+        </div>
+      `;
     }
 
     function editEducation(index) {
@@ -3895,69 +3893,136 @@
     // Display Projects
     function displayProjects() {
       const container = document.getElementById('projectsList');
+      const countEl = document.getElementById('tabProjectsCount');
+      const projects = userProfile.projects || [];
+      if (countEl) countEl.textContent = projects.length;
 
-      if (!userProfile.projects || userProfile.projects.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fa fa-folder-open"></i><p>No projects added yet</p></div>';
+      if (!projects || projects.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px; text-align: center;">
+            <i class="fas fa-folder-open" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
+            <p style="color: #8b949e; margin-bottom: 12px;">No projects added yet</p>
+            <button class="btn-primary" onclick="addProject()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add First Project</button>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = userProfile.projects.map((proj, index) => {
-        const title = proj.name || proj.title || 'Project';
-        const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
-        const url = proj.url || proj.project_url || '';
-        return `<div class="timeline-item">
-          <div class="timeline-icon">
-            <i class="fa fa-code-branch"></i>
-          </div>
-          <div class="timeline-content">
-            <h4>${title}</h4>
-            ${tech ? `<div class="timeline-meta">${tech}</div>` : ''}
-            ${proj.description ? `<p class="timeline-description">${proj.description}</p>` : ''}
-            ${url ? `<a href="${url}" target="_blank" style="color: #38bdf8; font-size: 13px;"><i class="fa fa-external-link-alt"></i> View project</a>` : ''}
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-              <button class="btn-remove" onclick="editProject(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-edit"></i> Edit
-              </button>
-              <button class="btn-remove" onclick="removeProject(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
+      container.innerHTML = `
+        <div class="repo-style-grid">
+          ${projects.map((proj, index) => {
+            const title = proj.name || proj.title || 'Project';
+            const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
+            const url = proj.url || proj.project_url || '';
+            const desc = proj.description || 'Verified developer project.';
+            const role = proj.role || 'Creator & Developer';
+
+            const techList = tech ? tech.split(/[•,]/).map(t => t.trim()).filter(Boolean) : [];
+
+            return `
+              <div class="repo-style-card">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <a class="github-repo-name" href="${url || '#'}" ${url ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                      <i class="fas fa-code-branch" style="font-size: 12px; color: #58a6ff;"></i>
+                      <span>${title}</span>
+                    </a>
+                    ${url ? `
+                      <a href="${url}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #58a6ff; flex-shrink: 0;" title="Live Preview">
+                        <i class="fas fa-external-link-alt" style="font-size: 9.5px;"></i> Live
+                      </a>
+                    ` : ''}
+                  </div>
+                  <div class="github-repo-desc">${desc}</div>
+                </div>
+
+                <div>
+                  ${techList.length > 0 ? `
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px;">
+                      ${techList.slice(0, 4).map(t => {
+                        const langColor = (window.GITHUB_LANG_COLORS && window.GITHUB_LANG_COLORS[t]) || '#38bdf8';
+                        return `
+                          <span class="github-stat-pill">
+                            <span class="skill-dot" style="background-color: ${langColor};"></span>
+                            <span>${t}</span>
+                          </span>
+                        `;
+                      }).join('')}
+                    </div>
+                  ` : ''}
+
+                  <div class="github-repo-footer">
+                    <span style="font-size: 11px; color: #8b949e; display: inline-flex; align-items: center; gap: 4px;">
+                      <i class="fas fa-user-tag" style="color: #a855f7;"></i> ${role}
+                    </span>
+                    <div style="display: flex; gap: 6px;">
+                      <button class="repo-action-btn edit" onclick="editProject(${index})" title="Edit project">
+                        <i class="fas fa-pen"></i> Edit
+                      </button>
+                      <button class="repo-action-btn delete" onclick="removeProject(${index})" title="Remove project">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     // Display Certifications
     function displayCertifications() {
       const container = document.getElementById('certificationsList');
+      const certs = userProfile.certifications || [];
 
-      if (!userProfile.certifications || userProfile.certifications.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fa fa-certificate"></i><p>No certifications added yet</p></div>';
+      if (!certs || certs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px; text-align: center;">
+            <i class="fas fa-certificate" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
+            <p style="color: #8b949e; margin-bottom: 12px;">No certifications added yet</p>
+            <button class="btn-primary" onclick="addCertification()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add Certification</button>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = userProfile.certifications.map((cert, index) =>
-        `<div class="timeline-item">
-          <div class="timeline-icon">
-            <i class="fa fa-certificate"></i>
-          </div>
-          <div class="timeline-content">
-            <h4>${cert.name}</h4>
-            <div class="timeline-meta">
-              ${cert.issuer || ''} ${cert.date ? '• ' + cert.date : ''}
+      container.innerHTML = `
+        <div class="repo-style-grid">
+          ${certs.map((cert, index) => `
+            <div class="repo-style-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div class="github-repo-name" style="color: #f0f6fc;">
+                    <i class="fas fa-certificate" style="color: #eab308; font-size: 13px;"></i>
+                    <span>${cert.name}</span>
+                  </div>
+                  ${cert.date ? `<span class="github-stat-pill" style="flex-shrink: 0;"><i class="fas fa-calendar-alt"></i> ${cert.date}</span>` : ''}
+                </div>
+                <div style="font-size: 12.5px; color: #58a6ff; font-weight: 500; margin: 8px 0 6px 0;">
+                  <i class="fas fa-building" style="font-size: 11px; opacity: 0.8;"></i> ${cert.issuer || 'Issuing Organization'}
+                </div>
+                ${cert.credential ? `<div class="github-repo-desc">Credential ID: ${cert.credential}</div>` : ''}
+              </div>
+
+              <div class="github-repo-footer" style="margin-top: 14px;">
+                <span class="github-stat-pill" style="border-color: rgba(234, 179, 8, 0.3); color: #fbbf24;">
+                  <i class="fas fa-check-circle"></i> Certified
+                </span>
+                <div style="display: flex; gap: 6px;">
+                  <button class="repo-action-btn edit" onclick="editCertification(${index})" title="Edit certification">
+                    <i class="fas fa-pen"></i> Edit
+                  </button>
+                  <button class="repo-action-btn delete" onclick="removeCertification(${index})" title="Remove certification">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
             </div>
-            ${cert.credential ? `<p class="timeline-description">Credential ID: ${cert.credential}</p>` : ''}
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-              <button class="btn-remove" onclick="editCertification(${index})" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-edit"></i> Edit
-              </button>
-              <button class="btn-remove" onclick="removeCertification(${index})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                <i class="fa fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        </div>`
-      ).join('');
+          `).join('')}
+        </div>
+      `;
     }
 
     function removeProject(index) {
@@ -4139,18 +4204,34 @@
     // Display Skills
     function displaySkills() {
       const container = document.getElementById('skillsList');
+      const countEl = document.getElementById('tabSkillsCount');
+      const skills = userProfile.skills || [];
+      if (countEl) countEl.textContent = skills.length;
 
-      if (!userProfile.skills || userProfile.skills.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fa fa-code"></i><p>No skills added yet</p></div>';
+      if (!skills || skills.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px; text-align: center;">
+            <i class="fas fa-code" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
+            <p style="color: #8b949e;">No skills added yet. Connect GitHub or add skills above.</p>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = userProfile.skills.map((skill, index) =>
-        `<div class="skill-tag" style="display: inline-flex; align-items: center; gap: 6px; margin: 4px;">
-          ${skill}
-          <i class="fa fa-times" onclick="removeSkill(${index})" style="cursor: pointer; color: #dc2626; font-size: 12px;" title="Remove skill"></i>
-        </div>`
-      ).join('');
+      container.innerHTML = `
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+          ${skills.map((skill, index) => {
+            const dotColor = (window.GITHUB_LANG_COLORS && window.GITHUB_LANG_COLORS[skill]) || '#38bdf8';
+            return `
+              <div class="skill-repo-pill">
+                <span class="skill-dot" style="background-color: ${dotColor};"></span>
+                <span>${skill}</span>
+                <i class="fas fa-times" onclick="removeSkill(${index})" style="cursor: pointer; color: #8b949e; font-size: 11px; margin-left: 3px; transition: color 0.15s;" onmouseover="this.style.color='#f85149'" onmouseout="this.style.color='#8b949e'" title="Remove skill"></i>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     // Calculate Profile Score
@@ -4691,18 +4772,49 @@
       setTimeout(() => toast.remove(), 3500);
     }
 
-    // Scroll to section
-    function scrollToSection(sectionId) {
-      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Workspace Tab Navigation - Zero Endless Scrolling
+    function switchProfileTab(sectionId) {
+      document.querySelectorAll('#profileWorkspaceTabs .nav-tab').forEach(t => {
+        if (t.getAttribute('data-section') === sectionId) {
+          t.classList.add('active');
+        } else {
+          t.classList.remove('active');
+        }
+      });
+
+      const sectionIds = ['summary', 'projects', 'skills', 'education', 'experience', 'personal', 'certifications', 'preferences'];
+
+      if (sectionId === 'all') {
+        sectionIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.display = 'block';
+            el.classList.remove('profile-section-panel');
+          }
+        });
+      } else {
+        sectionIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (id === sectionId) {
+              el.style.display = 'block';
+              el.classList.add('profile-section-panel');
+            } else {
+              el.style.display = 'none';
+            }
+          }
+        });
+      }
     }
 
-    // Tab navigation
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const section = tab.getAttribute('data-section');
-        scrollToSection(section);
+    // Attach click listeners to all workspace tabs
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('#profileWorkspaceTabs .nav-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          const section = tab.getAttribute('data-section');
+          if (section) switchProfileTab(section);
+        });
       });
     });
 
