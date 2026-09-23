@@ -31,6 +31,51 @@
       background: #0f172a;
       color: #e2e8f0;
       line-height: 1.6;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated gradient mesh background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(ellipse 600px 600px at 20% 20%, rgba(118, 77, 240, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 500px at 80% 80%, rgba(56, 189, 248, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 400px at 60% 30%, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
+      animation: meshFloat 20s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes meshFloat {
+      0% {
+        background:
+          radial-gradient(ellipse 600px 600px at 20% 20%, rgba(118, 77, 240, 0.08) 0%, transparent 70%),
+          radial-gradient(ellipse 500px 500px at 80% 80%, rgba(56, 189, 248, 0.06) 0%, transparent 70%),
+          radial-gradient(ellipse 400px 400px at 60% 30%, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
+      }
+      50% {
+        background:
+          radial-gradient(ellipse 600px 600px at 40% 60%, rgba(56, 189, 248, 0.08) 0%, transparent 70%),
+          radial-gradient(ellipse 500px 500px at 20% 80%, rgba(168, 85, 247, 0.06) 0%, transparent 70%),
+          radial-gradient(ellipse 400px 400px at 70% 10%, rgba(118, 77, 240, 0.05) 0%, transparent 70%);
+      }
+      100% {
+        background:
+          radial-gradient(ellipse 600px 600px at 70% 40%, rgba(168, 85, 247, 0.08) 0%, transparent 70%),
+          radial-gradient(ellipse 500px 500px at 30% 20%, rgba(118, 77, 240, 0.06) 0%, transparent 70%),
+          radial-gradient(ellipse 400px 400px at 50% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+      }
+    }
+
+    .main-container, .header, .sidebar, .sidebar-overlay, .modal {
+      position: relative;
+      z-index: 1;
     }
 
     /* Sidebar Navigation */
@@ -450,12 +495,20 @@
 
     /* Card Base */
     .card {
-      background: #1e293b;
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: 12px;
-      border: 1px solid #334155;
+      border: 1px solid rgba(51, 65, 85, 0.6);
       padding: 24px;
       margin-bottom: 24px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(118, 77, 240, 0.3);
+      box-shadow: 0 8px 32px rgba(118, 77, 240, 0.08), 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
     }
 
     /* Profile Card */
@@ -481,6 +534,14 @@
       font-weight: 700;
       color: white;
       flex-shrink: 0;
+      position: relative;
+      box-shadow: 0 0 0 3px #1e293b, 0 0 0 5px rgba(118, 77, 240, 0.4);
+      animation: avatarRingPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes avatarRingPulse {
+      0%, 100% { box-shadow: 0 0 0 3px #1e293b, 0 0 0 5px rgba(118, 77, 240, 0.4); }
+      50% { box-shadow: 0 0 0 3px #1e293b, 0 0 0 7px rgba(56, 189, 248, 0.3), 0 0 20px rgba(118, 77, 240, 0.15); }
     }
 
     .profile-info-main {
@@ -642,6 +703,18 @@
     .profile-score-card {
       position: sticky;
       top: 100px;
+      overflow: hidden;
+    }
+
+    .profile-score-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .score-header {
@@ -649,6 +722,71 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 16px;
+    }
+
+    /* SVG Score Gauge */
+    .score-svg-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 16px;
+    }
+
+    .score-svg-ring {
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.3));
+    }
+
+    .score-svg-bg {
+      fill: none;
+      stroke: #1e293b;
+      stroke-width: 8;
+    }
+
+    .score-svg-progress {
+      fill: none;
+      stroke: url(#scoreGradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 339.292;
+      stroke-dashoffset: 339.292;
+      animation: scoreRingFill 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+    }
+
+    @keyframes scoreRingFill {
+      to {
+        stroke-dashoffset: var(--score-offset, 84.823);
+      }
+    }
+
+    .score-svg-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-svg-value .score-num {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #8b5cf6, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      animation: scoreGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes scoreGlow {
+      0% { filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.3)); }
+      100% { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4)); }
+    }
+
+    .score-svg-value .score-label {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
     }
 
     .score-circle {
@@ -696,15 +834,48 @@
     }
 
     .action-item {
-      padding: 10px 12px;
-      background: #fef3c7;
+      padding: 10px 14px;
+      background: rgba(245, 158, 11, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(245, 158, 11, 0.2);
       border-left: 3px solid #f59e0b;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 13px;
-      color: #78350f;
+      color: #fbbf24;
       display: flex;
       align-items: center;
       gap: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-12px);
+      animation: actionSlideIn 0.4s ease forwards;
+    }
+
+    .action-item:nth-child(1) { animation-delay: 0.1s; }
+    .action-item:nth-child(2) { animation-delay: 0.2s; }
+    .action-item:nth-child(3) { animation-delay: 0.3s; }
+    .action-item:nth-child(4) { animation-delay: 0.4s; }
+    .action-item:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes actionSlideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .action-item:hover {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.4);
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.08);
+    }
+
+    .action-item i {
+      font-size: 14px;
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
     }
 
     /* Navigation Tabs */
@@ -733,26 +904,32 @@
 
     .nav-tab {
       padding: 6px 12px;
-      background: #334155;
-      border: 1px solid #475569;
+      background: rgba(51, 65, 85, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(71, 85, 105, 0.5);
       border-radius: 999px;
       cursor: pointer;
       font-size: 13px;
       color: #cbd5e1;
       white-space: nowrap;
       position: relative;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
     }
 
     .nav-tab:hover {
-      background: #475569;
+      background: rgba(71, 85, 105, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .nav-tab.active {
       background: linear-gradient(135deg, #764df0, #442490);
       color: white;
-      border-color: #764df0;
+      border-color: rgba(118, 77, 240, 0.6);
+      box-shadow: 0 0 16px rgba(118, 77, 240, 0.25), 0 4px 12px rgba(118, 77, 240, 0.15);
+      transform: translateY(-1px);
     }
 
     .nav-tab .alert-dot {
@@ -763,6 +940,12 @@
       height: 6px;
       background: #ef4444;
       border-radius: 50%;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
     }
 
     .nav-tab .badge-ai {
@@ -2165,12 +2348,18 @@
     .spotlight-card {
       background: linear-gradient(135deg, rgba(13, 17, 23, 0.95), rgba(22, 27, 34, 0.95));
       border: 1px solid rgba(88, 166, 255, 0.35);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 16px 18px;
       margin-top: 14px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(88, 166, 255, 0.04);
       position: relative;
       overflow: hidden;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .spotlight-card:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.06);
     }
 
     .spotlight-card::before {
@@ -2180,7 +2369,36 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc, #38bdf8);
+      background-size: 200% 100%;
+      animation: auroraShift 4s linear infinite;
+    }
+
+    @keyframes auroraShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+
+    .spotlight-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+    }
+
+    /* Shimmer animation for Featured badge */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .spotlight-card .github-stat-pill:first-child {
+      background: linear-gradient(110deg, rgba(56, 189, 248, 0.1) 0%, rgba(56, 189, 248, 0.05) 40%, rgba(255, 255, 255, 0.12) 50%, rgba(56, 189, 248, 0.05) 60%, rgba(56, 189, 248, 0.1) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
     }
 
     /* Skill Filter Buttons */
@@ -2222,12 +2440,33 @@
       top: 6px;
       bottom: 6px;
       width: 2px;
-      background: #30363d;
+      background: linear-gradient(180deg, #38bdf8, #818cf8, #c084fc, #fbbf24);
+      animation: timelineGrow 1.5s ease-out forwards;
+      transform-origin: top;
+    }
+
+    @keyframes timelineGrow {
+      from { transform: scaleY(0); opacity: 0; }
+      to { transform: scaleY(1); opacity: 1; }
     }
 
     .milestone-node {
       position: relative;
       margin-bottom: 14px;
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: milestoneAppear 0.5s ease forwards;
+    }
+
+    .milestone-node:nth-child(1) { animation-delay: 0.3s; }
+    .milestone-node:nth-child(2) { animation-delay: 0.6s; }
+    .milestone-node:nth-child(3) { animation-delay: 0.9s; }
+
+    @keyframes milestoneAppear {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .milestone-dot {
@@ -2240,6 +2479,12 @@
       background: #0d1117;
       border: 2px solid #38bdf8;
       box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+      animation: dotRipple 2.5s ease-in-out infinite;
+    }
+
+    @keyframes dotRipple {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4), 0 0 8px rgba(56, 189, 248, 0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0), 0 0 12px rgba(56, 189, 248, 0.3); }
     }
 
     .milestone-dot.completed {
@@ -2270,7 +2515,71 @@
     .competency-bar-fill {
       height: 100%;
       border-radius: 4px;
-      transition: width 0.6s ease;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .competency-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      animation: barShimmer 2s ease-in-out infinite;
+    }
+
+    @keyframes barShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Live Demo button pulse on hover */
+    .spotlight-card .btn-primary {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .spotlight-card .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
+      animation: liveDemoPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes liveDemoPulse {
+      0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(2, 132, 199, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    }
+
+    /* Animated stat values */
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f1f5f9;
+      background: linear-gradient(135deg, #f1f5f9, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* GitHub heatmap card enhanced */
+    .github-heatmap-card {
+      background: linear-gradient(135deg, rgba(22, 27, 34, 0.95), rgba(13, 17, 23, 0.95));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Enhanced profile section panel transitions */
+    .profile-section-panel {
+      animation: panelFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
     }
   </style>
   <script>
@@ -2460,21 +2769,35 @@
 
         <!-- Profile Score -->
         <div class="card profile-score-card">
-          <h3 style="font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; padding: 16px 16px 0;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; padding: 16px 16px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-chart-line" style="color: #8b5cf6;"></i>
             Profile Score</h3>
           <div style="text-align: center; padding: 0 16px 24px;">
-            <div class="score-circle"
-              style="width: 100px; height: 100px; margin: 0 auto 16px; position: relative; border-radius: 50%; background: conic-gradient(#764df0 0% 75%, #334155 75% 100%);">
-              <div
-                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center;">
-                <div id="scoreValue" style="font-size: 28px; font-weight: 800; color: #8b5cf6;">75</div>
+            <div class="score-svg-container">
+              <svg class="score-svg-ring" width="120" height="120" viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color: #8b5cf6;" />
+                    <stop offset="50%" style="stop-color: #6366f1;" />
+                    <stop offset="100%" style="stop-color: #38bdf8;" />
+                  </linearGradient>
+                </defs>
+                <circle class="score-svg-bg" cx="60" cy="60" r="54" />
+                <circle class="score-svg-progress" id="scoreRing" cx="60" cy="60" r="54" />
+              </svg>
+              <div class="score-svg-value">
+                <div class="score-num" id="scoreValue">75</div>
+                <div class="score-label">of 100</div>
               </div>
             </div>
             <p style="font-size: 13px; color: #94a3b8; margin: 0;">Complete your profile to reach 100%</p>
           </div>
 
-          <div style="border-top: 1px solid #334155; padding: 16px;">
-            <div style="font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px;">Pending actions</div>
+          <div style="border-top: 1px solid rgba(51, 65, 85, 0.6); padding: 16px;">
+            <div style="font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+              <i class="fas fa-bolt" style="color: #fbbf24; font-size: 12px;"></i>
+              Pending actions
+            </div>
             <div id="pendingActions" style="display: flex; flex-direction: column; gap: 8px;">
               <div class="action-item">
                 <i class="fa fa-plus-circle"></i> Add profile summary
@@ -4756,9 +5079,39 @@ ${projStr}
       }
 
       const displayScore = Math.min(100, score);
-      document.getElementById('scoreValue').textContent = displayScore;
 
-      // Update score circle gradient
+      // Animate SVG ring gauge
+      const circumference = 2 * Math.PI * 54; // 339.292
+      const offset = circumference - (displayScore / 100) * circumference;
+      const scoreRing = document.getElementById('scoreRing');
+      if (scoreRing) {
+        scoreRing.style.setProperty('--score-offset', offset);
+        scoreRing.style.strokeDashoffset = circumference;
+        scoreRing.style.animation = 'none';
+        // Force reflow
+        scoreRing.offsetHeight;
+        scoreRing.style.animation = 'scoreRingFill 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards';
+      }
+
+      // Animated count-up for score number
+      const scoreEl = document.getElementById('scoreValue');
+      if (scoreEl) {
+        let current = 0;
+        const duration = 1500;
+        const startTime = performance.now();
+        function animateCount(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          const eased = 1 - Math.pow(1 - progress, 3);
+          current = Math.round(eased * displayScore);
+          scoreEl.textContent = current;
+          if (progress < 1) requestAnimationFrame(animateCount);
+        }
+        setTimeout(() => requestAnimationFrame(animateCount), 300);
+      }
+
+      // Fallback: also update legacy score-circle if it exists
       const circle = document.querySelector('.score-circle');
       if (circle) {
         circle.style.background = `conic-gradient(#8b5cf6 0% ${displayScore}%, #334155 ${displayScore}% 100%)`;
@@ -4771,7 +5124,7 @@ ${projStr}
           `<div class="action-item">${action}</div>`
         ).join('');
       } else {
-        actionsContainer.innerHTML = '<div class="action-item" style="background: rgba(34, 197, 94, 0.15); border-color: #22c55e; color: #4ade80; font-weight: 600;"><i class="fa fa-star"></i> All-Star Candidate (Placement Ready)</div>';
+        actionsContainer.innerHTML = '<div class="action-item" style="background: rgba(34, 197, 94, 0.1); border-color: #22c55e; border-left-color: #22c55e; color: #4ade80; font-weight: 600;"><i class="fa fa-star" style="filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.5));"></i> All-Star Candidate (Placement Ready)</div>';
       }
     }
 
