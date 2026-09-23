@@ -2,35 +2,71 @@
  * WhatsApp Cloud API Configuration for PlaceAI
  * 
  * Free WhatsApp Verification is powered by Meta WhatsApp Cloud API.
- * Free tier includes 1,000 free conversations per month globally.
+ * Free tier includes 1,000 free service conversations per month globally.
  * 
- * HOW TO GET YOUR META CREDENTIALS:
- * 1. Go to Meta for Developers: https://developers.facebook.com/
- * 2. Log in and click "My Apps" > "Create App".
- * 3. Select App Type: "Other" > Next > "Business".
- * 4. Name your app (e.g., "PlaceAI WhatsApp") and create it.
- * 5. In your App Dashboard, scroll to "Add products to your app" and click "Set up" on WhatsApp.
- * 6. Under "API Setup" in the left sidebar under WhatsApp:
- *    - Copy your "Phone number ID"
- *    - Copy your "Temporary Access Token" (or generate a permanent System User token)
- * 7. In Vercel (Project Settings > Environment Variables) or below, add:
- *    - WHATSAPP_ACCESS_TOKEN
- *    - WHATSAPP_PHONE_NUMBER_ID
+ * -------------------------------------------------------------
+ * HOW TO GET A PERMANENT SYSTEM USER TOKEN (DOES NOT EXPIRE):
+ * -------------------------------------------------------------
+ * 1. Go to Meta Business Suite / Business Manager: https://business.facebook.com/settings/system-users
+ * 2. Select your Business Account.
+ * 3. Under "Users" > "System Users", click "Add".
+ * 4. Name it (e.g. "PlaceAI-WhatsApp-Bot") and set Role to "Admin".
+ * 5. Click "Generate New Token", select your WhatsApp App.
+ * 6. Set Token Expiration to "Never" (Permanent).
+ * 7. Check permissions: `whatsapp_business_messaging` and `whatsapp_business_management`.
+ * 8. Copy the generated permanent token and paste it below into `accessToken`.
+ * 
+ * -------------------------------------------------------------
+ * FOR FAST 24-HOUR TESTING TOKEN:
+ * -------------------------------------------------------------
+ * 1. Meta Developers: https://developers.facebook.com/apps/
+ * 2. Click your App > WhatsApp > API Setup.
+ * 3. Copy "Temporary access token" and "Phone number ID".
+ * 4. Paste below into `accessToken` and `phoneNumberId`.
  */
 
 (function () {
   'use strict';
 
-  // WhatsApp Cloud API Configuration
+  // Check if credentials are stored in localStorage for quick developer override
+  const localSavedToken = typeof localStorage !== 'undefined' ? localStorage.getItem('PLACEAI_WA_ACCESS_TOKEN') : null;
+  const localSavedPhoneId = typeof localStorage !== 'undefined' ? localStorage.getItem('PLACEAI_WA_PHONE_ID') : null;
+
   const config = {
+    // Endpoints for Vercel Serverless Function deployment
     sendEndpoint: '/api/whatsapp-otp/send',
     verifyEndpoint: '/api/whatsapp-otp/verify',
-    // Direct Meta Cloud API fallback for local testing without serverless runtime
-    phoneNumberId: '1386808957839795',
-    accessToken: 'EABDMDZCECsSwBSjgHOJQcM9o2yZAtO7rDGrZCZAX07PcDugWbFZBwbvAajHqSA6mDr4pXWbN9judwfwTczxOtggRne4V7mIZAaaV2tWf9zoq9duKYMQUaHg3PwmfhMrpJn674ZA35kd6CpgJsyK4xzZByhxvFYbD4H7pB1RpHRuJtOJjZAKVmZCUnVafdZA3kSOoW9iRcjVVZCBIJaCo8wYx80Jl6ReFcjJDl47S8nM4yNUPexN2YjZBYIwTfmZADJDAi92PqHeU52yboLQNIlBKDBg5tPfLuwZBAZDZD',
+
+    // Meta WhatsApp Cloud API Credentials
+    // Update accessToken with your fresh token from developers.facebook.com or System User token
+    phoneNumberId: localSavedPhoneId || '1386808957839795',
+    accessToken: localSavedToken || 'EABDMDZCECsSwBSto663VDrhFGdZBzqFIZCQCUJB4aa5VRcyK15IZAIzt2AQjZA2eARKqQyvWpQ8nfxKkyuomWJCeVX9o3QvonPCbxKd9vRXtFwfwCI1tyEDHkjqXMxNrV8ue9EHApVtZBJ10B7eLhA1xGNnZAZABAdMNWDoLVCrrZCtekTR8Nc3duwTSrQXpfPnpuKsETGNYkpLZC5QJ92bMY1yAiLddyWT0lYfpAS23O2qgCFmmHzRjznZACfuBL2byJddT9ZCMBLkTOh2jHj8PDxEsce5pVAZDZD',
+
+    // Optional pre-approved template name (leave empty to send direct text message)
+    templateName: '',
+
+    // Test Sandbox sender details
     testSenderNumber: '+1 (555) 187-7419',
     activateChatUrl: 'https://wa.me/15551877419?text=Hi',
+
+    // Enable direct client-side Meta Graph API calls when running locally (e.g. Live Server)
     enableDirectMetaFallback: true
+  };
+
+  // Global helper to quickly set a new token at runtime in browser console:
+  // e.g. PlaceAI_SetWhatsAppToken('EAAB...')
+  window.PlaceAI_SetWhatsAppToken = function(newToken, newPhoneId) {
+    if (newToken) {
+      localStorage.setItem('PLACEAI_WA_ACCESS_TOKEN', newToken.trim());
+      config.accessToken = newToken.trim();
+      console.log('✅ WhatsApp Access Token updated in localStorage.');
+    }
+    if (newPhoneId) {
+      localStorage.setItem('PLACEAI_WA_PHONE_ID', newPhoneId.trim());
+      config.phoneNumberId = newPhoneId.trim();
+      console.log('✅ WhatsApp Phone Number ID updated in localStorage.');
+    }
+    return 'Token configured successfully! Ready to send OTP.';
   };
 
   window.WHATSAPP_CONFIG = config;

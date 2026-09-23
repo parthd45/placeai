@@ -445,6 +445,15 @@
       border-color: #7c3aed;
       background: rgba(124, 58, 237, 0.2);
     }
+    .mobile-digit:focus {
+      border-color: #25D366 !important;
+      box-shadow: 0 0 10px rgba(37, 211, 102, 0.5) !important;
+      background: rgba(37, 211, 102, 0.15) !important;
+    }
+    .mobile-digit.filled {
+      border-color: #25D366 !important;
+      background: rgba(37, 211, 102, 0.2) !important;
+    }
     .otp-digit-input.error {
       border-color: #ef4444;
       background: rgba(239, 68, 68, 0.15);
@@ -551,13 +560,19 @@
               <div style="display: flex; flex-direction: column; width: 100%;">
                 <div class="mobile-input-container">
                   <input type="tel" id="mobileInput" placeholder="Enter 10-digit Mobile Number" />
-                  <button type="button" id="sendMobileOtpBtn" class="verify-phone-btn" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); display: inline-flex; align-items: center; gap: 5px;"><span>📱</span> Verify via OTP</button>
-                  <span id="mobileVerifiedBadge" class="phone-status-badge" style="display: none;">✓ Verified</span>
+                  <button type="button" id="sendMobileOtpBtn" class="verify-phone-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); display: inline-flex; align-items: center; gap: 6px; color: #fff; font-weight: 600; padding: 0 16px; border: none; border-radius: 8px; cursor: pointer;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="vertical-align: middle;"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    <span>Verify Mobile</span>
+                  </button>
+                  <span id="mobileVerifiedBadge" class="phone-status-badge" style="display: none; background: rgba(37, 211, 102, 0.15); border: 1.5px solid #25D366; color: #25D366; font-weight: 600;">✓ Mobile Verified</span>
                 </div>
                 <!-- Inline Mobile OTP container -->
-                <div id="mobileOtpBox" class="mobile-otp-box" style="display: none;">
-                  <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 8px;">
-                    Enter 6-digit OTP verification code for <span id="mobileOtpDisplay" style="color: #c4b5fd; font-weight: 600;"></span>
+                <div id="mobileOtpBox" class="mobile-otp-box" style="display: none; border: 1px solid rgba(37, 211, 102, 0.3); background: rgba(37, 211, 102, 0.05); border-radius: 12px; padding: 14px 10px; margin-top: 10px;">
+                  <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 6px;">
+                    Enter 6-digit OTP verification code for <span id="mobileOtpDisplay" style="color: #25D366; font-weight: 700;"></span>
+                  </div>
+                  <div style="font-size: 11px; color: rgba(255,255,255,0.65); margin-bottom: 6px;">
+                    💡 <em>Tip: You can paste the 6-digit code anywhere to auto-fill</em>
                   </div>
                   <div class="otp-digit-group" id="mobileOtpInputs">
                     <input type="text" maxlength="1" class="otp-digit-input mobile-digit" data-idx="0" inputmode="numeric" autocomplete="off" />
@@ -569,11 +584,11 @@
                   </div>
                   <div id="mobileOtpError" style="color: #ef4444; font-size: 12px; margin-bottom: 8px; display: none;"></div>
                   <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                    <button type="button" id="confirmMobileOtpBtn" class="verify-phone-btn" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); height: 36px; padding: 0 16px;">Confirm Code</button>
-                    <button type="button" id="cancelMobileOtpBtn" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 8px; height: 36px; padding: 0 12px; font-size: 12px; cursor: pointer;">Cancel</button>
+                    <button type="button" id="confirmMobileOtpBtn" class="verify-phone-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); height: 36px; padding: 0 18px; color: #fff; font-weight: 600; border-radius: 8px; border: none; cursor: pointer;">Confirm Code</button>
+                    <button type="button" id="cancelMobileOtpBtn" style="background: none; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); border-radius: 8px; height: 36px; padding: 0 14px; font-size: 12px; cursor: pointer;">Cancel</button>
                   </div>
-                  <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.6);">
-                    Didn't get code? <button type="button" id="resendMobileOtpBtn" style="background: none; border: none; color: #c4b5fd; cursor: pointer; text-decoration: underline; font-size: 12px;" disabled>Resend in <span id="mobileResendTimer">60</span>s</button>
+                  <div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.65);">
+                    Didn't get code? <button type="button" id="resendMobileOtpBtn" style="background: none; border: none; color: #25D366; cursor: pointer; text-decoration: underline; font-size: 12px;" disabled>Resend in <span id="mobileResendTimer">60</span>s</button>
                   </div>
                 </div>
               </div>

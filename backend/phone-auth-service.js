@@ -283,7 +283,8 @@
     setupRecaptcha: setupRecaptcha,
     sendPhoneOTP: sendPhoneOTP,
     verifyPhoneOTP: verifyPhoneOTP,
-    getLastPhoneNumber: getLastPhoneNumber
+    getLastPhoneNumber: getLastPhoneNumber,
+    hasActiveSession: () => !!confirmationResult
   };
 
   // Auto-init when script is loaded if Firebase is available

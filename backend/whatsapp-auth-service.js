@@ -1,7 +1,8 @@
 /**
  * WhatsApp OTP Authentication Service for PlaceAI
  * 
- * Interacts with /api/whatsapp-otp/send and /api/whatsapp-otp/verify
+ * Interacts with Meta Cloud API via /api/whatsapp-otp/send
+ * or direct Meta Cloud API when testing locally.
  */
 
 (function () {
@@ -10,13 +11,14 @@
   let currentPhone = '';
   let currentSessionToken = '';
   let localFallbackCode = '';
+  const recentValidCodes = new Set();
 
   /**
    * Format phone number to international E.164 format (+91 for India by default)
    */
   function formatPhoneNumber(phone) {
     if (!phone) return '';
-    let cleaned = phone.replace(/[\s\-\(\)]/g, '').trim();
+    let cleaned = phone.toString().replace(/[\s\-\(\)]/g, '').trim();
 
     if (cleaned.startsWith('+')) {
       return cleaned;
@@ -52,34 +54,153 @@
     }
 
     currentPhone = formattedPhone;
+    const metaCfg = window.WHATSAPP_CONFIG || {};
 
+    // 1. Try sending via backend serverless endpoint
     try {
-      // Generate clean 6-digit verification code
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      localFallbackCode = otp;
-      recentValidCodes.add(otp);
-      currentSessionToken = 'smart_session_' + Date.now();
+      const response = await fetch(metaCfg.sendEndpoint || '/api/whatsapp-otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formattedPhone,
+          accessToken: metaCfg.accessToken,
+          phoneNumberId: metaCfg.phoneNumberId
+        })
+      });
 
-      console.log(`%c[PlaceAI Smart OTP] Code for ${formattedPhone}: ${otp}`, 'color: #7c3aed; font-size: 16px; font-weight: bold;');
+      const data = await response.json().catch(() => ({}));
 
-      return {
-        success: true,
-        formattedPhone: formattedPhone,
-        otpCode: otp,
-        isDemoMode: true,
-        message: `📱 PlaceAI Verification Code: ${otp}`
-      };
-    } catch (err) {
-      console.error('Error generating OTP:', err);
-      return {
-        success: false,
-        error: 'Failed to generate verification code. Please try again.'
-      };
+      if (response.ok && data.success) {
+        currentSessionToken = data.sessionToken || '';
+        if (data.demoCode) {
+          localFallbackCode = data.demoCode;
+          recentValidCodes.add(data.demoCode);
+        }
+        return {
+          success: true,
+          formattedPhone: formattedPhone,
+          sessionToken: data.sessionToken,
+          message: data.message || `OTP sent to your WhatsApp at ${formattedPhone}!`
+        };
+      }
+
+      // If backend returned a specific error (e.g. token expired, recipient not added)
+      if (data.error) {
+        console.warn('Backend returned error dispatching WhatsApp message:', data);
+        if (data.fallbackOtp) {
+          localFallbackCode = data.fallbackOtp;
+          recentValidCodes.add(data.fallbackOtp);
+          currentSessionToken = data.sessionToken || 'fallback_' + Date.now();
+        }
+        return {
+          success: false,
+          error: data.error,
+          details: data.details,
+          fallbackOtp: data.fallbackOtp
+        };
+      }
+    } catch (networkError) {
+      console.warn('Backend endpoint unavailable, falling back to direct Meta Cloud API dispatch...', networkError);
     }
-  }
 
-  // Store set of recently sent valid codes for this session
-  const recentValidCodes = new Set();
+    // 2. Direct Meta Cloud API fallback (useful for local development on Live Server)
+    if (metaCfg.enableDirectMetaFallback && metaCfg.accessToken && metaCfg.phoneNumberId) {
+      try {
+        const directOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        localFallbackCode = directOtp;
+        recentValidCodes.add(directOtp);
+        currentSessionToken = 'direct_session_' + Date.now();
+        const recipientDigits = formattedPhone.replace(/[^0-9]/g, '');
+
+        console.log(`Sending direct Meta WhatsApp message to ${recipientDigits}...`);
+
+        let payload;
+        if (metaCfg.templateName) {
+          payload = {
+            messaging_product: 'whatsapp',
+            recipient_type: 'individual',
+            to: recipientDigits,
+            type: 'template',
+            template: {
+              name: metaCfg.templateName,
+              language: { code: 'en_US' },
+              components: [
+                { type: 'body', parameters: [{ type: 'text', text: directOtp }] }
+              ]
+            }
+          };
+        } else {
+          payload = {
+            messaging_product: 'whatsapp',
+            recipient_type: 'individual',
+            to: recipientDigits,
+            type: 'text',
+            text: {
+              preview_url: false,
+              body: `Your PlaceAI verification code is: *${directOtp}*.\n\nValid for 5 minutes. Do not share with anyone.`
+            }
+          };
+        }
+
+        const directRes = await fetch(
+          `https://graph.facebook.com/v20.0/${metaCfg.phoneNumberId}/messages`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${metaCfg.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const directData = await directRes.json().catch(() => ({}));
+
+        if (directRes.ok) {
+          console.log('✅ Direct Meta WhatsApp message sent successfully:', directData);
+          return {
+            success: true,
+            formattedPhone: formattedPhone,
+            message: `OTP sent to your WhatsApp at ${formattedPhone}!`
+          };
+        } else {
+          console.error('Direct Meta API Error:', directData);
+          let errText = directData.error?.message || 'Failed to dispatch WhatsApp message.';
+          if (directData.error?.code === 190) {
+            errText = 'Meta Access Token has expired. Please update it in backend/whatsapp-config.js.';
+          } else if (directData.error?.code === 131030) {
+            errText = `Recipient ${formattedPhone} is not in Meta WhatsApp Sandbox test list. Add it in Meta Developers Dashboard.`;
+          }
+
+          // In dev mode, return fallback code so development flow is not halted
+          return {
+            success: false,
+            error: errText,
+            fallbackOtp: directOtp,
+            message: `${errText} (Dev code: ${directOtp})`
+          };
+        }
+      } catch (directErr) {
+        console.error('Direct Meta dispatch exception:', directErr);
+      }
+    }
+
+    // 3. Local simulation fallback when offline / no token set
+    const fallbackOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    localFallbackCode = fallbackOtp;
+    recentValidCodes.add(fallbackOtp);
+    currentSessionToken = 'local_session_' + Date.now();
+
+    console.log(`%c[PlaceAI WhatsApp OTP] Dev code for ${formattedPhone}: ${fallbackOtp}`, 'color: #25D366; font-size: 15px; font-weight: bold;');
+
+    return {
+      success: true,
+      formattedPhone: formattedPhone,
+      otpCode: fallbackOtp,
+      isDemoMode: true,
+      message: `WhatsApp OTP sent! (Dev verification code: ${fallbackOtp})`
+    };
+  }
 
   /**
    * Verify WhatsApp 6-digit OTP code
@@ -97,9 +218,9 @@
       return { success: false, error: 'No active session. Please request a new WhatsApp OTP first.' };
     }
 
-    console.log(`Verifying OTP: entered="${cleanCode}", localFallback="${localFallbackCode}", recentCodes=`, Array.from(recentValidCodes));
+    console.log(`Verifying WhatsApp OTP: code="${cleanCode}", currentPhone="${currentPhone}"`);
 
-    // Check if code matches localFallbackCode, recentValidCodes, or test fallback '123456'
+    // Check local fallback codes or '123456'
     if (
       (localFallbackCode && cleanCode === localFallbackCode) ||
       recentValidCodes.has(cleanCode) ||
@@ -113,8 +234,10 @@
       };
     }
 
+    // Try backend verification endpoint if available
     try {
-      const response = await fetch('/api/whatsapp-otp/verify', {
+      const metaCfg = window.WHATSAPP_CONFIG || {};
+      const response = await fetch(metaCfg.verifyEndpoint || '/api/whatsapp-otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -149,11 +272,16 @@
     return currentPhone;
   }
 
+  function getLocalFallbackCode() {
+    return localFallbackCode;
+  }
+
   // Export to window
   window.WhatsAppAuthService = {
     formatPhoneNumber,
     sendWhatsAppOTP,
     verifyWhatsAppOTP,
-    getCurrentPhone
+    getCurrentPhone,
+    getLocalFallbackCode
   };
 })();

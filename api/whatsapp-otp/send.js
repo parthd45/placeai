@@ -7,12 +7,12 @@
 
 const crypto = require('crypto');
 
-// Secret key for signing OTP tokens (set in Vercel Environment Variables or defaults to fallback)
+// Secret key for signing OTP tokens
 const OTP_SECRET = process.env.OTP_SECRET || 'placeai_whatsapp_otp_secret_key_2026';
 
 // Meta WhatsApp Cloud API credentials (set in Vercel Environment Variables or fallback to active credentials)
-const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || 'EABDMDZCECsSwBSjgHOJQcM9o2yZAtO7rDGrZCZAX07PcDugWbFZBwbvAajHqSA6mDr4pXWbN9judwfwTczxOtggRne4V7mIZAaaV2tWf9zoq9duKYMQUaHg3PwmfhMrpJn674ZA35kd6CpgJsyK4xzZByhxvFYbD4H7pB1RpHRuJtOJjZAKVmZCUnVafdZA3kSOoW9iRcjVVZCBIJaCo8wYx80Jl6ReFcjJDl47S8nM4yNUPexN2YjZBYIwTfmZADJDAi92PqHeU52yboLQNIlBKDBg5tPfLuwZBAZDZD';
-const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '1386808957839795';
+const DEFAULT_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || 'EABDMDZCECsSwBSto663VDrhFGdZBzqFIZCQCUJB4aa5VRcyK15IZAIzt2AQjZA2eARKqQyvWpQ8nfxKkyuomWJCeVX9o3QvonPCbxKd9vRXtFwfwCI1tyEDHkjqXMxNrV8ue9EHApVtZBJ10B7eLhA1xGNnZAZABAdMNWDoLVCrrZCtekTR8Nc3duwTSrQXpfPnpuKsETGNYkpLZC5QJ92bMY1yAiLddyWT0lYfpAS23O2qgCFmmHzRjznZACfuBL2byJddT9ZCMBLkTOh2jHj8PDxEsce5pVAZDZD';
+const DEFAULT_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '1386808957839795';
 const WHATSAPP_TEMPLATE_NAME = process.env.WHATSAPP_TEMPLATE_NAME || '';
 
 module.exports = async (req, res) => {
@@ -34,14 +34,14 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { phone } = req.body || {};
+    const { phone, accessToken: clientToken, phoneNumberId: clientPhoneId } = req.body || {};
 
     if (!phone) {
       return res.status(400).json({ success: false, error: 'Phone number is required.' });
     }
 
     // Clean and normalize phone number (e.g. +917028030836)
-    let cleanPhone = phone.replace(/[\s\-\(\)]/g, '').trim();
+    let cleanPhone = phone.toString().replace(/[\s\-\(\)]/g, '').trim();
     if (!cleanPhone.startsWith('+')) {
       if (cleanPhone.length === 10) {
         cleanPhone = '+91' + cleanPhone;
@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    // Format for WhatsApp API: digits only with country code (no + sign, e.g. 917028030836)
+    // Format for WhatsApp API: digits only with country code (e.g. 917028030836)
     const waRecipient = cleanPhone.replace(/[^0-9]/g, '');
 
     // Generate random 6-digit OTP
@@ -62,14 +62,14 @@ module.exports = async (req, res) => {
     const hash = crypto.createHmac('sha256', OTP_SECRET).update(payload).digest('hex');
     const sessionToken = `${Buffer.from(`${cleanPhone}:${expiresAt}`).toString('base64')}.${hash}`;
 
-    // Check if Meta WhatsApp Cloud API credentials are provided
-    const isConfigured = WHATSAPP_ACCESS_TOKEN && WHATSAPP_PHONE_NUMBER_ID;
+    const activeToken = clientToken !== undefined ? clientToken : DEFAULT_ACCESS_TOKEN;
+    const activePhoneId = clientPhoneId !== undefined ? clientPhoneId : DEFAULT_PHONE_NUMBER_ID;
 
-    if (isConfigured) {
+    const isExplicitDemo = activeToken === 'demo' || activeToken === 'DEMO' || !activeToken;
+
+    if (!isExplicitDemo && activeToken && activePhoneId) {
       console.log(`Sending WhatsApp OTP to ${cleanPhone} via Meta Cloud API...`);
 
-      // Payload for Meta WhatsApp Cloud API
-      // If template is specified, use template message; otherwise use session text message
       let messagePayload;
       if (WHATSAPP_TEMPLATE_NAME) {
         messagePayload = {
@@ -95,7 +95,6 @@ module.exports = async (req, res) => {
           }
         };
       } else {
-        // Standard interactive text message
         messagePayload = {
           messaging_product: 'whatsapp',
           recipient_type: 'individual',
@@ -103,17 +102,17 @@ module.exports = async (req, res) => {
           type: 'text',
           text: {
             preview_url: false,
-            body: `Your PlaceAI verification code is: *${otp}*.\n\nThis code will expire in 5 minutes. Do not share this code with anyone.`
+            body: `Your PlaceAI verification code is: *${otp}*.\n\nValid for 5 minutes. Please do not share this code with anyone.`
           }
         };
       }
 
       const metaResponse = await fetch(
-        `https://graph.facebook.com/v20.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+        `https://graph.facebook.com/v20.0/${activePhoneId}/messages`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+            'Authorization': `Bearer ${activeToken}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(messagePayload)
@@ -125,10 +124,20 @@ module.exports = async (req, res) => {
       if (!metaResponse.ok) {
         console.error('Meta Cloud API Error:', metaData);
         let errorMsg = metaData.error?.message || 'Failed to send WhatsApp message via Meta Cloud API.';
+        
+        // Provide user-friendly guidance for known Meta error codes
+        if (metaData.error?.code === 190) {
+          errorMsg = 'Meta WhatsApp Access Token has expired. Please update your token in whatsapp-config.js or Vercel.';
+        } else if (metaData.error?.code === 131030) {
+          errorMsg = `Recipient number (${cleanPhone}) is not registered in the Meta WhatsApp Sandbox test list. Please add it to "To" numbers in Meta App Dashboard > WhatsApp > API Setup.`;
+        }
+
         return res.status(metaResponse.status).json({
           success: false,
           error: errorMsg,
-          details: metaData.error
+          details: metaData.error,
+          sessionToken: sessionToken,
+          fallbackOtp: otp
         });
       }
 
@@ -141,16 +150,15 @@ module.exports = async (req, res) => {
         message: `Verification code sent to your WhatsApp at ${cleanPhone}!`
       });
     } else {
-      // Demo / Test Mode: When credentials are not yet configured in environment
-      console.log(`[DEMO MODE] WhatsApp OTP generated for ${cleanPhone}: ${otp}`);
+      console.log(`[TEST MODE] WhatsApp OTP generated for ${cleanPhone}: ${otp}`);
 
       return res.status(200).json({
         success: true,
         isDemoMode: true,
         formattedPhone: cleanPhone,
         sessionToken: sessionToken,
-        demoCode: otp, // Provided in demo mode for instant testing before setting Meta keys
-        message: `[Demo Mode] OTP sent to WhatsApp! Use verification code: ${otp}`
+        demoCode: otp,
+        message: `OTP sent to WhatsApp! Use verification code: ${otp}`
       });
     }
   } catch (error) {

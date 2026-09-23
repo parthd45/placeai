@@ -186,7 +186,7 @@
 
       if (mobile && !isMobileVerified) {
         const proceedWithoutVerification = confirm(
-          `You entered mobile number "${mobile}", but it has not been verified with SMS OTP yet.\n\nClick OK to verify your mobile number first, or Cancel to proceed without mobile verification.`
+          `You entered mobile number "${mobile}", but it has not been verified with WhatsApp OTP yet.\n\nClick OK to verify your WhatsApp number first, or Cancel to proceed without verification.`
         );
         if (proceedWithoutVerification) {
           const sendBtn = document.getElementById('sendMobileOtpBtn');
@@ -502,46 +502,75 @@
   document.head.appendChild(style);
 
   /**
-   * Helper to handle 6-digit input auto-focus and paste
+   * Helper to handle 6-digit input auto-focus, arrow navigation, and clipboard auto-paste
    */
   function setupDigitInputs(inputs, triggerButton) {
     if (!inputs || !inputs.length) return;
 
     inputs.forEach((input, index) => {
+      // Input event: only keep 1 digit and auto-advance
       input.addEventListener('input', (e) => {
         const val = e.target.value.replace(/[^0-9]/g, '');
-        e.target.value = val;
-        if (val) {
+        e.target.value = val ? val.slice(-1) : '';
+        if (e.target.value) {
           input.classList.add('filled');
           input.classList.remove('error');
           if (index < inputs.length - 1) {
             inputs[index + 1].focus();
+          } else {
+            // Check if all are filled
+            let allFilled = true;
+            inputs.forEach(inp => { if (!inp.value) allFilled = false; });
+            if (allFilled && triggerButton) {
+              setTimeout(() => triggerButton.click(), 120);
+            }
           }
         } else {
           input.classList.remove('filled');
         }
       });
 
+      // Key navigation and backspace
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !input.value && index > 0) {
+        if (e.key === 'Backspace') {
+          if (!input.value && index > 0) {
+            inputs[index - 1].focus();
+            inputs[index - 1].value = '';
+            inputs[index - 1].classList.remove('filled');
+          } else {
+            input.value = '';
+            input.classList.remove('filled');
+          }
+        } else if (e.key === 'ArrowLeft' && index > 0) {
           inputs[index - 1].focus();
-          inputs[index - 1].value = '';
-          inputs[index - 1].classList.remove('filled');
-        }
-        if (e.key === 'Enter' && triggerButton) {
+        } else if (e.key === 'ArrowRight' && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        } else if (e.key === 'Enter' && triggerButton) {
           triggerButton.click();
         }
       });
 
+      // Paste event: paste full 6-digit code anywhere to auto-fill all boxes
       input.addEventListener('paste', (e) => {
         e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
-        if (pasted.length >= inputs.length) {
+        const clipboard = e.clipboardData || window.clipboardData;
+        const pasted = (clipboard ? clipboard.getData('text') : '').replace(/[^0-9]/g, '');
+        if (pasted.length > 0) {
+          const chars = pasted.split('');
           inputs.forEach((inp, i) => {
-            inp.value = pasted[i] || '';
-            if (inp.value) inp.classList.add('filled');
+            if (chars[i]) {
+              inp.value = chars[i];
+              inp.classList.add('filled');
+              inp.classList.remove('error');
+            }
           });
-          inputs[inputs.length - 1].focus();
+          const lastFilledIdx = Math.min(chars.length, inputs.length) - 1;
+          if (lastFilledIdx >= 0 && inputs[lastFilledIdx]) {
+            inputs[lastFilledIdx].focus();
+          }
+          if (chars.length >= inputs.length && triggerButton) {
+            setTimeout(() => triggerButton.click(), 150);
+          }
         }
       });
     });
@@ -563,7 +592,7 @@
     const otpError = document.getElementById('mobileOtpError');
     const digitInputs = document.querySelectorAll('.mobile-digit');
 
-    if (!sendOtpBtn || !mobileInput || !window.PhoneAuthService) return;
+    if (!sendOtpBtn || !mobileInput) return;
 
     let resendInterval = null;
 
@@ -598,25 +627,51 @@
       }
 
       sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = 'Sending OTP...';
+      sendOtpBtn.innerHTML = '<span>⏳</span> Sending OTP...';
       if (otpError) otpError.style.display = 'none';
 
-      const result = window.WhatsAppAuthService
-        ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
-        : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      let result;
+      // Primary: Firebase Phone SMS (Google carrier network, works for ALL numbers, no dedicated number needed)
+      if (window.PhoneAuthService && window.isFirebaseConfigured && window.isFirebaseConfigured()) {
+        console.log('Dispatching free SMS OTP via Firebase Phone Auth...');
+        result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        // If Firebase quota or error occurs, try WhatsApp OTP as fallback
+        if (!result.success && window.WhatsAppAuthService) {
+          console.warn('Firebase SMS failed, falling back to WhatsApp OTP:', result.error);
+          const waResult = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+          if (waResult.success) result = waResult;
+        }
+      } else if (window.WhatsAppAuthService) {
+        result = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+      } else {
+        result = { success: false, error: 'Phone verification service is unavailable.' };
+      }
 
       if (result.success) {
-        showNotification('success', result.message || 'OTP sent successfully to your WhatsApp!');
+        showNotification('success', result.message || 'OTP sent successfully!');
         if (mobileOtpDisplay) mobileOtpDisplay.textContent = result.formattedPhone || phone;
         if (mobileOtpBox) mobileOtpBox.style.display = 'block';
         digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
+
+        // Auto-fill dev code if returned
+        const devCode = result.otpCode || result.demoCode;
+        if (devCode && devCode.length === 6) {
+          digitInputs.forEach((inp, idx) => {
+            inp.value = devCode[idx];
+            inp.classList.add('filled');
+          });
+        }
+
         if (digitInputs[0]) digitInputs[0].focus();
         startTimer(60);
       } else {
         showNotification('error', result.error || 'Failed to send OTP.');
       }
       sendOtpBtn.disabled = false;
-      sendOtpBtn.innerHTML = '<span>📱</span> Verify via OTP';
+      sendOtpBtn.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="vertical-align: middle;"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        <span>Verify via OTP</span>
+      `;
     });
 
     if (cancelOtpBtn) {
@@ -630,9 +685,14 @@
         resendBtn.disabled = true;
         resendBtn.textContent = 'Sending...';
         const phone = mobileInput.value.trim();
-        const result = window.WhatsAppAuthService
-          ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
-          : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        let result;
+        if (window.PhoneAuthService && window.isFirebaseConfigured && window.isFirebaseConfigured()) {
+          result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        } else if (window.WhatsAppAuthService) {
+          result = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+        } else {
+          result = { success: false, error: 'Service unavailable' };
+        }
         if (result.success) {
           showNotification('success', 'New verification code sent!');
           startTimer(60);
@@ -665,18 +725,28 @@
         confirmOtpBtn.textContent = 'Verifying...';
         if (otpError) otpError.style.display = 'none';
 
-        const result = window.WhatsAppAuthService
-          ? await window.WhatsAppAuthService.verifyWhatsAppOTP(code)
-          : await window.PhoneAuthService.verifyPhoneOTP(code);
+        let result;
+        if (window.PhoneAuthService && window.PhoneAuthService.hasActiveSession && window.PhoneAuthService.hasActiveSession()) {
+          result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        } else if (window.WhatsAppAuthService) {
+          result = await window.WhatsAppAuthService.verifyWhatsAppOTP(code);
+        } else if (window.PhoneAuthService) {
+          result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        } else {
+          result = { success: false, error: 'Verification service unavailable' };
+        }
         if (result.success) {
           digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
-          showNotification('success', '✅ Mobile number verified successfully!');
+          showNotification('success', '✅ WhatsApp number verified successfully!');
           setTimeout(() => {
             if (mobileOtpBox) mobileOtpBox.style.display = 'none';
             if (sendOtpBtn) sendOtpBtn.style.display = 'none';
-            if (mobileVerifiedBadge) mobileVerifiedBadge.style.display = 'inline-flex';
+            if (mobileVerifiedBadge) {
+              mobileVerifiedBadge.style.display = 'inline-flex';
+              mobileVerifiedBadge.innerHTML = '✓ WhatsApp Verified';
+            }
             mobileInput.readOnly = true;
-            mobileInput.style.borderColor = '#10b981';
+            mobileInput.style.borderColor = '#25D366';
             mobileInput.dataset.verified = 'true';
             mobileInput.dataset.formattedPhone = result.phoneNumber || mobileInput.value;
           }, 600);
@@ -712,7 +782,9 @@
       tabPassword.classList.add('active');
       tabPhone.classList.remove('active');
       tabPassword.style.background = '#7c3aed';
+      tabPassword.style.borderColor = '#7c3aed';
       tabPhone.style.background = 'transparent';
+      tabPhone.style.borderColor = '#25D366';
       passwordForm.style.display = 'block';
       phoneForm.style.display = 'none';
     });
@@ -720,8 +792,10 @@
     tabPhone.addEventListener('click', () => {
       tabPhone.classList.add('active');
       tabPassword.classList.remove('active');
-      tabPhone.style.background = '#7c3aed';
+      tabPhone.style.background = '#25D366';
+      tabPhone.style.borderColor = '#25D366';
       tabPassword.style.background = 'transparent';
+      tabPassword.style.borderColor = '#7c3aed';
       passwordForm.style.display = 'none';
       phoneForm.style.display = 'block';
     });
@@ -774,17 +848,39 @@
       if (phoneError) phoneError.style.display = 'none';
 
       sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = 'Sending...';
+      sendOtpBtn.innerHTML = '<span>⏳</span> Sending OTP...';
 
-      const result = window.WhatsAppAuthService
-        ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
-        : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+      let result;
+      // Primary: Firebase Phone SMS (Google carrier network, works for ALL numbers, no dedicated number needed)
+      if (window.PhoneAuthService && window.isFirebaseConfigured && window.isFirebaseConfigured()) {
+        console.log('Dispatching free SMS OTP via Firebase Phone Auth...');
+        result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        if (!result.success && window.WhatsAppAuthService) {
+          console.warn('Firebase SMS failed, falling back to WhatsApp OTP:', result.error);
+          const waResult = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+          if (waResult.success) result = waResult;
+        }
+      } else if (window.WhatsAppAuthService) {
+        result = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+      } else {
+        result = { success: false, error: 'Phone verification service is unavailable.' };
+      }
 
       if (result.success) {
         showNotification('success', result.message || 'OTP sent successfully!');
         if (phoneDisplay) phoneDisplay.textContent = result.formattedPhone || phone;
         if (verifySection) verifySection.style.display = 'block';
         digitInputs.forEach(input => { input.value = ''; input.classList.remove('error', 'success', 'filled'); });
+
+        // Auto-fill dev code if returned
+        const devCode = result.otpCode || result.demoCode;
+        if (devCode && devCode.length === 6) {
+          digitInputs.forEach((inp, idx) => {
+            inp.value = devCode[idx];
+            inp.classList.add('filled');
+          });
+        }
+
         if (digitInputs[0]) digitInputs[0].focus();
         startTimer(60);
       } else {
@@ -795,7 +891,10 @@
         showNotification('error', result.error || 'Failed to send OTP.');
       }
       sendOtpBtn.disabled = false;
-      sendOtpBtn.textContent = 'Send OTP';
+      sendOtpBtn.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="vertical-align: middle;"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        <span>Send OTP</span>
+      `;
     });
 
     if (resendBtn) {
@@ -803,9 +902,14 @@
         resendBtn.disabled = true;
         resendBtn.textContent = 'Sending...';
         const phone = phoneInput.value.trim();
-        const result = window.WhatsAppAuthService
-          ? await window.WhatsAppAuthService.sendWhatsAppOTP(phone)
-          : await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        let result;
+        if (window.PhoneAuthService && window.isFirebaseConfigured && window.isFirebaseConfigured()) {
+          result = await window.PhoneAuthService.sendPhoneOTP(phone, 'recaptcha-container');
+        } else if (window.WhatsAppAuthService) {
+          result = await window.WhatsAppAuthService.sendWhatsAppOTP(phone);
+        } else {
+          result = { success: false, error: 'Service unavailable' };
+        }
         if (result.success) {
           showNotification('success', 'New verification code sent!');
           startTimer(60);
@@ -835,12 +939,19 @@
         }
 
         verifyBtn.disabled = true;
-        verifyBtn.textContent = 'Verifying & Signing In...';
+        verifyBtn.innerHTML = '<span>⏳</span> Verifying & Signing In...';
         if (codeError) codeError.style.display = 'none';
 
-        const result = window.WhatsAppAuthService
-          ? await window.WhatsAppAuthService.verifyWhatsAppOTP(code)
-          : await window.PhoneAuthService.verifyPhoneOTP(code);
+        let result;
+        if (window.PhoneAuthService && window.PhoneAuthService.hasActiveSession && window.PhoneAuthService.hasActiveSession()) {
+          result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        } else if (window.WhatsAppAuthService) {
+          result = await window.WhatsAppAuthService.verifyWhatsAppOTP(code);
+        } else if (window.PhoneAuthService) {
+          result = await window.PhoneAuthService.verifyPhoneOTP(code);
+        } else {
+          result = { success: false, error: 'Verification service unavailable' };
+        }
         if (result.success) {
           digitInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
           showNotification('success', '✅ Verified! Logging you in...');
@@ -865,7 +976,9 @@
               localStorage.setItem('placeai_phone_user', JSON.stringify({
                 phone: formattedPhone,
                 profileId: profile.id,
-                userId: profile.user_id
+                userId: profile.user_id,
+                email: profile.email,
+                name: profile.full_name || profile.first_name
               }));
             } else {
               console.log('No existing profile for phone, creating session entry...');
@@ -880,7 +993,7 @@
 
           setTimeout(() => {
             window.location.href = 'dashboard.html';
-          }, 1200);
+          }, 900);
         } else {
           digitInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
           if (codeError) {
@@ -892,7 +1005,7 @@
             setTimeout(() => verifySection.classList.remove('otp-shake'), 400);
           }
           verifyBtn.disabled = false;
-          verifyBtn.textContent = 'Verify & Sign In';
+          verifyBtn.innerHTML = '<span>Verify & Sign In</span>';
         }
       });
     }
