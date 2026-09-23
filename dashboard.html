@@ -1446,122 +1446,165 @@
     }
 
     /* =========================================================
-       LINKEDIN & GITHUB MIX DASHBOARD COMPONENTS
+       GITHUB AUTHENTIC CONTRIBUTION DASHBOARD & HEATMAP
        ========================================================= */
-    .mix-dashboard-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .github-dashboard-container {
       margin-bottom: 20px;
     }
 
-    /* LinkedIn Auto-Sync Hero Banner */
-    .linkedin-hero-card {
-      background: linear-gradient(135deg, rgba(10, 102, 194, 0.16) 0%, rgba(30, 41, 59, 0.9) 60%, rgba(15, 23, 42, 0.98) 100%);
-      border: 1px solid rgba(10, 102, 194, 0.45);
-      border-radius: 14px;
-      padding: 18px 22px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    .github-card-topbar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .linkedin-hero-card::before {
-      content: '';
-      position: absolute;
-      top: -30px;
-      right: -30px;
-      width: 130px;
-      height: 130px;
-      background: radial-gradient(circle, rgba(10, 102, 194, 0.25) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .linkedin-hero-left {
-      display: flex;
       align-items: center;
-      gap: 16px;
-      flex: 1;
-      min-width: 280px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 14px;
     }
 
-    .linkedin-icon-box {
-      width: 48px;
-      height: 48px;
-      background: #0a66c2;
-      border-radius: 12px;
+    .github-brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: #21262d;
+      border: 1px solid #30363d;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 26px;
-      box-shadow: 0 4px 14px rgba(10, 102, 194, 0.45);
+      font-size: 24px;
+      color: #f0f6fc;
       flex-shrink: 0;
     }
 
-    .linkedin-hero-content h3 {
-      font-size: 16.5px;
-      font-weight: 700;
-      color: #f8fafc;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .linkedin-hero-content p {
-      font-size: 13px;
-      color: #94a3b8;
-      margin: 0;
-      line-height: 1.45;
-    }
-
-    .linkedin-badge-sync {
+    .github-verified-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: rgba(35, 134, 54, 0.2);
+      color: #3fb950;
+      border-radius: 12px;
+      border: 1px solid rgba(35, 134, 54, 0.4);
+      font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
+      gap: 4px;
     }
 
-    .linkedin-hero-actions {
+    .github-connection-pill {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
+
+    .github-input-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12.5px;
     }
 
-    .btn-linkedin-sync {
-      background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+    .github-prefix {
+      color: #8b949e;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      font-weight: 500;
+      border-right: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      user-select: none;
+      font-size: 12px;
+    }
+
+    .github-input {
+      background: transparent;
+      border: none;
+      color: #f0f6fc;
+      padding: 6px 10px;
+      font-size: 12.5px;
+      outline: none;
+      width: 140px;
+    }
+
+    .github-input:focus {
+      outline: none;
+    }
+
+    .btn-github-connect {
+      background: linear-gradient(180deg, #2ea043 0%, #238636 100%);
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 10px 18px;
-      border-radius: 8px;
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
       font-weight: 600;
-      font-size: 13.5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(10, 102, 194, 0.35);
-      white-space: nowrap;
+      gap: 6px;
+      transition: all 0.15s ease;
     }
 
-    .btn-linkedin-sync:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(10, 102, 194, 0.55);
-      background: linear-gradient(135deg, #0077b5 0%, #0a66c2 100%);
+    .btn-github-connect:hover {
+      background: #2c974b;
+      transform: translateY(-1px);
+    }
+
+    .github-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid #38bdf8;
+      object-fit: cover;
+    }
+
+    .github-username-link {
+      font-size: 13px;
+      font-weight: 700;
+      color: #58a6ff;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .github-username-link:hover {
+      text-decoration: underline;
+    }
+
+    .github-meta-pill {
+      font-size: 10.5px;
+      color: #8b949e;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 1px 6px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-github-disconnect {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-github-disconnect:hover {
+      color: #f85149;
+      border-color: #f85149;
+      background: rgba(248, 81, 73, 0.1);
     }
 
     /* GitHub Contribution Heatmap Card */
@@ -1800,39 +1843,6 @@
       white-space: nowrap;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
-
-    /* LinkedIn Modal Tabs & UI */
-    .sync-tab-container {
-      display: flex;
-      border-bottom: 1px solid #334155;
-      margin-bottom: 16px;
-      gap: 4px;
-    }
-
-    .sync-tab-btn {
-      padding: 8px 16px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: #94a3b8;
-      font-size: 13.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sync-tab-btn.active {
-      color: #38bdf8;
-      border-bottom-color: #38bdf8;
-    }
-
-    .extracted-preview-box {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 14px;
-    }
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -2053,58 +2063,76 @@
 
       <!-- Right Content Area -->
       <div>
-        <!-- Mix Dashboard: LinkedIn Auto-Sync & GitHub Activity Matrix -->
-        <div class="mix-dashboard-grid">
-          <!-- LinkedIn Hero Sync Card -->
-          <div class="linkedin-hero-card">
-            <div class="linkedin-hero-left">
-              <div class="linkedin-icon-box">
-                <i class="fab fa-linkedin-in"></i>
-              </div>
-              <div class="linkedin-hero-content">
-                <h3>
-                  LinkedIn Profile Auto-Sync & Extraction
-                  <span class="linkedin-badge-sync"><i class="fas fa-bolt"></i> 1-Click Sync</span>
-                </h3>
-                <p>
-                  Connect your LinkedIn or paste your profile URL/text to automatically extract headline, bio, experience, education & skills into PlaceAI.
-                </p>
-              </div>
-            </div>
-            <div class="linkedin-hero-actions">
-              <button class="btn-linkedin-sync" onclick="openLinkedInSyncModal()">
-                <i class="fab fa-linkedin"></i> Connect & Auto-Extract
-              </button>
-            </div>
-          </div>
-
-          <!-- GitHub Activity Contribution Heatmap Card -->
+        <!-- Real GitHub Contribution Activity Card & Integration -->
+        <div class="github-dashboard-container">
           <div class="github-heatmap-card">
-            <div class="heatmap-header">
+            <!-- Header: Octocat, Title, Real Stats & Live Connect Pill -->
+            <div class="github-card-topbar">
               <div class="heatmap-header-title">
-                <i class="fab fa-github"></i>
+                <div class="github-brand-icon">
+                  <i class="fab fa-github"></i>
+                </div>
                 <div>
-                  <h3 style="display: flex; align-items: center; gap: 8px;">
+                  <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0;">
                     GitHub Contribution Activity
-                    <span style="font-size: 11px; padding: 2px 8px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.35); font-weight: 600;">
+                    <span class="github-verified-badge">
                       <i class="fas fa-check-circle" style="font-size: 10px;"></i> Real Activity Data
                     </span>
                   </h3>
+                  <p style="font-size: 12.5px; color: #94a3b8; margin: 2px 0 0 0;">
+                    Real 52-week contribution matrix synced with PlaceAI placement milestones.
+                  </p>
                 </div>
               </div>
-              <div class="heatmap-stats-group">
-                <div class="heatmap-stat-item">
-                  <i class="fas fa-calendar-check" style="color: #38bdf8;"></i>
-                  Total: <strong id="heatmapTotalCount">0</strong>
+
+              <!-- GitHub Account Connection State -->
+              <div id="githubConnectionBox" class="github-connection-pill">
+                <!-- If disconnected: Input to connect -->
+                <div id="githubDisconnectedView" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <div class="github-input-group">
+                    <span class="github-prefix"><i class="fab fa-github"></i> github.com/</span>
+                    <input type="text" id="githubUsernameInput" class="github-input" placeholder="username" autocomplete="off" />
+                  </div>
+                  <button type="button" id="btnConnectGitHub" class="btn-github-connect" onclick="connectGitHubAccount()">
+                    <i class="fas fa-plug"></i> Connect
+                  </button>
                 </div>
-                <div class="streak-badge">
-                  <i class="fas fa-fire"></i>
-                  <span id="heatmapCurrentStreak">0</span> Days Streak
+
+                <!-- If connected: Profile pill -->
+                <div id="githubConnectedView" style="display: none; align-items: center; gap: 10px;">
+                  <img id="githubUserAvatar" src="" alt="GitHub" class="github-user-avatar" />
+                  <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <a id="githubProfileLink" href="#" target="_blank" rel="noopener noreferrer" class="github-username-link">
+                        @<span id="githubUsernameDisplay"></span> <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                      </a>
+                      <span id="githubReposPill" class="github-meta-pill"><i class="fas fa-book-bookmark"></i> <span id="githubRepoCount">0</span> repos</span>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-github-disconnect" onclick="disconnectGitHubAccount()" title="Disconnect GitHub">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
-                <div class="heatmap-stat-item">
-                  <i class="fas fa-bolt" style="color: #eab308;"></i>
-                  Best: <strong id="heatmapLongestStreak">0</strong>d
-                </div>
+              </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="heatmap-stats-group" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(51, 65, 85, 0.5);">
+              <div class="heatmap-stat-item">
+                <i class="fas fa-calendar-check" style="color: #38bdf8;"></i>
+                Contributions: <strong id="heatmapTotalCount">0</strong>
+              </div>
+              <div class="streak-badge">
+                <i class="fas fa-fire"></i>
+                <span id="heatmapCurrentStreak">0</span> Days Streak
+              </div>
+              <div class="heatmap-stat-item">
+                <i class="fas fa-bolt" style="color: #eab308;"></i>
+                Best Streak: <strong id="heatmapLongestStreak">0</strong>d
+              </div>
+              <div id="githubSyncStatus" style="font-size: 11.5px; color: #94a3b8; margin-left: auto; display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-circle-notch fa-spin" id="githubSyncSpinner" style="display: none; color: #38bdf8;"></i>
+                <span id="githubSyncText">Ready</span>
               </div>
             </div>
 
@@ -2134,16 +2162,16 @@
                   <i class="fas fa-bolt" style="color: #38bdf8;"></i> Real Profile Actions:
                 </span>
                 <button class="quick-boost-btn" onclick="document.querySelector('[data-section=skills]').click(); const el = document.getElementById('skillInput'); if (el) el.focus();">
-                  <i class="fas fa-plus"></i> Add Skill
+                  <i class="fas fa-plus"></i> Add Skill (+1 pt)
                 </button>
                 <button class="quick-boost-btn" onclick="document.querySelector('[data-section=projects]').click(); addProject();">
-                  <i class="fas fa-plus"></i> Add Project
+                  <i class="fas fa-plus"></i> Add Project (+3 pts)
                 </button>
                 <button class="quick-boost-btn" onclick="document.querySelector('[data-section=experience]').click(); addExperience();">
-                  <i class="fas fa-plus"></i> Add Experience
+                  <i class="fas fa-plus"></i> Add Experience (+3 pts)
                 </button>
                 <button class="quick-boost-btn" onclick="handleResumeAction()">
-                  <i class="fas fa-upload"></i> Upload Resume
+                  <i class="fas fa-upload"></i> Upload Resume (+5 pts)
                 </button>
               </div>
 
@@ -2538,7 +2566,7 @@
   <script src="backend/auth-service.js"></script>
   <script src="backend/db-service.js"></script>
   <script src="backend/activity-tracker.js"></script>
-  <script src="backend/linkedin-service.js"></script>
+  <script src="backend/github-service.js"></script>
 
   <script>
     let currentUser = null;
@@ -2702,284 +2730,207 @@
     });
 
     // =========================================================
-    // LINKEDIN PROFILE SYNC & EXTRACTION LOGIC
+    // GITHUB PROFILE & CONTRIBUTION MATRIX INTEGRATION
     // =========================================================
-    let extractedLinkedInData = null;
+    let activeGitHubUser = null;
 
-    function openLinkedInSyncModal() {
-      let curHandle = '';
-      if (userProfile && userProfile.linkedin_url) {
-        curHandle = window.LinkedInService ? window.LinkedInService.extractHandle(userProfile.linkedin_url) : userProfile.linkedin_url;
-      }
-      const modalContent = `
-        <div style="text-align: left;">
-          <p style="color: #94a3b8; font-size: 13.5px; margin-bottom: 16px; line-height: 1.5;">
-            Sync candidate information from LinkedIn to automatically update your PlaceAI profile, headline, work experience, education, and skills.
-          </p>
+    function updateGitHubUI(profileData, isConnected) {
+      const disconnectedView = document.getElementById('githubDisconnectedView');
+      const connectedView = document.getElementById('githubConnectedView');
+      const usernameInput = document.getElementById('githubUsernameInput');
 
-          <div class="sync-tab-container">
-            <button class="sync-tab-btn active" id="tabUrlBtn" onclick="switchLinkedInTab('url')">
-              <i class="fab fa-linkedin"></i> LinkedIn Handle / URL
-            </button>
-            <button class="sync-tab-btn" id="tabTextBtn" onclick="switchLinkedInTab('text')">
-              <i class="fas fa-file-alt"></i> Smart Paste / Text
-            </button>
-            <button class="sync-tab-btn" id="tabOauthBtn" onclick="switchLinkedInTab('oauth')">
-              <i class="fab fa-linkedin-in"></i> LinkedIn Connect
-            </button>
-          </div>
+      if (isConnected && profileData) {
+        if (disconnectedView) disconnectedView.style.display = 'none';
+        if (connectedView) connectedView.style.display = 'flex';
 
-          <!-- Tab 1: Profile URL / Handle with built-in linkedin.com/in/ -->
-          <div id="syncTabUrl">
-            <div class="form-group">
-              <label class="form-label" style="font-weight: 600;">LinkedIn Profile Handle</label>
-              <div style="display: flex; gap: 8px; align-items: stretch;">
-                <div style="background: rgba(10, 102, 194, 0.16); border: 1.5px solid rgba(10, 102, 194, 0.45); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 8px; white-space: nowrap; user-select: none;">
-                  <i class="fab fa-linkedin" style="color: #0a66c2; font-size: 17px;"></i> linkedin.com/in/
-                </div>
-                <input type="text" class="form-input" id="linkedinUrlInput" 
-                  value="${curHandle}" 
-                  placeholder="username (e.g. parth-developer)" style="flex: 1;" />
-                <button type="button" class="btn-primary" onclick="extractFromUrl()" style="white-space: nowrap;">
-                  <i class="fas fa-magic"></i> Extract
-                </button>
-              </div>
-              <span style="font-size: 12px; color: #64748b; margin-top: 6px; display: block;">
-                Built-in prefix: <strong>linkedin.com/in/</strong> is predefined. Just enter your username or paste your link.
-              </span>
-            </div>
-          </div>
+        const avatarEl = document.getElementById('githubUserAvatar');
+        const usernameEl = document.getElementById('githubUsernameDisplay');
+        const reposEl = document.getElementById('githubRepoCount');
+        const linkEl = document.getElementById('githubProfileLink');
 
-          <!-- Tab 2: Smart Paste / PDF Text -->
-          <div id="syncTabText" style="display: none;">
-            <div class="form-group">
-              <label class="form-label">Paste LinkedIn Profile / Resume Text</label>
-              <textarea class="form-textarea" id="linkedinTextInput" rows="5" 
-                placeholder="Copy and paste text from your LinkedIn profile (About, Experience, Skills, Education)..."></textarea>
-              <button type="button" class="btn-primary" onclick="extractFromText()" style="margin-top: 8px; width: 100%; justify-content: center;">
-                <i class="fas fa-brain"></i> Parse & Extract Profile Details
-              </button>
-            </div>
-          </div>
-
-          <!-- Tab 3: OAuth Connect & Instant Verification -->
-          <div id="syncTabOauth" style="display: none; padding: 12px 6px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <i class="fab fa-linkedin" style="font-size: 44px; color: #0a66c2; margin-bottom: 10px;"></i>
-              <h4 style="color: #f1f5f9; margin-bottom: 6px; font-size: 16px;">Connect & Verify LinkedIn Account</h4>
-              <p style="color: #94a3b8; font-size: 13px; margin: 0 auto; max-width: 440px; line-height: 1.5;">
-                Link your official LinkedIn profile to PlaceAI to get a verified credential badge and auto-sync your career milestones.
-              </p>
-            </div>
-
-            <!-- Instant 1-Click Verification Form -->
-            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(10, 102, 194, 0.4); border-radius: 10px; padding: 18px; margin-bottom: 16px;">
-              <label class="form-label" style="font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
-                <i class="fas fa-link" style="color: #38bdf8;"></i> Verify & Link Profile Directly
-              </label>
-              <div style="display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px;">
-                <div style="background: rgba(10, 102, 194, 0.16); border: 1.5px solid rgba(10, 102, 194, 0.45); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 8px; white-space: nowrap; user-select: none;">
-                  <i class="fab fa-linkedin" style="color: #0a66c2; font-size: 17px;"></i> linkedin.com/in/
-                </div>
-                <input type="text" class="form-input" id="oauthDirectHandleInput" 
-                  value="${curHandle}" 
-                  placeholder="your-username" style="flex: 1;" />
-              </div>
-              <button type="button" class="btn-primary" onclick="directLinkLinkedInAccount()" style="width: 100%; justify-content: center; padding: 11px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); font-weight: 600; font-size: 13.5px;">
-                <i class="fas fa-check-circle"></i> Connect & Verify Account (+10 Points)
-              </button>
-            </div>
-
-            <div style="text-align: center;">
-              <span style="font-size: 12px; color: #64748b; display: block; margin-bottom: 10px;">— OR USE SINGLE SIGN-ON —</span>
-              <button type="button" class="btn-secondary" onclick="connectLinkedIn()" style="font-size: 13px; padding: 8px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fab fa-linkedin"></i> Sign in via LinkedIn OAuth
-              </button>
-            </div>
-            <div id="oauthStatusMsg" style="display: none; margin-top: 12px; font-size: 12.5px; color: #38bdf8; text-align: center; line-height: 1.4;"></div>
-          </div>
-
-          <!-- Extraction Preview Section -->
-          <div id="linkedinPreviewArea" style="display: none;" class="extracted-preview-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="color: #38bdf8; font-size: 14px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px;">
-                <i class="fas fa-check-circle" style="color: #34d399;"></i> Extracted Profile Data
-              </h4>
-              <span class="linkedin-badge-sync"><i class="fas fa-sparkles"></i> Ready to Apply</span>
-            </div>
-
-            <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-              <div style="margin-bottom: 6px;"><strong>Name:</strong> <span id="prevName"></span></div>
-              <div style="margin-bottom: 6px;"><strong>Headline:</strong> <span id="prevHeadline" style="color: #94a3b8;"></span></div>
-              <div style="margin-bottom: 6px;"><strong>Bio / Summary:</strong> <span id="prevBio" style="color: #94a3b8;"></span></div>
-              <div style="margin-bottom: 6px;"><strong>Work Experience:</strong> <span id="prevExpCount" style="color: #38bdf8;"></span></div>
-              <div style="margin-bottom: 6px;"><strong>Education:</strong> <span id="prevEduCount" style="color: #38bdf8;"></span></div>
-              <div style="margin-bottom: 6px;">
-                <strong>Detected Skills:</strong>
-                <div id="prevSkills" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;"></div>
-              </div>
-            </div>
-
-            <button type="button" class="btn-primary" onclick="applyLinkedInToProfile()" style="width: 100%; margin-top: 14px; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #0a66c2 0%, #2563eb 100%);">
-              <i class="fas fa-cloud-upload-alt"></i> Apply to PlaceAI Profile (+10 Activity Points)
-            </button>
-          </div>
-        </div>
-      `;
-
-      openModal('LinkedIn Profile Integration & Extraction', modalContent, null);
-
-      const saveBtn = document.getElementById('saveBtn');
-      if (saveBtn) saveBtn.style.display = 'none';
-
-      setTimeout(() => {
-        const uInput = document.getElementById('linkedinUrlInput');
-        if (uInput) {
-          uInput.focus();
-          uInput.addEventListener('input', (e) => {
-            let val = e.target.value.trim();
-            if (val.includes('linkedin.com') || val.includes('http')) {
-              val = window.LinkedInService ? window.LinkedInService.extractHandle(val) : val;
-              e.target.value = val;
-            }
-          });
+        if (avatarEl) avatarEl.src = profileData.avatar_url || `https://avatars.githubusercontent.com/${profileData.username}`;
+        if (usernameEl) usernameEl.textContent = profileData.username;
+        if (reposEl) reposEl.textContent = profileData.public_repos !== undefined ? profileData.public_repos : '0';
+        if (linkEl) {
+          linkEl.href = profileData.html_url || `https://github.com/${profileData.username}`;
         }
-      }, 100);
+      } else {
+        if (disconnectedView) disconnectedView.style.display = 'flex';
+        if (connectedView) connectedView.style.display = 'none';
+        if (usernameInput) usernameInput.value = '';
+      }
     }
 
-    function switchLinkedInTab(tab) {
-      const uEl = document.getElementById('syncTabUrl');
-      const tEl = document.getElementById('syncTabText');
-      const oEl = document.getElementById('syncTabOauth');
-      if (uEl) uEl.style.display = tab === 'url' ? 'block' : 'none';
-      if (tEl) tEl.style.display = tab === 'text' ? 'block' : 'none';
-      if (oEl) oEl.style.display = tab === 'oauth' ? 'block' : 'none';
+    async function connectGitHubAccount() {
+      const input = document.getElementById('githubUsernameInput');
+      const btn = document.getElementById('btnConnectGitHub');
+      const syncStatus = document.getElementById('githubSyncText');
+      const syncSpinner = document.getElementById('githubSyncSpinner');
 
-      const uBtn = document.getElementById('tabUrlBtn');
-      const tBtn = document.getElementById('tabTextBtn');
-      const oBtn = document.getElementById('tabOauthBtn');
-      if (uBtn) uBtn.classList.toggle('active', tab === 'url');
-      if (tBtn) tBtn.classList.toggle('active', tab === 'text');
-      if (oBtn) oBtn.classList.toggle('active', tab === 'oauth');
-    }
-
-    async function extractFromUrl() {
-      const urlInput = document.getElementById('linkedinUrlInput');
-      let val = urlInput ? urlInput.value.trim() : '';
-      if (!val) {
-        showToast('Please enter your LinkedIn profile handle', 'error');
+      const rawVal = input ? input.value.trim() : '';
+      if (!rawVal) {
+        showToast('Please enter your GitHub username', 'error');
+        if (input) input.focus();
         return;
       }
 
-      const handle = window.LinkedInService ? window.LinkedInService.extractHandle(val) : val;
-      showToast('Fetching real candidate details from LinkedIn...', 'info');
-
-      try {
-        extractedLinkedInData = await window.LinkedInService.fetchRealProfile(handle, userProfile || {});
-        showExtractionPreview(extractedLinkedInData);
-        showToast('Real profile details extracted successfully!', 'success');
-      } catch (err) {
-        console.warn('Real fetch fallback:', err);
-        extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(handle, userProfile || {});
-        showExtractionPreview(extractedLinkedInData);
-      }
-    }
-
-    async function directLinkLinkedInAccount() {
-      const input = document.getElementById('oauthDirectHandleInput');
-      let val = input ? input.value.trim() : '';
-      if (!val) {
-        showToast('Please enter your LinkedIn username handle', 'error');
+      if (!window.GitHubService) {
+        showToast('GitHub Service is not loaded', 'error');
         return;
       }
 
-      showToast('Linking and verifying LinkedIn profile...', 'info');
-      try {
-        const res = await window.LinkedInService.directLinkAccount(currentUser.id, val);
-        if (res.success) {
-          showToast('🎉 LinkedIn account successfully verified & linked! +10 Points awarded.', 'success');
-          closeModal();
-          await loadUserProfile();
-        } else {
-          showToast('Failed to link LinkedIn: ' + res.error, 'error');
-        }
-      } catch (err) {
-        showToast('Error linking LinkedIn: ' + err.message, 'error');
-      }
-    }
-
-    async function connectLinkedIn() {
-      showToast('Connecting to LinkedIn OAuth...', 'info');
-      const statusEl = document.getElementById('oauthStatusMsg');
-      const res = await window.LinkedInService.connectLinkedInOAuth();
-      if (!res.success) {
-        if (statusEl) {
-          statusEl.innerHTML = `<span style="color: #f59e0b;"><i class="fas fa-exclamation-triangle"></i> ${res.error}</span>`;
-          statusEl.style.display = 'block';
-        }
-        showToast(res.error, 'info');
-      }
-    }
-
-    function showExtractionPreview(data) {
-      if (!data) return;
-      const previewArea = document.getElementById('linkedinPreviewArea');
-      if (!previewArea) return;
-      previewArea.style.display = 'block';
-
-      const prevName = document.getElementById('prevName');
-      const prevHead = document.getElementById('prevHeadline');
-      const prevBio = document.getElementById('prevBio');
-      const prevExp = document.getElementById('prevExpCount');
-      const prevEdu = document.getElementById('prevEduCount');
-      const prevSkills = document.getElementById('prevSkills');
-
-      if (prevName) prevName.textContent = `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'Candidate';
-      if (prevHead) prevHead.textContent = data.current_designation || 'Software Developer';
-      if (prevBio) prevBio.textContent = (data.bio && data.bio.length > 140) ? (data.bio.slice(0, 140) + '...') : (data.bio || 'Profile summary');
-
-      const expCount = (data.experience || []).length;
-      if (prevExp) prevExp.textContent = expCount > 0 ? `${expCount} role(s) ready to sync` : 'Will preserve existing';
-
-      const eduCount = (data.education || []).length;
-      if (prevEdu) prevEdu.textContent = eduCount > 0 ? `${eduCount} qualification(s) ready to sync` : 'Will preserve existing';
-
-      if (prevSkills) {
-        if (data.skills && data.skills.length > 0) {
-          prevSkills.innerHTML = data.skills.slice(0, 10).map(s =>
-            `<span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 12px; font-size: 11px;">${s}</span>`
-          ).join('') + (data.skills.length > 10 ? `<span style="font-size: 11px; color: #94a3b8;">+${data.skills.length - 10} more</span>` : '');
-        } else {
-          prevSkills.innerHTML = '<span style="font-size: 12px; color: #94a3b8;">No new skills detected</span>';
-        }
-      }
-    }
-
-    async function applyLinkedInToProfile() {
-      if (!extractedLinkedInData) {
-        showToast('No extracted LinkedIn data to apply', 'error');
+      const username = window.GitHubService.extractUsername(rawVal);
+      if (!username) {
+        showToast('Please enter a valid GitHub username', 'error');
         return;
       }
 
-      showToast('Applying LinkedIn details to PlaceAI profile...', 'info');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Connecting...';
+      }
+      if (syncSpinner) syncSpinner.style.display = 'inline-block';
+      if (syncStatus) syncStatus.textContent = `Connecting @${username}...`;
+
       try {
-        const result = await window.LinkedInService.syncToUserProfile(currentUser.id, extractedLinkedInData);
-        if (result.success) {
-          showToast('🎉 PlaceAI profile successfully updated from LinkedIn! +10 Points awarded.', 'success');
-          closeModal();
-
-          const saveBtn = document.getElementById('saveBtn');
-          if (saveBtn) saveBtn.style.display = 'block';
-
-          await loadUserProfile();
-        } else {
-          showToast('Failed to apply LinkedIn profile: ' + result.error, 'error');
+        // 1. Fetch real public profile from GitHub API
+        const profileRes = await window.GitHubService.fetchProfile(username);
+        if (!profileRes.success) {
+          showToast(profileRes.error || `GitHub user "@${username}" not found`, 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plug"></i> Connect';
+          }
+          if (syncSpinner) syncSpinner.style.display = 'none';
+          if (syncStatus) syncStatus.textContent = 'Connection failed';
+          return;
         }
+
+        const ghProfile = profileRes.data;
+
+        // 2. Save github_url to Supabase user_profiles
+        if (currentUser && currentUser.id) {
+          await window.GitHubService.linkToUserProfile(currentUser.id, username);
+          if (userProfile) userProfile.github_url = `https://github.com/${username}`;
+        }
+
+        // 3. Fetch real 52-week contribution matrix
+        if (syncStatus) syncStatus.textContent = 'Syncing real contribution calendar...';
+        const contribRes = await window.GitHubService.fetchContributions(username);
+        if (contribRes.success && Array.isArray(contribRes.contributions)) {
+          if (window.ActivityTracker) {
+            window.ActivityTracker.mergeGitHubContributions(contribRes.contributions);
+          }
+        }
+
+        // 4. Update UI
+        activeGitHubUser = ghProfile;
+        updateGitHubUI(ghProfile, true);
+        renderHeatmap();
+
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = `Synced: @${username}`;
+        showToast(`🎉 GitHub account @${username} linked! Real contribution data synced.`, 'success');
       } catch (err) {
-        console.error('applyLinkedInToProfile error:', err);
-        showToast('Error syncing LinkedIn profile: ' + err.message, 'error');
+        console.error('Error connecting GitHub:', err);
+        showToast('Error connecting GitHub: ' + err.message, 'error');
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = 'Error syncing';
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-plug"></i> Connect';
+        }
       }
     }
+
+    async function disconnectGitHubAccount() {
+      if (!confirm('Are you sure you want to disconnect your GitHub account?')) return;
+
+      const syncStatus = document.getElementById('githubSyncText');
+      const syncSpinner = document.getElementById('githubSyncSpinner');
+      if (syncSpinner) syncSpinner.style.display = 'inline-block';
+      if (syncStatus) syncStatus.textContent = 'Disconnecting...';
+
+      try {
+        if (currentUser && currentUser.id && window.GitHubService) {
+          await window.GitHubService.unlinkFromUserProfile(currentUser.id);
+        }
+        if (userProfile) userProfile.github_url = null;
+        activeGitHubUser = null;
+
+        // Re-sync authentic PlaceAI profile actions
+        if (window.ActivityTracker) {
+          window.ActivityTracker.clearLegacyFakeData();
+          window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
+        }
+
+        updateGitHubUI(null, false);
+        renderHeatmap();
+
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = 'Disconnected';
+        showToast('GitHub account disconnected.', 'info');
+      } catch (err) {
+        console.error('Error disconnecting GitHub:', err);
+        showToast('Error disconnecting GitHub: ' + err.message, 'error');
+        if (syncSpinner) syncSpinner.style.display = 'none';
+      }
+    }
+
+    async function loadGitHubContributions(githubUrlOrUsername) {
+      if (!githubUrlOrUsername || !window.GitHubService) return;
+      const username = window.GitHubService.extractUsername(githubUrlOrUsername);
+      if (!username) return;
+
+      const syncStatus = document.getElementById('githubSyncText');
+      const syncSpinner = document.getElementById('githubSyncSpinner');
+      if (syncSpinner) syncSpinner.style.display = 'inline-block';
+      if (syncStatus) syncStatus.textContent = `Syncing @${username}...`;
+
+      try {
+        // Fetch profile
+        const profileRes = await window.GitHubService.fetchProfile(username);
+        const ghProfile = profileRes.success ? profileRes.data : {
+          username: username,
+          public_repos: 0,
+          avatar_url: `https://avatars.githubusercontent.com/${username}`,
+          html_url: `https://github.com/${username}`
+        };
+
+        // Fetch real contributions
+        const contribRes = await window.GitHubService.fetchContributions(username);
+        if (contribRes.success && Array.isArray(contribRes.contributions)) {
+          if (window.ActivityTracker) {
+            window.ActivityTracker.mergeGitHubContributions(contribRes.contributions);
+          }
+        }
+
+        activeGitHubUser = ghProfile;
+        updateGitHubUI(ghProfile, true);
+        renderHeatmap();
+
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = `Synced: @${username}`;
+      } catch (err) {
+        console.warn('loadGitHubContributions error:', err);
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = 'GitHub synced (cached)';
+      }
+    }
+
+    // Attach Enter key listener to GitHub username input
+    document.addEventListener('DOMContentLoaded', () => {
+      const ghInput = document.getElementById('githubUsernameInput');
+      if (ghInput) {
+        ghInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            connectGitHubAccount();
+          }
+        });
+      }
+    });
 
     // Check for email confirmation or OAuth callback in URL
     async function checkEmailConfirmation() {
@@ -3237,8 +3188,15 @@
         if (window.ActivityTracker && typeof window.ActivityTracker.syncFromRealProfile === 'function') {
           window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
         }
-        if (typeof renderHeatmap === 'function') {
-          renderHeatmap();
+
+        // If GitHub URL is connected, load authentic GitHub contributions & display profile badge
+        if (userProfile && userProfile.github_url) {
+          loadGitHubContributions(userProfile.github_url);
+        } else {
+          updateGitHubUI(null, false);
+          if (typeof renderHeatmap === 'function') {
+            renderHeatmap();
+          }
         }
 
       } catch (error) {

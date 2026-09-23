@@ -147,8 +147,8 @@
         if (profile.resume_url) {
           basePoints += 5; // Real uploaded resume
         }
-        if (profile.linkedin_url) {
-          basePoints += 4; // Real connected LinkedIn
+        if (profile.github_url) {
+          basePoints += 5; // Real connected GitHub profile
         }
       }
 
@@ -162,6 +162,26 @@
       // Dispatch event to update the heatmap
       window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
         detail: { date: today, count: map[today] || 0 }
+      }));
+    }
+
+    /**
+     * Merge real GitHub contribution calendar data
+     * @param {Array} contributions - Array of { date: 'YYYY-MM-DD', count: number }
+     */
+    mergeGitHubContributions(contributions) {
+      if (!Array.isArray(contributions) || contributions.length === 0) return;
+      const map = this.getStoredMap();
+
+      contributions.forEach(item => {
+        if (item.date && typeof item.count === 'number' && item.count > 0) {
+          map[item.date] = Math.max(map[item.date] || 0, item.count);
+        }
+      });
+
+      this.saveStoredMap(map);
+      window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
+        detail: { count: map[this.getTodayKey()] || 0 }
       }));
     }
 
