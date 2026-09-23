@@ -104,6 +104,28 @@
     }
 
     /**
+     * Fetch user's public repositories with stars and language details
+     */
+    async fetchUserRepos(username) {
+      const u = this.extractUsername(username);
+      if (!u) return [];
+      try {
+        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/repos?sort=updated&per_page=30`, {
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'PlaceAI-Platform'
+          }
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn('Repos fetch warning:', e.message);
+      }
+      return [];
+    }
+
+    /**
      * Extract comprehensive, accurate profile data from GitHub user endpoint,
      * repository list, and profile README (skills, bio, education/study, projects, socials)
      * @param {string} username
@@ -122,20 +144,7 @@
       const readmeText = await this.fetchProfileReadme(u);
 
       // 3. Fetch public repositories
-      let repos = [];
-      try {
-        const reposRes = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/repos?sort=updated&per_page=30`, {
-          headers: {
-            'Accept': 'application/vnd.github.v3+json',
-            'User-Agent': 'PlaceAI-Platform'
-          }
-        });
-        if (reposRes.ok) {
-          repos = await reposRes.json();
-        }
-      } catch (e) {
-        console.warn('Repos fetch warning:', e.message);
-      }
+      const repos = await this.fetchUserRepos(u);
 
       const combinedText = `${user.name || ''} ${user.bio || ''} ${user.company || ''} ${user.location || ''} ${readmeText}`;
 
@@ -389,7 +398,8 @@
           preferred_roles: preferredRoles,
           preferred_locations: city ? `${city}, Remote` : 'Remote',
           public_repos: user.public_repos,
-          followers: user.followers
+          followers: user.followers,
+          raw_repos: repos
         }
       };
     }

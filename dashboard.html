@@ -1898,6 +1898,144 @@
       white-space: nowrap;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
+
+    /* GitHub Languages Breakdown Bar */
+    .github-languages-container {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(48, 54, 61, 0.7);
+    }
+
+    .github-languages-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .github-languages-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .github-lang-bar {
+      display: flex;
+      height: 9px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #21262d;
+      gap: 2px;
+      margin-bottom: 10px;
+    }
+
+    .github-lang-segment {
+      height: 100%;
+      transition: width 0.4s ease;
+      border-radius: 2px;
+    }
+
+    .github-lang-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .github-lang-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .github-lang-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Top Repositories Showcase */
+    .github-repos-showcase {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(48, 54, 61, 0.7);
+    }
+
+    .github-repos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .github-repo-mini-card {
+      background: rgba(13, 17, 23, 0.9);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 12px 14px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .github-repo-mini-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .github-repo-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #58a6ff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      word-break: break-word;
+    }
+
+    .github-repo-name:hover {
+      text-decoration: underline;
+    }
+
+    .github-repo-desc {
+      font-size: 11.5px;
+      color: #8b949e;
+      margin: 6px 0 10px 0;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .github-repo-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #8b949e;
+    }
+
+    .github-stat-pill {
+      font-size: 11px;
+      padding: 2px 7px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      border: 1px solid #30363d;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -2251,6 +2389,31 @@
                 <div class="legend-box lvl-4"></div>
                 <span>More</span>
               </div>
+            </div>
+
+            <!-- GitHub Languages Breakdown -->
+            <div id="githubLanguagesContainer" class="github-languages-container" style="display: none;">
+              <div class="github-languages-header">
+                <span class="github-languages-title">
+                  <i class="fas fa-code" style="color: #38bdf8;"></i> Code Languages Breakdown
+                </span>
+                <span id="githubTopLangBadge" class="github-stat-pill"></span>
+              </div>
+              <div id="githubLangBar" class="github-lang-bar"></div>
+              <div id="githubLangPills" class="github-lang-pills"></div>
+            </div>
+
+            <!-- Top Public Repositories Showcase -->
+            <div id="githubReposShowcase" class="github-repos-showcase" style="display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="github-languages-title">
+                  <i class="fas fa-book-bookmark" style="color: #eab308;"></i> Top Public Repositories
+                </span>
+                <a id="githubAllReposLink" href="#" target="_blank" rel="noopener noreferrer" style="font-size: 11.5px; color: #58a6ff; text-decoration: none;">
+                  View all on GitHub <i class="fas fa-arrow-right" style="font-size: 9px;"></i>
+                </a>
+              </div>
+              <div id="githubReposGrid" class="github-repos-grid"></div>
             </div>
           </div>
         </div>
@@ -2845,6 +3008,143 @@
     // =========================================================
     let activeGitHubUser = null;
 
+    const GITHUB_LANG_COLORS = {
+      'JavaScript': '#f1e05a',
+      'Python': '#3572A5',
+      'HTML': '#e34c26',
+      'CSS': '#563d7c',
+      'TypeScript': '#3178c6',
+      'Java': '#b07219',
+      'C': '#555555',
+      'C++': '#f34b7d',
+      'C#': '#178600',
+      'PHP': '#4F5D95',
+      'Jupyter Notebook': '#DA5B0B',
+      'Shell': '#89e051',
+      'Vue': '#41b883',
+      'React': '#61dafb',
+      'Dart': '#00B4AB',
+      'Go': '#00ADD8',
+      'Rust': '#dea584',
+      'Kotlin': '#A97BFF',
+      'Ruby': '#701516',
+      'Swift': '#F05138'
+    };
+
+    function renderGitHubIntelligence(repos, username) {
+      const langContainer = document.getElementById('githubLanguagesContainer');
+      const langBar = document.getElementById('githubLangBar');
+      const langPills = document.getElementById('githubLangPills');
+      const topLangBadge = document.getElementById('githubTopLangBadge');
+
+      const reposContainer = document.getElementById('githubReposShowcase');
+      const reposGrid = document.getElementById('githubReposGrid');
+      const allReposLink = document.getElementById('githubAllReposLink');
+
+      if (!repos || !Array.isArray(repos) || repos.length === 0) {
+        if (langContainer) langContainer.style.display = 'none';
+        if (reposContainer) reposContainer.style.display = 'none';
+        return;
+      }
+
+      // --- 1. Language Breakdown Calculation ---
+      const langCounts = {};
+      let totalLangRepos = 0;
+
+      repos.forEach(r => {
+        if (r && r.language) {
+          langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+          totalLangRepos++;
+        }
+      });
+
+      if (totalLangRepos > 0 && langContainer && langBar && langPills) {
+        const sortedLangs = Object.entries(langCounts)
+          .sort((a, b) => b[1] - a[1]);
+
+        let barHtml = '';
+        let pillsHtml = '';
+
+        sortedLangs.forEach(([lang, count], index) => {
+          const pct = Math.round((count / totalLangRepos) * 100);
+          const color = GITHUB_LANG_COLORS[lang] || '#38bdf8';
+
+          barHtml += `<div class="github-lang-segment" style="width: ${pct}%; background-color: ${color};" title="${lang}: ${pct}% (${count} repos)"></div>`;
+          pillsHtml += `
+            <div class="github-lang-pill">
+              <span class="github-lang-dot" style="background-color: ${color};"></span>
+              <span style="font-weight: 600; color: #f1f5f9;">${lang}</span>
+              <span style="color: #64748b;">${pct}%</span>
+            </div>
+          `;
+
+          if (index === 0 && topLangBadge) {
+            topLangBadge.innerHTML = `<i class="fas fa-fire" style="color: #f59e0b;"></i> Primary Stack: <strong style="color: #fff; margin-left: 3px;">${lang}</strong> (${pct}%)`;
+          }
+        });
+
+        langBar.innerHTML = barHtml;
+        langPills.innerHTML = pillsHtml;
+        langContainer.style.display = 'block';
+      } else if (langContainer) {
+        langContainer.style.display = 'none';
+      }
+
+      // --- 2. Top Repositories Showcase ---
+      if (reposContainer && reposGrid) {
+        if (allReposLink && username) {
+          allReposLink.href = `https://github.com/${encodeURIComponent(username)}?tab=repositories`;
+        }
+
+        // Sort repos: non-forks first, then by stars desc, then recent update desc
+        const sortedRepos = [...repos].sort((a, b) => {
+          if (a.fork !== b.fork) return a.fork ? 1 : -1;
+          if ((b.stargazers_count || 0) !== (a.stargazers_count || 0)) {
+            return (b.stargazers_count || 0) - (a.stargazers_count || 0);
+          }
+          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+        }).slice(0, 4);
+
+        if (sortedRepos.length > 0) {
+          let reposHtml = '';
+          sortedRepos.forEach(repo => {
+            const lang = repo.language || 'Code';
+            const langColor = GITHUB_LANG_COLORS[lang] || '#38bdf8';
+            const stars = repo.stargazers_count || 0;
+            const forks = repo.forks_count || 0;
+            const desc = repo.description || 'Authentic public repository on GitHub.';
+
+            reposHtml += `
+              <div class="github-repo-mini-card">
+                <div>
+                  <a class="github-repo-name" href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-book-bookmark" style="font-size: 11px; opacity: 0.8;"></i>
+                    <span>${repo.name}</span>
+                  </a>
+                  <div class="github-repo-desc">${desc}</div>
+                </div>
+                <div class="github-repo-footer">
+                  <span style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span class="github-lang-dot" style="background-color: ${langColor};"></span>
+                    <span>${lang}</span>
+                  </span>
+                  <div style="display: flex; gap: 8px;">
+                    ${stars > 0 ? `<span class="github-stat-pill"><i class="fas fa-star" style="color: #eab308;"></i> ${stars}</span>` : ''}
+                    ${forks > 0 ? `<span class="github-stat-pill"><i class="fas fa-code-branch"></i> ${forks}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          reposGrid.innerHTML = reposHtml;
+          reposContainer.style.display = 'block';
+        } else {
+          reposContainer.style.display = 'none';
+        }
+      }
+    }
+
     function updateGitHubUI(profileData, isConnected) {
       const disconnectedView = document.getElementById('githubDisconnectedView');
       const connectedView = document.getElementById('githubConnectedView');
@@ -2865,10 +3165,15 @@
         if (linkEl) {
           linkEl.href = profileData.html_url || `https://github.com/${profileData.username}`;
         }
+
+        if (profileData.raw_repos && Array.isArray(profileData.raw_repos)) {
+          renderGitHubIntelligence(profileData.raw_repos, profileData.username);
+        }
       } else {
         if (disconnectedView) disconnectedView.style.display = 'flex';
         if (connectedView) connectedView.style.display = 'none';
         if (usernameInput) usernameInput.value = '';
+        renderGitHubIntelligence([], null);
       }
     }
 
@@ -3057,6 +3362,13 @@
           html_url: `https://github.com/${username}`
         };
 
+        // Fetch user public repos for language breakdown & showcase
+        let repos = [];
+        if (window.GitHubService && typeof window.GitHubService.fetchUserRepos === 'function') {
+          repos = await window.GitHubService.fetchUserRepos(username);
+          ghProfile.raw_repos = repos;
+        }
+
         // Fetch real multi-year contributions
         const contribRes = await window.GitHubService.fetchContributions(username);
         if (contribRes.success && Array.isArray(contribRes.contributions)) {
@@ -3067,6 +3379,7 @@
 
         activeGitHubUser = ghProfile;
         updateGitHubUI(ghProfile, true);
+        renderGitHubIntelligence(repos, username);
         renderHeatmap();
 
         if (syncSpinner) syncSpinner.style.display = 'none';
@@ -3864,52 +4177,71 @@
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add profile summary');
       }
 
-      // Skills (10 points) - Any skill added
-      if (userProfile.skills && userProfile.skills.length > 0) {
-        score += 10;
+      // Skills (15 points)
+      if (userProfile.skills && userProfile.skills.length >= 5) {
+        score += 15;
+      } else if (userProfile.skills && userProfile.skills.length > 0) {
+        score += 8;
       } else {
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add skills');
       }
 
-      // Education (15 points) - Any education added
+      // Education (15 points)
       if (userProfile.education && userProfile.education.length > 0) {
         score += 15;
       } else {
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add education details');
       }
 
-      // Experience (15 points) - Any experience added
+      // Experience (10 points)
       if (userProfile.experience && userProfile.experience.length > 0) {
-        score += 15;
+        score += 10;
       } else {
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add work experience');
       }
 
-      // Projects (10 points) - Any project added
-      if (userProfile.projects && userProfile.projects.length > 0) {
-        score += 10;
+      // Projects (15 points)
+      if (userProfile.projects && userProfile.projects.length >= 2) {
+        score += 15;
+      } else if (userProfile.projects && userProfile.projects.length > 0) {
+        score += 8;
       } else {
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add projects');
       }
 
-      // Certifications (5 points) - Any certification added
+      // Certifications (5 points)
       if (userProfile.certifications && userProfile.certifications.length > 0) {
         score += 5;
       }
 
-      // Job preferences (10 points)
+      // Job preferences (5 points)
       if (userProfile.preferred_roles) {
-        score += 10;
+        score += 5;
       } else {
         pendingActions.push('<i class="fa fa-plus-circle"></i> Add job preferences');
       }
 
-      document.getElementById('scoreValue').textContent = score;
+      // GitHub Profile & Code Intelligence (10 points)
+      if (userProfile.github_url) {
+        score += 10;
+      } else {
+        pendingActions.push('<i class="fab fa-github"></i> Connect GitHub profile (+10 pts)');
+      }
+
+      // Professional Network (5 points)
+      if (userProfile.linkedin_url) {
+        score += 5;
+      } else {
+        pendingActions.push('<i class="fab fa-linkedin"></i> Add LinkedIn profile (+5 pts)');
+      }
+
+      const displayScore = Math.min(100, score);
+      document.getElementById('scoreValue').textContent = displayScore;
 
       // Update score circle gradient
       const circle = document.querySelector('.score-circle');
       if (circle) {
-        circle.style.background = `conic-gradient(#8b5cf6 0% ${score}%, #334155 ${score}% 100%)`;
+        circle.style.background = `conic-gradient(#8b5cf6 0% ${displayScore}%, #334155 ${displayScore}% 100%)`;
       }
 
       // Update pending actions
@@ -3919,7 +4251,7 @@
           `<div class="action-item">${action}</div>`
         ).join('');
       } else {
-        actionsContainer.innerHTML = '<div class="action-item" style="background: #dcfce7; border-color: #22c55e; color: #166534;"><i class="fa fa-check-circle"></i> Profile complete!</div>';
+        actionsContainer.innerHTML = '<div class="action-item" style="background: rgba(34, 197, 94, 0.15); border-color: #22c55e; color: #4ade80; font-weight: 600;"><i class="fa fa-star"></i> All-Star Candidate (Placement Ready)</div>';
       }
     }
 
