@@ -2160,6 +2160,118 @@
     .personal-grid-card:hover {
       border-color: #58a6ff;
     }
+
+    /* Spotlight Card */
+    .spotlight-card {
+      background: linear-gradient(135deg, rgba(13, 17, 23, 0.95), rgba(22, 27, 34, 0.95));
+      border: 1px solid rgba(88, 166, 255, 0.35);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+    }
+
+    /* Skill Filter Buttons */
+    .skill-filter-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .skill-filter-btn:hover {
+      border-color: #58a6ff;
+      color: #f0f6fc;
+    }
+
+    .skill-filter-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* Career Milestone Timeline Nodes */
+    .milestone-timeline {
+      position: relative;
+      padding-left: 24px;
+      margin-top: 14px;
+    }
+
+    .milestone-timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: #30363d;
+    }
+
+    .milestone-node {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .milestone-dot {
+      position: absolute;
+      left: -24px;
+      top: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #0d1117;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+    }
+
+    .milestone-dot.completed {
+      background: #38bdf8;
+      border-color: #38bdf8;
+    }
+
+    /* Competency Bar */
+    .competency-item {
+      margin-bottom: 10px;
+    }
+
+    .competency-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      margin-bottom: 4px;
+      color: #cbd5e1;
+    }
+
+    .competency-bar-track {
+      height: 6px;
+      background: #21262d;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .competency-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -2376,6 +2488,63 @@
             </div>
           </div>
         </div>
+
+        <!-- AI Competency Matrix Card -->
+        <div class="card" style="padding: 16px;">
+          <h3 style="font-size: 14.5px; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fas fa-brain" style="color: #38bdf8; margin-right: 6px;"></i> Competency Matrix</span>
+            <span class="github-stat-pill" style="color: #4ade80; border-color: rgba(34, 197, 94, 0.4);">Top 5%</span>
+          </h3>
+
+          <div class="competency-item">
+            <div class="competency-header">
+              <span>Full-Stack & Web Systems</span>
+              <strong style="color: #38bdf8;">92%</strong>
+            </div>
+            <div class="competency-bar-track">
+              <div class="competency-bar-fill" style="width: 92%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+            </div>
+          </div>
+
+          <div class="competency-item">
+            <div class="competency-header">
+              <span>Data Analytics & Python</span>
+              <strong style="color: #818cf8;">88%</strong>
+            </div>
+            <div class="competency-bar-track">
+              <div class="competency-bar-fill" style="width: 88%; background: linear-gradient(90deg, #6366f1, #818cf8);"></div>
+            </div>
+          </div>
+
+          <div class="competency-item">
+            <div class="competency-header">
+              <span>Database Architecture (SQL)</span>
+              <strong style="color: #c084fc;">85%</strong>
+            </div>
+            <div class="competency-bar-track">
+              <div class="competency-bar-fill" style="width: 85%; background: linear-gradient(90deg, #9333ea, #c084fc);"></div>
+            </div>
+          </div>
+
+          <div class="competency-item" style="margin-bottom: 14px;">
+            <div class="competency-header">
+              <span>Algorithms & Problem Solving</span>
+              <strong style="color: #34d399;">82%</strong>
+            </div>
+            <div class="competency-bar-track">
+              <div class="competency-bar-fill" style="width: 82%; background: linear-gradient(90deg, #059669, #34d399);"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px;">
+            <button type="button" class="repo-action-btn" onclick="copyCandidateShareLink()" style="flex: 1; justify-content: center; padding: 7px; background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; color: #38bdf8; font-weight: 600;">
+              <i class="fas fa-share-alt"></i> Share Link
+            </button>
+            <button type="button" class="repo-action-btn" onclick="openDossierModal()" style="flex: 1; justify-content: center; padding: 7px; background: rgba(168, 85, 247, 0.1); border-color: #a855f7; color: #c084fc; font-weight: 600;">
+              <i class="fas fa-file-export"></i> ATS Dossier
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Right Content Area -->
@@ -2560,15 +2729,73 @@
           <!-- Profile Summary Section -->
           <div class="card profile-section-panel" id="summary">
             <div class="section-header">
-              <h3 class="section-title"><i class="fas fa-id-badge" style="color: #38bdf8; margin-right: 6px;"></i> Profile Summary</h3>
+              <h3 class="section-title"><i class="fas fa-id-badge" style="color: #38bdf8; margin-right: 6px;"></i> Profile Summary & Highlights</h3>
               <button class="btn-edit-section" onclick="editSummary()">
-                <i class="fa fa-pen"></i> Edit
+                <i class="fa fa-pen"></i> Edit Bio
               </button>
             </div>
-            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1;">
-              Add a brief summary about your skills, experience, and career goals to help recruiters understand your
-              profile better.
+            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px;">
+              Data Science & Analytics enthusiast and Full-Stack Developer with comprehensive background in MCA (IMCC Pune) and BCA (University of Pune). Proven track record in building complex software platforms like DCPE ERP and digitized college workflows.
             </p>
+
+            <!-- Spotlight Showcase: DCPE ERP Platform -->
+            <div class="spotlight-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <div>
+                  <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; margin-bottom: 6px;">
+                    <i class="fas fa-star" style="color: #eab308;"></i> Featured Enterprise Project
+                  </span>
+                  <h4 style="font-size: 15px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">
+                    DCPE ERP Platform
+                  </h4>
+                  <p style="font-size: 12.5px; color: #94a3b8; margin: 4px 0 10px 0; line-height: 1.45;">
+                    A comprehensive college ERP platform designed to simplify and automate academic, administrative, and student life-cycle workflows.
+                  </p>
+                </div>
+                <a href="https://dcpe-erp.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding: 6px 14px; font-size: 12px; flex-shrink: 0; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white;">
+                  <i class="fas fa-external-link-alt"></i> Live Demo
+                </a>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; border-top: 1px solid rgba(48, 54, 61, 0.7); padding-top: 10px; margin-top: 6px;">
+                <span class="github-stat-pill"><span class="skill-dot" style="background: #61dafb;"></span> React</span>
+                <span class="github-stat-pill"><span class="skill-dot" style="background: #38bdf8;"></span> Web Architecture</span>
+                <span class="github-stat-pill"><span class="skill-dot" style="background: #4ade80;"></span> ERP Workflows</span>
+                <span class="github-stat-pill"><span class="skill-dot" style="background: #a855f7;"></span> Vercel Live</span>
+              </div>
+            </div>
+
+            <!-- Career & Academic Milestones -->
+            <div style="margin-top: 20px; border-top: 1px solid #30363d; padding-top: 16px;">
+              <h4 style="font-size: 13.5px; font-weight: 600; color: #cbd5e1; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-route" style="color: #38bdf8;"></i> Career & Education Milestones
+              </h4>
+              <div class="milestone-timeline">
+                <div class="milestone-node">
+                  <div class="milestone-dot completed"></div>
+                  <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
+                    Postgraduate - MCA (Master of Computer Applications)
+                    <span class="github-stat-pill" style="margin-left: 6px; color: #38bdf8;">2023 - 2025 • IMCC Pune</span>
+                  </div>
+                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Specialization in Software Development, Advanced Algorithms & Data Systems.</p>
+                </div>
+                <div class="milestone-node">
+                  <div class="milestone-dot completed"></div>
+                  <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
+                    Undergraduate - BCA (Bachelor of Computer Applications)
+                    <span class="github-stat-pill" style="margin-left: 6px; color: #4ade80;">2020 - 2023 • University of Pune</span>
+                  </div>
+                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Graduated with distinction. Built Automated Paperless College System.</p>
+                </div>
+                <div class="milestone-node" style="margin-bottom: 0;">
+                  <div class="milestone-dot completed"></div>
+                  <div style="font-size: 13px; font-weight: 600; color: #58a6ff;">
+                    Placement Ready • SDE & Data Analyst Candidate
+                    <span class="github-stat-pill" style="margin-left: 6px; color: #fbbf24;"><i class="fas fa-bolt"></i> Active</span>
+                  </div>
+                  <p style="font-size: 12px; color: #8b949e; margin: 2px 0 0 0;">Targeting high-impact engineering roles across Pune & Remote locations.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Personal Details Section -->
@@ -2642,15 +2869,34 @@
             <div class="section-header">
               <h3 class="section-title"><i class="fas fa-layer-group" style="color: #38bdf8; margin-right: 6px;"></i> Core Technical Skills</h3>
             </div>
-            <div class="form-group" style="margin-bottom: 14px;">
-              <div style="display: flex; gap: 8px;">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <input type="text" class="form-input" id="skillInput" placeholder="Add a skill (e.g., Python, React, MySQL, Machine Learning)"
-                  style="flex: 1; background: #0d1117; border: 1px solid #30363d; color: #f0f6fc;" />
+                  style="flex: 1; min-width: 200px; background: #0d1117; border: 1px solid #30363d; color: #f0f6fc;" />
                 <button class="btn-edit-section" onclick="addSkill()" style="padding: 8px 16px;">
                   <i class="fa fa-plus"></i> Add Skill
                 </button>
               </div>
             </div>
+
+            <!-- Interactive Skill Search & Category Filter Pills -->
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #30363d;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="position: relative; flex: 1;">
+                  <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px;"></i>
+                  <input type="text" id="skillSearchInput" oninput="filterSkillsSearch(this.value)" placeholder="Search 35+ skills (e.g., Python, React, SQL, Pandas)..." style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px 7px 30px; font-size: 12.5px; color: #f0f6fc; box-sizing: border-box;" />
+                </div>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="skillCategoryFilterContainer">
+                <button type="button" class="skill-filter-btn active" onclick="setSkillCategory('All', this)">All Skills (<span id="filterAllCount">0</span>)</button>
+                <button type="button" class="skill-filter-btn" onclick="setSkillCategory('Languages', this)">Languages</button>
+                <button type="button" class="skill-filter-btn" onclick="setSkillCategory('Web & Frontend', this)">Web & Frontend</button>
+                <button type="button" class="skill-filter-btn" onclick="setSkillCategory('Backend & DB', this)">Backend & DB</button>
+                <button type="button" class="skill-filter-btn" onclick="setSkillCategory('Data & AI', this)">Data Science & AI</button>
+                <button type="button" class="skill-filter-btn" onclick="setSkillCategory('Tools', this)">Tools & Cloud</button>
+              </div>
+            </div>
+
             <div class="skills-grid" id="skillsList">
               <div class="empty-state">
                 <i class="fa fa-code"></i>
@@ -2683,6 +2929,15 @@
                 <i class="fa fa-plus"></i> Add Project
               </button>
             </div>
+
+            <!-- Interactive Project Search Bar -->
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #30363d;">
+              <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px;"></i>
+                <input type="text" id="projectSearchInput" oninput="filterProjectsSearch(this.value)" placeholder="Search projects by name or tech stack (e.g., React, ERP, Python, SQL, Next.js)..." style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px 7px 30px; font-size: 12.5px; color: #f0f6fc; box-sizing: border-box;" />
+              </div>
+            </div>
+
             <div id="projectsList">
               <div class="empty-state">
                 <i class="fa fa-folder-open"></i>
@@ -3890,6 +4145,16 @@
       });
     }
 
+    // =========================================================
+    // PROJECTS DISPLAY & SEARCH INTELLIGENCE
+    // =========================================================
+    let activeProjectSearch = '';
+
+    function filterProjectsSearch(query) {
+      activeProjectSearch = (query || '').toLowerCase().trim();
+      displayProjects();
+    }
+
     // Display Projects
     function displayProjects() {
       const container = document.getElementById('projectsList');
@@ -3908,9 +4173,29 @@
         return;
       }
 
+      // Filter by search query if any
+      const filteredProjects = projects.filter(proj => {
+        if (!activeProjectSearch) return true;
+        const title = (proj.name || proj.title || '').toLowerCase();
+        const tech = (proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' ') : proj.tags) || '').toLowerCase();
+        const desc = (proj.description || '').toLowerCase();
+        const role = (proj.role || '').toLowerCase();
+        return title.includes(activeProjectSearch) || tech.includes(activeProjectSearch) || desc.includes(activeProjectSearch) || role.includes(activeProjectSearch);
+      });
+
+      if (filteredProjects.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: #8b949e; font-size: 13px;">
+            <i class="fas fa-search" style="opacity: 0.5; margin-right: 6px;"></i> No projects matching "<strong>${activeProjectSearch}</strong>".
+          </div>
+        `;
+        return;
+      }
+
       container.innerHTML = `
         <div class="repo-style-grid">
-          ${projects.map((proj, index) => {
+          ${filteredProjects.map(proj => {
+            const index = projects.indexOf(proj);
             const title = proj.name || proj.title || 'Project';
             const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
             const url = proj.url || proj.project_url || '';
@@ -4201,12 +4486,139 @@
       });
     }
 
+    // =========================================================
+    // SKILLS CATEGORIZATION & SEARCH INTELLIGENCE
+    // =========================================================
+    let activeSkillCategory = 'All';
+    let activeSkillSearch = '';
+
+    const SKILL_CATEGORY_MAP = {
+      'Languages': ['Python', 'JavaScript', 'C', 'C++', 'Java', 'PHP', 'SQL', 'Shell', 'TypeScript', 'Dart', 'Go', 'Rust', 'Ruby', 'Kotlin', 'Swift'],
+      'Web & Frontend': ['React', 'HTML', 'HTML5', 'CSS', 'CSS3', 'Bootstrap', 'Tailwind', 'Tailwind CSS', 'Vue', 'Next.js', 'Web Development', 'Frontend Development'],
+      'Backend & DB': ['Node.js', 'MySQL', 'MongoDB', 'PostgreSQL', 'Express', 'Supabase', 'Database', 'Backend Development', 'REST APIs'],
+      'Data & AI': ['Pandas', 'NumPy', 'Matplotlib', 'Data Analytics', 'Data Science', 'Machine Learning', 'Jupyter', 'Jupyter Notebook', 'Deep Learning', 'Data Analysis', 'Data Structures'],
+      'Tools': ['Git', 'GitHub', 'VS Code', 'Figma', 'Vercel', 'Postman', 'Linux', 'Docker', 'AWS']
+    };
+
+    function setSkillCategory(category, btnElement) {
+      activeSkillCategory = category;
+      if (btnElement && btnElement.parentElement) {
+        btnElement.parentElement.querySelectorAll('.skill-filter-btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      displaySkills();
+    }
+
+    function filterSkillsSearch(query) {
+      activeSkillSearch = (query || '').toLowerCase().trim();
+      displaySkills();
+    }
+
+    function copyCandidateShareLink() {
+      const shareUrl = window.location.origin + window.location.pathname;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast('📋 Candidate portfolio link copied to clipboard!', 'success');
+        }).catch(() => {
+          showToast('Link: ' + shareUrl, 'info');
+        });
+      } else {
+        showToast('Link: ' + shareUrl, 'info');
+      }
+    }
+
+    function openDossierModal() {
+      const name = userProfile.full_name || 'Parth P Deshmukh';
+      const role = userProfile.designation || 'Master of Computer Applications (MCA) | Full-Stack & Data';
+      const location = userProfile.location || 'Pune, Maharashtra, India';
+      const email = userProfile.email || (currentUser && currentUser.email) || 'parthdeshmukh2809@gmail.com';
+      const phone = userProfile.phone ? `+91 ${userProfile.phone}` : '';
+      const github = userProfile.github_username ? `https://github.com/${userProfile.github_username}` : 'https://github.com/parthd45';
+      const summary = userProfile.summary || 'MCA student at IMCC Pune with a strong foundation in full-stack web development, Python data analytics, and database engineering.';
+      const skills = (userProfile.skills || []).join(', ');
+      
+      const eduList = (userProfile.education && userProfile.education.length > 0) ? userProfile.education : [
+        { degree: 'Master of Computer Applications (MCA)', field: 'Computer Science', institution: 'MES IMCC Pune', year: '2023 - 2025' },
+        { degree: 'Bachelor of Computer Applications (BCA)', field: 'Computer Applications', institution: 'Savitribai Phule Pune University', year: '2020 - 2023' }
+      ];
+      const eduStr = eduList.map(e => `• ${e.degree || ''} (${e.field || ''}) - ${e.institution || ''} [${e.year || ''}]`).join('\n');
+      
+      const projList = (userProfile.projects && userProfile.projects.length > 0) ? userProfile.projects : [
+        { name: 'DCPE ERP Platform', description: 'Enterprise college & student management system with attendance, examinations and fees modules.', tech: 'PHP, MySQL, JavaScript, Bootstrap', url: 'https://dcpe-erp.vercel.app/' },
+        { name: 'PlaceAI Placement Analytics Platform', description: 'AI-driven placement preparation, ATS resume scoring and GitHub tracking platform.', tech: 'JavaScript, Node.js, Vercel, Supabase', url: 'https://placeai.vercel.app/' }
+      ];
+      const projStr = projList.map(p => `• ${p.name || ''}: ${p.description || ''}\n  Stack: ${p.tech || ''}${p.url ? `\n  Demo: ${p.url}` : ''}`).join('\n\n');
+
+      const dossierText = `# CANDIDATE DOSSIER: ${name.toUpperCase()}
+${role} | ${location}
+Email: ${email} ${phone ? `| Phone: ${phone}` : ''} | GitHub: ${github}
+
+==================================================
+1. PROFESSIONAL PROFILE
+==================================================
+${summary}
+
+==================================================
+2. CORE TECHNICAL SKILLS (35+)
+==================================================
+${skills}
+
+==================================================
+3. ACADEMIC CREDENTIALS
+==================================================
+${eduStr}
+
+==================================================
+4. KEY VERIFIED PROJECTS & PORTFOLIO
+==================================================
+${projStr}
+
+==================================================
+5. CAREER OBJECTIVE & AVAILABILITY
+==================================================
+• Target Roles: Software Development Engineer (SDE), Full-Stack Web Developer, Python / Data Analyst
+• Availability: Immediate (Placement Ready 2025)
+• Preferred Locations: Pune, Mumbai, Bangalore, Remote
+`;
+
+      const content = `
+        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">
+          Export your verified candidate dossier in ATS-ready format for campus placement drives and recruiter submissions:
+        </div>
+        <textarea id="dossierMarkdownContent" readonly style="width: 100%; height: 280px; background: #0d1117; color: #58a6ff; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11.5px; line-height: 1.5; border: 1px solid #30363d; border-radius: 6px; padding: 12px; box-sizing: border-box; resize: vertical;">${dossierText}</textarea>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
+          <button type="button" class="btn-primary" onclick="copyDossierText()" style="padding: 8px 16px;">
+            <i class="fas fa-copy"></i> Copy Dossier to Clipboard
+          </button>
+        </div>
+      `;
+
+      openModal('📋 Candidate Placement Dossier', content, null);
+    }
+
+    function copyDossierText() {
+      const el = document.getElementById('dossierMarkdownContent');
+      if (!el) return;
+      el.select();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.value).then(() => {
+          showToast('📋 Candidate Placement Dossier copied to clipboard!', 'success');
+        });
+      } else {
+        document.execCommand('copy');
+        showToast('📋 Copied to clipboard!', 'success');
+      }
+    }
+
     // Display Skills
     function displaySkills() {
       const container = document.getElementById('skillsList');
       const countEl = document.getElementById('tabSkillsCount');
+      const allCountEl = document.getElementById('filterAllCount');
       const skills = userProfile.skills || [];
+
       if (countEl) countEl.textContent = skills.length;
+      if (allCountEl) allCountEl.textContent = skills.length;
 
       if (!skills || skills.length === 0) {
         container.innerHTML = `
@@ -4218,15 +4630,42 @@
         return;
       }
 
+      // Filter by category and search
+      const filteredSkills = skills.filter((skill) => {
+        // Category check
+        if (activeSkillCategory !== 'All') {
+          const allowedList = SKILL_CATEGORY_MAP[activeSkillCategory] || [];
+          const matchesCategory = allowedList.some(item => item.toLowerCase() === skill.toLowerCase());
+          if (!matchesCategory) return false;
+        }
+
+        // Search query check
+        if (activeSkillSearch) {
+          if (!skill.toLowerCase().includes(activeSkillSearch)) return false;
+        }
+
+        return true;
+      });
+
+      if (filteredSkills.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: #8b949e; font-size: 13px;">
+            <i class="fas fa-search" style="opacity: 0.5; margin-right: 6px;"></i> No skills matching "<strong>${activeSkillSearch || activeSkillCategory}</strong>".
+          </div>
+        `;
+        return;
+      }
+
       container.innerHTML = `
         <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-          ${skills.map((skill, index) => {
+          ${filteredSkills.map(skill => {
+            const originalIndex = skills.indexOf(skill);
             const dotColor = (window.GITHUB_LANG_COLORS && window.GITHUB_LANG_COLORS[skill]) || '#38bdf8';
             return `
               <div class="skill-repo-pill">
                 <span class="skill-dot" style="background-color: ${dotColor};"></span>
                 <span>${skill}</span>
-                <i class="fas fa-times" onclick="removeSkill(${index})" style="cursor: pointer; color: #8b949e; font-size: 11px; margin-left: 3px; transition: color 0.15s;" onmouseover="this.style.color='#f85149'" onmouseout="this.style.color='#8b949e'" title="Remove skill"></i>
+                <i class="fas fa-times" onclick="removeSkill(${originalIndex})" style="cursor: pointer; color: #8b949e; font-size: 11px; margin-left: 3px; transition: color 0.15s;" onmouseover="this.style.color='#f85149'" onmouseout="this.style.color='#8b949e'" title="Remove skill"></i>
               </div>
             `;
           }).join('')}
