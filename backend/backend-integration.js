@@ -27,14 +27,12 @@
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
       setupLoginForm(loginForm);
-      setupPhoneOtpLoginForm();
     }
 
     // Check if on register page
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
       setupRegisterForm(registerForm);
-      setupRegisterMobileOtp();
     }
 
     // Check for authentication state on page load
@@ -151,12 +149,33 @@
    * Setup register form handlers
    */
   function setupRegisterForm(form) {
+    const mobileInput = document.getElementById('mobileInput');
+    const mobileError = document.getElementById('mobileError');
+
+    // Real-time 10-digit mobile number formatting & validation
+    if (mobileInput) {
+      mobileInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '').slice(0, 10);
+        e.target.value = val;
+        if (mobileError) {
+          if (val.length > 0 && !/^[6-9]/.test(val)) {
+            mobileError.textContent = 'Mobile number must start with 6, 7, 8, or 9';
+            mobileError.style.display = 'block';
+          } else if (val.length > 0 && val.length < 10) {
+            mobileError.textContent = `${10 - val.length} more digits needed (10-digit number)`;
+            mobileError.style.display = 'block';
+          } else {
+            mobileError.style.display = 'none';
+          }
+        }
+      });
+    }
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       // Get form values by ID
       const email = document.getElementById('emailInput').value.trim();
-      const mobileInput = document.getElementById('mobileInput');
       const mobile = mobileInput ? mobileInput.value.trim() : '';
       const firstName = document.getElementById('firstNameInput').value.trim();
       const lastName = document.getElementById('lastNameInput').value.trim();
@@ -181,18 +200,20 @@
         return;
       }
 
-      // Check if mobile number is entered and verified
-      const isMobileVerified = mobileInput && mobileInput.dataset.verified === 'true';
-
-      if (mobile && !isMobileVerified) {
-        const proceedWithoutVerification = confirm(
-          `You entered mobile number "${mobile}", but it has not been verified with WhatsApp OTP yet.\n\nClick OK to verify your WhatsApp number first, or Cancel to proceed without verification.`
-        );
-        if (proceedWithoutVerification) {
-          const sendBtn = document.getElementById('sendMobileOtpBtn');
-          if (sendBtn) sendBtn.click();
+      // Validate mobile number if entered
+      let cleanMobile = null;
+      if (mobile) {
+        cleanMobile = mobile.replace(/\D/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+          if (mobileError) {
+            mobileError.textContent = 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.';
+            mobileError.style.display = 'block';
+          }
+          showNotification('error', 'Please enter a valid 10-digit mobile number');
+          if (mobileInput) mobileInput.focus();
           return;
         }
+        if (mobileError) mobileError.style.display = 'none';
       }
 
       // Show loading state
@@ -205,8 +226,7 @@
         const metadata = {
           firstName: firstName,
           lastName: lastName,
-          mobile: (mobileInput?.dataset?.formattedPhone || mobile) || null,
-          mobile_verified: isMobileVerified
+          mobile: cleanMobile || null
         };
 
         const result = await window.AuthService.registerWithEmail(email, password, metadata);
@@ -237,10 +257,10 @@
             document.getElementById('verifyOtpBtn').onclick = async function () {
               const otpInputs = document.querySelectorAll('.otp-input');
               let otpCode = '';
-              otpInputs.forEach(input => otpCode += input.value);
+              otpInputs.forEach(input => otpCode += input.value.trim());
 
-              if (otpCode.length !== 8) {
-                document.getElementById('otpError').textContent = 'Please enter the complete 8-digit code.';
+              if (otpCode.length !== 6) {
+                document.getElementById('otpError').textContent = 'Please enter the complete 6-digit verification code.';
                 document.getElementById('otpError').style.display = 'block';
                 document.getElementById('otpInputContainer').classList.add('otp-shake');
                 setTimeout(() => document.getElementById('otpInputContainer').classList.remove('otp-shake'), 400);
@@ -422,16 +442,18 @@
         }
       });
 
-      // Handle paste (paste full 8-digit code)
+      // Handle paste (paste full 6-digit code)
       input.addEventListener('paste', (e) => {
         e.preventDefault();
         const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
-        if (pastedData.length >= 8) {
+        if (pastedData.length >= 6) {
           inputs.forEach((inp, i) => {
             inp.value = pastedData[i] || '';
             if (inp.value) inp.classList.add('filled');
           });
           inputs[inputs.length - 1].focus();
+          const verifyBtn = document.getElementById('verifyOtpBtn');
+          if (verifyBtn) setTimeout(() => verifyBtn.click(), 200);
         }
       });
     });
