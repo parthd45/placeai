@@ -309,13 +309,18 @@ CREATE TRIGGER update_placements_updated_at
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.user_profiles (user_id, email, first_name, last_name)
+  INSERT INTO public.user_profiles (user_id, email, first_name, last_name, mobile)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'last_name', '')
-  );
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    NEW.raw_user_meta_data->>'mobile'
+  )
+  ON CONFLICT (user_id) DO UPDATE SET
+    first_name = COALESCE(EXCLUDED.first_name, public.user_profiles.first_name),
+    last_name = COALESCE(EXCLUDED.last_name, public.user_profiles.last_name),
+    mobile = COALESCE(EXCLUDED.mobile, public.user_profiles.mobile);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

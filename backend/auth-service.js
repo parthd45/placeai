@@ -36,7 +36,8 @@ async function registerWithEmail(email, password, metadata = {}) {
         data: {
           first_name: metadata.firstName || '',
           last_name: metadata.lastName || '',
-          full_name: `${metadata.firstName || ''} ${metadata.lastName || ''}`.trim()
+          full_name: `${metadata.firstName || ''} ${metadata.lastName || ''}`.trim(),
+          mobile: metadata.mobile || null
         },
         emailRedirectTo: 'https://firstplacewise.tech/dashboard.html'
       }
@@ -649,6 +650,24 @@ async function verifyEmailOTP(email, token) {
     });
 
     if (error) throw error;
+
+    // Now authenticated! Update user profile in database with user metadata
+    if (data.user) {
+      try {
+        const meta = data.user.user_metadata || {};
+        await supabase.from('user_profiles').upsert({
+          user_id: data.user.id,
+          email: data.user.email,
+          first_name: meta.first_name || '',
+          last_name: meta.last_name || '',
+          mobile: meta.mobile || null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+        console.log('Profile synced successfully on OTP verify');
+      } catch (upsertErr) {
+        console.warn('Upsert profile post-OTP verification warning:', upsertErr);
+      }
+    }
 
     return {
       success: true,

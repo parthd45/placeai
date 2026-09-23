@@ -2169,9 +2169,25 @@
         userProfile = profileResponse.profile;
         console.log('Profile loaded successfully:', userProfile);
 
-        const firstName = userProfile.first_name || 'User';
-        const lastName = userProfile.last_name || '';
-        const fullName = `${firstName} ${lastName}`.trim();
+        // Fallback to user_metadata if database fields are empty
+        const meta = (currentUser && (currentUser.user_metadata || currentUser.raw_user_meta_data)) || {};
+        const firstName = userProfile.first_name || meta.first_name || meta.firstName || 'User';
+        const lastName = userProfile.last_name || meta.last_name || meta.lastName || '';
+        const fullName = `${firstName} ${lastName}`.trim() || 'User';
+        const rawMobile = userProfile.mobile || meta.mobile || meta.phone || '';
+
+        // Auto-sync to database if database had blank values
+        if ((!userProfile.first_name && (meta.first_name || meta.firstName)) || (!userProfile.mobile && (meta.mobile || meta.phone))) {
+          userProfile.first_name = firstName;
+          userProfile.last_name = lastName;
+          userProfile.mobile = rawMobile;
+          updateUserProfile(currentUser.id, {
+            first_name: firstName,
+            last_name: lastName,
+            mobile: rawMobile || null
+          }).catch(err => console.warn('Auto-sync profile metadata:', err));
+        }
+
         const initial = firstName.charAt(0).toUpperCase();
 
         // Update profile avatar
@@ -2225,7 +2241,7 @@
 
         // Update contact
         document.getElementById('contactEmail').textContent = userProfile.email || currentUser.email;
-        const phoneFormatted = userProfile.mobile ? (userProfile.mobile.startsWith('+') ? userProfile.mobile : '+91 ' + userProfile.mobile) : 'Not set';
+        const phoneFormatted = rawMobile ? (rawMobile.startsWith('+') ? rawMobile : '+91 ' + rawMobile) : 'Not set';
         document.getElementById('contactPhone').textContent = phoneFormatted;
 
         // Update skills - always call to display or show empty state

@@ -305,6 +305,22 @@
               const verifyResult = await window.AuthService.verifyEmailOTP(email, otpCode);
 
               if (verifyResult.success) {
+                // Ensure profile has the registered name and mobile
+                try {
+                  const targetUser = verifyResult.user || (verifyResult.session && verifyResult.session.user);
+                  if (targetUser && targetUser.id && window.DBService && window.DBService.updateUserProfile) {
+                    await window.DBService.updateUserProfile(targetUser.id, {
+                      first_name: firstName,
+                      last_name: lastName,
+                      mobile: cleanMobile || null,
+                      email: email
+                    });
+                    console.log('Post-verify profile update succeeded');
+                  }
+                } catch (profErr) {
+                  console.warn('Post-verify profile update warning:', profErr);
+                }
+
                 // Mark all inputs green
                 otpInputs.forEach(input => { input.classList.remove('error'); input.classList.add('success'); });
                 document.getElementById('otpError').style.display = 'none';
@@ -313,7 +329,7 @@
                 
                 setTimeout(() => {
                   window.location.href = 'dashboard.html';
-                }, 1500);
+                }, 1200);
               } else {
                 otpInputs.forEach(input => { input.classList.remove('success'); input.classList.add('error'); });
                 document.getElementById('otpError').textContent = verifyResult.error;
