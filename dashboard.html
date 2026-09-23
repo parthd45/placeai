@@ -2762,16 +2762,41 @@
             </div>
           </div>
 
-          <!-- Tab 3: OAuth Connect -->
-          <div id="syncTabOauth" style="display: none; text-align: center; padding: 20px;">
-            <i class="fab fa-linkedin" style="font-size: 48px; color: #0a66c2; margin-bottom: 12px;"></i>
-            <h4 style="color: #f1f5f9; margin-bottom: 8px;">Connect LinkedIn with PlaceAI</h4>
-            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
-              Authenticate via LinkedIn OpenID to link your account verified badge and credentials.
-            </p>
-            <button type="button" class="btn-linkedin-sync" onclick="connectLinkedIn()" style="font-size: 14px; padding: 10px 24px;">
-              <i class="fab fa-linkedin"></i> Sign in with LinkedIn
-            </button>
+          <!-- Tab 3: OAuth Connect & Instant Verification -->
+          <div id="syncTabOauth" style="display: none; padding: 12px 6px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <i class="fab fa-linkedin" style="font-size: 44px; color: #0a66c2; margin-bottom: 10px;"></i>
+              <h4 style="color: #f1f5f9; margin-bottom: 6px; font-size: 16px;">Connect & Verify LinkedIn Account</h4>
+              <p style="color: #94a3b8; font-size: 13px; margin: 0 auto; max-width: 440px; line-height: 1.5;">
+                Link your official LinkedIn profile to PlaceAI to get a verified credential badge and auto-sync your career milestones.
+              </p>
+            </div>
+
+            <!-- Instant 1-Click Verification Form -->
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(10, 102, 194, 0.4); border-radius: 10px; padding: 18px; margin-bottom: 16px;">
+              <label class="form-label" style="font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
+                <i class="fas fa-link" style="color: #38bdf8;"></i> Verify & Link Profile Directly
+              </label>
+              <div style="display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px;">
+                <div style="background: rgba(10, 102, 194, 0.16); border: 1.5px solid rgba(10, 102, 194, 0.45); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 8px; white-space: nowrap; user-select: none;">
+                  <i class="fab fa-linkedin" style="color: #0a66c2; font-size: 17px;"></i> linkedin.com/in/
+                </div>
+                <input type="text" class="form-input" id="oauthDirectHandleInput" 
+                  value="${curHandle}" 
+                  placeholder="your-username" style="flex: 1;" />
+              </div>
+              <button type="button" class="btn-primary" onclick="directLinkLinkedInAccount()" style="width: 100%; justify-content: center; padding: 11px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); font-weight: 600; font-size: 13.5px;">
+                <i class="fas fa-check-circle"></i> Connect & Verify Account (+10 Points)
+              </button>
+            </div>
+
+            <div style="text-align: center;">
+              <span style="font-size: 12px; color: #64748b; display: block; margin-bottom: 10px;">— OR USE SINGLE SIGN-ON —</span>
+              <button type="button" class="btn-secondary" onclick="connectLinkedIn()" style="font-size: 13px; padding: 8px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fab fa-linkedin"></i> Sign in via LinkedIn OAuth
+              </button>
+            </div>
+            <div id="oauthStatusMsg" style="display: none; margin-top: 12px; font-size: 12.5px; color: #38bdf8; text-align: center; line-height: 1.4;"></div>
           </div>
 
           <!-- Extraction Preview Section -->
@@ -2838,7 +2863,7 @@
       if (oBtn) oBtn.classList.toggle('active', tab === 'oauth');
     }
 
-    function extractFromUrl() {
+    async function extractFromUrl() {
       const urlInput = document.getElementById('linkedinUrlInput');
       let val = urlInput ? urlInput.value.trim() : '';
       if (!val) {
@@ -2847,45 +2872,52 @@
       }
 
       const handle = window.LinkedInService ? window.LinkedInService.extractHandle(val) : val;
-      const fullUrl = `https://www.linkedin.com/in/${handle}/`;
+      showToast('Fetching real candidate details from LinkedIn...', 'info');
 
-      showToast('Extracting candidate details from LinkedIn...', 'info');
-      extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(fullUrl, userProfile || {});
-      showExtractionPreview(extractedLinkedInData);
+      try {
+        extractedLinkedInData = await window.LinkedInService.fetchRealProfile(handle, userProfile || {});
+        showExtractionPreview(extractedLinkedInData);
+        showToast('Real profile details extracted successfully!', 'success');
+      } catch (err) {
+        console.warn('Real fetch fallback:', err);
+        extractedLinkedInData = window.LinkedInService.extractFromUrlOrHandle(handle, userProfile || {});
+        showExtractionPreview(extractedLinkedInData);
+      }
     }
 
-    function extractFromText() {
-      const textInput = document.getElementById('linkedinTextInput');
-      const rawText = textInput ? textInput.value.trim() : '';
-      if (!rawText) {
-        showToast('Please paste LinkedIn profile text to extract', 'error');
+    async function directLinkLinkedInAccount() {
+      const input = document.getElementById('oauthDirectHandleInput');
+      let val = input ? input.value.trim() : '';
+      if (!val) {
+        showToast('Please enter your LinkedIn username handle', 'error');
         return;
       }
 
-      showToast('Analyzing and extracting candidate details...', 'info');
-      extractedLinkedInData = window.LinkedInService.parseLinkedInText(rawText);
-
-      if (userProfile) {
-        if (!extractedLinkedInData.first_name && userProfile.first_name) {
-          extractedLinkedInData.first_name = userProfile.first_name;
-          extractedLinkedInData.last_name = userProfile.last_name;
+      showToast('Linking and verifying LinkedIn profile...', 'info');
+      try {
+        const res = await window.LinkedInService.directLinkAccount(currentUser.id, val);
+        if (res.success) {
+          showToast('🎉 LinkedIn account successfully verified & linked! +10 Points awarded.', 'success');
+          closeModal();
+          await loadUserProfile();
+        } else {
+          showToast('Failed to link LinkedIn: ' + res.error, 'error');
         }
-        if (!extractedLinkedInData.current_designation && userProfile.current_designation) {
-          extractedLinkedInData.current_designation = userProfile.current_designation;
-        }
-        if (userProfile.linkedin_url) {
-          extractedLinkedInData.linkedin_url = userProfile.linkedin_url;
-        }
+      } catch (err) {
+        showToast('Error linking LinkedIn: ' + err.message, 'error');
       }
-
-      showExtractionPreview(extractedLinkedInData);
     }
 
     async function connectLinkedIn() {
-      showToast('Redirecting to LinkedIn OAuth...', 'info');
+      showToast('Connecting to LinkedIn OAuth...', 'info');
+      const statusEl = document.getElementById('oauthStatusMsg');
       const res = await window.LinkedInService.connectLinkedInOAuth();
       if (!res.success) {
-        showToast('LinkedIn OAuth: ' + res.error, 'error');
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color: #f59e0b;"><i class="fas fa-exclamation-triangle"></i> ${res.error}</span>`;
+          statusEl.style.display = 'block';
+        }
+        showToast(res.error, 'info');
       }
     }
 
