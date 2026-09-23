@@ -234,36 +234,58 @@
     }
 
     /**
-     * Calculate Real Current Streak, Longest Streak, and Total Contributions
+     * Calculate Real Current Streak, Longest Streak, Total Contributions, and Available Years
+     * @param {string|null} selectedYear - e.g. '2025' or null for all-time / rolling 365
      */
-    getStats() {
+    getStats(selectedYear = null) {
       const map = this.getStoredMap();
-      const today = new Date();
-      let total = 0;
-      let currentStreak = 0;
-      let longestStreak = 0;
-      let tempStreak = 0;
+      const allDates = Object.keys(map).sort();
+      let allTimeTotal = 0;
+      let yearTotal = 0;
+      const yearsSet = new Set();
 
-      // Count total in last 365 days
-      for (let i = 0; i < 365; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const k = `${y}-${m}-${day}`;
-        const count = map[k] || 0;
-        total += count;
-
-        if (count > 0) {
-          tempStreak++;
-          if (tempStreak > longestStreak) longestStreak = tempStreak;
-        } else {
-          tempStreak = 0;
+      allDates.forEach(d => {
+        const c = map[d] || 0;
+        if (c > 0) {
+          allTimeTotal += c;
+          const y = d.split('-')[0];
+          yearsSet.add(y);
+          if (selectedYear && y === String(selectedYear)) {
+            yearTotal += c;
+          }
         }
-      }
+      });
+
+      // Always include current year in available years
+      yearsSet.add(String(new Date().getFullYear()));
+      const availableYears = Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
+
+      // Calculate all-time longest streak across all consecutive days in history
+      let longestStreak = 0;
+      let currentStreak = 0;
+      let tempStreak = 0;
+      let prevDate = null;
+
+      allDates.forEach(d => {
+        if ((map[d] || 0) > 0) {
+          const curD = new Date(d);
+          if (prevDate) {
+            const diffDays = Math.round((curD - prevDate) / (1000 * 60 * 60 * 24));
+            if (diffDays === 1) {
+              tempStreak++;
+            } else {
+              tempStreak = 1;
+            }
+          } else {
+            tempStreak = 1;
+          }
+          prevDate = curD;
+          if (tempStreak > longestStreak) longestStreak = tempStreak;
+        }
+      });
 
       // Compute current streak starting from today or yesterday
+      const today = new Date();
       let checkDate = new Date(today);
       const todayKey = this.getTodayKey();
       if (!map[todayKey]) {
@@ -283,10 +305,14 @@
         }
       }
 
+      const totalToShow = selectedYear ? yearTotal : allTimeTotal;
+
       return {
-        totalContributions: total,
+        totalContributions: totalToShow,
+        allTimeTotal: allTimeTotal,
         currentStreak: currentStreak,
-        longestStreak: Math.max(longestStreak, currentStreak)
+        longestStreak: Math.max(longestStreak, currentStreak),
+        availableYears: availableYears
       };
     }
   }

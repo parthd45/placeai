@@ -1607,13 +1607,68 @@
       background: rgba(248, 81, 73, 0.1);
     }
 
+    .btn-github-resync {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-github-resync:hover {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+
+    .heatmap-years-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      flex-wrap: wrap;
+    }
+
+    .heatmap-year-btn {
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .heatmap-year-btn:hover {
+      color: #f0f6fc;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .heatmap-year-btn.active {
+      background: #238636;
+      color: #ffffff;
+      box-shadow: 0 1px 4px rgba(35, 134, 54, 0.4);
+    }
+
     /* GitHub Contribution Heatmap Card */
     .github-heatmap-card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #161b22;
+      border: 1px solid #30363d;
       border-radius: 14px;
       padding: 18px 22px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .heatmap-header {
@@ -2094,7 +2149,7 @@
                     <input type="text" id="githubUsernameInput" class="github-input" placeholder="username" autocomplete="off" />
                   </div>
                   <button type="button" id="btnConnectGitHub" class="btn-github-connect" onclick="connectGitHubAccount()">
-                    <i class="fas fa-plug"></i> Connect
+                    <i class="fas fa-magic"></i> Connect & Auto-Extract
                   </button>
                 </div>
 
@@ -2109,6 +2164,9 @@
                       <span id="githubReposPill" class="github-meta-pill"><i class="fas fa-book-bookmark"></i> <span id="githubRepoCount">0</span> repos</span>
                     </div>
                   </div>
+                  <button type="button" class="btn-github-resync" onclick="reSyncGitHubProfile()" title="Auto-extract GitHub bio, skills, repositories & full heatmap">
+                    <i class="fas fa-magic"></i> Auto-Extract
+                  </button>
                   <button type="button" class="btn-github-disconnect" onclick="disconnectGitHubAccount()" title="Disconnect GitHub">
                     <i class="fas fa-times"></i>
                   </button>
@@ -2116,23 +2174,32 @@
               </div>
             </div>
 
-            <!-- Stats Bar -->
-            <div class="heatmap-stats-group" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(51, 65, 85, 0.5);">
-              <div class="heatmap-stat-item">
-                <i class="fas fa-calendar-check" style="color: #38bdf8;"></i>
-                Contributions: <strong id="heatmapTotalCount">0</strong>
+            <!-- Stats Bar & Multi-Year Navigation -->
+            <div class="heatmap-stats-group" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <div class="heatmap-stat-item">
+                  <i class="fas fa-calendar-check" style="color: #38bdf8;"></i>
+                  Contributions: <strong id="heatmapTotalCount">0</strong>
+                </div>
+                <div class="streak-badge">
+                  <i class="fas fa-fire"></i>
+                  <span id="heatmapCurrentStreak">0</span> Days Streak
+                </div>
+                <div class="heatmap-stat-item">
+                  <i class="fas fa-bolt" style="color: #eab308;"></i>
+                  Best Streak: <strong id="heatmapLongestStreak">0</strong>d
+                </div>
               </div>
-              <div class="streak-badge">
-                <i class="fas fa-fire"></i>
-                <span id="heatmapCurrentStreak">0</span> Days Streak
-              </div>
-              <div class="heatmap-stat-item">
-                <i class="fas fa-bolt" style="color: #eab308;"></i>
-                Best Streak: <strong id="heatmapLongestStreak">0</strong>d
-              </div>
-              <div id="githubSyncStatus" style="font-size: 11.5px; color: #94a3b8; margin-left: auto; display: flex; align-items: center; gap: 5px;">
-                <i class="fas fa-circle-notch fa-spin" id="githubSyncSpinner" style="display: none; color: #38bdf8;"></i>
-                <span id="githubSyncText">Ready</span>
+
+              <!-- Multi-Year Historical Navigation Tabs -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap;">
+                <div id="heatmapYearSelector" class="heatmap-years-nav">
+                  <button type="button" class="heatmap-year-btn active" onclick="setHeatmapYear('last12')">Last 12 Months</button>
+                </div>
+                <div id="githubSyncStatus" style="font-size: 11.5px; color: #94a3b8; display: flex; align-items: center; gap: 5px;">
+                  <i class="fas fa-circle-notch fa-spin" id="githubSyncSpinner" style="display: none; color: #38bdf8;"></i>
+                  <span id="githubSyncText">Ready</span>
+                </div>
               </div>
             </div>
 
@@ -2584,7 +2651,14 @@
     // =========================================================
     // GITHUB CONTRIBUTION HEATMAP LOGIC
     // =========================================================
-    function renderHeatmap() {
+    let currentHeatmapYear = 'last12';
+
+    function setHeatmapYear(year) {
+      currentHeatmapYear = year;
+      renderHeatmap(year);
+    }
+
+    function renderHeatmap(yearFilter) {
       const grid = document.getElementById('heatmapGrid');
       const monthsRow = document.getElementById('heatmapMonths');
       const tooltip = document.getElementById('heatmapTooltip');
@@ -2592,27 +2666,52 @@
 
       const tracker = window.ActivityTracker;
       const activityMap = tracker.getStoredMap();
-      const stats = tracker.getStats();
+      const targetYear = yearFilter !== undefined ? yearFilter : currentHeatmapYear;
+      currentHeatmapYear = targetYear;
+
+      const stats = tracker.getStats(targetYear === 'last12' ? null : targetYear);
 
       // Update counters
       const totalEl = document.getElementById('heatmapTotalCount');
       const streakEl = document.getElementById('heatmapCurrentStreak');
       const longestEl = document.getElementById('heatmapLongestStreak');
-      if (totalEl) totalEl.textContent = stats.totalContributions;
+      if (totalEl) totalEl.textContent = stats.totalContributions.toLocaleString();
       if (streakEl) streakEl.textContent = stats.currentStreak;
       if (longestEl) longestEl.textContent = stats.longestStreak;
 
-      // 52 weeks (364 days). End on upcoming Saturday of current week
+      // Render Dynamic Multi-Year Navigation Tabs
+      const yearNav = document.getElementById('heatmapYearSelector');
+      if (yearNav && Array.isArray(stats.availableYears) && stats.availableYears.length > 0) {
+        let navHtml = `<button type="button" class="heatmap-year-btn ${targetYear === 'last12' ? 'active' : ''}" onclick="setHeatmapYear('last12')">Last 12 Months</button>`;
+        stats.availableYears.forEach(y => {
+          navHtml += `<button type="button" class="heatmap-year-btn ${targetYear === String(y) ? 'active' : ''}" onclick="setHeatmapYear('${y}')">${y}</button>`;
+        });
+        yearNav.innerHTML = navHtml;
+      }
+
+      // Calculate start and end dates based on selected view
       const today = new Date();
       const todayKey = tracker.getTodayKey();
-      const todayDayOfWeek = today.getDay(); // 0 is Sun, 6 is Sat
+      let startDate, endDate;
 
-      const endDate = new Date(today);
-      endDate.setDate(today.getDate() + (6 - todayDayOfWeek));
+      if (targetYear === 'last12') {
+        const todayDayOfWeek = today.getDay(); // 0 is Sun, 6 is Sat
+        endDate = new Date(today);
+        endDate.setDate(today.getDate() + (6 - todayDayOfWeek));
 
-      // Start date is 52 weeks prior (Sunday)
-      const startDate = new Date(endDate);
-      startDate.setDate(endDate.getDate() - (52 * 7 - 1));
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - (52 * 7 - 1));
+      } else {
+        const yNum = Number(targetYear);
+        const firstDay = new Date(yNum, 0, 1);
+        const lastDay = new Date(yNum, 11, 31);
+
+        startDate = new Date(firstDay);
+        startDate.setDate(firstDay.getDate() - firstDay.getDay());
+
+        endDate = new Date(lastDay);
+        endDate.setDate(lastDay.getDate() + (6 - lastDay.getDay()));
+      }
 
       grid.innerHTML = '';
       monthsRow.innerHTML = '';
@@ -2620,9 +2719,13 @@
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       let lastMonthAdded = -1;
 
-      // Render 52 columns x 7 rows
-      for (let col = 0; col < 52; col++) {
-        // Month label placement
+      // Compute number of weeks
+      const diffTime = Math.abs(endDate - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      const numWeeks = Math.min(54, Math.ceil(diffDays / 7));
+
+      // Render columns x 7 rows
+      for (let col = 0; col < numWeeks; col++) {
         const colDate = new Date(startDate);
         colDate.setDate(startDate.getDate() + col * 7);
         const m = colDate.getMonth();
@@ -2631,7 +2734,7 @@
           const mSpan = document.createElement('span');
           mSpan.textContent = monthNames[m];
           mSpan.style.position = 'absolute';
-          mSpan.style.left = `${(col / 52) * 100}%`;
+          mSpan.style.left = `${(col / numWeeks) * 100}%`;
           monthsRow.appendChild(mSpan);
           lastMonthAdded = m;
         }
@@ -2647,6 +2750,14 @@
 
           const cell = document.createElement('div');
           cell.className = 'heatmap-cell';
+
+          // If viewing specific year, hide cells that belong to previous/next year
+          if (targetYear !== 'last12' && y !== Number(targetYear)) {
+            cell.style.opacity = '0';
+            cell.style.pointerEvents = 'none';
+            grid.appendChild(cell);
+            continue;
+          }
 
           // Zero out time for comparison
           const cellMidnight = new Date(y, cellDate.getMonth(), cellDate.getDate());
@@ -2748,7 +2859,7 @@
         const reposEl = document.getElementById('githubRepoCount');
         const linkEl = document.getElementById('githubProfileLink');
 
-        if (avatarEl) avatarEl.src = profileData.avatar_url || `https://avatars.githubusercontent.com/${profileData.username}`;
+        if (avatarEl) avatarEl.src = profileData.avatar_url || profileData.profile_image_url || `https://avatars.githubusercontent.com/${profileData.username}`;
         if (usernameEl) usernameEl.textContent = profileData.username;
         if (reposEl) reposEl.textContent = profileData.public_repos !== undefined ? profileData.public_repos : '0';
         if (linkEl) {
@@ -2787,35 +2898,37 @@
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Connecting...';
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Extracting...';
       }
       if (syncSpinner) syncSpinner.style.display = 'inline-block';
-      if (syncStatus) syncStatus.textContent = `Connecting @${username}...`;
+      if (syncStatus) syncStatus.textContent = `Extracting @${username}...`;
 
       try {
-        // 1. Fetch real public profile from GitHub API
-        const profileRes = await window.GitHubService.fetchProfile(username);
-        if (!profileRes.success) {
-          showToast(profileRes.error || `GitHub user "@${username}" not found`, 'error');
+        // 1. Extract authentic profile details & public repositories
+        showToast(`Fetching real GitHub profile & repositories for @${username}...`, 'info');
+        const extractRes = await window.GitHubService.extractFullProfile(username);
+        if (!extractRes.success) {
+          showToast(extractRes.error || `GitHub user "@${username}" not found`, 'error');
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-plug"></i> Connect';
+            btn.innerHTML = '<i class="fas fa-magic"></i> Connect & Auto-Extract';
           }
           if (syncSpinner) syncSpinner.style.display = 'none';
           if (syncStatus) syncStatus.textContent = 'Connection failed';
           return;
         }
 
-        const ghProfile = profileRes.data;
+        const extracted = extractRes.data;
 
-        // 2. Save github_url to Supabase user_profiles
+        // 2. Auto-fill and sync into Supabase user_profiles table
         if (currentUser && currentUser.id) {
-          await window.GitHubService.linkToUserProfile(currentUser.id, username);
-          if (userProfile) userProfile.github_url = `https://github.com/${username}`;
+          if (syncStatus) syncStatus.textContent = 'Auto-filling profile fields...';
+          const syncRes = await window.GitHubService.syncExtractedDataToProfile(currentUser.id, extracted, userProfile || {});
+          console.log('Profile auto-fill result:', syncRes);
         }
 
-        // 3. Fetch real 52-week contribution matrix
-        if (syncStatus) syncStatus.textContent = 'Syncing real contribution calendar...';
+        // 3. Fetch full multi-year contribution calendar
+        if (syncStatus) syncStatus.textContent = 'Syncing historical contributions...';
         const contribRes = await window.GitHubService.fetchContributions(username);
         if (contribRes.success && Array.isArray(contribRes.contributions)) {
           if (window.ActivityTracker) {
@@ -2823,14 +2936,20 @@
           }
         }
 
-        // 4. Update UI
-        activeGitHubUser = ghProfile;
-        updateGitHubUI(ghProfile, true);
+        // 4. Reload user profile to display newly extracted skills, projects, bio, avatar
+        await loadUserProfile();
+
+        // 5. Update UI state
+        activeGitHubUser = extracted;
+        updateGitHubUI(extracted, true);
         renderHeatmap();
 
         if (syncSpinner) syncSpinner.style.display = 'none';
         if (syncStatus) syncStatus.textContent = `Synced: @${username}`;
-        showToast(`🎉 GitHub account @${username} linked! Real contribution data synced.`, 'success');
+
+        const skillsCount = extracted.skills ? extracted.skills.length : 0;
+        const projCount = extracted.projects ? extracted.projects.length : 0;
+        showToast(`🎉 GitHub linked! Extracted ${projCount} projects, ${skillsCount} skills & full contribution history.`, 'success');
       } catch (err) {
         console.error('Error connecting GitHub:', err);
         showToast('Error connecting GitHub: ' + err.message, 'error');
@@ -2839,8 +2958,48 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-plug"></i> Connect';
+          btn.innerHTML = '<i class="fas fa-magic"></i> Connect & Auto-Extract';
         }
+      }
+    }
+
+    async function reSyncGitHubProfile() {
+      if (!userProfile || !userProfile.github_url) {
+        showToast('Please connect your GitHub account first', 'info');
+        return;
+      }
+      const username = window.GitHubService ? window.GitHubService.extractUsername(userProfile.github_url) : '';
+      if (!username) return;
+
+      const syncStatus = document.getElementById('githubSyncText');
+      const syncSpinner = document.getElementById('githubSyncSpinner');
+      if (syncSpinner) syncSpinner.style.display = 'inline-block';
+      if (syncStatus) syncStatus.textContent = `Re-extracting @${username}...`;
+
+      try {
+        showToast(`Re-extracting GitHub data for @${username}...`, 'info');
+        const extractRes = await window.GitHubService.extractFullProfile(username);
+        if (extractRes.success) {
+          await window.GitHubService.syncExtractedDataToProfile(currentUser.id, extractRes.data, userProfile || {});
+        }
+
+        const contribRes = await window.GitHubService.fetchContributions(username);
+        if (contribRes.success && Array.isArray(contribRes.contributions)) {
+          window.ActivityTracker.mergeGitHubContributions(contribRes.contributions);
+        }
+
+        await loadUserProfile();
+        activeGitHubUser = extractRes.data;
+        updateGitHubUI(extractRes.data, true);
+        renderHeatmap();
+
+        if (syncSpinner) syncSpinner.style.display = 'none';
+        if (syncStatus) syncStatus.textContent = `Synced: @${username}`;
+        showToast('✅ GitHub profile, projects, skills & historical contributions refreshed!', 'success');
+      } catch (err) {
+        console.error('reSyncGitHubProfile error:', err);
+        showToast('Error re-syncing GitHub: ' + err.message, 'error');
+        if (syncSpinner) syncSpinner.style.display = 'none';
       }
     }
 
@@ -2898,7 +3057,7 @@
           html_url: `https://github.com/${username}`
         };
 
-        // Fetch real contributions
+        // Fetch real multi-year contributions
         const contribRes = await window.GitHubService.fetchContributions(username);
         if (contribRes.success && Array.isArray(contribRes.contributions)) {
           if (window.ActivityTracker) {
