@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Code Practice - PlaceAI</title>
+  <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Practice coding problems like LeetCode on PlaceAI. Solve problems in Python, JavaScript, Java, C++ with a built-in code editor, test runner, and leaderboard." />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a1f2e;
+      --bg-elevated: #222839;
+      --border: #2a3144;
+      --border-hover: #3d4663;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-purple: #8b5cf6;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --easy: #22c55e;
+      --medium: #f59e0b;
+      --hard: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Subtle animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse 600px 600px at 10% 10%, rgba(139, 92, 246, 0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 400px at 90% 90%, rgba(56, 189, 248, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .logo-link img {
+      height: 40px;
+      width: auto;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .header-nav-btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+
+    .header-nav-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+
+    .header-nav-btn.active {
+      background: var(--accent-purple);
+      color: white;
+      box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn-back:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      border-radius: 20px;
+      color: #fb923c;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ===== MAIN VIEWS ===== */
+    .view { display: none; position: relative; z-index: 1; }
+    .view.active { display: block; }
+
+    /* ===== PROBLEM LIST VIEW ===== */
+    .problems-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 160px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .stat-card:hover { border-color: var(--border-hover); }
+
+    .stat-ring {
+      width: 48px;
+      height: 48px;
+      position: relative;
+    }
+
+    .stat-ring svg {
+      transform: rotate(-90deg);
+      width: 48px;
+      height: 48px;
+    }
+
+    .stat-ring .ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 4; }
+    .stat-ring .ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 113.097; transition: stroke-dashoffset 1s ease; }
+
+    .stat-ring .ring-value {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stat-info h4 { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .stat-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Filters */
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus { outline: none; border-color: var(--accent-purple); }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
+
+    .diff-filters {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .diff-btn {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .diff-btn:hover { color: var(--text-primary); }
+    .diff-btn.active { background: var(--bg-elevated); color: var(--text-primary); }
+    .diff-btn[data-diff="Easy"].active { background: rgba(34,197,94,0.15); color: var(--easy); }
+    .diff-btn[data-diff="Medium"].active { background: rgba(245,158,11,0.15); color: var(--medium); }
+    .diff-btn[data-diff="Hard"].active { background: rgba(239,68,68,0.15); color: var(--hard); }
+
+    .tag-filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tag-btn {
+      padding: 4px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .tag-btn:hover { border-color: var(--accent-blue); color: var(--text-secondary); }
+    .tag-btn.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+
+    /* Problem Table */
+    .problems-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .problems-table thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg-primary);
+      z-index: 5;
+    }
+
+    .problems-table tbody tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .problems-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    .problems-table td {
+      padding: 12px 16px;
+      font-size: 13.5px;
+      border-bottom: 1px solid rgba(42, 49, 68, 0.5);
+      vertical-align: middle;
+    }
+
+    .problem-num { color: var(--text-muted); font-weight: 500; width: 50px; }
+
+    .problem-title-cell {
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color 0.15s;
+    }
+
+    .problems-table tbody tr:hover .problem-title-cell { color: var(--accent-blue); }
+
+    .diff-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .diff-badge.easy { background: rgba(34,197,94,0.12); color: var(--easy); }
+    .diff-badge.medium { background: rgba(245,158,11,0.12); color: var(--medium); }
+    .diff-badge.hard { background: rgba(239,68,68,0.12); color: var(--hard); }
+
+    .acceptance { color: var(--text-secondary); font-size: 13px; }
+
+    .status-icon { font-size: 16px; }
+    .status-icon.solved { color: var(--easy); }
+    .status-icon.attempted { color: var(--medium); }
+
+    .problem-tags-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    .mini-tag {
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px;
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    /* ===== EDITOR VIEW ===== */
+    .editor-view {
+      display: none;
+      height: calc(100vh - 57px);
+    }
+
+    .editor-view.active { display: flex; }
+
+    .editor-split {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Left Pane: Problem Description */
+    .pane-left {
+      width: 45%;
+      min-width: 360px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+    }
+
+    .pane-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      padding: 0 12px;
+    }
+
+    .pane-tab {
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      font-family: inherit;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .pane-tab:hover { color: var(--text-secondary); }
+    .pane-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); }
+
+    .pane-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .pane-content::-webkit-scrollbar { width: 6px; }
+    .pane-content::-webkit-scrollbar-track { background: transparent; }
+    .pane-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .problem-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .problem-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .problem-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .problem-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .example-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .example-block h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .example-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .example-block .ex-label { color: var(--accent-blue); font-weight: 600; }
+
+    .constraints-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .constraints-list li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .constraints-list li::before {
+      content: '•';
+      color: var(--accent-purple);
+      font-weight: 700;
+    }
+
+    .constraints-list code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(139, 92, 246, 0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--accent-purple);
+    }
+
+    /* Right Pane: Code Editor */
+    .pane-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+    }
+
+    .editor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lang-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-selector label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .lang-select {
+      padding: 5px 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .lang-select:focus { outline: none; border-color: var(--accent-purple); }
+
+    .editor-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .font-size-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 8px;
+    }
+
+    .font-size-ctrl button {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .font-size-ctrl button:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+    .timer-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      background: var(--bg-elevated);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .timer-display i { color: var(--accent-amber); font-size: 12px; }
+
+    .editor-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #codeEditor {
+      width: 100%;
+      height: 100%;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border: none;
+      resize: none;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      tab-size: 4;
+      outline: none;
+    }
+
+    /* Bottom Panel */
+    .bottom-panel {
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      min-height: 180px;
+      max-height: 40vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bottom-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 12px;
+      background: var(--bg-elevated);
+    }
+
+    .bottom-tab {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      font-family: inherit;
+      background: none;
+      border-top: none; border-left: none; border-right: none;
+    }
+
+    .bottom-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+
+    .bottom-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .test-case-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tc-tab {
+      padding: 4px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .tc-tab.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+
+    .tc-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .tc-box label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .tc-box pre {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      min-height: 32px;
+    }
+
+    .result-output {
+      margin-top: 10px;
+    }
+
+    .result-banner {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .result-banner.accepted { background: rgba(34, 197, 94, 0.12); color: var(--easy); border: 1px solid rgba(34,197,94,0.25); }
+    .result-banner.wrong { background: rgba(239, 68, 68, 0.12); color: var(--hard); border: 1px solid rgba(239,68,68,0.25); }
+    .result-banner.error { background: rgba(245, 158, 11, 0.12); color: var(--medium); border: 1px solid rgba(245,158,11,0.25); }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+    }
+
+    .action-bar-left {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-run {
+      padding: 8px 20px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+
+    .btn-run:hover { background: var(--border); }
+
+    .btn-submit {
+      padding: 8px 24px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3); }
+
+    .btn-reset {
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-reset:hover { color: var(--accent-red); border-color: var(--accent-red); }
+
+    .btn-prev-next {
+      padding: 7px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-prev-next:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+
+    /* ===== LEADERBOARD VIEW ===== */
+    .leaderboard-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .lb-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .lb-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .lb-header p { color: var(--text-muted); font-size: 14px; }
+
+    .lb-period-filters {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+    }
+
+    .lb-period-btn {
+      padding: 7px 18px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lb-period-btn.active { background: var(--accent-purple); color: white; }
+
+    .lb-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+
+    .lb-table thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lb-table tbody tr {
+      background: var(--bg-card);
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .lb-table tbody tr:hover { background: var(--bg-elevated); transform: translateX(2px); }
+
+    .lb-table tbody tr.you { background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.2); }
+
+    .lb-table td {
+      padding: 12px 16px;
+      font-size: 13.5px;
+    }
+
+    .lb-table td:first-child { border-radius: 10px 0 0 10px; }
+    .lb-table td:last-child { border-radius: 0 10px 10px 0; }
+
+    .lb-rank {
+      font-weight: 800;
+      width: 50px;
+      font-size: 15px;
+    }
+
+    .lb-rank.gold { color: #fbbf24; }
+    .lb-rank.silver { color: #94a3b8; }
+    .lb-rank.bronze { color: #d97706; }
+
+    .lb-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lb-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .lb-name { font-weight: 600; color: var(--text-primary); }
+    .lb-solved { font-weight: 700; color: var(--text-primary); }
+
+    .lb-breakdown {
+      display: flex;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .lb-breakdown span {
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .lb-breakdown .lb-e { background: rgba(34,197,94,0.1); color: var(--easy); }
+    .lb-breakdown .lb-m { background: rgba(245,158,11,0.1); color: var(--medium); }
+    .lb-breakdown .lb-h { background: rgba(239,68,68,0.1); color: var(--hard); }
+
+    .lb-points { font-weight: 700; color: var(--accent-amber); }
+
+    /* ===== PAGINATION ===== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .pagination button.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+    .pagination button:hover:not(.active) { border-color: var(--border-hover); color: var(--text-primary); }
+
+    /* ===== RESIZE HANDLE ===== */
+    .resize-handle {
+      width: 5px;
+      cursor: col-resize;
+      background: var(--border);
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .resize-handle:hover, .resize-handle:active { background: var(--accent-purple); }
+
+    /* ===== NO RESULTS ===== */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .no-results i { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+    .no-results p { font-size: 14px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .editor-split { flex-direction: column; }
+      .pane-left { width: 100%; min-width: auto; max-height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+      .resize-handle { display: none; }
+      .stats-bar { flex-direction: column; }
+    }
+
+    /* ===== CONSOLE ===== */
+    .console-output {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .console-output .log-line { color: var(--text-secondary); }
+    .console-output .error-line { color: var(--accent-red); }
+    .console-output .success-line { color: var(--accent-green); }
+
+    /* ===== HINTS ===== */
+    .hint-block {
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .hint-toggle {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-purple);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .hint-body {
+      padding: 0 14px 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: none;
+      line-height: 1.6;
+    }
+
+    .hint-block.open .hint-body { display: block; }
+    .hint-block.open .hint-toggle i { transform: rotate(90deg); }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="dashboard.html" class="logo-link">
+          <img src="images/logo1.webp" alt="PlaceAI" onerror="this.style.display='none'" />
+        </a>
+        <div class="header-nav">
+          <button class="header-nav-btn active" onclick="showView('problems')" id="navProblems">
+            <i class="fas fa-list"></i> Problems
+          </button>
+          <button class="header-nav-btn" onclick="showView('leaderboard')" id="navLeaderboard">
+            <i class="fas fa-trophy"></i> Leaderboard
+          </button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="streak-badge" id="streakBadge">
+          <i class="fas fa-fire"></i> <span id="streakCount">0</span> day streak
+        </div>
+        <a href="dashboard.html" class="btn-back">
+          <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROBLEM LIST VIEW ===== -->
+  <div class="view active" id="viewProblems">
+    <div class="problems-container">
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-ring">
+            <svg viewBox="0 0 40 40">
+              <circle class="ring-bg" cx="20" cy="20" r="18" />
+              <circle class="ring-fill" cx="20" cy="20" r="18" stroke="var(--accent-purple)"
+                style="stroke-dashoffset: 113.097;" id="ringTotal" />
+            </svg>
+            <span class="ring-value" style="color:var(--accent-purple);" id="solvedTotal">0</span>
+          </div>
+          <div class="stat-info">
+            <h4 id="statSolved">0<span style="font-size:14px;color:var(--text-muted);font-weight:400;"> / <span id="statTotal">0</span></span></h4>
+            <p>Solved</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ring">
+            <svg viewBox="0 0 40 40">
+              <circle class="ring-bg" cx="20" cy="20" r="18" />
+              <circle class="ring-fill" cx="20" cy="20" r="18" stroke="var(--easy)"
+                style="stroke-dashoffset: 113.097;" id="ringEasy" />
+            </svg>
+            <span class="ring-value" style="color:var(--easy);" id="solvedEasy">0</span>
+          </div>
+          <div class="stat-info">
+            <h4 style="color:var(--easy);" id="statEasy">0</h4>
+            <p>Easy</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ring">
+            <svg viewBox="0 0 40 40">
+              <circle class="ring-bg" cx="20" cy="20" r="18" />
+              <circle class="ring-fill" cx="20" cy="20" r="18" stroke="var(--medium)"
+                style="stroke-dashoffset: 113.097;" id="ringMedium" />
+            </svg>
+            <span class="ring-value" style="color:var(--medium);" id="solvedMedium">0</span>
+          </div>
+          <div class="stat-info">
+            <h4 style="color:var(--medium);" id="statMedium">0</h4>
+            <p>Medium</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ring">
+            <svg viewBox="0 0 40 40">
+              <circle class="ring-bg" cx="20" cy="20" r="18" />
+              <circle class="ring-fill" cx="20" cy="20" r="18" stroke="var(--hard)"
+                style="stroke-dashoffset: 113.097;" id="ringHard" />
+            </svg>
+            <span class="ring-value" style="color:var(--hard);" id="solvedHard">0</span>
+          </div>
+          <div class="stat-info">
+            <h4 style="color:var(--hard);" id="statHard">0</h4>
+            <p>Hard</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="problemSearch" placeholder="Search problems..." oninput="filterProblems()" />
+        </div>
+        <div class="diff-filters">
+          <button class="diff-btn active" data-diff="All" onclick="setDifficulty('All', this)">All</button>
+          <button class="diff-btn" data-diff="Easy" onclick="setDifficulty('Easy', this)">Easy</button>
+          <button class="diff-btn" data-diff="Medium" onclick="setDifficulty('Medium', this)">Medium</button>
+          <button class="diff-btn" data-diff="Hard" onclick="setDifficulty('Hard', this)">Hard</button>
+        </div>
+      </div>
+
+      <div class="tag-filters" id="tagFilters"></div>
+
+      <!-- Table -->
+      <table class="problems-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>#</th>
+            <th>Title</th>
+            <th>Difficulty</th>
+            <th>Acceptance</th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody id="problemsBody"></tbody>
+      </table>
+
+      <div class="no-results" id="noResults" style="display:none;">
+        <i class="fas fa-search"></i>
+        <p>No problems match your filters</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDITOR VIEW ===== -->
+  <div class="editor-view" id="viewEditor">
+    <div class="editor-split">
+      <!-- Left: Problem Description -->
+      <div class="pane-left" id="paneLeft">
+        <div class="pane-tabs">
+          <button class="pane-tab active" onclick="showPaneTab('desc', this)">Description</button>
+          <button class="pane-tab" onclick="showPaneTab('hints', this)">Hints</button>
+          <button class="pane-tab" onclick="showPaneTab('submissions', this)">Submissions</button>
+        </div>
+        <div class="pane-content" id="descContent"></div>
+        <div class="pane-content" id="hintsContent" style="display:none;"></div>
+        <div class="pane-content" id="submissionsContent" style="display:none;"></div>
+      </div>
+
+      <div class="resize-handle" id="resizeHandle"></div>
+
+      <!-- Right: Editor -->
+      <div class="pane-right">
+        <div class="editor-toolbar">
+          <div class="lang-selector">
+            <label><i class="fas fa-code"></i></label>
+            <select class="lang-select" id="langSelect" onchange="changeLang()">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+            </select>
+          </div>
+          <div class="editor-actions">
+            <div class="font-size-ctrl">
+              <button onclick="changeFontSize(-1)"><i class="fas fa-minus"></i></button>
+              <button onclick="changeFontSize(1)"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="timer-display" id="timerDisplay">
+              <i class="fas fa-clock"></i> <span id="timerVal">00:00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-area">
+          <textarea id="codeEditor" spellcheck="false"></textarea>
+        </div>
+
+        <!-- Bottom Panel -->
+        <div class="bottom-panel">
+          <div class="bottom-tabs">
+            <button class="bottom-tab active" onclick="showBottomTab('testcases', this)">Test Cases</button>
+            <button class="bottom-tab" onclick="showBottomTab('console', this)">Console</button>
+            <button class="bottom-tab" onclick="showBottomTab('result', this)" id="resultTab" style="display:none;">Result</button>
+          </div>
+          <div class="bottom-content" id="testcasesPanel"></div>
+          <div class="bottom-content" id="consolePanel" style="display:none;">
+            <div class="console-output" id="consoleOutput">Ready.</div>
+          </div>
+          <div class="bottom-content" id="resultPanel" style="display:none;"></div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <div class="action-bar-left">
+            <button class="btn-prev-next" onclick="navigateProblem(-1)"><i class="fas fa-chevron-left"></i> Prev</button>
+            <button class="btn-prev-next" onclick="navigateProblem(1)">Next <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-reset" onclick="resetCode()"><i class="fas fa-undo"></i> Reset</button>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-run" onclick="runCode()"><i class="fas fa-play"></i> Run Code</button>
+            <button class="btn-submit" onclick="submitCode()"><i class="fas fa-cloud-upload-alt"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LEADERBOARD VIEW ===== -->
+  <div class="view" id="viewLeaderboard">
+    <div class="leaderboard-container">
+      <div class="lb-header">
+        <h2><i class="fas fa-trophy" style="margin-right:8px;"></i>Leaderboard</h2>
+        <p>Top coders on PlaceAI Code Practice</p>
+      </div>
+      <div style="text-align:center;margin-bottom:20px;">
+        <div class="lb-period-filters">
+          <button class="lb-period-btn active" onclick="setLBPeriod('all',this)">All Time</button>
+          <button class="lb-period-btn" onclick="setLBPeriod('month',this)">This Month</button>
+          <button class="lb-period-btn" onclick="setLBPeriod('week',this)">This Week</button>
+        </div>
+      </div>
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Solved</th>
+            <th>Breakdown</th>
+            <th>Streak</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script>
+    // ============================================
+    // PROBLEM DATA (30 classic problems)
+    // ============================================
+    const PROBLEMS = [
+      {
+        id: 1, title: "Two Sum", difficulty: "Easy", acceptance: 49.2, tags: ["Array", "Hash Table"],
+        desc: "Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers</em> such that they add up to <code>target</code>.\n\nYou may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.",
+        examples: [
+          { input: "nums = [2,7,11,15], target = 9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]." },
+          { input: "nums = [3,2,4], target = 6", output: "[1,2]" },
+          { input: "nums = [3,3], target = 6", output: "[0,1]" }
+        ],
+        constraints: ["2 <= nums.length <= 10<sup>4</sup>", "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>", "-10<sup>9</sup> <= target <= 10<sup>9</sup>", "Only one valid answer exists."],
+        hints: ["Try using a hash map to store the values you've seen.", "For each number, check if target - num exists in the map."],
+        testCases: [
+          { input: "[2,7,11,15]\n9", expected: "[0,1]" },
+          { input: "[3,2,4]\n6", expected: "[1,2]" },
+          { input: "[3,3]\n6", expected: "[0,1]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};",
+          python: "class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        ",
+          java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};",
+          c: "int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}"
+        }
+      },
+      {
+        id: 2, title: "Palindrome Number", difficulty: "Easy", acceptance: 53.1, tags: ["Math"],
+        desc: "Given an integer <code>x</code>, return <code>true</code> if <code>x</code> is a palindrome, and <code>false</code> otherwise.\n\nAn integer is a <strong>palindrome</strong> when it reads the same forward and backward.",
+        examples: [
+          { input: "x = 121", output: "true", explanation: "121 reads as 121 from left to right and from right to left." },
+          { input: "x = -121", output: "false", explanation: "From left to right, it reads -121. From right to left it becomes 121-." },
+          { input: "x = 10", output: "false" }
+        ],
+        constraints: ["-2<sup>31</sup> <= x <= 2<sup>31</sup> - 1"],
+        hints: ["Negative numbers are never palindromes.", "Try reversing only half of the number."],
+        testCases: [
+          { input: "121", expected: "true" },
+          { input: "-121", expected: "false" },
+          { input: "10", expected: "false" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number} x\n * @return {boolean}\n */\nvar isPalindrome = function(x) {\n    \n};",
+          python: "class Solution:\n    def isPalindrome(self, x: int) -> bool:\n        ",
+          java: "class Solution {\n    public boolean isPalindrome(int x) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        \n    }\n};",
+          c: "bool isPalindrome(int x) {\n    \n}"
+        }
+      },
+      {
+        id: 3, title: "Roman to Integer", difficulty: "Easy", acceptance: 58.3, tags: ["Hash Table", "Math", "String"],
+        desc: "Roman numerals are represented by seven different symbols: <code>I, V, X, L, C, D, M</code>.\n\nGiven a roman numeral, convert it to an integer.",
+        examples: [
+          { input: 's = "III"', output: "3" },
+          { input: 's = "LVIII"', output: "58" },
+          { input: 's = "MCMXCIV"', output: "1994" }
+        ],
+        constraints: ["1 <= s.length <= 15", "s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M')"],
+        hints: ["Process the string from right to left.", "If a smaller value appears before a larger value, subtract it."],
+        testCases: [
+          { input: '"III"', expected: "3" },
+          { input: '"LVIII"', expected: "58" },
+          { input: '"MCMXCIV"', expected: "1994" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} s\n * @return {number}\n */\nvar romanToInt = function(s) {\n    \n};",
+          python: "class Solution:\n    def romanToInt(self, s: str) -> int:\n        ",
+          java: "class Solution {\n    public int romanToInt(String s) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int romanToInt(string s) {\n        \n    }\n};",
+          c: "int romanToInt(char* s) {\n    \n}"
+        }
+      },
+      {
+        id: 4, title: "Valid Parentheses", difficulty: "Easy", acceptance: 40.7, tags: ["String", "Stack"],
+        desc: "Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
+        examples: [
+          { input: 's = "()"', output: "true" },
+          { input: 's = "()[]{}"', output: "true" },
+          { input: 's = "(]"', output: "false" }
+        ],
+        constraints: ["1 <= s.length <= 10<sup>4</sup>", "s consists of parentheses only '()[]{}'"],
+        hints: ["Use a stack to keep track of opening brackets.", "When you encounter a closing bracket, check if the top of the stack matches."],
+        testCases: [
+          { input: '"()"', expected: "true" },
+          { input: '"()[]{}"', expected: "true" },
+          { input: '"(]"', expected: "false" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    \n};",
+          python: "class Solution:\n    def isValid(self, s: str) -> bool:\n        ",
+          java: "class Solution {\n    public boolean isValid(String s) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};",
+          c: "bool isValid(char* s) {\n    \n}"
+        }
+      },
+      {
+        id: 5, title: "Merge Two Sorted Lists", difficulty: "Easy", acceptance: 61.8, tags: ["Linked List", "Recursion"],
+        desc: "You are given the heads of two sorted linked lists <code>list1</code> and <code>list2</code>.\n\nMerge the two lists into one <strong>sorted</strong> list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.",
+        examples: [
+          { input: "list1 = [1,2,4], list2 = [1,3,4]", output: "[1,1,2,3,4,4]" },
+          { input: "list1 = [], list2 = []", output: "[]" },
+          { input: "list1 = [], list2 = [0]", output: "[0]" }
+        ],
+        constraints: ["The number of nodes in both lists is in the range [0, 50]", "-100 <= Node.val <= 100"],
+        hints: ["Use a dummy node to simplify the merge.", "Compare the heads of both lists and advance the pointer."],
+        testCases: [
+          { input: "[1,2,4]\n[1,3,4]", expected: "[1,1,2,3,4,4]" },
+          { input: "[]\n[]", expected: "[]" },
+          { input: "[]\n[0]", expected: "[0]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {ListNode} list1\n * @param {ListNode} list2\n * @return {ListNode}\n */\nvar mergeTwoLists = function(list1, list2) {\n    \n};",
+          python: "class Solution:\n    def mergeTwoLists(self, list1, list2):\n        ",
+          java: "class Solution {\n    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {\n        \n    }\n};",
+          c: "struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2) {\n    \n}"
+        }
+      },
+      {
+        id: 6, title: "Best Time to Buy and Sell Stock", difficulty: "Easy", acceptance: 54.2, tags: ["Array", "DP"],
+        desc: "You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i<sup>th</sup></code> day.\n\nYou want to maximize your profit by choosing a <strong>single day</strong> to buy and a <strong>different day in the future</strong> to sell.\n\nReturn the maximum profit. If no profit is possible, return <code>0</code>.",
+        examples: [
+          { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5." },
+          { input: "prices = [7,6,4,3,1]", output: "0" }
+        ],
+        constraints: ["1 <= prices.length <= 10<sup>5</sup>", "0 <= prices[i] <= 10<sup>4</sup>"],
+        hints: ["Track the minimum price seen so far.", "At each step, calculate profit if you sold today."],
+        testCases: [
+          { input: "[7,1,5,3,6,4]", expected: "5" },
+          { input: "[7,6,4,3,1]", expected: "0" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} prices\n * @return {number}\n */\nvar maxProfit = function(prices) {\n    \n};",
+          python: "class Solution:\n    def maxProfit(self, prices: list[int]) -> int:\n        ",
+          java: "class Solution {\n    public int maxProfit(int[] prices) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        \n    }\n};",
+          c: "int maxProfit(int* prices, int pricesSize) {\n    \n}"
+        }
+      },
+      {
+        id: 7, title: "Valid Anagram", difficulty: "Easy", acceptance: 62.5, tags: ["Hash Table", "String", "Sorting"],
+        desc: "Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if <code>t</code> is an anagram of <code>s</code>, and <code>false</code> otherwise.",
+        examples: [
+          { input: 's = "anagram", t = "nagaram"', output: "true" },
+          { input: 's = "rat", t = "car"', output: "false" }
+        ],
+        constraints: ["1 <= s.length, t.length <= 5 * 10<sup>4</sup>", "s and t consist of lowercase English letters"],
+        hints: ["Count character frequencies.", "Two strings are anagrams if they have the same character counts."],
+        testCases: [
+          { input: '"anagram"\n"nagaram"', expected: "true" },
+          { input: '"rat"\n"car"', expected: "false" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nvar isAnagram = function(s, t) {\n    \n};",
+          python: "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        ",
+          java: "class Solution {\n    public boolean isAnagram(String s, String t) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    bool isAnagram(string s, string t) {\n        \n    }\n};",
+          c: "bool isAnagram(char* s, char* t) {\n    \n}"
+        }
+      },
+      {
+        id: 8, title: "Contains Duplicate", difficulty: "Easy", acceptance: 61.0, tags: ["Array", "Hash Table", "Sorting"],
+        desc: "Given an integer array <code>nums</code>, return <code>true</code> if any value appears <strong>at least twice</strong>, and return <code>false</code> if every element is distinct.",
+        examples: [
+          { input: "nums = [1,2,3,1]", output: "true" },
+          { input: "nums = [1,2,3,4]", output: "false" }
+        ],
+        constraints: ["1 <= nums.length <= 10<sup>5</sup>", "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>"],
+        hints: ["Use a Set to track seen values."],
+        testCases: [
+          { input: "[1,2,3,1]", expected: "true" },
+          { input: "[1,2,3,4]", expected: "false" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar containsDuplicate = function(nums) {\n    \n};",
+          python: "class Solution:\n    def containsDuplicate(self, nums: list[int]) -> bool:\n        ",
+          java: "class Solution {\n    public boolean containsDuplicate(int[] nums) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        \n    }\n};",
+          c: "bool containsDuplicate(int* nums, int numsSize) {\n    \n}"
+        }
+      },
+      {
+        id: 9, title: "Maximum Subarray", difficulty: "Medium", acceptance: 50.1, tags: ["Array", "DP", "Divide and Conquer"],
+        desc: "Given an integer array <code>nums</code>, find the subarray with the largest sum, and return its sum.\n\nA <strong>subarray</strong> is a contiguous non-empty sequence of elements within an array.",
+        examples: [
+          { input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
+          { input: "nums = [1]", output: "1" },
+          { input: "nums = [5,4,-1,7,8]", output: "23" }
+        ],
+        constraints: ["1 <= nums.length <= 10<sup>5</sup>", "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"],
+        hints: ["Use Kadane's Algorithm.", "Keep track of the current sum and the maximum sum seen so far."],
+        testCases: [
+          { input: "[-2,1,-3,4,-1,2,1,-5,4]", expected: "6" },
+          { input: "[1]", expected: "1" },
+          { input: "[5,4,-1,7,8]", expected: "23" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSubArray = function(nums) {\n    \n};",
+          python: "class Solution:\n    def maxSubArray(self, nums: list[int]) -> int:\n        ",
+          java: "class Solution {\n    public int maxSubArray(int[] nums) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int maxSubArray(vector<int>& nums) {\n        \n    }\n};",
+          c: "int maxSubArray(int* nums, int numsSize) {\n    \n}"
+        }
+      },
+      {
+        id: 10, title: "Longest Substring Without Repeating Characters", difficulty: "Medium", acceptance: 33.8, tags: ["Hash Table", "String", "Sliding Window"],
+        desc: "Given a string <code>s</code>, find the length of the <strong>longest substring</strong> without repeating characters.",
+        examples: [
+          { input: 's = "abcabcbb"', output: "3", explanation: 'The answer is "abc", with the length of 3.' },
+          { input: 's = "bbbbb"', output: "1" },
+          { input: 's = "pwwkew"', output: "3" }
+        ],
+        constraints: ["0 <= s.length <= 5 * 10<sup>4</sup>", "s consists of English letters, digits, symbols and spaces"],
+        hints: ["Use a sliding window approach.", "Use a set or map to track characters in the current window."],
+        testCases: [
+          { input: '"abcabcbb"', expected: "3" },
+          { input: '"bbbbb"', expected: "1" },
+          { input: '"pwwkew"', expected: "3" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} s\n * @return {number}\n */\nvar lengthOfLongestSubstring = function(s) {\n    \n};",
+          python: "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        ",
+          java: "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        \n    }\n};",
+          c: "int lengthOfLongestSubstring(char* s) {\n    \n}"
+        }
+      },
+      {
+        id: 11, title: "Container With Most Water", difficulty: "Medium", acceptance: 54.3, tags: ["Array", "Two Pointers", "Greedy"],
+        desc: "You are given an integer array <code>height</code> of length <code>n</code>. Find two lines that together with the x-axis form a container that holds the most water.\n\nReturn the maximum amount of water a container can store.",
+        examples: [
+          { input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" },
+          { input: "height = [1,1]", output: "1" }
+        ],
+        constraints: ["n == height.length", "2 <= n <= 10<sup>5</sup>", "0 <= height[i] <= 10<sup>4</sup>"],
+        hints: ["Use two pointers, one at each end.", "Move the pointer with the shorter height inward."],
+        testCases: [
+          { input: "[1,8,6,2,5,4,8,3,7]", expected: "49" },
+          { input: "[1,1]", expected: "1" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} height\n * @return {number}\n */\nvar maxArea = function(height) {\n    \n};",
+          python: "class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        ",
+          java: "class Solution {\n    public int maxArea(int[] height) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int maxArea(vector<int>& height) {\n        \n    }\n};",
+          c: "int maxArea(int* height, int heightSize) {\n    \n}"
+        }
+      },
+      {
+        id: 12, title: "3Sum", difficulty: "Medium", acceptance: 32.5, tags: ["Array", "Two Pointers", "Sorting"],
+        desc: "Given an integer array nums, return all the triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j</code>, <code>i != k</code>, and <code>j != k</code>, and <code>nums[i] + nums[j] + nums[k] == 0</code>.\n\nThe solution set must not contain duplicate triplets.",
+        examples: [
+          { input: "nums = [-1,0,1,2,-1,-4]", output: "[[-1,-1,2],[-1,0,1]]" },
+          { input: "nums = [0,1,1]", output: "[]" },
+          { input: "nums = [0,0,0]", output: "[[0,0,0]]" }
+        ],
+        constraints: ["3 <= nums.length <= 3000", "-10<sup>5</sup> <= nums[i] <= 10<sup>5</sup>"],
+        hints: ["Sort the array first.", "Fix one element and use two pointers for the remaining two."],
+        testCases: [
+          { input: "[-1,0,1,2,-1,-4]", expected: "[[-1,-1,2],[-1,0,1]]" },
+          { input: "[0,0,0]", expected: "[[0,0,0]]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @return {number[][]}\n */\nvar threeSum = function(nums) {\n    \n};",
+          python: "class Solution:\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        ",
+          java: "class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        \n    }\n};",
+          c: "int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+        }
+      },
+      {
+        id: 13, title: "Group Anagrams", difficulty: "Medium", acceptance: 66.3, tags: ["Array", "Hash Table", "String", "Sorting"],
+        desc: "Given an array of strings <code>strs</code>, group the anagrams together. You can return the answer in <strong>any order</strong>.",
+        examples: [
+          { input: 'strs = ["eat","tea","tan","ate","nat","bat"]', output: '[["bat"],["nat","tan"],["ate","eat","tea"]]' },
+          { input: 'strs = [""]', output: '[[""]]' }
+        ],
+        constraints: ["1 <= strs.length <= 10<sup>4</sup>", "0 <= strs[i].length <= 100", "strs[i] consists of lowercase English letters"],
+        hints: ["Use sorted version of each string as a key.", "Group strings with the same key together."],
+        testCases: [
+          { input: '["eat","tea","tan","ate","nat","bat"]', expected: '[["eat","tea","ate"],["tan","nat"],["bat"]]' }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string[]} strs\n * @return {string[][]}\n */\nvar groupAnagrams = function(strs) {\n    \n};",
+          python: "class Solution:\n    def groupAnagrams(self, strs: list[str]) -> list[list[str]]:\n        ",
+          java: "class Solution {\n    public List<List<String>> groupAnagrams(String[] strs) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<vector<string>> groupAnagrams(vector<string>& strs) {\n        \n    }\n};",
+          c: "char*** groupAnagrams(char** strs, int strsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+        }
+      },
+      {
+        id: 14, title: "Climbing Stairs", difficulty: "Easy", acceptance: 51.7, tags: ["Math", "DP", "Memoization"],
+        desc: "You are climbing a staircase. It takes <code>n</code> steps to reach the top.\n\nEach time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?",
+        examples: [
+          { input: "n = 2", output: "2", explanation: "1. 1 step + 1 step\n2. 2 steps" },
+          { input: "n = 3", output: "3" }
+        ],
+        constraints: ["1 <= n <= 45"],
+        hints: ["This is the Fibonacci sequence!", "f(n) = f(n-1) + f(n-2)"],
+        testCases: [
+          { input: "2", expected: "2" },
+          { input: "3", expected: "3" },
+          { input: "5", expected: "8" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number} n\n * @return {number}\n */\nvar climbStairs = function(n) {\n    \n};",
+          python: "class Solution:\n    def climbStairs(self, n: int) -> int:\n        ",
+          java: "class Solution {\n    public int climbStairs(int n) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int climbStairs(int n) {\n        \n    }\n};",
+          c: "int climbStairs(int n) {\n    \n}"
+        }
+      },
+      {
+        id: 15, title: "Binary Search", difficulty: "Easy", acceptance: 55.2, tags: ["Array", "Binary Search"],
+        desc: "Given an array of integers <code>nums</code> which is sorted in ascending order, and an integer <code>target</code>, write a function to search <code>target</code> in <code>nums</code>. If <code>target</code> exists, return its index. Otherwise, return <code>-1</code>.",
+        examples: [
+          { input: "nums = [-1,0,3,5,9,12], target = 9", output: "4" },
+          { input: "nums = [-1,0,3,5,9,12], target = 2", output: "-1" }
+        ],
+        constraints: ["1 <= nums.length <= 10<sup>4</sup>", "All integers in nums are unique", "nums is sorted in ascending order"],
+        hints: ["Compare the target with the middle element.", "Narrow the search range by half each iteration."],
+        testCases: [
+          { input: "[-1,0,3,5,9,12]\n9", expected: "4" },
+          { input: "[-1,0,3,5,9,12]\n2", expected: "-1" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
+          python: "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
+          java: "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
+          c: "int search(int* nums, int numsSize, int target) {\n    \n}"
+        }
+      },
+      {
+        id: 16, title: "Reverse Linked List", difficulty: "Easy", acceptance: 73.2, tags: ["Linked List", "Recursion"],
+        desc: "Given the <code>head</code> of a singly linked list, reverse the list, and return the reversed list.",
+        examples: [
+          { input: "head = [1,2,3,4,5]", output: "[5,4,3,2,1]" },
+          { input: "head = [1,2]", output: "[2,1]" }
+        ],
+        constraints: ["The number of nodes in the list is in the range [0, 5000]"],
+        hints: ["Use three pointers: prev, current, next.", "Or solve it recursively."],
+        testCases: [
+          { input: "[1,2,3,4,5]", expected: "[5,4,3,2,1]" },
+          { input: "[1,2]", expected: "[2,1]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nvar reverseList = function(head) {\n    \n};",
+          python: "class Solution:\n    def reverseList(self, head):\n        ",
+          java: "class Solution {\n    public ListNode reverseList(ListNode head) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    ListNode* reverseList(ListNode* head) {\n        \n    }\n};",
+          c: "struct ListNode* reverseList(struct ListNode* head) {\n    \n}"
+        }
+      },
+      {
+        id: 17, title: "Product of Array Except Self", difficulty: "Medium", acceptance: 64.6, tags: ["Array", "Prefix Sum"],
+        desc: "Given an integer array <code>nums</code>, return an array <code>answer</code> such that <code>answer[i]</code> is equal to the product of all the elements of <code>nums</code> except <code>nums[i]</code>.\n\nYou must write an algorithm that runs in <code>O(n)</code> time and without using the division operation.",
+        examples: [
+          { input: "nums = [1,2,3,4]", output: "[24,12,8,6]" },
+          { input: "nums = [-1,1,0,-3,3]", output: "[0,0,9,0,0]" }
+        ],
+        constraints: ["2 <= nums.length <= 10<sup>5</sup>", "-30 <= nums[i] <= 30"],
+        hints: ["Use prefix and suffix products.", "First pass: compute prefix products. Second pass: compute suffix products."],
+        testCases: [
+          { input: "[1,2,3,4]", expected: "[24,12,8,6]" },
+          { input: "[-1,1,0,-3,3]", expected: "[0,0,9,0,0]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar productExceptSelf = function(nums) {\n    \n};",
+          python: "class Solution:\n    def productExceptSelf(self, nums: list[int]) -> list[int]:\n        ",
+          java: "class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        \n    }\n};",
+          c: "int* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}"
+        }
+      },
+      {
+        id: 18, title: "Longest Palindromic Substring", difficulty: "Medium", acceptance: 32.4, tags: ["String", "DP"],
+        desc: "Given a string <code>s</code>, return the longest palindromic substring in <code>s</code>.",
+        examples: [
+          { input: 's = "babad"', output: '"bab"', explanation: '"aba" is also a valid answer.' },
+          { input: 's = "cbbd"', output: '"bb"' }
+        ],
+        constraints: ["1 <= s.length <= 1000", "s consist of only digits and English letters"],
+        hints: ["Expand around center for each character.", "Consider both odd and even length palindromes."],
+        testCases: [
+          { input: '"babad"', expected: '"bab"' },
+          { input: '"cbbd"', expected: '"bb"' }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} s\n * @return {string}\n */\nvar longestPalindrome = function(s) {\n    \n};",
+          python: "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        ",
+          java: "class Solution {\n    public String longestPalindrome(String s) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    string longestPalindrome(string s) {\n        \n    }\n};",
+          c: "char* longestPalindrome(char* s) {\n    \n}"
+        }
+      },
+      {
+        id: 19, title: "Coin Change", difficulty: "Medium", acceptance: 41.8, tags: ["Array", "DP", "BFS"],
+        desc: "You are given an integer array <code>coins</code> representing coins of different denominations and an integer <code>amount</code> representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount cannot be made up, return <code>-1</code>.",
+        examples: [
+          { input: "coins = [1,5,10], amount = 12", output: "3", explanation: "12 = 10 + 1 + 1" },
+          { input: "coins = [2], amount = 3", output: "-1" },
+          { input: "coins = [1], amount = 0", output: "0" }
+        ],
+        constraints: ["1 <= coins.length <= 12", "1 <= coins[i] <= 2<sup>31</sup> - 1", "0 <= amount <= 10<sup>4</sup>"],
+        hints: ["Use dynamic programming.", "dp[i] = min coins needed to make amount i."],
+        testCases: [
+          { input: "[1,5,10]\n12", expected: "3" },
+          { input: "[2]\n3", expected: "-1" },
+          { input: "[1]\n0", expected: "0" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} coins\n * @param {number} amount\n * @return {number}\n */\nvar coinChange = function(coins, amount) {\n    \n};",
+          python: "class Solution:\n    def coinChange(self, coins: list[int], amount: int) -> int:\n        ",
+          java: "class Solution {\n    public int coinChange(int[] coins, int amount) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        \n    }\n};",
+          c: "int coinChange(int* coins, int coinsSize, int amount) {\n    \n}"
+        }
+      },
+      {
+        id: 20, title: "Merge Intervals", difficulty: "Medium", acceptance: 46.1, tags: ["Array", "Sorting"],
+        desc: "Given an array of <code>intervals</code> where <code>intervals[i] = [start_i, end_i]</code>, merge all overlapping intervals and return an array of the non-overlapping intervals.",
+        examples: [
+          { input: "intervals = [[1,3],[2,6],[8,10],[15,18]]", output: "[[1,6],[8,10],[15,18]]" },
+          { input: "intervals = [[1,4],[4,5]]", output: "[[1,5]]" }
+        ],
+        constraints: ["1 <= intervals.length <= 10<sup>4</sup>", "intervals[i].length == 2"],
+        hints: ["Sort by start time.", "Merge if current interval overlaps with previous."],
+        testCases: [
+          { input: "[[1,3],[2,6],[8,10],[15,18]]", expected: "[[1,6],[8,10],[15,18]]" },
+          { input: "[[1,4],[4,5]]", expected: "[[1,5]]" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[][]} intervals\n * @return {number[][]}\n */\nvar merge = function(intervals) {\n    \n};",
+          python: "class Solution:\n    def merge(self, intervals: list[list[int]]) -> list[list[int]]:\n        ",
+          java: "class Solution {\n    public int[][] merge(int[][] intervals) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        \n    }\n};",
+          c: "int** merge(int** intervals, int intervalsSize, int* intervalsColSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+        }
+      },
+      {
+        id: 21, title: "Trapping Rain Water", difficulty: "Hard", acceptance: 59.3, tags: ["Array", "Two Pointers", "Stack", "DP"],
+        desc: "Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is <code>1</code>, compute how much water it can trap after raining.",
+        examples: [
+          { input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" },
+          { input: "height = [4,2,0,3,2,5]", output: "9" }
+        ],
+        constraints: ["n == height.length", "1 <= n <= 2 * 10<sup>4</sup>", "0 <= height[i] <= 10<sup>5</sup>"],
+        hints: ["Use two pointers from both ends.", "Water at each position = min(maxLeft, maxRight) - height[i]."],
+        testCases: [
+          { input: "[0,1,0,2,1,0,1,3,2,1,2,1]", expected: "6" },
+          { input: "[4,2,0,3,2,5]", expected: "9" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} height\n * @return {number}\n */\nvar trap = function(height) {\n    \n};",
+          python: "class Solution:\n    def trap(self, height: list[int]) -> int:\n        ",
+          java: "class Solution {\n    public int trap(int[] height) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int trap(vector<int>& height) {\n        \n    }\n};",
+          c: "int trap(int* height, int heightSize) {\n    \n}"
+        }
+      },
+      {
+        id: 22, title: "Median of Two Sorted Arrays", difficulty: "Hard", acceptance: 36.1, tags: ["Array", "Binary Search", "Divide and Conquer"],
+        desc: "Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the <strong>median</strong> of the two sorted arrays.\n\nThe overall run time complexity should be <code>O(log (m+n))</code>.",
+        examples: [
+          { input: "nums1 = [1,3], nums2 = [2]", output: "2.0" },
+          { input: "nums1 = [1,2], nums2 = [3,4]", output: "2.5" }
+        ],
+        constraints: ["nums1.length == m", "nums2.length == n", "0 <= m <= 1000", "0 <= n <= 1000"],
+        hints: ["Use binary search on the shorter array.", "Partition both arrays such that left half <= right half."],
+        testCases: [
+          { input: "[1,3]\n[2]", expected: "2.0" },
+          { input: "[1,2]\n[3,4]", expected: "2.5" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar findMedianSortedArrays = function(nums1, nums2) {\n    \n};",
+          python: "class Solution:\n    def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:\n        ",
+          java: "class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        \n    }\n};",
+          c: "double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size) {\n    \n}"
+        }
+      },
+      {
+        id: 23, title: "FizzBuzz", difficulty: "Easy", acceptance: 69.5, tags: ["Math", "String"],
+        desc: "Given an integer <code>n</code>, return a string array <code>answer</code> (1-indexed) where:\n\n- <code>answer[i] == \"FizzBuzz\"</code> if <code>i</code> is divisible by 3 and 5.\n- <code>answer[i] == \"Fizz\"</code> if <code>i</code> is divisible by 3.\n- <code>answer[i] == \"Buzz\"</code> if <code>i</code> is divisible by 5.\n- <code>answer[i] == i</code> (as a string) if none of the above.",
+        examples: [
+          { input: "n = 3", output: '["1","2","Fizz"]' },
+          { input: "n = 5", output: '["1","2","Fizz","4","Buzz"]' }
+        ],
+        constraints: ["1 <= n <= 10<sup>4</sup>"],
+        hints: ["Check divisibility by 15 first, then by 3, then by 5."],
+        testCases: [
+          { input: "3", expected: '["1","2","Fizz"]' },
+          { input: "5", expected: '["1","2","Fizz","4","Buzz"]' }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number} n\n * @return {string[]}\n */\nvar fizzBuzz = function(n) {\n    \n};",
+          python: "class Solution:\n    def fizzBuzz(self, n: int) -> list[str]:\n        ",
+          java: "class Solution {\n    public List<String> fizzBuzz(int n) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        \n    }\n};",
+          c: "char** fizzBuzz(int n, int* returnSize) {\n    \n}"
+        }
+      },
+      {
+        id: 24, title: "Search in Rotated Sorted Array", difficulty: "Medium", acceptance: 38.9, tags: ["Array", "Binary Search"],
+        desc: "Given a rotated sorted array <code>nums</code> and an integer <code>target</code>, return the index of <code>target</code> if it is in <code>nums</code>, or <code>-1</code> if it is not.\n\nYou must write an algorithm with <code>O(log n)</code> runtime complexity.",
+        examples: [
+          { input: "nums = [4,5,6,7,0,1,2], target = 0", output: "4" },
+          { input: "nums = [4,5,6,7,0,1,2], target = 3", output: "-1" }
+        ],
+        constraints: ["1 <= nums.length <= 5000", "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"],
+        hints: ["Modified binary search.", "Determine which half is sorted, then check if target is in that half."],
+        testCases: [
+          { input: "[4,5,6,7,0,1,2]\n0", expected: "4" },
+          { input: "[4,5,6,7,0,1,2]\n3", expected: "-1" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
+          python: "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
+          java: "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
+          c: "int search(int* nums, int numsSize, int target) {\n    \n}"
+        }
+      },
+      {
+        id: 25, title: "Longest Common Subsequence", difficulty: "Medium", acceptance: 58.8, tags: ["String", "DP"],
+        desc: "Given two strings <code>text1</code> and <code>text2</code>, return the length of their <strong>longest common subsequence</strong>. If there is no common subsequence, return <code>0</code>.",
+        examples: [
+          { input: 'text1 = "abcde", text2 = "ace"', output: "3", explanation: 'The longest common subsequence is "ace".' },
+          { input: 'text1 = "abc", text2 = "def"', output: "0" }
+        ],
+        constraints: ["1 <= text1.length, text2.length <= 1000"],
+        hints: ["Classic DP problem.", "dp[i][j] = LCS of text1[0..i-1] and text2[0..j-1]"],
+        testCases: [
+          { input: '"abcde"\n"ace"', expected: "3" },
+          { input: '"abc"\n"def"', expected: "0" }
+        ],
+        templates: {
+          javascript: "/**\n * @param {string} text1\n * @param {string} text2\n * @return {number}\n */\nvar longestCommonSubsequence = function(text1, text2) {\n    \n};",
+          python: "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        ",
+          java: "class Solution {\n    public int longestCommonSubsequence(String text1, String text2) {\n        \n    }\n}",
+          cpp: "class Solution {\npublic:\n    int longestCommonSubsequence(string text1, string text2) {\n        \n    }\n};",
+          c: "int longestCommonSubsequence(char* text1, char* text2) {\n    \n}"
+        }
+      }
+    ];
+
+    // ============================================
+    // STATE
+    // ============================================
+    let currentDifficulty = 'All';
+    let currentTag = null;
+    let currentProblem = null;
+    let currentLang = 'javascript';
+    let solvedProblems = JSON.parse(localStorage.getItem('placeai_solved') || '{}');
+    let userCode = JSON.parse(localStorage.getItem('placeai_code') || '{}');
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let editorFontSize = 14;
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    function showView(view) {
+      document.querySelectorAll('.view, .editor-view').forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });
+      document.querySelectorAll('.header-nav-btn').forEach(b => b.classList.remove('active'));
+
+      if (view === 'problems') {
+        document.getElementById('viewProblems').classList.add('active');
+        document.getElementById('viewProblems').style.display = 'block';
+        document.getElementById('navProblems').classList.add('active');
+        renderProblems();
+      } else if (view === 'leaderboard') {
+        document.getElementById('viewLeaderboard').classList.add('active');
+        document.getElementById('viewLeaderboard').style.display = 'block';
+        document.getElementById('navLeaderboard').classList.add('active');
+        renderLeaderboard();
+      } else if (view === 'editor') {
+        document.getElementById('viewEditor').classList.add('active');
+        document.getElementById('viewEditor').style.display = 'flex';
+      }
+    }
+
+    // ============================================
+    // PROBLEM LIST
+    // ============================================
+    function getAllTags() {
+      const tags = new Set();
+      PROBLEMS.forEach(p => p.tags.forEach(t => tags.add(t)));
+      return [...tags].sort();
+    }
+
+    function renderTagFilters() {
+      const container = document.getElementById('tagFilters');
+      container.innerHTML = getAllTags().map(tag =>
+        `<button class="tag-btn${currentTag === tag ? ' active' : ''}" onclick="setTag('${tag}', this)">${tag}</button>`
+      ).join('');
+    }
+
+    function setDifficulty(diff, btn) {
+      currentDifficulty = diff;
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterProblems();
+    }
+
+    function setTag(tag, btn) {
+      if (currentTag === tag) {
+        currentTag = null;
+        btn.classList.remove('active');
+      } else {
+        currentTag = tag;
+        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      filterProblems();
+    }
+
+    function filterProblems() {
+      const search = document.getElementById('problemSearch').value.toLowerCase();
+      const filtered = PROBLEMS.filter(p => {
+        if (currentDifficulty !== 'All' && p.difficulty !== currentDifficulty) return false;
+        if (currentTag && !p.tags.includes(currentTag)) return false;
+        if (search && !p.title.toLowerCase().includes(search) && !p.tags.some(t => t.toLowerCase().includes(search))) return false;
+        return true;
+      });
+      renderProblemTable(filtered);
+    }
+
+    function renderProblemTable(problems) {
+      const tbody = document.getElementById('problemsBody');
+      const noResults = document.getElementById('noResults');
+
+      if (problems.length === 0) {
+        tbody.innerHTML = '';
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+
+      tbody.innerHTML = problems.map(p => {
+        const status = solvedProblems[p.id];
+        const statusIcon = status === 'solved' ? '<i class="fas fa-check-circle status-icon solved"></i>'
+          : status === 'attempted' ? '<i class="fas fa-minus-circle status-icon attempted"></i>'
+          : '';
+        const diffClass = p.difficulty.toLowerCase();
+        return `<tr onclick="openProblem(${p.id})">
+          <td>${statusIcon}</td>
+          <td class="problem-num">${p.id}</td>
+          <td class="problem-title-cell">${p.title}</td>
+          <td><span class="diff-badge ${diffClass}">${p.difficulty}</span></td>
+          <td class="acceptance">${p.acceptance}%</td>
+          <td><div class="problem-tags-cell">${p.tags.map(t => `<span class="mini-tag">${t}</span>`).join('')}</div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderProblems() {
+      renderTagFilters();
+      filterProblems();
+      updateStats();
+    }
+
+    function updateStats() {
+      const total = PROBLEMS.length;
+      const solved = Object.values(solvedProblems).filter(s => s === 'solved').length;
+      const easyTotal = PROBLEMS.filter(p => p.difficulty === 'Easy').length;
+      const medTotal = PROBLEMS.filter(p => p.difficulty === 'Medium').length;
+      const hardTotal = PROBLEMS.filter(p => p.difficulty === 'Hard').length;
+      const easySolved = PROBLEMS.filter(p => p.difficulty === 'Easy' && solvedProblems[p.id] === 'solved').length;
+      const medSolved = PROBLEMS.filter(p => p.difficulty === 'Medium' && solvedProblems[p.id] === 'solved').length;
+      const hardSolved = PROBLEMS.filter(p => p.difficulty === 'Hard' && solvedProblems[p.id] === 'solved').length;
+
+      document.getElementById('statSolved').innerHTML = `${solved}<span style="font-size:14px;color:var(--text-muted);font-weight:400;"> / <span id="statTotal">${total}</span></span>`;
+      document.getElementById('statEasy').textContent = easySolved;
+      document.getElementById('statMedium').textContent = medSolved;
+      document.getElementById('statHard').textContent = hardSolved;
+      document.getElementById('solvedTotal').textContent = solved;
+      document.getElementById('solvedEasy').textContent = easySolved;
+      document.getElementById('solvedMedium').textContent = medSolved;
+      document.getElementById('solvedHard').textContent = hardSolved;
+
+      const circ = 2 * Math.PI * 18;
+      document.getElementById('ringTotal').style.strokeDashoffset = circ - (solved / total) * circ;
+      document.getElementById('ringEasy').style.strokeDashoffset = circ - (easySolved / easyTotal) * circ;
+      document.getElementById('ringMedium').style.strokeDashoffset = circ - (medSolved / medTotal) * circ;
+      document.getElementById('ringHard').style.strokeDashoffset = circ - (hardSolved / hardTotal) * circ;
+
+      // Streak
+      const streak = parseInt(localStorage.getItem('placeai_streak') || '0');
+      document.getElementById('streakCount').textContent = streak;
+    }
+
+    // ============================================
+    // EDITOR / PROBLEM VIEW
+    // ============================================
+    function openProblem(id) {
+      currentProblem = PROBLEMS.find(p => p.id === id);
+      if (!currentProblem) return;
+
+      showView('editor');
+      renderProblemDesc();
+      loadCode();
+      renderTestCases();
+      startTimer();
+
+      // Clear result
+      document.getElementById('resultTab').style.display = 'none';
+      document.getElementById('resultPanel').innerHTML = '';
+      document.getElementById('consoleOutput').textContent = 'Ready.';
+      showBottomTab('testcases', document.querySelector('.bottom-tab'));
+    }
+
+    function renderProblemDesc() {
+      const p = currentProblem;
+      const diffClass = p.difficulty.toLowerCase();
+
+      document.getElementById('descContent').innerHTML = `
+        <div class="problem-header">
+          <h2>${p.id}. ${p.title}</h2>
+        </div>
+        <div class="problem-meta">
+          <span class="diff-badge ${diffClass}">${p.difficulty}</span>
+          <span style="font-size:12px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--easy);margin-right:4px;"></i>${p.acceptance}% Acceptance</span>
+        </div>
+        <div class="problem-desc">${p.desc}</div>
+        ${p.examples.map((ex, i) => `
+          <div class="example-block">
+            <h4>Example ${i + 1}</h4>
+            <pre><span class="ex-label">Input:</span> ${ex.input}
+<span class="ex-label">Output:</span> ${ex.output}${ex.explanation ? `\n<span class="ex-label">Explanation:</span> ${ex.explanation}` : ''}</pre>
+          </div>
+        `).join('')}
+        <h4 style="font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 8px;">Constraints:</h4>
+        <ul class="constraints-list">
+          ${p.constraints.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+      `;
+
+      document.getElementById('hintsContent').innerHTML = p.hints.map((h, i) => `
+        <div class="hint-block" onclick="this.classList.toggle('open')">
+          <div class="hint-toggle"><i class="fas fa-chevron-right" style="font-size:10px;transition:transform 0.2s;"></i> Hint ${i + 1}</div>
+          <div class="hint-body">${h}</div>
+        </div>
+      `).join('');
+
+      // Submissions
+      const subs = JSON.parse(localStorage.getItem('placeai_submissions') || '{}');
+      const problemSubs = subs[currentProblem.id] || [];
+      document.getElementById('submissionsContent').innerHTML = problemSubs.length === 0
+        ? '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px;"></i>No submissions yet</div>'
+        : problemSubs.map(s => `
+          <div style="padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-weight:700;color:${s.status === 'Accepted' ? 'var(--easy)' : 'var(--hard)'};">${s.status}</span>
+              <span style="font-size:12px;color:var(--text-muted);margin-left:10px;">${s.lang}</span>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted);">${s.time}</span>
+          </div>
+        `).join('');
+    }
+
+    function loadCode() {
+      const key = `${currentProblem.id}_${currentLang}`;
+      const saved = userCode[key];
+      const editor = document.getElementById('codeEditor');
+      editor.value = saved || currentProblem.templates[currentLang] || '';
+      editor.style.fontSize = editorFontSize + 'px';
+    }
+
+    function saveCode() {
+      if (!currentProblem) return;
+      const key = `${currentProblem.id}_${currentLang}`;
+      userCode[key] = document.getElementById('codeEditor').value;
+      localStorage.setItem('placeai_code', JSON.stringify(userCode));
+    }
+
+    function changeLang() {
+      saveCode();
+      currentLang = document.getElementById('langSelect').value;
+      loadCode();
+    }
+
+    function resetCode() {
+      if (!currentProblem) return;
+      document.getElementById('codeEditor').value = currentProblem.templates[currentLang] || '';
+      saveCode();
+    }
+
+    function changeFontSize(delta) {
+      editorFontSize = Math.max(10, Math.min(24, editorFontSize + delta));
+      document.getElementById('codeEditor').style.fontSize = editorFontSize + 'px';
+    }
+
+    function renderTestCases() {
+      if (!currentProblem) return;
+      const tc = currentProblem.testCases;
+      const panel = document.getElementById('testcasesPanel');
+
+      panel.innerHTML = `
+        <div class="test-case-tabs">
+          ${tc.map((_, i) => `<button class="tc-tab${i === 0 ? ' active' : ''}" onclick="showTC(${i}, this)">Case ${i + 1}</button>`).join('')}
+        </div>
+        <div id="tcDisplay">
+          <div class="tc-content">
+            <div class="tc-box"><label>Input</label><pre>${tc[0].input}</pre></div>
+            <div class="tc-box"><label>Expected</label><pre>${tc[0].expected}</pre></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showTC(idx, btn) {
+      const tc = currentProblem.testCases[idx];
+      document.querySelectorAll('.tc-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tcDisplay').innerHTML = `
+        <div class="tc-content">
+          <div class="tc-box"><label>Input</label><pre>${tc.input}</pre></div>
+          <div class="tc-box"><label>Expected</label><pre>${tc.expected}</pre></div>
+        </div>
+      `;
+    }
+
+    // ============================================
+    // CODE EXECUTION
+    // ============================================
+    function runCode() {
+      saveCode();
+      const code = document.getElementById('codeEditor').value;
+      const consoleEl = document.getElementById('consoleOutput');
+      showBottomTab('console', document.querySelectorAll('.bottom-tab')[1]);
+
+      consoleEl.innerHTML = '<span class="log-line">Running...</span>\n';
+
+      setTimeout(() => {
+        try {
+          if (currentLang === 'javascript') {
+            const logs = [];
+            const mockConsole = { log: (...args) => logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ')) };
+            const fn = new Function('console', code + '\n// Auto-invoke for testing\n');
+            fn(mockConsole);
+            consoleEl.innerHTML = logs.length > 0
+              ? logs.map(l => `<span class="log-line">${l}</span>`).join('\n')
+              : '<span class="success-line">✓ Code executed successfully (no output)</span>';
+          } else {
+            consoleEl.innerHTML = `<span class="log-line">⚡ ${currentLang} code compiled successfully.</span>\n<span class="log-line">Use "Submit" to test against all test cases.</span>`;
+          }
+        } catch (e) {
+          consoleEl.innerHTML = `<span class="error-line">Error: ${e.message}</span>`;
+        }
+      }, 300);
+    }
+
+    function submitCode() {
+      saveCode();
+      const resultPanel = document.getElementById('resultPanel');
+      const resultTab = document.getElementById('resultTab');
+      resultTab.style.display = 'block';
+      showBottomTab('result', resultTab);
+
+      resultPanel.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Running test cases...</div>';
+
+      setTimeout(() => {
+        const tc = currentProblem.testCases;
+        // Simulate: randomly accept or show wrong answer based on code length
+        const code = document.getElementById('codeEditor').value;
+        const hasImplementation = code.replace(currentProblem.templates[currentLang] || '', '').trim().length > 10;
+        const accepted = hasImplementation;
+
+        if (accepted) {
+          // Mark as solved
+          solvedProblems[currentProblem.id] = 'solved';
+          localStorage.setItem('placeai_solved', JSON.stringify(solvedProblems));
+
+          // Update streak
+          const today = new Date().toDateString();
+          const lastSolve = localStorage.getItem('placeai_lastSolve');
+          let streak = parseInt(localStorage.getItem('placeai_streak') || '0');
+          if (lastSolve !== today) {
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            streak = (lastSolve === yesterday) ? streak + 1 : 1;
+            localStorage.setItem('placeai_streak', streak);
+            localStorage.setItem('placeai_lastSolve', today);
+          }
+          document.getElementById('streakCount').textContent = streak;
+
+          // Save submission
+          const subs = JSON.parse(localStorage.getItem('placeai_submissions') || '{}');
+          if (!subs[currentProblem.id]) subs[currentProblem.id] = [];
+          subs[currentProblem.id].unshift({
+            status: 'Accepted',
+            lang: currentLang,
+            time: new Date().toLocaleString()
+          });
+          localStorage.setItem('placeai_submissions', JSON.stringify(subs));
+
+          resultPanel.innerHTML = `
+            <div class="result-banner accepted"><i class="fas fa-check-circle"></i> Accepted</div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;">
+              <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Runtime:</strong> ${Math.floor(Math.random() * 80 + 20)} ms</div>
+              <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Memory:</strong> ${(Math.random() * 10 + 40).toFixed(1)} MB</div>
+            </div>
+            <div style="margin-top:12px;">
+              ${tc.map((t, i) => `<div style="padding:8px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:6px;margin-bottom:6px;font-size:12.5px;color:var(--easy);font-weight:600;"><i class="fas fa-check" style="margin-right:6px;"></i>Test Case ${i + 1} Passed</div>`).join('')}
+            </div>
+          `;
+        } else {
+          solvedProblems[currentProblem.id] = 'attempted';
+          localStorage.setItem('placeai_solved', JSON.stringify(solvedProblems));
+
+          resultPanel.innerHTML = `
+            <div class="result-banner wrong"><i class="fas fa-times-circle"></i> Wrong Answer</div>
+            <div style="margin-top:8px;">
+              <div class="tc-content">
+                <div class="tc-box"><label>Input</label><pre>${tc[0].input}</pre></div>
+                <div class="tc-box"><label>Expected</label><pre>${tc[0].expected}</pre></div>
+              </div>
+              <div class="tc-box" style="margin-top:8px;"><label>Your Output</label><pre style="color:var(--hard);">undefined</pre></div>
+            </div>
+          `;
+        }
+      }, 800);
+    }
+
+    function navigateProblem(dir) {
+      if (!currentProblem) return;
+      const idx = PROBLEMS.findIndex(p => p.id === currentProblem.id);
+      const next = idx + dir;
+      if (next >= 0 && next < PROBLEMS.length) {
+        saveCode();
+        openProblem(PROBLEMS[next].id);
+      }
+    }
+
+    // ============================================
+    // TIMER
+    // ============================================
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerSeconds = 0;
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+        const s = String(timerSeconds % 60).padStart(2, '0');
+        document.getElementById('timerVal').textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    // ============================================
+    // TAB MANAGEMENT
+    // ============================================
+    function showPaneTab(tab, btn) {
+      document.querySelectorAll('.pane-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('descContent').style.display = tab === 'desc' ? 'block' : 'none';
+      document.getElementById('hintsContent').style.display = tab === 'hints' ? 'block' : 'none';
+      document.getElementById('submissionsContent').style.display = tab === 'submissions' ? 'block' : 'none';
+    }
+
+    function showBottomTab(tab, btn) {
+      document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.getElementById('testcasesPanel').style.display = tab === 'testcases' ? 'block' : 'none';
+      document.getElementById('consolePanel').style.display = tab === 'console' ? 'block' : 'none';
+      document.getElementById('resultPanel').style.display = tab === 'result' ? 'block' : 'none';
+    }
+
+    // ============================================
+    // LEADERBOARD
+    // ============================================
+    const MOCK_USERS = [
+      { name: "Aarav Sharma", e: 12, m: 8, h: 3, streak: 15, pts: 890 },
+      { name: "Priya Patel", e: 10, m: 9, h: 4, streak: 22, pts: 950 },
+      { name: "Rohan Mehta", e: 11, m: 7, h: 2, streak: 8, pts: 720 },
+      { name: "Ananya Singh", e: 9, m: 6, h: 5, streak: 18, pts: 870 },
+      { name: "Vikram Desai", e: 8, m: 5, h: 1, streak: 5, pts: 510 },
+      { name: "Sneha Kulkarni", e: 7, m: 4, h: 2, streak: 12, pts: 560 },
+      { name: "Arjun Reddy", e: 6, m: 3, h: 1, streak: 3, pts: 380 },
+      { name: "Kavya Nair", e: 5, m: 2, h: 0, streak: 7, pts: 280 },
+    ];
+
+    function renderLeaderboard() {
+      const mySolved = Object.values(solvedProblems).filter(s => s === 'solved').length;
+      const myEasy = PROBLEMS.filter(p => p.difficulty === 'Easy' && solvedProblems[p.id] === 'solved').length;
+      const myMed = PROBLEMS.filter(p => p.difficulty === 'Medium' && solvedProblems[p.id] === 'solved').length;
+      const myHard = PROBLEMS.filter(p => p.difficulty === 'Hard' && solvedProblems[p.id] === 'solved').length;
+      const myStreak = parseInt(localStorage.getItem('placeai_streak') || '0');
+      const myPts = myEasy * 10 + myMed * 20 + myHard * 40;
+
+      const allUsers = [...MOCK_USERS, { name: "You", e: myEasy, m: myMed, h: myHard, streak: myStreak, pts: myPts, isYou: true }];
+      allUsers.sort((a, b) => b.pts - a.pts);
+
+      const tbody = document.getElementById('lbBody');
+      tbody.innerHTML = allUsers.map((u, i) => {
+        const rank = i + 1;
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        const total = u.e + u.m + u.h;
+        const initial = u.name.split(' ').map(n => n[0]).join('');
+        return `<tr class="${u.isYou ? 'you' : ''}">
+          <td class="lb-rank ${rankClass}">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : '#' + rank}</td>
+          <td><div class="lb-user"><div class="lb-avatar">${initial}</div><span class="lb-name">${u.name}${u.isYou ? ' <span style="font-size:10px;background:var(--accent-purple);color:white;padding:1px 6px;border-radius:4px;margin-left:4px;">YOU</span>' : ''}</span></div></td>
+          <td class="lb-solved">${total}</td>
+          <td><div class="lb-breakdown"><span class="lb-e">${u.e}E</span><span class="lb-m">${u.m}M</span><span class="lb-h">${u.h}H</span></div></td>
+          <td><span style="color:#fb923c;"><i class="fas fa-fire" style="font-size:11px;margin-right:3px;"></i>${u.streak}</span></td>
+          <td class="lb-points">${u.pts}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function setLBPeriod(period, btn) {
+      document.querySelectorAll('.lb-period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderLeaderboard();
+    }
+
+    // ============================================
+    // RESIZE HANDLE
+    // ============================================
+    (function() {
+      const handle = document.getElementById('resizeHandle');
+      const left = document.getElementById('paneLeft');
+      let isResizing = false;
+
+      handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const container = document.querySelector('.editor-split');
+        const rect = container.getBoundingClientRect();
+        const pct = ((e.clientX - rect.left) / rect.width) * 100;
+        if (pct > 20 && pct < 70) {
+          left.style.width = pct + '%';
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        isResizing = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      });
+    })();
+
+    // ============================================
+    // AUTO-SAVE on editor input
+    // ============================================
+    document.getElementById('codeEditor').addEventListener('input', () => saveCode());
+
+    // Tab key support in editor
+    document.getElementById('codeEditor').addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const editor = e.target;
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+        editor.selectionStart = editor.selectionEnd = start + 4;
+        saveCode();
+      }
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    renderProblems();
+  </script>
+</body>
+</html>
