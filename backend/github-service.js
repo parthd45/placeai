@@ -297,114 +297,20 @@
         graduationYear = 2024;
       }
 
-      // 9. Extract Featured Projects
+      // 9. Extract Featured Projects & Repositories (Universal Dynamic Engine for ALL Users)
       const projectsList = [];
 
-      // Look for featured projects in README
-      if (/DCPE\s+ERP/i.test(readmeText)) {
-        projectsList.push({
-          name: 'DCPE ERP',
-          title: 'DCPE ERP',
-          description: 'A comprehensive college ERP platform designed to simplify academic and administrative workflows.',
-          url: 'https://dcpe-erp.vercel.app/',
-          project_url: 'https://dcpe-erp.vercel.app/',
-          tech: 'React • Web Development • ERP',
-          tags: ['React', 'Web Development', 'ERP'],
-          role: 'Creator & Developer'
-        });
+      // Scan README for any explicitly featured Vercel or live URLs
+      const readmeVercelUrls = {};
+      const vercelRegex = /https?:\/\/([a-zA-Z0-9_\-\.]+)\.vercel\.app\b/gi;
+      let vMatch;
+      while ((vMatch = vercelRegex.exec(readmeText)) !== null) {
+        const fullUrl = vMatch[0];
+        const sub = vMatch[1].toLowerCase().replace(/[-_]/g, '');
+        readmeVercelUrls[sub] = fullUrl;
       }
 
-      if (/Automated\s+Paperless\s+Transparent\s+College\s+System/i.test(readmeText) || /Paperless.*College/i.test(readmeText)) {
-        projectsList.push({
-          name: 'Automated Paperless Transparent College System',
-          title: 'Automated Paperless Transparent College System',
-          description: 'College management system designed to digitize processes including student elections, secure voting, live results, and notifications.',
-          url: `https://github.com/${u}`,
-          project_url: `https://github.com/${u}`,
-          tech: 'PHP • MySQL • JavaScript • HTML • CSS',
-          tags: ['PHP', 'MySQL', 'JavaScript', 'HTML', 'CSS'],
-          role: 'Lead Developer'
-        });
-      }
-
-      // Known enriched metadata for user repositories
-      const repoDetails = {
-        'placeai': {
-          title: 'PlaceAI - Campus Placement & AI Assessment Platform',
-          description: 'AI-driven platform for campus placement prep, ATS resume analysis, realtime mock interviews, peer networking, and student analytics.',
-          tech: 'JavaScript • Node.js • Supabase • AI Integration',
-          tags: ['JavaScript', 'AI', 'Full Stack', 'Web Development'],
-          category: 'Web & AI'
-        },
-        'Tableau-business-dashboard': {
-          title: 'Business Performance Dashboard Tool (Tableau Public)',
-          description: 'Designed and published interactive dashboards using sales data. Visualized key metrics like Sales, Profit, and Discount, and analyzed operational performance by Ship Mode and Product Category. Tracked profit trends over 5 years.',
-          tech: 'Tableau • Excel • Python • Data Analytics',
-          tags: ['Tableau', 'Excel', 'Python', 'Data Analytics'],
-          category: 'Data & Analytics',
-          url: 'https://public.tableau.com/'
-        },
-        'credit-card-risk-analysis': {
-          title: 'Credit Card Risk & Fraud Analysis',
-          description: 'Comprehensive financial risk assessment and classification model analyzing credit default indicators and risk scoring using machine learning.',
-          tech: 'Python • Jupyter Notebook • Pandas • Scikit-Learn • Data Science',
-          tags: ['Python', 'Jupyter', 'Data Science', 'Machine Learning'],
-          category: 'Data & Analytics'
-        },
-        'dcpe-erp': {
-          title: 'DCPE ERP - College Management Platform',
-          description: 'A comprehensive academic and institutional ERP platform designed to digitize processes, student records, and administrative workflows.',
-          tech: 'React • JavaScript • Web Development • ERP',
-          tags: ['React', 'JavaScript', 'ERP', 'Web Development'],
-          category: 'Web & Fullstack',
-          url: 'https://dcpe-erp.vercel.app/'
-        },
-        'project-connect': {
-          title: 'Project Connect - Student Collaboration Portal',
-          description: 'Peer collaboration and project sharing hub for students to discover teammates, share codebases, and coordinate development.',
-          tech: 'JavaScript • HTML5 • CSS3 • Web App',
-          tags: ['JavaScript', 'Web Development', 'Collaboration'],
-          category: 'Web & Fullstack'
-        },
-        'projectconnect': {
-          title: 'ProjectConnect Platform',
-          description: 'Full-stack student networking and project showcase application connecting developers and researchers.',
-          tech: 'JavaScript • CSS • HTML',
-          tags: ['JavaScript', 'Web Development'],
-          category: 'Web & Fullstack'
-        },
-        'Hacakathon': {
-          title: 'Hackathon Innovation Challenge System',
-          description: 'Competitive coding and problem-solving software solution developed for collaborative team hackathons.',
-          tech: 'Java • Algorithms • Problem Solving',
-          tags: ['Java', 'Algorithms', 'Hackathon'],
-          category: 'Software Engineering'
-        },
-        'Pythonoop': {
-          title: 'Python Object-Oriented Programming Suite',
-          description: 'Advanced Python OOP architecture including design patterns, class inheritance, encapsulation, and data structure implementations.',
-          tech: 'Python • OOP • Data Structures',
-          tags: ['Python', 'OOP', 'Software Design'],
-          category: 'Software Engineering'
-        },
-        'Python-Practice': {
-          title: 'Python Core & Algorithmic Practice',
-          description: 'Comprehensive collection of algorithmic challenges, data structures, and computational problem solving in Python.',
-          tech: 'Python • DSA • Problem Solving',
-          tags: ['Python', 'DSA', 'Algorithms'],
-          category: 'Software Engineering'
-        },
-        'parthd45.github.io': {
-          title: 'GitHub Pages Hosted Portfolio Site',
-          description: 'Live deployed GitHub Pages static web app presenting engineering highlights and technical credentials.',
-          tech: 'GitHub Pages • Web Hosting • HTML/CSS',
-          tags: ['GitHub Pages', 'Web Development'],
-          category: 'Web & Fullstack',
-          url: `https://${u}.github.io`
-        }
-      };
-
-      // Add ALL public repositories from GitHub
+      // Add ALL public repositories from GitHub dynamically for ANY user
       if (Array.isArray(repos)) {
         // Sort non-forks first, then recently updated
         const sorted = [...repos].sort((a, b) => {
@@ -413,30 +319,94 @@
         });
 
         sorted.forEach(r => {
-          const titleClean = (repoDetails[r.name] && repoDetails[r.name].title) || r.name.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          const exists = projectsList.some(p => (p.name || p.title || '').toLowerCase() === titleClean.toLowerCase() || (p.project_url || '').toLowerCase() === (r.html_url || '').toLowerCase());
+          // Dynamic title cleanup
+          let titleClean = r.name
+            .replace(/[-_]+/g, ' ')
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .trim()
+            .replace(/\b\w/g, c => c.toUpperCase());
+
+          // Fix known acronyms
+          titleClean = titleClean
+            .replace(/\bErp\b/g, 'ERP')
+            .replace(/\bHtml\b/g, 'HTML')
+            .replace(/\bCss\b/g, 'CSS')
+            .replace(/\bJs\b/g, 'JS')
+            .replace(/\bAi\b/g, 'AI')
+            .replace(/\bOop\b/g, 'OOP')
+            .replace(/\bDsa\b/g, 'DSA')
+            .replace(/\bApi\b/g, 'API')
+            .replace(/\bUi\b/g, 'UI');
+
+          const exists = projectsList.some(p =>
+            (p.name || '').toLowerCase() === r.name.toLowerCase() ||
+            (p.project_url || '').toLowerCase() === (r.html_url || '').toLowerCase()
+          );
+
           if (!exists) {
-            const meta = repoDetails[r.name] || {};
-            const lang = r.language || (meta.tech ? meta.tech.split('•')[0].trim() : 'Software Development');
-            const desc = meta.description || r.description || `Authentic GitHub repository: ${titleClean} developed by ${user.name || u}.`;
-            const tech = meta.tech || (lang ? `${lang} • Git • Software Development` : 'Git • Software Development');
-            const tags = meta.tags || (lang ? [lang, 'GitHub'] : ['GitHub']);
-            const category = meta.category || (lang === 'Python' || lang === 'Jupyter Notebook' ? 'Data & Analytics' : 'Web & Fullstack');
+            // Check for live deployment in homepage or README
+            let homepage = (r.homepage || '').trim();
+            const cleanNameKey = r.name.toLowerCase().replace(/[-_]/g, '');
+            if (!homepage && readmeVercelUrls[cleanNameKey]) {
+              homepage = readmeVercelUrls[cleanNameKey];
+            }
+
+            const isVercel = /vercel\.app/i.test(homepage);
+            const hasLive = !!homepage;
+
+            const lang = r.language || 'Software Development';
+            const tags = [lang];
+            if (isVercel) tags.push('Vercel');
+            if (Array.isArray(r.topics)) {
+              r.topics.slice(0, 3).forEach(t => {
+                if (t && !tags.includes(t)) tags.push(t.charAt(0).toUpperCase() + t.slice(1));
+              });
+            }
+
+            // Universal category detection
+            let category = 'Web & Fullstack';
+            const combinedMeta = (lang + ' ' + (r.topics || []).join(' ') + ' ' + r.name + ' ' + (r.description || '')).toLowerCase();
+            if (/python|jupyter|data|analysis|analytics|tableau|pandas|numpy|machine learning|deep learning|sql|model/i.test(combinedMeta)) {
+              category = 'Data & Analytics';
+            } else if (/java\b|c\+\+|c#|go\b|rust\b|algorithm|dsa|problem solving|oop/i.test(combinedMeta)) {
+              category = 'Software Engineering';
+            } else if (/sem\b|semester|college|lab|assignment|academic|mca|bca/i.test(combinedMeta)) {
+              category = 'Academic';
+            }
+
+            // Universal intelligent description
+            let desc = r.description ? r.description.trim() : '';
+            if (!desc) {
+              if (isVercel) {
+                desc = `Interactive full-stack web application built with ${lang}, featuring verified live production deployment on Vercel.`;
+              } else if (category === 'Data & Analytics') {
+                desc = `Data-driven software solution and analytical modeling built using ${lang}.`;
+              } else if (category === 'Software Engineering') {
+                desc = `Software engineering platform built with ${lang}, implementing modular architecture and computational logic.`;
+              } else {
+                desc = `Practical software project developed with ${lang}, demonstrating clean structure and real-world implementation.`;
+              }
+            }
+
+            const isFeatured = (r.stargazers_count > 0) || isVercel || (!r.fork && projectsList.length < 5);
 
             projectsList.push({
               name: r.name,
               title: titleClean,
               description: desc,
-              url: meta.url || r.html_url,
+              url: homepage || r.html_url,
+              live_url: homepage || null,
               project_url: r.html_url,
               github_url: r.html_url,
-              tech: tech,
+              tech: tags.join(' • '),
               tags: tags,
               role: 'Creator & Developer',
               stars: r.stargazers_count || 0,
               forks: r.forks_count || 0,
               category: category,
-              featured: meta.featured || r.name === 'placeai' || r.name === 'credit-card-risk-analysis' || r.name === 'dcpe-erp' || r.name === 'Tableau-business-dashboard'
+              deployment: isVercel ? 'Vercel' : (hasLive ? 'Live' : null),
+              is_vercel: isVercel,
+              featured: isFeatured
             });
           }
         });
@@ -609,23 +579,37 @@
       }
       updates.skills = mergedSkills;
 
-      // 12. Merge Projects (preserve existing, append real GitHub repositories and featured projects)
+      // 12. Merge Projects (preserve existing, upgrade with Vercel deployment links, append real GitHub repositories)
       const existingProjects = Array.isArray(currentProfile.projects) ? currentProfile.projects : [];
-      const existingUrls = new Set(existingProjects.map(p => (p.project_url || p.url || p.link || '').toLowerCase().trim()).filter(Boolean));
-      const existingTitles = new Set(existingProjects.map(p => (p.title || p.name || '').toLowerCase().trim()).filter(Boolean));
-      const mergedProjects = [...existingProjects];
+      const mergedProjects = existingProjects.map(p => ({ ...p }));
       let newProjectsAdded = 0;
 
       if (Array.isArray(extracted.projects)) {
-        extracted.projects.forEach(p => {
-          const pUrl = (p.project_url || p.url || p.link || '').toLowerCase().trim();
-          const pTitle = (p.title || p.name || '').toLowerCase().trim();
-          const urlMatch = pUrl && existingUrls.has(pUrl);
-          const titleMatch = pTitle && existingTitles.has(pTitle);
-          if (!urlMatch && !titleMatch) {
-            mergedProjects.push(p);
-            if (pUrl) existingUrls.add(pUrl);
-            if (pTitle) existingTitles.add(pTitle);
+        extracted.projects.forEach(newP => {
+          const newUrl = (newP.project_url || newP.github_url || newP.url || '').toLowerCase().trim();
+          const newTitle = (newP.title || newP.name || '').toLowerCase().trim();
+
+          const existingIndex = mergedProjects.findIndex(p => {
+            const pUrl = (p.project_url || p.github_url || p.url || p.link || '').toLowerCase().trim();
+            const pTitle = (p.title || p.name || '').toLowerCase().trim();
+            return (newUrl && pUrl && (pUrl === newUrl || (newP.name && pUrl.includes(newP.name.toLowerCase())))) || (newTitle && pTitle && pTitle === newTitle);
+          });
+
+          if (existingIndex >= 0) {
+            // Upgrade existing project with Vercel live url or stars if missing
+            const curr = mergedProjects[existingIndex];
+            if (newP.is_vercel && !curr.is_vercel) {
+              curr.is_vercel = true;
+              curr.deployment = 'Vercel';
+              curr.live_url = newP.live_url || curr.live_url;
+              curr.url = newP.live_url || curr.url;
+            }
+            if (newP.live_url && !curr.live_url) curr.live_url = newP.live_url;
+            if (newP.stars && !curr.stars) curr.stars = newP.stars;
+            if (!curr.github_url && newP.github_url) curr.github_url = newP.github_url;
+            if (!curr.category && newP.category) curr.category = newP.category;
+          } else {
+            mergedProjects.push(newP);
             newProjectsAdded++;
           }
         });

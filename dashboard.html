@@ -9274,6 +9274,11 @@
               <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; display: inline-flex; align-items: center; gap: 6px;">
                 <i class="fas fa-star" style="color: #eab308;"></i> Featured Project
               </span>
+              ${(proj.is_vercel || (liveUrl && liveUrl.includes('vercel.app')) || (url && url.includes('vercel.app'))) ? `
+                <span class="github-stat-pill" style="border-color: rgba(255, 255, 255, 0.4); color: #fff; background: rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 5px;">
+                  <span style="font-size: 8px;">▲</span> Vercel Live
+                </span>
+              ` : ''}
               <span style="font-size: 11.5px; color: #8b949e;">
                 ${spotlightActiveIndex + 1} of ${projects.length} Projects
               </span>
@@ -9298,9 +9303,10 @@
               ${topProjects.map((p, idx) => {
                 const shortTitle = (p.title || p.name || `Project ${idx+1}`).split('-')[0].split(':')[0].trim();
                 const isActive = idx === spotlightActiveIndex;
+                const hasV = p.is_vercel || (p.live_url && p.live_url.includes('vercel.app')) || (p.url && p.url.includes('vercel.app'));
                 return `
                   <button type="button" onclick="switchSpotlightProject(${idx})" style="flex-shrink: 0; background: ${isActive ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)'}; border: 1px solid ${isActive ? '#38bdf8' : '#30363d'}; color: ${isActive ? '#38bdf8' : '#94a3b8'}; border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease;">
-                    <i class="${isActive ? 'fas fa-check-circle' : 'fas fa-circle'}" style="font-size: 8px;"></i>
+                    ${hasV ? '<span style="font-size: 7px; color: #fff;">▲</span>' : `<i class="${isActive ? 'fas fa-check-circle' : 'fas fa-circle'}" style="font-size: 8px;"></i>`}
                     ${escapeHtml(shortTitle.slice(0, 24))}
                   </button>
                 `;
@@ -9325,11 +9331,15 @@
             </div>
 
             <div style="display: flex; gap: 8px; flex-shrink: 0; align-items: center; flex-wrap: wrap;">
-              ${liveUrl ? `
+              ${(proj.is_vercel || (liveUrl && liveUrl.includes('vercel.app')) || (url && url.includes('vercel.app'))) ? `
+                <a href="${escapeHtml(liveUrl || url)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 7px 14px; font-size: 12px; background: #000; border: 1px solid rgba(255, 255, 255, 0.4); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);" title="Live Production App on Vercel">
+                  <span style="font-size: 9px;">▲</span> Live on Vercel
+                </a>
+              ` : (liveUrl ? `
                 <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 7px 14px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);">
                   <i class="fas fa-external-link-alt"></i> Live Demo
                 </a>
-              ` : ''}
+              ` : '')}
               ${githubUrl ? `
                 <a href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 7px 14px; font-size: 12px; background: #21262d; border: 1px solid #30363d; text-decoration: none; color: #f0f6fc; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px;">
                   <i class="fab fa-github"></i> Repository
@@ -10052,6 +10062,7 @@
       if (!filterContainer) return;
 
       const totalCount = projects.length;
+      const vercelCount = projects.filter(p => p.is_vercel || p.deployment === 'Vercel' || (p.url && p.url.includes('vercel.app')) || (p.live_url && p.live_url.includes('vercel.app'))).length;
       const dataCount = projects.filter(p => (p.category === 'Data & Analytics') || (p.tech && /python|tableau|jupyter|data|sql|excel/i.test(p.tech)) || (p.title && /data|tableau|risk|analysis|analytics/i.test(p.title))).length;
       const webCount = projects.filter(p => (p.category === 'Web & Fullstack' || p.category === 'Web & AI') || (p.tech && /react|javascript|html|css|php|node|web/i.test(p.tech))).length;
       const repoCount = projects.filter(p => p.project_url || p.github_url || (p.url && p.url.includes('github.com'))).length;
@@ -10059,6 +10070,7 @@
 
       const categories = [
         { id: 'all', label: `All Projects (${totalCount})`, icon: 'fa-layer-group' },
+        { id: 'vercel', label: `▲ Vercel Live (${vercelCount})`, icon: 'fa-play' },
         { id: 'data', label: `Data & Analytics (${dataCount})`, icon: 'fa-chart-pie' },
         { id: 'web', label: `Web & Fullstack (${webCount})`, icon: 'fa-laptop-code' },
         { id: 'github', label: `GitHub Repos (${repoCount})`, icon: 'fa-code-branch' },
@@ -10087,7 +10099,7 @@
             <i class="fas fa-folder-open" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
             <p style="color: #8b949e; margin-bottom: 12px;">No projects added yet</p>
             <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-              <button class="btn-github-resync" onclick="syncAllGitHubProjectsDirectly()"><i class="fab fa-github"></i> Import GitHub Repos</button>
+              <button class="btn-github-resync" onclick="syncAllGitHubProjectsDirectly()"><i class="fab fa-github"></i> Import GitHub & Vercel Repos</button>
               <button class="btn-primary" onclick="addProject()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add Project</button>
             </div>
           </div>
@@ -10103,9 +10115,12 @@
         const role = (proj.role || '').toLowerCase();
         const url = (proj.url || proj.project_url || proj.link || '').toLowerCase();
         const isGithub = url.includes('github.com') || !!proj.project_url || !!proj.github_url;
+        const isVercel = proj.is_vercel || proj.deployment === 'Vercel' || url.includes('vercel.app') || (proj.live_url && proj.live_url.includes('vercel.app'));
 
         // Category filter
-        if (activeProjectCategory === 'data') {
+        if (activeProjectCategory === 'vercel') {
+          if (!isVercel) return false;
+        } else if (activeProjectCategory === 'data') {
           const isData = (proj.category === 'Data & Analytics') || /python|tableau|jupyter|data|sql|excel/i.test(tech) || /data|tableau|risk|analysis|analytics/i.test(title);
           if (!isData) return false;
         } else if (activeProjectCategory === 'web') {
@@ -10140,7 +10155,8 @@
             const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
             const url = proj.url || proj.project_url || proj.link || '';
             const githubUrl = proj.github_url || (url.includes('github.com') ? url : (proj.project_url && proj.project_url.includes('github.com') ? proj.project_url : ''));
-            const liveUrl = (url && !url.includes('github.com')) ? url : '';
+            const liveUrl = (url && !url.includes('github.com')) ? url : (proj.live_url || '');
+            const isVercel = proj.is_vercel || proj.deployment === 'Vercel' || (url && url.includes('vercel.app')) || (liveUrl && liveUrl.includes('vercel.app'));
             const desc = proj.description || 'Verified developer project on GitHub.';
             const role = proj.role || 'Creator & Developer';
             const stars = proj.stars || 0;
@@ -10155,16 +10171,21 @@
                       <i class="fas fa-code-branch" style="font-size: 12px; color: #58a6ff;"></i>
                       <span>${escapeHtml(title)}</span>
                     </a>
-                    <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center;">
+                    <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center; flex-wrap: wrap;">
+                      ${isVercel ? `
+                        <a href="${escapeHtml(liveUrl || url)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #f0f6fc; background: rgba(0, 0, 0, 0.85); border-color: rgba(255, 255, 255, 0.45); font-weight: 600;" title="Live production deployment on Vercel">
+                          <span style="font-size: 8px; margin-right: 3px;">▲</span> Vercel
+                        </a>
+                      ` : ''}
                       ${proj.featured ? `<span class="github-stat-pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);"><i class="fas fa-star"></i> Featured</span>` : ''}
-                      ${liveUrl ? `
+                      ${(liveUrl && !isVercel) ? `
                         <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #34d399; border-color: rgba(52, 211, 153, 0.3);" title="Live Preview">
                           <i class="fas fa-external-link-alt" style="font-size: 9.5px;"></i> Live
                         </a>
                       ` : ''}
                       ${githubUrl ? `
                         <a href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #58a6ff;" title="GitHub Repo">
-                          <i class="fab fa-github" style="font-size: 10px;"></i>
+                          <i class="fab fa-github" style="font-size: 10px;"></i> Repo
                         </a>
                       ` : ''}
                     </div>
