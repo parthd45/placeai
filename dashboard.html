@@ -10801,9 +10801,16 @@
       const grid = document.getElementById('supabaseConsoleProjectsGrid');
 
       // 1. Update user handle in topbar: e.g. parthd45
-      const handle = (activeGitHubUser && activeGitHubUser.username) ? activeGitHubUser.username : (
-        (userProfile && userProfile.github_url) ? userProfile.github_url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/.*$/, '') : 'parthd45'
-      );
+      let handle = 'parthd45';
+      if (activeGitHubUser && activeGitHubUser.username) {
+        handle = activeGitHubUser.username;
+      } else if (userProfile && userProfile.github_url) {
+        handle = userProfile.github_url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/.*$/, '');
+      } else if (currentUser && currentUser.email) {
+        handle = currentUser.email.split('@')[0];
+      } else if (userProfile && userProfile.full_name) {
+        handle = userProfile.full_name.toLowerCase().replace(/\s+/g, '');
+      }
       if (orgUserEl) orgUserEl.textContent = handle || 'parthd45';
 
       if (avatarEl) {
@@ -11854,15 +11861,19 @@
         displayExperience();
 
         // Update projects - always call to display or show empty state
-        displayProjects();
+        try { displayProjects(); } catch (e) { console.error('displayProjects error:', e); }
 
         // Render dynamic spotlight project, milestones, and competency matrix
-        renderSpotlightProject();
-        renderMilestones();
-        renderCompetencyMatrix();
+        try { renderSpotlightProject(); } catch (e) { console.error('renderSpotlightProject error:', e); }
+        try { renderMilestones(); } catch (e) { console.error('renderMilestones error:', e); }
+        try { renderCompetencyMatrix(); } catch (e) { console.error('renderCompetencyMatrix error:', e); }
 
         // Update certifications
-        displayCertifications();
+        try { displayCertifications(); } catch (e) { console.error('displayCertifications error:', e); }
+
+        // Render Developer Cloud Suite: Vercel Deployments & Supabase Console
+        try { if (typeof renderVercelDeployments === 'function') renderVercelDeployments(); } catch (e) { console.warn('renderVercelDeployments error:', e); }
+        try { if (typeof renderSupabaseConsole === 'function') renderSupabaseConsole(); } catch (e) { console.warn('renderSupabaseConsole error:', e); }
 
         // Update job preferences
         if (userProfile.preferred_roles) {
@@ -12249,33 +12260,40 @@
     }
 
     function updateProjectSliderCounter() {
-      const track = document.getElementById('projectsSliderTrack');
-      const counter = document.getElementById('projectSlideCounter');
-      if (!counter) return;
+      try {
+        const track = document.getElementById('projectsSliderTrack');
+        const counter = document.getElementById('projectSlideCounter');
+        if (!counter) return;
 
-      if (!track || projectLayoutMode !== 'slide') {
-        const total = (userProfile && userProfile.projects) ? userProfile.projects.length : 0;
-        counter.textContent = `${total} total`;
-        return;
+        const allProjs = (userProfile && Array.isArray(userProfile.projects)) ? userProfile.projects.length : 0;
+        if (!track || projectLayoutMode !== 'slide') {
+          counter.textContent = `${allProjs} total`;
+          return;
+        }
+
+        const cards = track.querySelectorAll('.repo-style-card');
+        const total = cards ? cards.length : allProjs;
+        if (total === 0) {
+          counter.textContent = '0 of 0';
+          return;
+        }
+
+        const scrollLeft = track.scrollLeft || 0;
+        const cardWidth = 356;
+        const currentIndex = Math.min(total, Math.max(1, Math.round(scrollLeft / cardWidth) + 1));
+        counter.textContent = `${currentIndex} of ${total}`;
+      } catch (e) {
+        console.warn('updateProjectSliderCounter:', e);
       }
-
-      const cards = track.querySelectorAll('.repo-style-card');
-      const total = cards.length;
-      if (total === 0) {
-        counter.textContent = '0 of 0';
-        return;
-      }
-
-      const scrollLeft = track.scrollLeft;
-      const cardWidth = 356;
-      const currentIndex = Math.min(total, Math.max(1, Math.round(scrollLeft / cardWidth) + 1));
-      counter.textContent = `${currentIndex} of ${total}`;
     }
 
     function displayProjects() {
-      const container = document.getElementById('projectsList');
-      const countEl = document.getElementById('tabProjectsCount');
-      const projects = (userProfile && userProfile.projects) ? userProfile.projects : [];
+      try {
+        const container = document.getElementById('projectsList');
+        if (!container) return;
+        const countEl = document.getElementById('tabProjectsCount');
+        const projects = (userProfile && Array.isArray(userProfile.projects)) ? userProfile.projects : [];
+        if (countEl) countEl.textContent = projects.length;
       if (countEl) countEl.textContent = projects.length;
 
       renderProjectCategoryFilters(projects);
@@ -12414,6 +12432,7 @@
               </div>
             `;
           }).join('')}
+          </div>
         </div>
       ` : `
         <div class="repo-style-grid">
@@ -12498,7 +12517,10 @@
 
       // Update slide counter
       updateProjectSliderCounter();
+    } catch (err) {
+      console.error('Error rendering projects:', err);
     }
+  }
 
     // Display Certifications
     function displayCertifications() {
