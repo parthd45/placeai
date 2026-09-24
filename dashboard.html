@@ -5995,6 +5995,90 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
     }
 
+  
+    /* ===== FEATURED PROJECTS HORIZONTAL SLIDER SYSTEM ===== */
+    .projects-slider-wrapper {
+      position: relative;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .projects-slider-track {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      padding: 6px 4px 18px 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .projects-slider-track::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .projects-slider-track::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 10px;
+    }
+
+    .projects-slider-track::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #a855f7);
+      border-radius: 10px;
+      border: 2px solid rgba(15, 23, 42, 0.8);
+    }
+
+    .projects-slider-track .repo-style-card {
+      min-width: 320px;
+      max-width: 360px;
+      width: 340px;
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      min-height: 220px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Slider Nav Controls */
+    .projects-slider-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slider-arrow-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slider-arrow-btn:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      transform: scale(1.08);
+      box-shadow: 0 3px 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .slider-counter-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-family: monospace;
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -7023,7 +7107,27 @@
                 <input type="text" id="projectSearchInput" oninput="filterProjectsSearch(this.value)" placeholder="Search projects by name or tech stack (e.g., React, ERP, Python, SQL, Tableau)..." style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px 7px 30px; font-size: 12.5px; color: #f0f6fc; box-sizing: border-box;" />
               </div>
               <!-- Category Filter Chips -->
-              <div id="projectCategoryFilters" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;"></div>
+              <!-- Category Filter Chips & Slide Navigation Toolbar -->
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div id="projectCategoryFilters" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;"></div>
+                <div class="projects-slider-nav" id="projectSliderNavControls">
+                  <div class="supabase-view-mode-toggle" style="margin-right: 4px;">
+                    <button type="button" class="view-mode-btn active" id="btnProjectModeSlide" onclick="setProjectLayoutMode('slide')" title="Horizontal Carousel Slider">
+                      <i class="fas fa-arrows-left-right"></i> Slide
+                    </button>
+                    <button type="button" class="view-mode-btn" id="btnProjectModeGrid" onclick="setProjectLayoutMode('grid')" title="Multi-Row Grid">
+                      <i class="fas fa-grip"></i> Grid
+                    </button>
+                  </div>
+                  <button type="button" class="slider-arrow-btn" onclick="slideProjectsTrack(-1)" title="Previous Project Slide">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <span class="slider-counter-pill" id="projectSlideCounter">1 of 1</span>
+                  <button type="button" class="slider-arrow-btn" onclick="slideProjectsTrack(1)" title="Next Project Slide">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div id="projectsList">
@@ -11669,6 +11773,58 @@
     }
 
     // Display Projects
+    
+    /* ===== PROJECTS HORIZONTAL SLIDER CONTROLLERS ===== */
+    let projectLayoutMode = 'slide'; // default to horizontal slider
+
+    function setProjectLayoutMode(mode) {
+      projectLayoutMode = mode;
+      const btnSlide = document.getElementById('btnProjectModeSlide');
+      const btnGrid = document.getElementById('btnProjectModeGrid');
+      if (btnSlide && btnGrid) {
+        if (mode === 'slide') {
+          btnSlide.classList.add('active');
+          btnGrid.classList.remove('active');
+        } else {
+          btnSlide.classList.remove('active');
+          btnGrid.classList.add('active');
+        }
+      }
+      displayProjects();
+    }
+
+    function slideProjectsTrack(direction) {
+      const track = document.getElementById('projectsSliderTrack');
+      if (!track) return;
+      const scrollStep = 350; // card width + gap
+      track.scrollBy({ left: direction * scrollStep, behavior: 'smooth' });
+      setTimeout(updateProjectSliderCounter, 300);
+    }
+
+    function updateProjectSliderCounter() {
+      const track = document.getElementById('projectsSliderTrack');
+      const counter = document.getElementById('projectSlideCounter');
+      if (!counter) return;
+
+      if (!track || projectLayoutMode !== 'slide') {
+        const total = (userProfile && userProfile.projects) ? userProfile.projects.length : 0;
+        counter.textContent = `${total} total`;
+        return;
+      }
+
+      const cards = track.querySelectorAll('.repo-style-card');
+      const total = cards.length;
+      if (total === 0) {
+        counter.textContent = '0 of 0';
+        return;
+      }
+
+      const scrollLeft = track.scrollLeft;
+      const cardWidth = 356;
+      const currentIndex = Math.min(total, Math.max(1, Math.round(scrollLeft / cardWidth) + 1));
+      counter.textContent = `${currentIndex} of ${total}`;
+    }
+
     function displayProjects() {
       const container = document.getElementById('projectsList');
       const countEl = document.getElementById('tabProjectsCount');
@@ -11731,9 +11887,10 @@
         return;
       }
 
-      container.innerHTML = `
-        <div class="repo-style-grid">
-          ${filteredProjects.map(proj => {
+      container.innerHTML = (projectLayoutMode === 'slide') ? `
+        <div class="projects-slider-wrapper">
+          <div class="projects-slider-track" id="projectsSliderTrack" onscroll="updateProjectSliderCounter()">
+            ${filteredProjects.map(proj => {
             const index = projects.indexOf(proj);
             const title = proj.name || proj.title || 'Project';
             const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
@@ -11811,7 +11968,89 @@
             `;
           }).join('')}
         </div>
+      ` : `
+        <div class="repo-style-grid">
+          ${filteredProjects.map(proj => {
+            const index = projects.indexOf(proj);
+            const title = proj.name || proj.title || 'Project';
+            const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
+            const url = proj.url || proj.project_url || proj.link || '';
+            const githubUrl = proj.github_url || (url.includes('github.com') ? url : (proj.project_url && proj.project_url.includes('github.com') ? proj.project_url : ''));
+            const liveUrl = (url && !url.includes('github.com')) ? url : (proj.live_url || '');
+            const isVercel = proj.is_vercel || proj.deployment === 'Vercel' || (url && url.includes('vercel.app')) || (liveUrl && liveUrl.includes('vercel.app'));
+            const desc = proj.description || 'Verified developer project on GitHub.';
+            const role = proj.role || 'Creator & Developer';
+            const stars = proj.stars || 0;
+            const techList = tech ? tech.split(/[•,]/).map(t => t.trim()).filter(Boolean) : [];
+
+            return `
+              <div class="repo-style-card">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <a class="github-repo-name" href="${githubUrl || url || '#'}" ${(githubUrl || url) ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                      <i class="fas fa-code-branch" style="font-size: 12px; color: #58a6ff;"></i>
+                      <span>${escapeHtml(title)}</span>
+                    </a>
+                    <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center; flex-wrap: wrap;">
+                      ${isVercel ? `
+                        <a href="${escapeHtml(liveUrl || url)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #f0f6fc; background: rgba(0, 0, 0, 0.85); border-color: rgba(255, 255, 255, 0.45); font-weight: 600;" title="Live production deployment on Vercel">
+                          <span style="font-size: 8px; margin-right: 3px;">▲</span> Vercel
+                        </a>
+                      ` : ''}
+                      ${proj.featured ? `<span class="github-stat-pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);"><i class="fas fa-star"></i> Featured</span>` : ''}
+                      ${(liveUrl && !isVercel) ? `
+                        <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #34d399; border-color: rgba(52, 211, 153, 0.3);" title="Live Preview">
+                          <i class="fas fa-external-link-alt" style="font-size: 9.5px;"></i> Live
+                        </a>
+                      ` : ''}
+                      ${githubUrl ? `
+                        <a href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #58a6ff;" title="GitHub Repo">
+                          <i class="fab fa-github" style="font-size: 10px;"></i> Repo
+                        </a>
+                      ` : ''}
+                    </div>
+                  </div>
+                  <div class="github-repo-desc">${escapeHtml(desc)}</div>
+                </div>
+
+                <div>
+                  ${techList.length > 0 ? `
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px;">
+                      ${techList.slice(0, 4).map(t => {
+                        const langColor = (window.GITHUB_LANG_COLORS && window.GITHUB_LANG_COLORS[t]) || '#38bdf8';
+                        return `
+                          <span class="github-stat-pill">
+                            <span class="skill-dot" style="background-color: ${langColor};"></span>
+                            <span>${escapeHtml(t)}</span>
+                          </span>
+                        `;
+                      }).join('')}
+                    </div>
+                  ` : ''}
+
+                  <div class="github-repo-footer">
+                    <span style="font-size: 11px; color: #8b949e; display: inline-flex; align-items: center; gap: 4px;">
+                      ${stars > 0 ? `<span style="color:#eab308;margin-right:4px;"><i class="fas fa-star"></i> ${stars}</span>` : ''}
+                      <i class="fas fa-user-tag" style="color: #a855f7;"></i> ${escapeHtml(role)}
+                    </span>
+                    <div style="display: flex; gap: 6px;">
+                      <button class="repo-action-btn edit" onclick="editProject(${index})" title="Edit project">
+                        <i class="fas fa-pen"></i> Edit
+                      </button>
+                      <button class="repo-action-btn delete" onclick="removeProject(${index})" title="Remove project">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       `;
+
+      // Update slide counter
+      updateProjectSliderCounter();
     }
 
     // Display Certifications
