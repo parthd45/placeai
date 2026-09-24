@@ -6429,7 +6429,10 @@
       playWpIncomingSound();
 
       // If thread is currently open: send 'read' (double blue tick). Otherwise send 'delivered' (double grey tick).
-      sendAckToPeer(peerId, payload.id, isThreadOpen ? 'read' : 'delivered');
+      const ackStatus = isThreadOpen ? 'read' : 'delivered';
+      sendAckToPeer(peerId, payload.id, ackStatus);
+      // Also persist ack to cloud so sender sees tick update even if they were offline
+      syncAckToCloud(payload.id, peerId, ackStatus);
 
       if (isThreadOpen) {
         renderDirectThread();
@@ -6442,29 +6445,39 @@
     }
 
     // 4. Handle Incoming Acknowledgements (Single -> Double Grey -> Double Blue Tick)
+    // Status can only UPGRADE: sent(0) -> delivered(1) -> read(2). Never downgrade.
+    const STATUS_RANK = { 'sent': 0, 'delivered': 1, 'read': 2 };
+
+    function upgradeMessageStatus(peerId, msgId, newStatus) {
+      const history = getDirectChatHistory(peerId);
+      const msg = history.find(m => m.id === msgId);
+      if (!msg || msg.sender !== 'user') return false;
+
+      const currentRank = STATUS_RANK[msg.status] || 0;
+      const newRank = STATUS_RANK[newStatus] || 0;
+      if (newRank <= currentRank) return false; // Never downgrade
+
+      msg.status = newStatus;
+      saveDirectChatHistory(peerId, history);
+
+      // Update live tick in DOM if thread is open
+      if (currentDirectPeerId === peerId) {
+        const tickEl = document.getElementById('wpTick_' + msgId);
+        if (tickEl) {
+          if (newStatus === 'read') {
+            tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" title="Read"></i>';
+          } else if (newStatus === 'delivered') {
+            tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
+          }
+        }
+      }
+      return true;
+    }
+
     function handleIncomingAck(payload) {
       if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
       const peerId = payload.fromUserId;
-      const history = getDirectChatHistory(peerId);
-      const msg = history.find(m => m.id === payload.msgId);
-
-      if (msg) {
-        msg.status = payload.status; // 'delivered' or 'read'
-        saveDirectChatHistory(peerId, history);
-
-        // Update live tick in DOM
-        if (currentDirectPeerId === peerId) {
-          const tickEl = document.getElementById('wpTick_' + payload.msgId);
-          if (tickEl) {
-            if (payload.status === 'read') {
-              tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" title="Read"></i>';
-            } else if (payload.status === 'delivered') {
-              tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
-            } else {
-              tickEl.innerHTML = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent"></i>';
-            }
-          }
-        }
+      if (upgradeMessageStatus(peerId, payload.msgId, payload.status)) {
         renderDirectUserList();
       }
     }
@@ -6574,11 +6587,42 @@
         const { data } = await supabase.from('user_profiles').select('certifications').eq('user_id', myUserId).single();
         const existing = (data && Array.isArray(data.certifications)) ? data.certifications : [];
         existing.push(msgPayload);
-        const trimmed = existing.slice(-100);
+        const trimmed = existing.slice(-150);
 
         await supabase.from('user_profiles').update({ certifications: trimmed }).eq('user_id', myUserId);
       } catch (e) {
         console.warn('syncOutboxToCloud error:', e);
+      }
+    }
+
+    // 8b. Persist ACK to cloud so sender sees tick updates even when offline
+    async function syncAckToCloud(msgId, originalSenderId, status) {
+      try {
+        const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
+        if (!supabase || !currentUser) return;
+
+        const myUserId = currentUser.id;
+        const { data } = await supabase.from('user_profiles').select('certifications').eq('user_id', myUserId).single();
+        const existing = (data && Array.isArray(data.certifications)) ? data.certifications : [];
+
+        // Prevent duplicate acks — use unique ack ID
+        const ackId = 'ack_' + msgId + '_' + status;
+        if (existing.some(e => e.id === ackId)) return;
+
+        existing.push({
+          id: ackId,
+          _isAck: true,
+          msgId: msgId,
+          fromUserId: myUserId,
+          toUserId: originalSenderId,
+          status: status,
+          timestamp: Date.now()
+        });
+        const trimmed = existing.slice(-150);
+
+        await supabase.from('user_profiles').update({ certifications: trimmed }).eq('user_id', myUserId);
+      } catch (e) {
+        console.warn('syncAckToCloud error:', e);
       }
     }
 
@@ -6601,11 +6645,20 @@
             const history = getDirectChatHistory(peerId);
 
             peerProfile.certifications.forEach(msg => {
+              // Cloud-persisted ACK record: upgrade our sent message ticks
+              if (msg._isAck && msg.toUserId === myId) {
+                if (upgradeMessageStatus(peerId, msg.msgId, msg.status)) {
+                  hasNew = true;
+                }
+                return;
+              }
+
               // Direct message sent to me
               if (msg.toUserId === myId) {
                 const exists = history.some(m => m.id === msg.id);
                 if (!exists) {
                   const isThreadOpen = (currentChatMode === 'direct' && currentDirectPeerId === peerId);
+                  const ackStatus = isThreadOpen ? 'read' : 'delivered';
                   history.push({
                     id: msg.id,
                     sender: 'peer',
@@ -6616,15 +6669,15 @@
                     duration: msg.duration,
                     problemTitle: msg.problemTitle,
                     time: msg.time,
-                    status: isThreadOpen ? 'read' : 'delivered',
+                    status: ackStatus,
                     timestamp: msg.timestamp || Date.now()
                   });
                   hasNew = true;
 
-                  if (isThreadOpen) {
-                    sendAckToPeer(peerId, msg.id, 'read');
-                  } else {
-                    sendAckToPeer(peerId, msg.id, 'delivered');
+                  sendAckToPeer(peerId, msg.id, ackStatus);
+                  syncAckToCloud(msg.id, peerId, ackStatus);
+
+                  if (!isThreadOpen) {
                     peerUnreadCounts[peerId] = (peerUnreadCounts[peerId] || 0) + 1;
                   }
                 }
@@ -7050,7 +7103,9 @@
         if (m.sender === 'peer' && m.status !== 'read') {
           m.status = 'read';
           updatedAny = true;
+          // Send ack via both WebSocket (instant) AND cloud (persistent)
           sendAckToPeer(peerId, m.id, 'read');
+          syncAckToCloud(m.id, peerId, 'read');
         }
       });
 
