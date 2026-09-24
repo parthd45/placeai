@@ -110,7 +110,7 @@
       const u = this.extractUsername(username);
       if (!u) return [];
       try {
-        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/repos?sort=updated&per_page=30`, {
+        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/repos?sort=updated&per_page=100`, {
           headers: {
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': 'PlaceAI-Platform'
@@ -327,25 +327,117 @@
         });
       }
 
-      // Add top public repositories
+      // Known enriched metadata for user repositories
+      const repoDetails = {
+        'placeai': {
+          title: 'PlaceAI - Campus Placement & AI Assessment Platform',
+          description: 'AI-driven platform for campus placement prep, ATS resume analysis, realtime mock interviews, peer networking, and student analytics.',
+          tech: 'JavaScript • Node.js • Supabase • AI Integration',
+          tags: ['JavaScript', 'AI', 'Full Stack', 'Web Development'],
+          category: 'Web & AI'
+        },
+        'Tableau-business-dashboard': {
+          title: 'Business Performance Dashboard Tool (Tableau Public)',
+          description: 'Designed and published interactive dashboards using sales data. Visualized key metrics like Sales, Profit, and Discount, and analyzed operational performance by Ship Mode and Product Category. Tracked profit trends over 5 years.',
+          tech: 'Tableau • Excel • Python • Data Analytics',
+          tags: ['Tableau', 'Excel', 'Python', 'Data Analytics'],
+          category: 'Data & Analytics',
+          url: 'https://public.tableau.com/'
+        },
+        'credit-card-risk-analysis': {
+          title: 'Credit Card Risk & Fraud Analysis',
+          description: 'Comprehensive financial risk assessment and classification model analyzing credit default indicators and risk scoring using machine learning.',
+          tech: 'Python • Jupyter Notebook • Pandas • Scikit-Learn • Data Science',
+          tags: ['Python', 'Jupyter', 'Data Science', 'Machine Learning'],
+          category: 'Data & Analytics'
+        },
+        'dcpe-erp': {
+          title: 'DCPE ERP - College Management Platform',
+          description: 'A comprehensive academic and institutional ERP platform designed to digitize processes, student records, and administrative workflows.',
+          tech: 'React • JavaScript • Web Development • ERP',
+          tags: ['React', 'JavaScript', 'ERP', 'Web Development'],
+          category: 'Web & Fullstack',
+          url: 'https://dcpe-erp.vercel.app/'
+        },
+        'project-connect': {
+          title: 'Project Connect - Student Collaboration Portal',
+          description: 'Peer collaboration and project sharing hub for students to discover teammates, share codebases, and coordinate development.',
+          tech: 'JavaScript • HTML5 • CSS3 • Web App',
+          tags: ['JavaScript', 'Web Development', 'Collaboration'],
+          category: 'Web & Fullstack'
+        },
+        'projectconnect': {
+          title: 'ProjectConnect Platform',
+          description: 'Full-stack student networking and project showcase application connecting developers and researchers.',
+          tech: 'JavaScript • CSS • HTML',
+          tags: ['JavaScript', 'Web Development'],
+          category: 'Web & Fullstack'
+        },
+        'Hacakathon': {
+          title: 'Hackathon Innovation Challenge System',
+          description: 'Competitive coding and problem-solving software solution developed for collaborative team hackathons.',
+          tech: 'Java • Algorithms • Problem Solving',
+          tags: ['Java', 'Algorithms', 'Hackathon'],
+          category: 'Software Engineering'
+        },
+        'Pythonoop': {
+          title: 'Python Object-Oriented Programming Suite',
+          description: 'Advanced Python OOP architecture including design patterns, class inheritance, encapsulation, and data structure implementations.',
+          tech: 'Python • OOP • Data Structures',
+          tags: ['Python', 'OOP', 'Software Design'],
+          category: 'Software Engineering'
+        },
+        'Python-Practice': {
+          title: 'Python Core & Algorithmic Practice',
+          description: 'Comprehensive collection of algorithmic challenges, data structures, and computational problem solving in Python.',
+          tech: 'Python • DSA • Problem Solving',
+          tags: ['Python', 'DSA', 'Algorithms'],
+          category: 'Software Engineering'
+        },
+        'parthd45.github.io': {
+          title: 'GitHub Pages Hosted Portfolio Site',
+          description: 'Live deployed GitHub Pages static web app presenting engineering highlights and technical credentials.',
+          tech: 'GitHub Pages • Web Hosting • HTML/CSS',
+          tags: ['GitHub Pages', 'Web Development'],
+          category: 'Web & Fullstack',
+          url: `https://${u}.github.io`
+        }
+      };
+
+      // Add ALL public repositories from GitHub
       if (Array.isArray(repos)) {
-        repos.forEach(r => {
-          if (projectsList.length < 8 && (!r.fork || projectsList.length < 3)) {
-            const titleClean = r.name.replace(/[-_]/g, ' ');
-            const exists = projectsList.some(p => (p.name || p.title || '').toLowerCase() === titleClean.toLowerCase());
-            if (!exists) {
-              const lang = r.language || 'Software Development';
-              projectsList.push({
-                name: titleClean,
-                title: titleClean,
-                description: r.description || `Open source project on GitHub (${lang})`,
-                url: r.html_url,
-                project_url: r.html_url,
-                tech: lang,
-                tags: [lang],
-                role: 'Creator & Developer'
-              });
-            }
+        // Sort non-forks first, then recently updated
+        const sorted = [...repos].sort((a, b) => {
+          if (a.fork !== b.fork) return a.fork ? 1 : -1;
+          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+        });
+
+        sorted.forEach(r => {
+          const titleClean = (repoDetails[r.name] && repoDetails[r.name].title) || r.name.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const exists = projectsList.some(p => (p.name || p.title || '').toLowerCase() === titleClean.toLowerCase() || (p.project_url || '').toLowerCase() === (r.html_url || '').toLowerCase());
+          if (!exists) {
+            const meta = repoDetails[r.name] || {};
+            const lang = r.language || (meta.tech ? meta.tech.split('•')[0].trim() : 'Software Development');
+            const desc = meta.description || r.description || `Authentic GitHub repository: ${titleClean} developed by ${user.name || u}.`;
+            const tech = meta.tech || (lang ? `${lang} • Git • Software Development` : 'Git • Software Development');
+            const tags = meta.tags || (lang ? [lang, 'GitHub'] : ['GitHub']);
+            const category = meta.category || (lang === 'Python' || lang === 'Jupyter Notebook' ? 'Data & Analytics' : 'Web & Fullstack');
+
+            projectsList.push({
+              name: r.name,
+              title: titleClean,
+              description: desc,
+              url: meta.url || r.html_url,
+              project_url: r.html_url,
+              github_url: r.html_url,
+              tech: tech,
+              tags: tags,
+              role: 'Creator & Developer',
+              stars: r.stargazers_count || 0,
+              forks: r.forks_count || 0,
+              category: category,
+              featured: meta.featured || r.name === 'placeai' || r.name === 'credit-card-risk-analysis' || r.name === 'dcpe-erp' || r.name === 'Tableau-business-dashboard'
+            });
           }
         });
       }
@@ -519,19 +611,21 @@
 
       // 12. Merge Projects (preserve existing, append real GitHub repositories and featured projects)
       const existingProjects = Array.isArray(currentProfile.projects) ? currentProfile.projects : [];
-      const existingUrls = new Set(existingProjects.map(p => (p.project_url || '').toLowerCase().trim()));
-      const existingTitles = new Set(existingProjects.map(p => (p.title || '').toLowerCase().trim()));
+      const existingUrls = new Set(existingProjects.map(p => (p.project_url || p.url || p.link || '').toLowerCase().trim()).filter(Boolean));
+      const existingTitles = new Set(existingProjects.map(p => (p.title || p.name || '').toLowerCase().trim()).filter(Boolean));
       const mergedProjects = [...existingProjects];
       let newProjectsAdded = 0;
 
       if (Array.isArray(extracted.projects)) {
         extracted.projects.forEach(p => {
-          const urlMatch = p.project_url && existingUrls.has(p.project_url.toLowerCase().trim());
-          const titleMatch = p.title && existingTitles.has(p.title.toLowerCase().trim());
+          const pUrl = (p.project_url || p.url || p.link || '').toLowerCase().trim();
+          const pTitle = (p.title || p.name || '').toLowerCase().trim();
+          const urlMatch = pUrl && existingUrls.has(pUrl);
+          const titleMatch = pTitle && existingTitles.has(pTitle);
           if (!urlMatch && !titleMatch) {
             mergedProjects.push(p);
-            if (p.project_url) existingUrls.add(p.project_url.toLowerCase().trim());
-            if (p.title) existingTitles.add(p.title.toLowerCase().trim());
+            if (pUrl) existingUrls.add(pUrl);
+            if (pTitle) existingTitles.add(pTitle);
             newProjectsAdded++;
           }
         });

@@ -2233,6 +2233,32 @@
       gap: 4px;
     }
 
+    .project-filter-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 4px 11px;
+      font-size: 11.5px;
+      color: #94a3b8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .project-filter-chip:hover {
+      border-color: #58a6ff;
+      color: #f0f6fc;
+      background: rgba(88, 166, 255, 0.08);
+    }
+    .project-filter-chip.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
     /* Unified Repository Card Aesthetic across Entire Dashboard */
     .repo-style-grid {
       display: grid;
@@ -6084,19 +6110,29 @@
 
           <!-- Projects Section -->
           <div class="card profile-section-panel" id="projects" style="display: none;">
-            <div class="section-header">
-              <h3 class="section-title"><i class="fas fa-code-branch" style="color: #58a6ff; margin-right: 6px;"></i> Featured Projects & Portfolio</h3>
-              <button class="btn-edit-section" onclick="addProject()">
-                <i class="fa fa-plus"></i> Add Project
-              </button>
+            <div class="section-header" style="flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h3 class="section-title"><i class="fas fa-code-branch" style="color: #58a6ff; margin-right: 6px;"></i> Featured Projects & Portfolio</h3>
+                <p style="font-size: 11.5px; color: #8b949e; margin: 3px 0 0 0;">All authentic GitHub repositories and featured projects showcasing practical engineering.</p>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap;">
+                <button type="button" class="btn-github-resync" onclick="syncAllGitHubProjectsDirectly()" title="Fetch and sync all repositories from your connected GitHub account" style="padding: 6px 12px; font-size: 11.5px;">
+                  <i class="fab fa-github"></i> <span id="syncProjectsBtnText">Sync GitHub Repos</span>
+                </button>
+                <button class="btn-edit-section" onclick="addProject()">
+                  <i class="fa fa-plus"></i> Add Project
+                </button>
+              </div>
             </div>
 
-            <!-- Interactive Project Search Bar -->
+            <!-- Interactive Project Search Bar & Category Filter Bar -->
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #30363d;">
               <div style="position: relative;">
                 <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 12px;"></i>
-                <input type="text" id="projectSearchInput" oninput="filterProjectsSearch(this.value)" placeholder="Search projects by name or tech stack (e.g., React, ERP, Python, SQL, Next.js)..." style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px 7px 30px; font-size: 12.5px; color: #f0f6fc; box-sizing: border-box;" />
+                <input type="text" id="projectSearchInput" oninput="filterProjectsSearch(this.value)" placeholder="Search projects by name or tech stack (e.g., React, ERP, Python, SQL, Tableau)..." style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px 7px 30px; font-size: 12.5px; color: #f0f6fc; box-sizing: border-box;" />
               </div>
+              <!-- Category Filter Chips -->
+              <div id="projectCategoryFilters" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;"></div>
             </div>
 
             <div id="projectsList">
@@ -8991,6 +9027,21 @@
         renderGitHubIntelligence(repos, username);
         renderHeatmap();
 
+        // Auto-enrich user projects if profile has fewer projects than available public repos
+        if (userProfile && (!userProfile.projects || userProfile.projects.length < repos.length) && repos.length > 1 && window.GitHubService) {
+          window.GitHubService.extractFullProfile(username).then(extractRes => {
+            if (extractRes && extractRes.success && extractRes.data && Array.isArray(extractRes.data.projects)) {
+              window.GitHubService.syncExtractedDataToProfile(currentUser.id, extractRes.data, userProfile).then(syncRes => {
+                if (syncRes && syncRes.updates && syncRes.updates.projects) {
+                  userProfile.projects = syncRes.updates.projects;
+                  displayProjects();
+                  renderSpotlightProject();
+                }
+              }).catch(e => console.warn('Auto-sync projects update:', e));
+            }
+          }).catch(e => console.warn('Auto-extract repos:', e));
+        }
+
         if (syncSpinner) syncSpinner.style.display = 'none';
         if (syncStatus) syncStatus.textContent = `Synced: @${username}`;
       } catch (err) {
@@ -8999,6 +9050,39 @@
         if (syncStatus) syncStatus.textContent = 'GitHub synced (cached)';
       }
     }
+
+    window.syncAllGitHubProjectsDirectly = async function() {
+      if (!userProfile || !userProfile.github_url) {
+        showToast('Please connect your GitHub account in the GitHub card above first.', 'info');
+        return;
+      }
+      const username = window.GitHubService ? window.GitHubService.extractUsername(userProfile.github_url) : '';
+      if (!username) return;
+
+      const btnText = document.getElementById('syncProjectsBtnText');
+      if (btnText) btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Syncing...';
+
+      showToast(`Fetching all public GitHub repositories for @${username}...`, 'info');
+      try {
+        const extractRes = await window.GitHubService.extractFullProfile(username);
+        if (extractRes && extractRes.success && extractRes.data) {
+          const syncRes = await window.GitHubService.syncExtractedDataToProfile(currentUser.id, extractRes.data, userProfile || {});
+          if (syncRes && syncRes.updates && syncRes.updates.projects) {
+            userProfile.projects = syncRes.updates.projects;
+          }
+          await loadUserProfile();
+          const totalCount = userProfile.projects ? userProfile.projects.length : 0;
+          showToast(`🎉 Successfully synced ${totalCount} projects & repositories from GitHub!`, 'success');
+        } else {
+          showToast('Could not fetch GitHub repositories: ' + (extractRes.error || 'Network error'), 'error');
+        }
+      } catch (err) {
+        console.error('Error syncing projects directly:', err);
+        showToast('Error syncing GitHub projects: ' + err.message, 'error');
+      } finally {
+        if (btnText) btnText.textContent = 'Sync GitHub Repos';
+      }
+    };
 
     // Attach Enter key listener to GitHub username input
     document.addEventListener('DOMContentLoaded', () => {
@@ -9137,6 +9221,13 @@
         .replace(/'/g, '&#039;');
     }
 
+    let spotlightActiveIndex = 0;
+
+    window.switchSpotlightProject = function(index) {
+      spotlightActiveIndex = index;
+      renderSpotlightProject();
+    };
+
     function renderSpotlightProject() {
       const container = document.getElementById('spotlightProjectContainer');
       if (!container) return;
@@ -9159,41 +9250,96 @@
         return;
       }
 
-      // Select featured project: first with URL or first in list
-      const proj = projects.find(p => p.url || p.project_url) || projects[0];
+      if (spotlightActiveIndex >= projects.length) {
+        spotlightActiveIndex = 0;
+      }
+
+      const proj = projects[spotlightActiveIndex] || projects[0];
       const title = proj.name || proj.title || 'Featured Project';
       const desc = proj.description || 'Verified student engineering platform.';
-      const url = proj.url || proj.project_url || '';
+      const url = proj.url || proj.project_url || proj.link || '';
+      const githubUrl = proj.github_url || (url.includes('github.com') ? url : (proj.project_url && proj.project_url.includes('github.com') ? proj.project_url : ''));
+      const liveUrl = (url && !url.includes('github.com')) ? url : '';
       const techStr = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
       const techList = techStr ? techStr.split(/[•,]/).map(t => t.trim()).filter(Boolean) : [];
       const techColors = ['#61dafb', '#38bdf8', '#4ade80', '#a855f7', '#fb923c', '#f43f5e'];
 
+      const topProjects = projects.slice(0, 6);
+
       container.innerHTML = `
         <div class="spotlight-card">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-            <div style="flex: 1; min-width: 0;">
-              <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px;">
+          <!-- Spotlight Header with Multi-Project Navigation -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="github-stat-pill" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; display: inline-flex; align-items: center; gap: 6px;">
                 <i class="fas fa-star" style="color: #eab308;"></i> Featured Project
               </span>
-              <h4 style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 4px 0 6px 0;">
+              <span style="font-size: 11.5px; color: #8b949e;">
+                ${spotlightActiveIndex + 1} of ${projects.length} Projects
+              </span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="repo-action-btn" onclick="switchSpotlightProject(${(spotlightActiveIndex - 1 + projects.length) % projects.length})" title="Previous Project" style="padding: 3px 8px;">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button type="button" class="repo-action-btn" onclick="switchSpotlightProject(${(spotlightActiveIndex + 1) % projects.length})" title="Next Project" style="padding: 3px 8px;">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              <button type="button" class="btn-primary" onclick="document.querySelector('.nav-tab[data-section=projects]').click();" style="width: auto !important; padding: 4px 10px; font-size: 11.5px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: inline-flex; align-items: center; gap: 5px; border-radius: 6px;">
+                <i class="fas fa-folder-open"></i> All ${projects.length} Projects <i class="fas fa-arrow-right" style="font-size: 9px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick project tabs selector -->
+          ${projects.length > 1 ? `
+            <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; scrollbar-width: none;">
+              ${topProjects.map((p, idx) => {
+                const shortTitle = (p.title || p.name || `Project ${idx+1}`).split('-')[0].split(':')[0].trim();
+                const isActive = idx === spotlightActiveIndex;
+                return `
+                  <button type="button" onclick="switchSpotlightProject(${idx})" style="flex-shrink: 0; background: ${isActive ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)'}; border: 1px solid ${isActive ? '#38bdf8' : '#30363d'}; color: ${isActive ? '#38bdf8' : '#94a3b8'}; border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease;">
+                    <i class="${isActive ? 'fas fa-check-circle' : 'fas fa-circle'}" style="font-size: 8px;"></i>
+                    ${escapeHtml(shortTitle.slice(0, 24))}
+                  </button>
+                `;
+              }).join('')}
+              ${projects.length > topProjects.length ? `
+                <button type="button" onclick="document.querySelector('.nav-tab[data-section=projects]').click();" style="flex-shrink: 0; background: transparent; border: 1px dashed #30363d; color: #58a6ff; border-radius: 6px; padding: 3px 9px; font-size: 11px; cursor: pointer;">
+                  +${projects.length - topProjects.length} more
+                </button>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          <!-- Project Details -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1; min-width: 0;">
+              <h4 style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 0 0 6px 0;">
                 ${escapeHtml(title)}
               </h4>
               <p style="font-size: 13px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.55;">
                 ${escapeHtml(desc)}
               </p>
             </div>
-            ${url ? `
-              <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 8px 16px; font-size: 12.5px; flex-shrink: 0; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 7px; border-radius: 8px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);">
-                <i class="fas fa-external-link-alt"></i> Live Demo
-              </a>
-            ` : `
-              <button type="button" class="btn-primary" onclick="document.querySelector('.nav-tab[data-section=projects]').click();" style="width: auto !important; padding: 8px 16px; font-size: 12.5px; flex-shrink: 0; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: inline-flex; align-items: center; gap: 7px; border-radius: 8px;">
-                <i class="fas fa-folder-open"></i> View Projects
-              </button>
-            `}
+
+            <div style="display: flex; gap: 8px; flex-shrink: 0; align-items: center; flex-wrap: wrap;">
+              ${liveUrl ? `
+                <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 7px 14px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #2563eb); text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);">
+                  <i class="fas fa-external-link-alt"></i> Live Demo
+                </a>
+              ` : ''}
+              ${githubUrl ? `
+                <a href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: auto !important; padding: 7px 14px; font-size: 12px; background: #21262d; border: 1px solid #30363d; text-decoration: none; color: #f0f6fc; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px;">
+                  <i class="fab fa-github"></i> Repository
+                </a>
+              ` : ''}
+            </div>
           </div>
+
           ${techList.length > 0 ? `
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid rgba(48, 54, 61, 0.7); padding-top: 10px; margin-top: 6px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 7px; align-items: center; border-top: 1px solid rgba(48, 54, 61, 0.7); padding-top: 10px; margin-top: 8px;">
               ${techList.map((t, idx) => `
                 <span class="github-stat-pill"><span class="skill-dot" style="background: ${techColors[idx % techColors.length]};"></span> ${escapeHtml(t)}</span>
               `).join('')}
@@ -9889,44 +10035,98 @@
     // PROJECTS DISPLAY & SEARCH INTELLIGENCE
     // =========================================================
     let activeProjectSearch = '';
+    let activeProjectCategory = 'all';
+
+    function setProjectCategory(cat) {
+      activeProjectCategory = cat;
+      displayProjects();
+    }
 
     function filterProjectsSearch(query) {
       activeProjectSearch = (query || '').toLowerCase().trim();
       displayProjects();
     }
 
+    function renderProjectCategoryFilters(projects) {
+      const filterContainer = document.getElementById('projectCategoryFilters');
+      if (!filterContainer) return;
+
+      const totalCount = projects.length;
+      const dataCount = projects.filter(p => (p.category === 'Data & Analytics') || (p.tech && /python|tableau|jupyter|data|sql|excel/i.test(p.tech)) || (p.title && /data|tableau|risk|analysis|analytics/i.test(p.title))).length;
+      const webCount = projects.filter(p => (p.category === 'Web & Fullstack' || p.category === 'Web & AI') || (p.tech && /react|javascript|html|css|php|node|web/i.test(p.tech))).length;
+      const repoCount = projects.filter(p => p.project_url || p.github_url || (p.url && p.url.includes('github.com'))).length;
+      const featuredCount = projects.filter(p => p.featured).length;
+
+      const categories = [
+        { id: 'all', label: `All Projects (${totalCount})`, icon: 'fa-layer-group' },
+        { id: 'data', label: `Data & Analytics (${dataCount})`, icon: 'fa-chart-pie' },
+        { id: 'web', label: `Web & Fullstack (${webCount})`, icon: 'fa-laptop-code' },
+        { id: 'github', label: `GitHub Repos (${repoCount})`, icon: 'fa-code-branch' },
+        { id: 'featured', label: `Featured (${featuredCount})`, icon: 'fa-star' }
+      ];
+
+      filterContainer.innerHTML = categories.map(c => `
+        <button type="button" class="project-filter-chip ${activeProjectCategory === c.id ? 'active' : ''}" onclick="setProjectCategory('${c.id}')">
+          <i class="fas ${c.icon}"></i> ${c.label}
+        </button>
+      `).join('');
+    }
+
     // Display Projects
     function displayProjects() {
       const container = document.getElementById('projectsList');
       const countEl = document.getElementById('tabProjectsCount');
-      const projects = userProfile.projects || [];
+      const projects = (userProfile && userProfile.projects) ? userProfile.projects : [];
       if (countEl) countEl.textContent = projects.length;
+
+      renderProjectCategoryFilters(projects);
 
       if (!projects || projects.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="padding: 24px; text-align: center;">
             <i class="fas fa-folder-open" style="font-size: 32px; color: #8b949e; opacity: 0.5; margin-bottom: 8px;"></i>
             <p style="color: #8b949e; margin-bottom: 12px;">No projects added yet</p>
-            <button class="btn-primary" onclick="addProject()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add First Project</button>
+            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn-github-resync" onclick="syncAllGitHubProjectsDirectly()"><i class="fab fa-github"></i> Import GitHub Repos</button>
+              <button class="btn-primary" onclick="addProject()" style="padding: 6px 14px; font-size: 12.5px;"><i class="fas fa-plus"></i> Add Project</button>
+            </div>
           </div>
         `;
         return;
       }
 
-      // Filter by search query if any
+      // Filter by category and search query
       const filteredProjects = projects.filter(proj => {
-        if (!activeProjectSearch) return true;
         const title = (proj.name || proj.title || '').toLowerCase();
         const tech = (proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' ') : proj.tags) || '').toLowerCase();
         const desc = (proj.description || '').toLowerCase();
         const role = (proj.role || '').toLowerCase();
+        const url = (proj.url || proj.project_url || proj.link || '').toLowerCase();
+        const isGithub = url.includes('github.com') || !!proj.project_url || !!proj.github_url;
+
+        // Category filter
+        if (activeProjectCategory === 'data') {
+          const isData = (proj.category === 'Data & Analytics') || /python|tableau|jupyter|data|sql|excel/i.test(tech) || /data|tableau|risk|analysis|analytics/i.test(title);
+          if (!isData) return false;
+        } else if (activeProjectCategory === 'web') {
+          const isWeb = (proj.category === 'Web & Fullstack' || proj.category === 'Web & AI') || /react|javascript|html|css|php|node|web/i.test(tech);
+          if (!isWeb) return false;
+        } else if (activeProjectCategory === 'github') {
+          if (!isGithub) return false;
+        } else if (activeProjectCategory === 'featured') {
+          if (!proj.featured) return false;
+        }
+
+        // Search query filter
+        if (!activeProjectSearch) return true;
         return title.includes(activeProjectSearch) || tech.includes(activeProjectSearch) || desc.includes(activeProjectSearch) || role.includes(activeProjectSearch);
       });
 
       if (filteredProjects.length === 0) {
         container.innerHTML = `
-          <div style="padding: 20px; text-align: center; color: #8b949e; font-size: 13px;">
-            <i class="fas fa-search" style="opacity: 0.5; margin-right: 6px;"></i> No projects matching "<strong>${activeProjectSearch}</strong>".
+          <div style="padding: 24px; text-align: center; color: #8b949e; font-size: 13px;">
+            <i class="fas fa-search" style="opacity: 0.5; margin-right: 6px;"></i> No projects matching current filter.
+            <button type="button" onclick="setProjectCategory('all'); activeProjectSearch=''; document.getElementById('projectSearchInput').value='';" style="background:none;border:none;color:#38bdf8;text-decoration:underline;cursor:pointer;margin-left:6px;">Reset filters</button>
           </div>
         `;
         return;
@@ -9938,9 +10138,12 @@
             const index = projects.indexOf(proj);
             const title = proj.name || proj.title || 'Project';
             const tech = proj.tech || (Array.isArray(proj.tags) ? proj.tags.join(' • ') : proj.tags) || '';
-            const url = proj.url || proj.project_url || '';
-            const desc = proj.description || 'Verified developer project.';
+            const url = proj.url || proj.project_url || proj.link || '';
+            const githubUrl = proj.github_url || (url.includes('github.com') ? url : (proj.project_url && proj.project_url.includes('github.com') ? proj.project_url : ''));
+            const liveUrl = (url && !url.includes('github.com')) ? url : '';
+            const desc = proj.description || 'Verified developer project on GitHub.';
             const role = proj.role || 'Creator & Developer';
+            const stars = proj.stars || 0;
 
             const techList = tech ? tech.split(/[•,]/).map(t => t.trim()).filter(Boolean) : [];
 
@@ -9948,17 +10151,25 @@
               <div class="repo-style-card">
                 <div>
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-                    <a class="github-repo-name" href="${url || '#'}" ${url ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                    <a class="github-repo-name" href="${githubUrl || url || '#'}" ${(githubUrl || url) ? 'target="_blank" rel="noopener noreferrer"' : ''}>
                       <i class="fas fa-code-branch" style="font-size: 12px; color: #58a6ff;"></i>
-                      <span>${title}</span>
+                      <span>${escapeHtml(title)}</span>
                     </a>
-                    ${url ? `
-                      <a href="${url}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #58a6ff; flex-shrink: 0;" title="Live Preview">
-                        <i class="fas fa-external-link-alt" style="font-size: 9.5px;"></i> Live
-                      </a>
-                    ` : ''}
+                    <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center;">
+                      ${proj.featured ? `<span class="github-stat-pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);"><i class="fas fa-star"></i> Featured</span>` : ''}
+                      ${liveUrl ? `
+                        <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #34d399; border-color: rgba(52, 211, 153, 0.3);" title="Live Preview">
+                          <i class="fas fa-external-link-alt" style="font-size: 9.5px;"></i> Live
+                        </a>
+                      ` : ''}
+                      ${githubUrl ? `
+                        <a href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" class="github-stat-pill" style="text-decoration: none; color: #58a6ff;" title="GitHub Repo">
+                          <i class="fab fa-github" style="font-size: 10px;"></i>
+                        </a>
+                      ` : ''}
+                    </div>
                   </div>
-                  <div class="github-repo-desc">${desc}</div>
+                  <div class="github-repo-desc">${escapeHtml(desc)}</div>
                 </div>
 
                 <div>
@@ -9969,7 +10180,7 @@
                         return `
                           <span class="github-stat-pill">
                             <span class="skill-dot" style="background-color: ${langColor};"></span>
-                            <span>${t}</span>
+                            <span>${escapeHtml(t)}</span>
                           </span>
                         `;
                       }).join('')}
@@ -9978,7 +10189,8 @@
 
                   <div class="github-repo-footer">
                     <span style="font-size: 11px; color: #8b949e; display: inline-flex; align-items: center; gap: 4px;">
-                      <i class="fas fa-user-tag" style="color: #a855f7;"></i> ${role}
+                      ${stars > 0 ? `<span style="color:#eab308;margin-right:4px;"><i class="fas fa-star"></i> ${stars}</span>` : ''}
+                      <i class="fas fa-user-tag" style="color: #a855f7;"></i> ${escapeHtml(role)}
                     </span>
                     <div style="display: flex; gap: 6px;">
                       <button class="repo-action-btn edit" onclick="editProject(${index})" title="Edit project">
