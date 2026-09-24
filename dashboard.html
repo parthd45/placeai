@@ -6122,19 +6122,7 @@
     </div>
   </div>
 
-  
-  <!-- Floating Community & AI Chat Button (Bottom Right) -->
-  <div class="floating-campus-chat-btn" id="floatingCampusChatBtn" onclick="openCampusChatModal('all')" title="PlaceAI Campus Chat & AI Placement Copilot" style="position:relative;">
-    <div class="floating-chat-icon" style="position:relative;">
-      <i class="fas fa-comments"></i>
-      <span class="wp-floating-unread-dot" id="floatingUnreadDot" style="display:none;">0</span>
-    </div>
-    <div class="floating-chat-label">
-      <span>Campus Chat & AI</span>
-      <small><i class="fas fa-robot" style="font-size:9.5px;margin-right:3px;"></i>Peers, All & Copilot</small>
-    </div>
-    <span class="floating-chat-badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">AI Live</span>
-  </div>
+
 
   <!-- Complete Community & Direct Chat Modal -->
   <div class="community-chat-overlay" id="communityChatModal" onclick="if(event.target===this)closeCampusChatModal()">
@@ -7595,7 +7583,6 @@
             <div class="peer-thread-profile">
               <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
                 <div class="peer-avatar-img ai-avatar-icon" style="font-size:16px;"><i class="fas fa-robot"></i></div>
-                <span class="peer-status-dot online" style="background:#38bdf8;box-shadow:0 0 8px #38bdf8;" title="PlaceAI AI is Online"></span>
               </div>
               <div class="peer-thread-info">
                 <h4 style="display:flex; align-items:center; gap:8px;">
@@ -7727,7 +7714,6 @@
           <div class="peer-thread-profile">
             <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
               <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
-              <span class="peer-status-dot ${online ? 'online' : 'offline'}" id="peerHeaderDot" title="${online ? 'Online now' : lastSeenText}"></span>
             </div>
             <div class="peer-thread-info">
               <h4 style="display:flex; align-items:center; gap:8px;">
