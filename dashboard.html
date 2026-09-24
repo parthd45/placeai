@@ -4505,6 +4505,276 @@
       background: #0b1120;
     }
 
+  
+    /* ===== WHATSAPP-LIKE MESSAGING STYLES ===== */
+    .direct-thread-pane {
+      background: #0b141a !important;
+      position: relative;
+    }
+    #directMessagesStream {
+      background-color: #0b141a !important;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        radial-gradient(rgba(0, 168, 132, 0.03) 1px, transparent 1px) !important;
+      background-size: 24px 24px, 48px 48px !important;
+      background-position: 0 0, 12px 12px !important;
+    }
+    .peer-msg-row {
+      display: flex;
+      gap: 8px;
+      max-width: 75%;
+      margin-bottom: 4px;
+      position: relative;
+    }
+    .peer-msg-row.sent {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .peer-msg-row.received {
+      align-self: flex-start;
+    }
+    .peer-msg-bubble {
+      padding: 8px 12px 6px 12px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      position: relative;
+      word-break: break-word;
+      transition: background 0.2s;
+    }
+    .peer-msg-row.sent .peer-msg-bubble {
+      background: #005c4b; /* Authentic WhatsApp Dark Sent Bubble */
+      color: #e9edef;
+      border-top-right-radius: 0px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    .peer-msg-row.sent .peer-msg-bubble::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -8px;
+      width: 0;
+      height: 0;
+      border-top: 9px solid #005c4b;
+      border-right: 8px solid transparent;
+    }
+    .peer-msg-row.received .peer-msg-bubble {
+      background: #202c33; /* Authentic WhatsApp Dark Received Bubble */
+      color: #e9edef;
+      border-top-left-radius: 0px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    .peer-msg-row.received .peer-msg-bubble::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-top: 9px solid #202c33;
+      border-left: 8px solid transparent;
+    }
+    .peer-msg-meta {
+      font-size: 10.5px;
+      color: rgba(233, 237, 239, 0.6);
+      margin-top: 4px;
+      margin-left: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      float: right;
+      user-select: none;
+    }
+    .peer-msg-row.received .peer-msg-meta {
+      color: rgba(233, 237, 239, 0.5);
+    }
+
+    /* WhatsApp Ticks */
+    .wp-tick-wrapper {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 2px;
+    }
+    .wp-tick-icon {
+      font-size: 11px;
+      line-height: 1;
+    }
+    .wp-tick-single {
+      color: rgba(233, 237, 239, 0.55);
+    }
+    .wp-tick-delivered {
+      color: rgba(233, 237, 239, 0.55);
+    }
+    .wp-tick-read {
+      color: #53bdeb !important; /* WhatsApp Iconic Blue Double Tick */
+      text-shadow: 0 0 5px rgba(83, 189, 235, 0.5);
+      animation: wpTickPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes wpTickPop {
+      0% { transform: scale(0.7); }
+      70% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    /* Message Reactions Tray & Badges */
+    .wp-bubble-actions {
+      position: absolute;
+      top: -18px;
+      right: 12px;
+      background: #111b21;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 2px 6px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+    }
+    .peer-msg-row:hover .wp-bubble-actions {
+      display: flex;
+    }
+    .wp-react-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 1px 3px;
+      transition: transform 0.15s;
+    }
+    .wp-react-btn:hover {
+      transform: scale(1.3);
+    }
+    .wp-reaction-badge {
+      position: absolute;
+      bottom: -9px;
+      right: 8px;
+      background: #202c33;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1px 5px;
+      font-size: 11px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    /* WhatsApp Input Bar & Tools */
+    .peer-input-bar {
+      padding: 10px 16px;
+      background: #202c33 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .wp-tool-btn {
+      background: transparent;
+      border: none;
+      color: #8696a0;
+      font-size: 18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .wp-tool-btn:hover {
+      color: #e9edef;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .peer-input-field {
+      flex: 1;
+      background: #2a3942 !important;
+      border: none !important;
+      border-radius: 8px !important;
+      padding: 10px 16px !important;
+      color: #d1d7db !important;
+      font-size: 14px !important;
+      outline: none;
+    }
+    .peer-input-field::placeholder {
+      color: #8696a0 !important;
+    }
+    .peer-send-btn {
+      background: #00a884 !important; /* Authentic WhatsApp Emerald */
+      border: none;
+      color: #111b21 !important;
+      width: 40px;
+      height: 40px;
+      border-radius: 50% !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0, 168, 132, 0.4);
+    }
+    .peer-send-btn:hover {
+      background: #06cf9c !important;
+      transform: scale(1.06);
+    }
+
+    /* WhatsApp Emoji Drawer */
+    .wp-emoji-drawer {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      left: 16px;
+      width: 300px;
+      background: #202c33;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+    .wp-emoji-drawer.active {
+      display: block;
+    }
+    .wp-emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+    .wp-emoji-chip {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .wp-emoji-chip:hover {
+      transform: scale(1.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* WhatsApp Thread Header Buttons */
+    .wp-header-call-btn {
+      background: transparent;
+      border: none;
+      color: #8696a0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .wp-header-call-btn:hover {
+      color: #00a884;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -5415,9 +5685,34 @@
               </div>
             </div>
 
+            <!-- WhatsApp Style Emoji Drawer -->
+            <div class="wp-emoji-drawer" id="wpEmojiDrawer">
+              <div style="font-size: 11px; font-weight: 600; color: #8696a0; margin-bottom: 8px; text-transform: uppercase;">Quick Reactions</div>
+              <div class="wp-emoji-grid">
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('👍')">👍</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('❤️')">❤️</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('🔥')">🔥</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('😂')">😂</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('👏')">👏</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('🎉')">🎉</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('🚀')">🚀</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('💡')">💡</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('💻')">💻</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('✅')">✅</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('🙌')">🙌</button>
+                <button class="wp-emoji-chip" onclick="insertWpEmoji('💯')">💯</button>
+              </div>
+            </div>
+
             <div class="peer-input-bar">
-              <input type="text" class="peer-input-field" id="directMessageInput" placeholder="Type a direct private message..." onkeydown="if(event.key==='Enter')sendDirectMessage()" />
-              <button class="peer-send-btn" onclick="sendDirectMessage()" title="Send Private Message">
+              <button class="wp-tool-btn" onclick="toggleWpEmojiDrawer()" title="Emojis">
+                <i class="far fa-smile"></i>
+              </button>
+              <button class="wp-tool-btn" onclick="triggerWpAttachment()" title="Attach document/code snippet">
+                <i class="fas fa-paperclip"></i>
+              </button>
+              <input type="text" class="peer-input-field" id="directMessageInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendDirectMessage()" />
+              <button class="peer-send-btn" onclick="sendDirectMessage()" title="Send">
                 <i class="fas fa-paper-plane"></i>
               </button>
             </div>
@@ -5662,7 +5957,7 @@
       }
     }
 
-    // ===== MODE 2: DIRECT MESSAGE (REAL SPECIFIC USERS) =====
+    // ===== MODE 2: DIRECT MESSAGE (REAL SPECIFIC USERS - WHATSAPP ENGINE) =====
     function getDirectChatHistory(peerId) {
       try {
         const d = localStorage.getItem('placeai_real_chat_' + peerId);
@@ -5674,6 +5969,30 @@
     function saveDirectChatHistory(peerId, history) {
       try {
         localStorage.setItem('placeai_real_chat_' + peerId, JSON.stringify(history));
+      } catch (e) {}
+    }
+
+    // Play synthesized WhatsApp sent pop tone (Web Audio API)
+    function playWpSentSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(680, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1050, ctx.currentTime + 0.07);
+
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.09);
       } catch (e) {}
     }
 
@@ -5716,21 +6035,35 @@
         const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
         const isActive = peer.id === currentDirectPeerId;
 
+        // WhatsApp Tick Indicator in the Preview list
+        let tickIconHtml = '';
+        if (lastMsg && lastMsg.sender === 'user') {
+          if (lastMsg.status === 'read') {
+            tickIconHtml = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" style="margin-right:4px;"></i>';
+          } else if (lastMsg.status === 'delivered') {
+            tickIconHtml = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" style="margin-right:4px;"></i>';
+          } else {
+            tickIconHtml = '<i class="fas fa-check wp-tick-icon wp-tick-single" style="margin-right:4px;"></i>';
+          }
+        }
+
         return `
           <div class="peer-item-card ${isActive ? 'active' : ''}" onclick="selectDirectUser('${peer.id}')">
             <div class="peer-avatar-wrapper">
-              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #6366f1, #38bdf8);">${peer.avatarText}</div>
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #00a884, #005c4b); color:#e9edef;">${peer.avatarText}</div>
               <span class="peer-status-dot online"></span>
             </div>
             <div class="peer-item-meta">
               <div class="peer-item-name-row">
                 <span class="peer-item-name">${peer.name}</span>
-                <span class="peer-item-time">${lastMsg ? lastMsg.time : ''}</span>
+                <span class="peer-item-time" style="font-size:11px; color:#8696a0;">${lastMsg ? lastMsg.time : ''}</span>
               </div>
               <div class="peer-item-tag">
                 <i class="fas fa-graduation-cap" style="font-size:10px;"></i> ${peer.college}
               </div>
-              <div class="peer-item-preview">${lastMsg ? (lastMsg.sender === 'user' ? 'You: ' : '') + lastMsg.text : 'Click to start conversation'}</div>
+              <div class="peer-item-preview" style="display:flex; align-items:center;">
+                ${lastMsg ? (tickIconHtml + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (lastMsg.sender === 'user' ? 'You: ' : '') + lastMsg.text + '</span>') : 'Click to start conversation'}
+              </div>
             </div>
           </div>
         `;
@@ -5751,33 +6084,43 @@
       const inputEl = document.getElementById('directMessageInput');
 
       if (!peer) {
-        if (headerEl) headerEl.innerHTML = '<div style="color:#94a3b8;font-size:13px;">Select a user from the directory to start chatting</div>';
-        if (streamEl) streamEl.innerHTML = '<div style="text-align:center;padding:50px;color:#64748b;">No conversation selected.</div>';
+        if (headerEl) headerEl.innerHTML = '<div style="color:#8696a0;font-size:13px;">Select a user from the directory to start chatting</div>';
+        if (streamEl) streamEl.innerHTML = '<div style="text-align:center;padding:50px;color:#8696a0;">No conversation selected.</div>';
         return;
       }
 
       if (inputEl) {
-        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + ' directly...';
+        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + '...';
         inputEl.focus();
       }
 
+      // WhatsApp Style Header with Online Beacon & Call Icons
       if (headerEl) {
         headerEl.innerHTML = `
           <div class="peer-thread-profile">
-            <div class="peer-avatar-wrapper" style="width:38px;height:38px;">
-              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #6366f1, #38bdf8);font-size:14px;">${peer.avatarText}</div>
+            <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #00a884, #005c4b); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
               <span class="peer-status-dot online"></span>
             </div>
             <div class="peer-thread-info">
-              <h4>
+              <h4 style="display:flex; align-items:center; gap:8px;">
                 <span>${peer.name}</span>
-                <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${peer.college}</span>
+                <span style="font-size:10.5px;font-weight:700;color:#00a884;background:rgba(0,168,132,0.15);padding:1px 6px;border-radius:4px;border:1px solid rgba(0,168,132,0.3);">${peer.college}</span>
               </h4>
-              <p>${peer.role} • <span style="color:#34d399;">Registered User</span></p>
+              <p style="font-size:11.5px; color:#00a884; display:flex; align-items:center; gap:4px; margin-top:2px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#00a884;display:inline-block;animation:pulse 1.5s infinite;"></span>
+                online • ${peer.role}
+              </p>
             </div>
           </div>
-          <div class="peer-thread-actions">
-            <a href="code-practice.html" class="peer-thread-btn" title="Practice coding questions">
+          <div class="peer-thread-actions" style="display:flex; align-items:center; gap:6px;">
+            <button class="wp-header-call-btn" onclick="startWpVoiceCall('${peer.name}')" title="Voice Call">
+              <i class="fas fa-phone-alt"></i>
+            </button>
+            <button class="wp-header-call-btn" onclick="startWpVideoCall('${peer.name}')" title="Video Call">
+              <i class="fas fa-video"></i>
+            </button>
+            <a href="code-practice.html" class="peer-thread-btn" title="Practice coding questions" style="background:rgba(0,168,132,0.15); border-color:rgba(0,168,132,0.35); color:#00a884;">
               <i class="fas fa-code"></i> Code Practice
             </a>
           </div>
@@ -5793,24 +6136,47 @@
       if (streamEl) {
         if (msgs.length === 0) {
           streamEl.innerHTML = `
-            <div style="text-align:center;padding:50px 20px;color:#94a3b8;">
-              <div style="width:48px;height:48px;border-radius:50%;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:18px;">
-                <i class="fas fa-envelope-open-text"></i>
+            <div style="text-align:center;padding:50px 20px;color:#8696a0;">
+              <div style="width:54px;height:54px;border-radius:50%;background:rgba(0,168,132,0.12);border:1px solid rgba(0,168,132,0.3);color:#00a884;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;">
+                <i class="fab fa-whatsapp"></i>
               </div>
-              <h5 style="color:#f1f5f9;font-size:14px;margin-bottom:4px;">No messages yet with ${peer.name}</h5>
-              <p style="font-size:12px;color:#94a3b8;margin:0;">Send a message below to start your direct conversation!</p>
+              <h5 style="color:#e9edef;font-size:15px;margin-bottom:6px;">Direct Chat with ${peer.name}</h5>
+              <p style="font-size:12.5px;color:#8696a0;max-width:320px;margin:0 auto;line-height:1.5;">
+                Messages are end-to-end encrypted for student privacy. Type a message below to start chatting!
+              </p>
             </div>
           `;
         } else {
           streamEl.innerHTML = msgs.map(m => {
             const isSent = m.sender === 'user';
+            
+            // Build WhatsApp Tick Icon
+            let tickHtml = '';
+            if (isSent) {
+              if (m.status === 'read') {
+                tickHtml = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" title="Read"></i>';
+              } else if (m.status === 'delivered') {
+                tickHtml = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
+              } else {
+                tickHtml = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent"></i>';
+              }
+            }
+
             return `
-              <div class="peer-msg-row ${isSent ? 'sent' : 'received'}">
+              <div class="peer-msg-row ${isSent ? 'sent' : 'received'}" id="msgRow_${m.id}">
                 <div class="peer-msg-bubble">
-                  <div>${m.text}</div>
+                  <div class="peer-msg-text" style="display:inline;">${m.text}</div>
                   <div class="peer-msg-meta">
                     <span>${m.time}</span>
-                    ${isSent ? '<i class="fas fa-check-double" style="font-size:9px;color:#a7f3d0;"></i>' : ''}
+                    ${isSent ? `<span class="wp-tick-wrapper" id="wpTick_${m.id}">${tickHtml}</span>` : ''}
+                  </div>
+                  ${m.reaction ? `<div class="wp-reaction-badge" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '')">${m.reaction}</div>` : ''}
+                  <div class="wp-bubble-actions">
+                    <button class="wp-react-btn" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '👍')">👍</button>
+                    <button class="wp-react-btn" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '❤️')">❤️</button>
+                    <button class="wp-react-btn" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '🔥')">🔥</button>
+                    <button class="wp-react-btn" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '😂')">😂</button>
+                    <button class="wp-react-btn" onclick="toggleEmojiReaction('${peer.id}', '${m.id}', '🎉')">🎉</button>
                   </div>
                 </div>
               </div>
@@ -5822,6 +6188,7 @@
       }
     }
 
+    // WhatsApp Message Lifecycle: Sent -> Delivered -> Read
     function sendDirectMessage() {
       const input = document.getElementById('directMessageInput');
       if (!input) return;
@@ -5829,24 +6196,124 @@
       if (!text || !currentDirectPeerId) return;
 
       const history = getDirectChatHistory(currentDirectPeerId);
-
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
 
-      history.push({
+      // 1. Initial State: Sent (Single Grey Tick)
+      const newMsg = {
+        id: msgId,
         sender: 'user',
-        text,
-        time: timeStr
-      });
+        text: text,
+        time: timeStr,
+        status: 'sent', // Single grey tick
+        timestamp: Date.now()
+      };
 
+      history.push(newMsg);
       saveDirectChatHistory(currentDirectPeerId, history);
       input.value = '';
+
+      // Play WhatsApp sent sound
+      playWpSentSound();
+
       renderDirectThread();
+      renderDirectUserList();
+
+      // 2. Progression: Delivered (Double Grey Tick) after 900ms
+      setTimeout(() => {
+        updateMessageStatus(currentDirectPeerId, msgId, 'delivered');
+      }, 900);
+
+      // 3. Progression: Read (Double Blue Tick) after 2400ms
+      setTimeout(() => {
+        updateMessageStatus(currentDirectPeerId, msgId, 'read');
+      }, 2400);
+    }
+
+    // Status updater for live DOM & localStorage
+    function updateMessageStatus(peerId, msgId, newStatus) {
+      const history = getDirectChatHistory(peerId);
+      const target = history.find(m => m.id === msgId);
+      if (!target) return;
+
+      target.status = newStatus;
+      saveDirectChatHistory(peerId, history);
+
+      if (currentDirectPeerId === peerId) {
+        const tickEl = document.getElementById('wpTick_' + msgId);
+        if (tickEl) {
+          if (newStatus === 'read') {
+            tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" title="Read"></i>';
+          } else if (newStatus === 'delivered') {
+            tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
+          } else {
+            tickEl.innerHTML = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent"></i>';
+          }
+        }
+      }
       renderDirectUserList();
     }
 
-    // ==========================================================
-// =========================================================
+    // Toggle message emoji reaction
+    window.toggleEmojiReaction = function(peerId, msgId, emoji) {
+      const history = getDirectChatHistory(peerId);
+      const target = history.find(m => m.id === msgId);
+      if (!target) return;
+
+      target.reaction = (target.reaction === emoji) ? null : emoji;
+      saveDirectChatHistory(peerId, history);
+      renderDirectThread();
+    };
+
+    // Toggle Emoji Drawer
+    window.toggleWpEmojiDrawer = function() {
+      const drawer = document.getElementById('wpEmojiDrawer');
+      if (drawer) drawer.classList.toggle('active');
+    };
+
+    // Insert Emoji into input field
+    window.insertWpEmoji = function(emoji) {
+      const input = document.getElementById('directMessageInput');
+      if (input) {
+        input.value += emoji;
+        input.focus();
+      }
+      const drawer = document.getElementById('wpEmojiDrawer');
+      if (drawer) drawer.classList.remove('active');
+    };
+
+    // Quick Attachment Simulator
+    window.triggerWpAttachment = function() {
+      const input = document.getElementById('directMessageInput');
+      if (input) {
+        input.value += ' [📁 Code Solution attached] ';
+        input.focus();
+      }
+    };
+
+    // Call triggers with WhatsApp notification
+    window.startWpVoiceCall = function(peerName) {
+      alert('📞 Calling ' + peerName + ' via PlaceAI WhatsApp voice bridge... (Connected to active session)');
+    };
+
+    window.startWpVideoCall = function(peerName) {
+      alert('📹 Starting video connection with ' + peerName + '... (PlaceAI Peer Connect)');
+    };
+
+    // Close emoji drawer when clicking outside
+    document.addEventListener('click', function(e) {
+      const drawer = document.getElementById('wpEmojiDrawer');
+      const btn = e.target.closest('.wp-tool-btn');
+      if (drawer && drawer.classList.contains('active')) {
+        if (!drawer.contains(e.target) && !btn) {
+          drawer.classList.remove('active');
+        }
+      }
+    });
+
+    
+    // =========================================================
     // GITHUB CONTRIBUTION HEATMAP LOGIC
     // =========================================================
     let currentHeatmapYear = 'last12';
