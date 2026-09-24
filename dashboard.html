@@ -4775,6 +4775,21 @@
       background: rgba(255, 255, 255, 0.06);
     }
 
+  
+    .peer-status-dot.online {
+      background: #00a884 !important;
+      box-shadow: 0 0 7px #00a884 !important;
+    }
+    .peer-status-dot.offline {
+      background: #64748b !important;
+      box-shadow: none !important;
+      border-color: #0f172a !important;
+    }
+    @keyframes wpOnlineBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.85); }
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -5763,7 +5778,7 @@
 
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('user_id, first_name, last_name, email, city, college_name, profile_image_url, skills, current_designation, created_at')
+          .select('user_id, first_name, last_name, email, city, college_name, profile_image_url, skills, current_designation, created_at, updated_at')
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -5787,7 +5802,9 @@
             college: u.college_name || u.city || 'Verified Student',
             avatarText: initials,
             avatarImg: u.profile_image_url || null,
-            skills: u.skills || []
+            skills: u.skills || [],
+            createdAt: u.created_at,
+            updatedAt: u.updated_at
           };
         });
 
@@ -5957,7 +5974,123 @@
       }
     }
 
-    // ===== MODE 2: DIRECT MESSAGE (REAL SPECIFIC USERS - WHATSAPP ENGINE) =====
+    // ===== MODE 2: DIRECT MESSAGE (REAL SPECIFIC USERS - WHATSAPP ENGINE & REALTIME PRESENCE) =====
+    window.liveOnlineUserIds = new Set();
+    let wpPresenceChannel = null;
+    let presenceRefreshInterval = null;
+
+    // Realtime Presence Initialization using Supabase
+    function initRealtimePresence() {
+      try {
+        const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
+        if (!supabase) return;
+
+        const myId = currentUser ? currentUser.id : null;
+        if (!myId) return;
+
+        // Current user is always active locally
+        window.liveOnlineUserIds.add(myId);
+
+        if (wpPresenceChannel) {
+          try { supabase.removeChannel(wpPresenceChannel); } catch (e) {}
+        }
+
+        wpPresenceChannel = supabase.channel('placeai_campus_presence', {
+          config: { presence: { key: myId } }
+        });
+
+        wpPresenceChannel
+          .on('presence', { event: 'sync' }, () => {
+            const state = wpPresenceChannel.presenceState();
+            window.liveOnlineUserIds.clear();
+            if (currentUser) window.liveOnlineUserIds.add(currentUser.id);
+
+            Object.keys(state).forEach(uid => {
+              window.liveOnlineUserIds.add(uid);
+            });
+
+            renderDirectUserList();
+            updateCurrentThreadPresence();
+          })
+          .on('presence', { event: 'join' }, ({ key }) => {
+            window.liveOnlineUserIds.add(key);
+            renderDirectUserList();
+            updateCurrentThreadPresence();
+          })
+          .on('presence', { event: 'leave' }, ({ key }) => {
+            window.liveOnlineUserIds.delete(key);
+            renderDirectUserList();
+            updateCurrentThreadPresence();
+          })
+          .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+              const myName = (userProfile && userProfile.first_name) 
+                ? (userProfile.first_name + ' ' + (userProfile.last_name || '')).trim() 
+                : (currentUser.email ? currentUser.email.split('@')[0] : 'Student');
+
+              await wpPresenceChannel.track({
+                user_id: myId,
+                name: myName,
+                online_at: new Date().toISOString()
+              });
+            }
+          });
+
+        if (!presenceRefreshInterval) {
+          presenceRefreshInterval = setInterval(() => {
+            renderDirectUserList();
+            updateCurrentThreadPresence();
+          }, 15000);
+        }
+      } catch (err) {
+        console.warn('Realtime presence init error:', err);
+      }
+    }
+
+    // Determine if a real user is actually online right now
+    function isPeerOnline(peer) {
+      if (!peer) return false;
+      // 1. Live presence broadcast check
+      if (window.liveOnlineUserIds && window.liveOnlineUserIds.has(peer.id)) return true;
+
+      // 2. Real database timestamp: active within last 5 minutes
+      if (peer.updatedAt) {
+        const diffMs = Date.now() - new Date(peer.updatedAt).getTime();
+        if (diffMs >= 0 && diffMs < 5 * 60 * 1000) return true;
+      }
+      return false;
+    }
+
+    // Format authentic human-readable last seen timestamp
+    function formatWpLastSeen(dateStr) {
+      if (!dateStr) return 'offline';
+      try {
+        const d = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - d;
+        if (diffMs < 0) return 'online';
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        if (diffMins < 5) return 'online';
+        if (diffMins < 60) return `last seen ${diffMins}m ago`;
+        if (diffHours < 24 && d.getDate() === now.getDate()) {
+          return `last seen today at ${timeStr}`;
+        }
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        if (d.getDate() === yesterday.getDate() && d.getMonth() === yesterday.getMonth() && d.getFullYear() === yesterday.getFullYear()) {
+          return `last seen yesterday at ${timeStr}`;
+        }
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `last seen ${d.getDate()} ${months[d.getMonth()]} at ${timeStr}`;
+      } catch (e) {
+        return 'offline';
+      }
+    }
+
     function getDirectChatHistory(peerId) {
       try {
         const d = localStorage.getItem('placeai_real_chat_' + peerId);
@@ -6035,6 +6168,10 @@
         const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
         const isActive = peer.id === currentDirectPeerId;
 
+        // REAL presence status
+        const online = isPeerOnline(peer);
+        const lastSeenText = online ? 'Online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+
         // WhatsApp Tick Indicator in the Preview list
         let tickIconHtml = '';
         if (lastMsg && lastMsg.sender === 'user') {
@@ -6050,19 +6187,21 @@
         return `
           <div class="peer-item-card ${isActive ? 'active' : ''}" onclick="selectDirectUser('${peer.id}')">
             <div class="peer-avatar-wrapper">
-              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #00a884, #005c4b); color:#e9edef;">${peer.avatarText}</div>
-              <span class="peer-status-dot online"></span>
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); color:#e9edef;">${peer.avatarText}</div>
+              <span class="peer-status-dot ${online ? 'online' : 'offline'}" title="${online ? 'Online now' : lastSeenText}"></span>
             </div>
             <div class="peer-item-meta">
               <div class="peer-item-name-row">
                 <span class="peer-item-name">${peer.name}</span>
-                <span class="peer-item-time" style="font-size:11px; color:#8696a0;">${lastMsg ? lastMsg.time : ''}</span>
+                <span class="peer-item-time" style="font-size:10.5px; color:${online ? '#00a884' : '#8696a0'};">
+                  ${online ? '<i class="fas fa-circle" style="font-size:7px;margin-right:3px;animation:wpOnlineBlink 1.5s infinite;"></i>Online' : (lastMsg ? lastMsg.time : lastSeenText)}
+                </span>
               </div>
               <div class="peer-item-tag">
                 <i class="fas fa-graduation-cap" style="font-size:10px;"></i> ${peer.college}
               </div>
               <div class="peer-item-preview" style="display:flex; align-items:center;">
-                ${lastMsg ? (tickIconHtml + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (lastMsg.sender === 'user' ? 'You: ' : '') + lastMsg.text + '</span>') : 'Click to start conversation'}
+                ${lastMsg ? (tickIconHtml + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (lastMsg.sender === 'user' ? 'You: ' : '') + lastMsg.text + '</span>') : `<span style="color:#64748b;font-style:italic;font-size:11px;">${lastSeenText}</span>`}
               </div>
             </div>
           </div>
@@ -6074,6 +6213,36 @@
       currentDirectPeerId = peerId;
       renderDirectUserList();
       renderDirectThread();
+    }
+
+    function updateCurrentThreadPresence() {
+      if (!currentDirectPeerId) return;
+      const peer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      if (!peer) return;
+
+      const online = isPeerOnline(peer);
+      const dotEl = document.getElementById('peerHeaderDot');
+      const statusEl = document.getElementById('peerHeaderStatus');
+
+      if (dotEl) {
+        dotEl.className = 'peer-status-dot ' + (online ? 'online' : 'offline');
+        dotEl.title = online ? 'Online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+      }
+
+      if (statusEl) {
+        if (online) {
+          statusEl.innerHTML = `
+            <span style="width:6px;height:6px;border-radius:50%;background:#00a884;display:inline-block;animation:wpOnlineBlink 1.5s infinite;margin-right:4px;"></span>
+            <span style="color:#00a884;font-weight:600;">online</span> • ${peer.role}
+          `;
+        } else {
+          const lastSeenText = formatWpLastSeen(peer.updatedAt || peer.createdAt);
+          statusEl.innerHTML = `
+            <span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;margin-right:4px;"></span>
+            <span style="color:#8696a0;">${lastSeenText}</span> • ${peer.role}
+          `;
+        }
+      }
     }
 
     function renderDirectThread() {
@@ -6094,22 +6263,30 @@
         inputEl.focus();
       }
 
-      // WhatsApp Style Header with Online Beacon & Call Icons
+      const online = isPeerOnline(peer);
+      const lastSeenText = online ? 'online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+
+      // WhatsApp Style Header with REAL-TIME Online / Last Seen
       if (headerEl) {
         headerEl.innerHTML = `
           <div class="peer-thread-profile">
             <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
-              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #00a884, #005c4b); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
-              <span class="peer-status-dot online"></span>
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
+              <span class="peer-status-dot ${online ? 'online' : 'offline'}" id="peerHeaderDot" title="${online ? 'Online' : lastSeenText}"></span>
             </div>
             <div class="peer-thread-info">
               <h4 style="display:flex; align-items:center; gap:8px;">
                 <span>${peer.name}</span>
-                <span style="font-size:10.5px;font-weight:700;color:#00a884;background:rgba(0,168,132,0.15);padding:1px 6px;border-radius:4px;border:1px solid rgba(0,168,132,0.3);">${peer.college}</span>
+                <span style="font-size:10.5px;font-weight:700;color:${online ? '#00a884' : '#94a3b8'};background:${online ? 'rgba(0,168,132,0.15)' : 'rgba(148,163,184,0.15)'};padding:1px 6px;border-radius:4px;border:1px solid ${online ? 'rgba(0,168,132,0.3)' : 'rgba(148,163,184,0.3)'};">${peer.college}</span>
               </h4>
-              <p style="font-size:11.5px; color:#00a884; display:flex; align-items:center; gap:4px; margin-top:2px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#00a884;display:inline-block;animation:pulse 1.5s infinite;"></span>
-                online • ${peer.role}
+              <p id="peerHeaderStatus" style="font-size:11.5px; display:flex; align-items:center; margin-top:2px;">
+                ${online ? `
+                  <span style="width:6px;height:6px;border-radius:50%;background:#00a884;display:inline-block;animation:wpOnlineBlink 1.5s infinite;margin-right:4px;"></span>
+                  <span style="color:#00a884;font-weight:600;">online</span> • ${peer.role}
+                ` : `
+                  <span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;margin-right:4px;"></span>
+                  <span style="color:#8696a0;">${lastSeenText}</span> • ${peer.role}
+                `}
               </p>
             </div>
           </div>
@@ -6312,7 +6489,13 @@
       }
     });
 
-    
+    // Auto-initialize presence when direct chat opens
+    const prevOpenModal = window.openCampusChatModal;
+    window.openCampusChatModal = async function(mode = 'all') {
+      if (typeof prevOpenModal === 'function') await prevOpenModal(mode);
+      initRealtimePresence();
+    };
+
     // =========================================================
     // GITHUB CONTRIBUTION HEATMAP LOGIC
     // =========================================================
