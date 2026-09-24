@@ -3202,6 +3202,346 @@
       color: #fff;
     }
 
+  
+    /* ===== ENHANCED PROFILE CARD WITH COVER BANNER & BADGES ===== */
+    .profile-card {
+      padding: 0 !important;
+      overflow: hidden;
+      border: 1px solid rgba(139, 92, 246, 0.28) !important;
+      background: linear-gradient(180deg, rgba(26, 31, 46, 0.95) 0%, rgba(15, 23, 42, 0.94) 100%) !important;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 25px rgba(139, 92, 246, 0.1) !important;
+      position: relative;
+    }
+    .profile-cover-banner {
+      height: 95px;
+      position: relative;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #0f172a 100%);
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cover-mesh-glow {
+      position: absolute;
+      top: -20px; left: -20px; right: -20px; bottom: -20px;
+      background: radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.45) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 60%, rgba(56, 189, 248, 0.35) 0%, transparent 60%);
+      pointer-events: none;
+      filter: blur(12px);
+    }
+    .cover-grid-pattern {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 16px 16px;
+      pointer-events: none;
+    }
+    .cover-badge-top {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      z-index: 2;
+    }
+    .cover-badge-pill {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #c4b5fd;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cover-edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      z-index: 2;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 5px 10px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+    .cover-edit-btn:hover {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #fff;
+    }
+    .profile-card-body {
+      padding: 0 18px 18px;
+      position: relative;
+    }
+    .profile-avatar-wrapper {
+      margin-top: -42px;
+      margin-bottom: 12px;
+      position: relative;
+      display: inline-block;
+      z-index: 3;
+    }
+    .profile-avatar-large {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #764df0, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 0 4px #0f172a, 0 0 0 6px rgba(139, 92, 246, 0.55), 0 10px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .profile-avatar-large:hover {
+      transform: scale(1.03);
+    }
+    .avatar-beacon-ring {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+    .avatar-beacon-pulse {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #10b981;
+      animation: beaconPulse 1.8s infinite;
+    }
+    @keyframes beaconPulse {
+      0% { transform: scale(1); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .avatar-camera-btn {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      border: 2px solid #0f172a;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+    .profile-avatar-large:hover .avatar-camera-btn {
+      transform: scale(1.15);
+    }
+    .avatar-remove-btn {
+      position: absolute;
+      bottom: -2px;
+      left: -2px;
+      background: #ef4444;
+      border: 2px solid #0f172a;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      cursor: pointer;
+      z-index: 5;
+    }
+    .profile-main-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .profile-name {
+      font-size: 21px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .profile-verified-badge {
+      color: #38bdf8;
+      font-size: 16px;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.45));
+    }
+    .profile-role-tag {
+      font-size: 13px;
+      font-weight: 600;
+      color: #c4b5fd;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .profile-chips-ribbon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .profile-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .profile-chip.interactive {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .profile-chip.interactive:hover {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+    .profile-availability-glow {
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #34d399;
+      cursor: pointer;
+      width: fit-content;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
+    }
+    .profile-availability-glow:hover {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.6);
+      transform: translateY(-1px);
+    }
+    .beacon-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulseDot 1.4s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+    .chip-edit-icon {
+      font-size: 9px;
+      opacity: 0.6;
+      margin-left: 2px;
+    }
+    .profile-connect-strip {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .connect-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(51, 65, 85, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .connect-circle:hover {
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    .connect-circle.github:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+    .connect-circle.linkedin:hover {
+      background: rgba(10, 102, 194, 0.25);
+      border-color: #0a66c2;
+      color: #38bdf8;
+    }
+    .connect-circle.web:hover {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: #8b5cf6;
+      color: #c4b5fd;
+    }
+    .connect-circle.share:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+  
+    /* Bio Quote Container */
+    .bio-quote-container {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-left: 3.5px solid #8b5cf6;
+      border-radius: 0 12px 12px 0;
+      padding: 14px 18px 14px 44px;
+      position: relative;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .bio-quote-mark {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      color: rgba(139, 92, 246, 0.5);
+      font-size: 16px;
+    }
+    .bio-quote-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #cbd5e1;
+      margin: 0;
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -3313,70 +3653,118 @@
       <div>
         <!-- Profile Card -->
         <div class="card profile-card">
-          <button class="btn-edit-icon" id="editProfileBtn">
-            <i class="fa fa-pen"></i>
-          </button>
-
-          <div class="profile-header-section">
-            <div class="profile-avatar-large" id="profileAvatar"
-              onclick="document.getElementById('profilePicInput').click()"
-              style="cursor: pointer; position: relative; background-size: cover; background-position: center;"
-              title="Click to change profile picture">
-              U
-              <div
-                style="position: absolute; bottom: 0; right: 0; background: #764df0; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 3px solid white; z-index: 10;">
-                <i class="fa fa-camera" style="color: white; font-size: 14px;"></i>
-              </div>
-              <div id="removeProfilePicBtn"
-                style="position: absolute; bottom: 0; left: 0; background: #ef4444; border-radius: 50%; width: 32px; height: 32px; display: none; align-items: center; justify-content: center; border: 3px solid white; cursor: pointer; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"
-                onclick="event.stopPropagation(); removeProfilePicture();" title="Remove profile picture">
-                <i class="fa fa-trash" style="color: white; font-size: 12px;"></i>
-              </div>
+          <!-- Atmospheric Cover Banner -->
+          <div class="profile-cover-banner">
+            <div class="cover-mesh-glow"></div>
+            <div class="cover-grid-pattern"></div>
+            <div class="cover-badge-top">
+              <span class="cover-badge-pill"><i class="fas fa-certificate"></i> Verified Candidate</span>
             </div>
-            <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
-            <div class="profile-info-main">
-              <h2 class="profile-name" id="profileFullName">Loading...</h2>
-              <p class="profile-role" id="profileDesignation">Development Intern</p>
-              <p class="profile-experience" id="profileExperience" style="cursor: pointer;" onclick="editExperience()"
-                title="Click to edit">0 years 6 months</p>
-              <p class="profile-location">
-                <i class="fa fa-map-marker-alt"></i>
-                <span id="profileLocation">Amravati</span>
-              </p>
-              <span class="profile-status" id="profileAvailability" style="cursor: pointer;"
-                onclick="editAvailability()" title="Click to edit">
-                <i class="fa fa-circle" style="font-size: 6px;"></i>
-                Available immediately
-              </span>
-            </div>
-          </div>
-
-          <hr class="profile-divider">
-
-          <div class="profile-stats-grid">
-            <div class="stat-item">
-              <div class="stat-value" id="statViews">0</div>
-              <div class="stat-label">Profile views</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value" id="statApplications">0</div>
-              <div class="stat-label">Applications</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value" id="statSkills">0</div>
-              <div class="stat-label">Skills</div>
-            </div>
-          </div>
-
-          <div class="profile-actions">
-            <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display: none;" />
-            <button class="btn-primary" id="resumeButton" onclick="handleResumeAction()">
-              <i class="fa fa-download"></i> Upload Resume
+            <button class="cover-edit-btn" id="editProfileBtn" title="Edit Profile Details">
+              <i class="fas fa-pen"></i> <span>Edit Profile</span>
             </button>
+          </div>
+
+          <!-- Profile Body with Overlapping Avatar -->
+          <div class="profile-card-body">
+            <div class="profile-avatar-wrapper">
+              <div class="profile-avatar-large" id="profileAvatar"
+                onclick="document.getElementById('profilePicInput').click()"
+                title="Click to change profile picture">
+                U
+                <!-- Glowing Online Active Beacon -->
+                <div class="avatar-beacon-ring" title="Active on PlaceAI">
+                  <span class="avatar-beacon-pulse"></span>
+                </div>
+                <!-- Camera Upload Button -->
+                <div class="avatar-camera-btn">
+                  <i class="fas fa-camera"></i>
+                </div>
+                <!-- Remove Photo Button -->
+                <div id="removeProfilePicBtn" class="avatar-remove-btn"
+                  onclick="event.stopPropagation(); removeProfilePicture();" title="Remove profile picture">
+                  <i class="fas fa-trash"></i>
+                </div>
+              </div>
+              <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
+            </div>
+
+            <!-- Profile Main Info -->
+            <div class="profile-main-meta">
+              <div class="profile-name-row">
+                <h2 class="profile-name" id="profileFullName">Loading...</h2>
+                <span class="profile-verified-badge" title="Identity & Placement Verified">
+                  <i class="fas fa-circle-check"></i>
+                </span>
+              </div>
+
+              <div class="profile-role-tag">
+                <i class="fas fa-terminal"></i>
+                <span id="profileDesignation">Development Intern</span>
+              </div>
+
+              <!-- Interactive Metadata Chips Ribbon -->
+              <div class="profile-chips-ribbon">
+                <div class="profile-chip" title="Location">
+                  <i class="fas fa-location-dot" style="color: #38bdf8;"></i>
+                  <span id="profileLocation">Amravati</span>
+                </div>
+                <div class="profile-chip interactive" onclick="editExperience()" title="Click to edit experience">
+                  <i class="fas fa-business-time" style="color: #fbbf24;"></i>
+                  <span id="profileExperience">0 years 6 months</span>
+                </div>
+              </div>
+
+              <!-- Glowing Availability Beacon -->
+              <div class="profile-availability-glow" id="profileAvailability" onclick="editAvailability()" title="Click to update availability status">
+                <span class="beacon-pulse"></span>
+                <span id="availabilityText">Available immediately</span>
+                <i class="fas fa-pencil-alt chip-edit-icon"></i>
+              </div>
+
+              <!-- Developer Social / Portfolio Strip -->
+              <div class="profile-connect-strip">
+                <a id="profileGithubLink" class="connect-circle github" href="#githubCard" title="GitHub Profile">
+                  <i class="fab fa-github"></i>
+                </a>
+                <a id="profileLinkedinLink" class="connect-circle linkedin" onclick="if(userProfile.linkedin_url) window.open(userProfile.linkedin_url, '_blank'); else editLinkedIn();" title="LinkedIn Profile">
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a id="profilePortfolioLink" class="connect-circle web" onclick="editLinkedIn()" title="Portfolio / Project Link">
+                  <i class="fas fa-globe"></i>
+                </a>
+                <button type="button" class="connect-circle share" onclick="copyCandidateShareLink()" title="Share Candidate Profile">
+                  <i class="fas fa-share-nodes"></i>
+                </button>
+              </div>
+            </div>
+
+            <hr class="profile-divider">
+
+            <div class="profile-stats-grid">
+              <div class="stat-item">
+                <div class="stat-value" id="statViews">0</div>
+                <div class="stat-label">Profile views</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="statApplications">0</div>
+                <div class="stat-label">Applications</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="statSkills">0</div>
+                <div class="stat-label">Skills</div>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display: none;" />
+              <button class="btn-primary" id="resumeButton" onclick="handleResumeAction()">
+                <i class="fa fa-download"></i> Upload Resume
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Contact Card -->
         <div class="card contact-info">
           <div class="contact-header">
             <span><i class="fas fa-id-card-clip" style="color: #8b5cf6; margin-right: 6px;"></i> Contact Information</span>
@@ -3723,9 +4111,12 @@
                 <i class="fa fa-pen"></i> Edit Bio
               </button>
             </div>
-            <p id="profileSummary" class="timeline-description" style="font-size: 13.5px; line-height: 1.6; color: #94a3b8; font-style: italic; margin-bottom: 16px;">
-              No bio added yet. Click "Edit Bio" above to share your background, skills, and aspirations.
-            </p>
+            <div class="bio-quote-container">
+              <i class="fas fa-quote-left bio-quote-mark"></i>
+              <p id="profileSummary" class="timeline-description bio-quote-text" style="font-style: italic; color: #94a3b8;">
+                No bio added yet. Click "Edit Bio" above to share your background, skills, and aspirations.
+              </p>
+            </div>
 
             <!-- Spotlight Showcase: Dynamic Featured Project -->
             <div id="spotlightProjectContainer"></div>
@@ -4965,10 +5356,18 @@
 
         // Update availability
         const availability = userProfile.availability || 'Available immediately';
-        document.getElementById('profileAvailability').innerHTML = `
-          <i class="fa fa-circle" style="font-size: 6px;"></i>
-          ${availability}
-        `;
+        const availEl = document.getElementById('profileAvailability');
+        if (availEl) {
+          availEl.innerHTML = `
+            <span class="beacon-pulse"></span>
+            <span id="availabilityText">${availability}</span>
+            <i class="fas fa-pencil-alt chip-edit-icon"></i>
+          `;
+        }
+        const ghLnk = document.getElementById('profileGithubLink');
+        if (ghLnk && userProfile.github_url) {
+          ghLnk.href = userProfile.github_url;
+        }
 
         // Update contact
         document.getElementById('contactEmail').textContent = userProfile.email || currentUser.email;
