@@ -6954,7 +6954,7 @@
                       </span>
                     </h3>
                     <p style="font-size: 12.5px; color: #a1a1aa; margin: 2px 0 0 0;">
-                      Live production web apps, custom domains & edge-deployed portfolio projects.
+                      Real-time production deployments, project builds & live preview domains.
                     </p>
                   </div>
                 </div>
@@ -6968,18 +6968,25 @@
                       <input type="text" id="vercelUsernameInput" class="vercel-input" placeholder="username" autocomplete="off" />
                     </div>
                     <button type="button" id="btnConnectVercel" class="btn-vercel-connect" onclick="connectVercelAccount()">
-                      <span style="font-size: 11px;">▲</span> Link & Auto-Detect
+                      <span style="font-size: 11px;">▲</span> Link
+                    </button>
+                    <button type="button" class="btn-github-resync" onclick="openVercelConnectModal()" title="Connect Vercel API token for 100% real-time deployments">
+                      <i class="fas fa-key"></i> Connect Token
                     </button>
                   </div>
 
                   <!-- Connected View -->
                   <div id="vercelConnectedView" style="display: none; align-items: center; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 6px;">
+                      <img id="vercelUserAvatar" src="" style="width: 20px; height: 20px; border-radius: 50%; display: none; object-fit: cover;" />
                       <span style="font-weight: 800; font-size: 13px; color: #ffffff;">▲ @<span id="vercelUsernameDisplay">user</span></span>
-                      <span class="dev-tab-pill vercel"><span id="vercelLivePillCount">0</span> Live Apps</span>
+                      <span class="dev-tab-pill vercel"><span id="vercelLivePillCount">0</span> Live</span>
                     </div>
-                    <button type="button" class="btn-github-resync" onclick="renderVercelDeployments(true)" title="Auto-detect new Vercel deployments from repositories">
-                      <i class="fas fa-sync-alt"></i> Resync
+                    <button type="button" class="btn-github-resync" onclick="renderVercelDeployments(true)" title="Fetch latest deployments from Vercel API">
+                      <i class="fas fa-sync-alt" id="vercelSyncIcon"></i> Resync
+                    </button>
+                    <button type="button" class="btn-github-resync" onclick="openVercelConnectModal()" title="Switch Vercel Account or API Token">
+                      <i class="fas fa-cog"></i> Settings
                     </button>
                     <button type="button" class="btn-vercel-disconnect" onclick="disconnectVercelAccount()" title="Disconnect Vercel">
                       <i class="fas fa-times"></i>
@@ -6993,7 +7000,7 @@
                 <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
                   <div class="heatmap-stat-item">
                     <span style="color: #ffffff; font-weight: 800;">▲</span>
-                    Verified Live Apps: <strong id="vercelTotalLiveApps" style="color: #ffffff;">0</strong>
+                    Production Apps: <strong id="vercelTotalLiveApps" style="color: #ffffff;">0</strong>
                   </div>
                   <div class="heatmap-stat-item">
                     <i class="fas fa-network-wired" style="color: #38bdf8;"></i>
@@ -7001,30 +7008,38 @@
                   </div>
                   <div class="heatmap-stat-item">
                     <i class="fas fa-shield-alt" style="color: #4ade80;"></i>
-                    SSL & Routing: <strong style="color: #4ade80;">Automatic HTTPS</strong>
+                    SSL: <strong style="color: #4ade80;">Automatic HTTPS</strong>
                   </div>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
+                  <button type="button" class="quick-boost-btn" onclick="openVercelConnectModal()" style="border-color: #3f3f46; background: rgba(255, 255, 255, 0.08); color: #f4f4f5;">
+                    <i class="fas fa-bolt"></i> Vercel API Connect
+                  </button>
                   <button type="button" class="quick-boost-btn" onclick="openAddProjectModalWithVercel()" style="border-color: #3f3f46; background: rgba(255, 255, 255, 0.08); color: #f4f4f5;">
-                    <i class="fas fa-plus"></i> Add Vercel App
+                    <i class="fas fa-plus"></i> Add Project
                   </button>
                 </div>
               </div>
 
-              <!-- Live Deployed Applications Grid -->
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span class="github-languages-title" style="color: #e4e4e7;">
-                    <i class="fas fa-globe" style="color: #38bdf8;"></i> Active Production Deployments
-                  </span>
-                  <span style="font-size: 11.5px; color: #a1a1aa;">
-                    Synced with PlaceAI ATS Portfolio
-                  </span>
+              <!-- Sub-Tabs: Real-Time Deployments vs Projects -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div class="vercel-subtabs-bar">
+                  <button type="button" class="vercel-subtab-btn active" id="btnVercelTabDeployments" onclick="switchVercelSubTab('deployments')">
+                    <i class="fas fa-satellite-dish"></i> Live Deployments (<span id="vercelSubCountDeployments">0</span>)
+                  </button>
+                  <button type="button" class="vercel-subtab-btn" id="btnVercelTabProjects" onclick="switchVercelSubTab('projects')">
+                    <i class="fas fa-folder-tree"></i> Vercel Projects (<span id="vercelSubCountProjects">0</span>)
+                  </button>
                 </div>
-                <div id="vercelAppsGrid" class="vercel-apps-grid">
-                  <!-- Rendered dynamically -->
+                <div id="vercelRealApiNotice" style="font-size: 11.5px; color: #a1a1aa; display: flex; align-items: center; gap: 6px;">
+                  <span class="beacon-pulse" style="width: 6px; height: 6px; background: #34d399;"></span> Real-time Vercel Cloud Sync
                 </div>
+              </div>
+
+              <!-- Content Grid -->
+              <div id="vercelAppsGrid" class="vercel-apps-grid">
+                <!-- Populated dynamically: Real Deployments or Projects -->
               </div>
             </div>
           </div>
@@ -7049,7 +7064,7 @@
 
                 <!-- Right Top Bar Utilities -->
                 <div style="display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: #a1a1a1;">
-                  <button type="button" class="btn-github-resync" onclick="connectCustomSupabaseAccount()" style="padding: 4px 10px; font-size: 11.5px;">
+                  <button type="button" class="btn-github-resync" onclick="openSupabaseAccountModal()" style="padding: 4px 10px; font-size: 11.5px;">
                     <i class="fas fa-link"></i> Change Account
                   </button>
                   <span style="cursor: pointer;" onclick="showToast('Feedback submitted to Supabase Cloud team', 'info')">Feedback</span>
@@ -10284,35 +10299,47 @@
       }
     }
 
+    /* ===== VERCEL CLOUD REAL DEPLOYMENTS & PROJECTS ENGINE ===== */
+    let vercelSubTab = 'deployments'; // 'deployments' or 'projects'
+
     function getVercelStorageKey() {
       const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
       return 'placeai_vercel_user_' + uid;
     }
 
-    function connectVercelAccount() {
-      const input = document.getElementById('vercelUsernameInput');
-      const val = input ? input.value.trim() : '';
-      if (!val) {
-        showToast('Please enter your Vercel username or team slug', 'error');
-        if (input) input.focus();
-        return;
-      }
-
-      let username = val.replace(/^https?:\/\/(www\.)?vercel\.com\//i, '').replace(/\/.*$/, '').replace(/^@/, '').trim();
-      if (!username) {
-        showToast('Invalid Vercel username', 'error');
-        return;
-      }
-
-      localStorage.setItem(getVercelStorageKey(), username);
-      showToast(`🎉 Vercel account @${username} linked! Auto-detecting live deployments...`, 'success');
-      renderVercelDeployments(true);
+    function getVercelTokenStorageKey() {
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      return 'placeai_vercel_token_' + uid;
     }
 
-    function disconnectVercelAccount() {
-      localStorage.removeItem(getVercelStorageKey());
-      showToast('Vercel account disconnected', 'info');
-      renderVercelDeployments();
+    function getVercelDataStorageKey() {
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      return 'placeai_vercel_data_' + uid;
+    }
+
+    function switchVercelSubTab(tab) {
+      vercelSubTab = tab;
+      const btnDep = document.getElementById('btnVercelTabDeployments');
+      const btnPrj = document.getElementById('btnVercelTabProjects');
+      if (btnDep) btnDep.classList.toggle('active', tab === 'deployments');
+      if (btnPrj) btnPrj.classList.toggle('active', tab === 'projects');
+      renderVercelDeployments(false);
+    }
+
+    function openVercelConnectModal() {
+      const modal = document.getElementById('vercelConnectModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const tokenInp = document.getElementById('vercelModalTokenInput');
+        const userInp = document.getElementById('vercelModalUsernameInput');
+        if (tokenInp) tokenInp.value = localStorage.getItem(getVercelTokenStorageKey()) || '';
+        if (userInp) userInp.value = localStorage.getItem(getVercelStorageKey()) || '';
+      }
+    }
+
+    function closeVercelConnectModal() {
+      const modal = document.getElementById('vercelConnectModal');
+      if (modal) modal.style.display = 'none';
     }
 
     function openAddProjectModalWithVercel() {
@@ -10327,21 +10354,189 @@
       }, 200);
     }
 
+    async function fetchVercelRealData(token) {
+      const cleanToken = token.startsWith('Bearer ') ? token : ('Bearer ' + token);
+      let user = null;
+      let projects = [];
+      let deployments = [];
+
+      // 1. Fetch User Info
+      try {
+        let uRes = await fetch('https://api.vercel.com/v2/user', {
+          headers: { 'Authorization': cleanToken }
+        });
+        if (!uRes.ok) {
+          uRes = await fetch('/api/vercel-proxy?endpoint=user', {
+            headers: { 'Authorization': cleanToken }
+          });
+        }
+        if (uRes.ok) {
+          const uData = await uRes.json();
+          user = uData.user || uData;
+        }
+      } catch (e) {
+        console.warn('Vercel user fetch err:', e);
+      }
+
+      // 2. Fetch Projects
+      try {
+        let pRes = await fetch('https://api.vercel.com/v9/projects', {
+          headers: { 'Authorization': cleanToken }
+        });
+        if (!pRes.ok) {
+          pRes = await fetch('/api/vercel-proxy?endpoint=projects', {
+            headers: { 'Authorization': cleanToken }
+          });
+        }
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          projects = pData.projects || [];
+        }
+      } catch (e) {
+        console.warn('Vercel projects fetch err:', e);
+      }
+
+      // 3. Fetch Real-time Deployments
+      try {
+        let dRes = await fetch('https://api.vercel.com/v6/deployments?limit=25', {
+          headers: { 'Authorization': cleanToken }
+        });
+        if (!dRes.ok) {
+          dRes = await fetch('/api/vercel-proxy?endpoint=deployments', {
+            headers: { 'Authorization': cleanToken }
+          });
+        }
+        if (dRes.ok) {
+          const dData = await dRes.json();
+          deployments = dData.deployments || [];
+        }
+      } catch (e) {
+        console.warn('Vercel deployments fetch err:', e);
+      }
+
+      return { user, projects, deployments };
+    }
+
+    async function saveVercelAccountFromModal() {
+      const tokenInput = document.getElementById('vercelModalTokenInput');
+      const userInput = document.getElementById('vercelModalUsernameInput');
+      const btn = document.getElementById('btnSaveVercelAccount');
+
+      const token = tokenInput ? tokenInput.value.trim() : '';
+      const username = userInput ? userInput.value.trim().replace(/^@/, '') : '';
+
+      if (!token && !username) {
+        showToast('Please enter either a Vercel token or username', 'error');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Connecting...';
+      }
+
+      try {
+        if (token) {
+          showToast('Connecting to Vercel Cloud API...', 'info');
+          const data = await fetchVercelRealData(token);
+          const handle = (data.user && data.user.username) ? data.user.username : (username || 'developer');
+
+          localStorage.setItem(getVercelTokenStorageKey(), token);
+          localStorage.setItem(getVercelStorageKey(), handle);
+          localStorage.setItem(getVercelDataStorageKey(), JSON.stringify({
+            ...data,
+            lastSynced: Date.now()
+          }));
+
+          showToast(`🎉 Connected to Vercel as @${handle}! Loaded ${data.deployments.length} deployments & ${data.projects.length} projects.`, 'success');
+        } else {
+          localStorage.removeItem(getVercelTokenStorageKey());
+          localStorage.setItem(getVercelStorageKey(), username);
+          showToast(`Linked Vercel username @${username}`, 'success');
+        }
+
+        closeVercelConnectModal();
+        renderVercelDeployments(true);
+      } catch (err) {
+        showToast('Failed to connect Vercel: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>▲</span> Connect & Stream';
+        }
+      }
+    }
+
+    async function connectVercelAccount() {
+      const input = document.getElementById('vercelUsernameInput');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        openVercelConnectModal();
+        return;
+      }
+
+      // If user entered a token in the quick input
+      if (val.length > 20 && !val.includes(' ') && !val.includes('/')) {
+        const tokenInput = document.getElementById('vercelModalTokenInput');
+        if (tokenInput) tokenInput.value = val;
+        await saveVercelAccountFromModal();
+        return;
+      }
+
+      let username = val.replace(/^https?:\/\/(www\.)?vercel\.com\//i, '').replace(/\/.*$/, '').replace(/^@/, '').trim();
+      localStorage.setItem(getVercelStorageKey(), username);
+      showToast(`🎉 Vercel username @${username} linked!`, 'success');
+      renderVercelDeployments(true);
+    }
+
+    function disconnectVercelAccount() {
+      localStorage.removeItem(getVercelStorageKey());
+      localStorage.removeItem(getVercelTokenStorageKey());
+      localStorage.removeItem(getVercelDataStorageKey());
+      showToast('Vercel account disconnected', 'info');
+      closeVercelConnectModal();
+      renderVercelDeployments();
+    }
+
     function renderVercelDeployments(forceResync = false) {
       const disconnectedView = document.getElementById('vercelDisconnectedView');
       const connectedView = document.getElementById('vercelConnectedView');
       const usernameDisplay = document.getElementById('vercelUsernameDisplay');
+      const userAvatar = document.getElementById('vercelUserAvatar');
       const livePillCount = document.getElementById('vercelLivePillCount');
       const totalLiveApps = document.getElementById('vercelTotalLiveApps');
       const vercelTabCount = document.getElementById('vercelTabCount');
+      const countDeployments = document.getElementById('vercelSubCountDeployments');
+      const countProjects = document.getElementById('vercelSubCountProjects');
       const grid = document.getElementById('vercelAppsGrid');
 
       const savedVercelUser = localStorage.getItem(getVercelStorageKey());
-      const hasVercelConnected = !!savedVercelUser;
+      const savedToken = localStorage.getItem(getVercelTokenStorageKey());
+      let vercelData = null;
 
-      // Extract all projects with live deployments
+      try {
+        const raw = localStorage.getItem(getVercelDataStorageKey());
+        if (raw) vercelData = JSON.parse(raw);
+      } catch (e) {}
+
+      // If resync requested and token exists, fetch in background
+      if (forceResync && savedToken) {
+        const syncIcon = document.getElementById('vercelSyncIcon');
+        if (syncIcon) syncIcon.classList.add('fa-spin');
+        fetchVercelRealData(savedToken).then(data => {
+          if (syncIcon) syncIcon.classList.remove('fa-spin');
+          if (data && (data.deployments.length > 0 || data.projects.length > 0)) {
+            localStorage.setItem(getVercelDataStorageKey(), JSON.stringify({ ...data, lastSynced: Date.now() }));
+            renderVercelDeployments(false);
+          }
+        }).catch(() => {
+          if (syncIcon) syncIcon.classList.remove('fa-spin');
+        });
+      }
+
+      // Check if user has portfolio projects with live Vercel deployments
       const allProjects = (userProfile && Array.isArray(userProfile.projects)) ? userProfile.projects : [];
-      const vercelApps = allProjects.filter(p => {
+      const fallbackVercelApps = allProjects.filter(p => {
         if (!p) return false;
         if (p.is_vercel) return true;
         if (p.deployment === 'Vercel') return true;
@@ -10349,10 +10544,20 @@
         return false;
       });
 
+      const hasVercelConnected = !!savedVercelUser || !!savedToken;
+
       // Update connected / disconnected view
-      if (hasVercelConnected || vercelApps.length > 0) {
-        const displayUser = savedVercelUser || (activeGitHubUser ? activeGitHubUser.username : (userProfile ? userProfile.github_url : 'developer'));
+      if (hasVercelConnected || fallbackVercelApps.length > 0) {
+        const displayUser = savedVercelUser || (vercelData && vercelData.user && vercelData.user.username) || (activeGitHubUser ? activeGitHubUser.username : (userProfile ? userProfile.github_url : 'developer'));
         if (usernameDisplay) usernameDisplay.textContent = displayUser || 'developer';
+        if (userAvatar) {
+          if (vercelData && vercelData.user && vercelData.user.avatar) {
+            userAvatar.src = `https://vercel.com/api/www/avatar/${vercelData.user.avatar}?s=60`;
+            userAvatar.style.display = 'inline-block';
+          } else {
+            userAvatar.style.display = 'none';
+          }
+        }
         if (disconnectedView) disconnectedView.style.display = 'none';
         if (connectedView) connectedView.style.display = 'flex';
       } else {
@@ -10360,24 +10565,30 @@
         if (connectedView) connectedView.style.display = 'none';
       }
 
-      const count = vercelApps.length;
-      if (livePillCount) livePillCount.textContent = count;
-      if (totalLiveApps) totalLiveApps.textContent = count;
-      if (vercelTabCount) vercelTabCount.textContent = count;
+      const realDeployments = (vercelData && Array.isArray(vercelData.deployments)) ? vercelData.deployments : [];
+      const realProjects = (vercelData && Array.isArray(vercelData.projects)) ? vercelData.projects : [];
+
+      const totalCount = Math.max(realDeployments.length, realProjects.length, fallbackVercelApps.length);
+      if (livePillCount) livePillCount.textContent = totalCount;
+      if (totalLiveApps) totalLiveApps.textContent = totalCount;
+      if (vercelTabCount) vercelTabCount.textContent = totalCount;
+      if (countDeployments) countDeployments.textContent = realDeployments.length || fallbackVercelApps.length;
+      if (countProjects) countProjects.textContent = realProjects.length || fallbackVercelApps.length;
 
       if (!grid) return;
 
-      if (count === 0) {
+      // EMPTY STATE
+      if (totalCount === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 28px; text-align: center; background: rgba(18, 18, 20, 0.7); border: 1px dashed #3f3f46; border-radius: 10px;">
             <span style="font-size: 28px; color: #ffffff; display: block; margin-bottom: 8px;">▲</span>
-            <p style="font-size: 14px; font-weight: 600; color: #f4f4f5; margin-bottom: 4px;">No Vercel Deployments Detected Yet</p>
+            <p style="font-size: 14px; font-weight: 600; color: #f4f4f5; margin-bottom: 4px;">Connect Your Vercel Cloud Account</p>
             <p style="font-size: 12px; color: #a1a1aa; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto;">
-              Connect your GitHub account or link your Vercel projects to automatically verify live *.vercel.app production deployments.
+              Connect your Personal Access Token from vercel.com/account/tokens to view all your real production deployments, build statuses, and domains in real time.
             </p>
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-              <button type="button" class="btn-vercel-connect" onclick="switchDevSuiteTab('github')">
-                <i class="fab fa-github"></i> Connect GitHub Repos
+              <button type="button" class="btn-vercel-connect" onclick="openVercelConnectModal()">
+                <span>▲</span> Connect Vercel Token
               </button>
               <button type="button" class="btn-supabase-action" onclick="openAddProjectModalWithVercel()">
                 <i class="fas fa-plus"></i> Add Project with Vercel Link
@@ -10388,47 +10599,166 @@
         return;
       }
 
-      grid.innerHTML = vercelApps.map(app => {
-        const liveUrl = app.live_url || '#';
-        const displayHost = liveUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
-        const repoUrl = app.github_url || app.repo_url || (activeGitHubUser ? `https://github.com/${activeGitHubUser.username}` : '#');
+      // TAB 1: REAL-TIME DEPLOYMENTS
+      if (vercelSubTab === 'deployments') {
+        if (realDeployments.length > 0) {
+          grid.innerHTML = realDeployments.map(dep => {
+            const state = (dep.readyState || dep.state || 'READY').toUpperCase();
+            const isReady = state === 'READY';
+            const isBuilding = state === 'BUILDING' || state === 'INITIALIZING';
+            const stateClass = isReady ? 'ready' : (isBuilding ? 'building' : 'error');
+            const stateLabel = isReady ? 'Ready (Production)' : (isBuilding ? 'Building...' : 'Error');
 
-        return `
-          <div class="vercel-app-card">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
-                  <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(app.title || 'Vercel Deployment')}</strong>
+            const liveUrl = dep.url ? `https://${dep.url}` : '#';
+            const displayHost = dep.url || 'deployment.vercel.app';
+            const commitRef = (dep.meta && dep.meta.githubCommitRef) || 'main';
+            const commitMsg = (dep.meta && dep.meta.githubCommitMessage) || (dep.name + ' production deployment');
+            const author = (dep.creator && dep.creator.username) || (dep.meta && dep.meta.githubCommitAuthorName) || 'Developer';
+            
+            // Format time ago
+            let timeAgo = 'recently';
+            if (dep.createdAt) {
+              const diffMs = Date.now() - Number(dep.createdAt);
+              const mins = Math.floor(diffMs / 60000);
+              const hrs = Math.floor(mins / 60);
+              const days = Math.floor(hrs / 24);
+              if (days > 0) timeAgo = `${days}d ago`;
+              else if (hrs > 0) timeAgo = `${hrs}h ago`;
+              else if (mins > 0) timeAgo = `${mins}m ago`;
+              else timeAgo = 'just now';
+            }
+
+            return `
+              <div class="vercel-deploy-card">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
+                      <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(dep.name || 'Deployment')}</strong>
+                    </div>
+                    <span class="vercel-status-pill ${stateClass}">${stateLabel}</span>
+                  </div>
+
+                  <div class="vercel-commit-msg" title="${escapeHtml(commitMsg)}">
+                    <i class="fab fa-git-alt" style="color: #f97316; font-size: 11px;"></i>
+                    <strong style="color: #a1a1aa; font-family: monospace;">${escapeHtml(commitRef)}</strong>
+                    <span>${escapeHtml(commitMsg)}</span>
+                  </div>
+
+                  <div class="vercel-meta-row">
+                    <span><i class="far fa-user" style="font-size: 10px; margin-right: 3px;"></i> ${escapeHtml(author)}</span>
+                    <span><i class="far fa-clock" style="font-size: 10px; margin-right: 3px;"></i> ${timeAgo}</span>
+                    <span style="color: #38bdf8; font-family: monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;">
+                      ${escapeHtml(displayHost)}
+                    </span>
+                  </div>
                 </div>
-                <span class="vercel-status-beacon">Live</span>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 6px;">
+                  <span class="dev-tab-pill vercel" style="font-size: 9.5px; padding: 2px 7px;">
+                    <i class="fas fa-bolt" style="font-size: 8px; color: #38bdf8;"></i> Edge Live
+                  </span>
+                  <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn-github-resync" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" style="padding: 4px 8px; font-size: 11px;" title="Copy Domain">
+                      <i class="far fa-copy"></i>
+                    </button>
+                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
+                      Visit App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
+                    </a>
+                  </div>
+                </div>
               </div>
-              <p style="font-size: 11.5px; color: #a1a1aa; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                ${escapeHtml(app.description || 'Verified production web application deployed on Vercel Global Edge CDN.')}
-              </p>
-              <div style="font-family: monospace; font-size: 11px; color: #71717a; margin-bottom: 12px; word-break: break-all;">
-                <i class="fas fa-link" style="font-size: 10px; margin-right: 4px;"></i> ${escapeHtml(displayHost)}
+            `;
+          }).join('');
+          return;
+        }
+
+        // Fallback to portfolio apps if token not connected
+        grid.innerHTML = fallbackVercelApps.map(app => {
+          const liveUrl = app.live_url || '#';
+          const displayHost = liveUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+          const repoUrl = app.github_url || app.repo_url || (activeGitHubUser ? `https://github.com/${activeGitHubUser.username}` : '#');
+
+          return `
+            <div class="vercel-app-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
+                    <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(app.title || app.name || 'Vercel Deployment')}</strong>
+                  </div>
+                  <span class="vercel-status-beacon">Live</span>
+                </div>
+                <p style="font-size: 11.5px; color: #a1a1aa; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  ${escapeHtml(app.description || 'Verified production web application deployed on Vercel Global Edge CDN.')}
+                </p>
+                <div style="font-family: monospace; font-size: 11px; color: #71717a; margin-bottom: 12px; word-break: break-all;">
+                  <i class="fas fa-link" style="font-size: 10px; margin-right: 4px;"></i> ${escapeHtml(displayHost)}
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 4px;">
+                <span class="dev-tab-pill vercel" style="font-size: 10px;">
+                  ${escapeHtml(app.category || 'Web & Fullstack')}
+                </span>
+                <div style="display: flex; gap: 6px;">
+                  ${repoUrl && repoUrl !== '#' ? `
+                    <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-github-resync" style="padding: 4px 8px; font-size: 11px;" title="View Source on GitHub">
+                      <i class="fab fa-github"></i>
+                    </a>
+                  ` : ''}
+                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
+                    Launch App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
+                  </a>
+                </div>
               </div>
             </div>
+          `;
+        }).join('');
+        return;
+      }
 
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 4px;">
-              <span class="dev-tab-pill vercel" style="font-size: 10px;">
-                ${escapeHtml(app.category || 'Web & Fullstack')}
-              </span>
-              <div style="display: flex; gap: 6px;">
-                ${repoUrl && repoUrl !== '#' ? `
-                  <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-github-resync" style="padding: 4px 8px; font-size: 11px;" title="View Source on GitHub">
-                    <i class="fab fa-github"></i>
-                  </a>
-                ` : ''}
+      // TAB 2: VERCEL PROJECTS CONSOLE
+      if (vercelSubTab === 'projects') {
+        const projectsToRender = realProjects.length > 0 ? realProjects : fallbackVercelApps.map(p => ({
+          name: p.name || p.title,
+          framework: p.tech || 'Web App',
+          url: p.live_url,
+          repo: p.github_url
+        }));
+
+        grid.innerHTML = projectsToRender.map(prj => {
+          const liveUrl = prj.url || (prj.targets && prj.targets.production && prj.targets.production.url ? `https://${prj.targets.production.url}` : (prj.latestDeployments && prj.latestDeployments[0] && prj.latestDeployments[0].url ? `https://${prj.latestDeployments[0].url}` : '#'));
+          const framework = prj.framework || 'Custom Web';
+          const repo = (prj.link && prj.link.repo) || prj.repo || '';
+
+          return `
+            <div class="vercel-deploy-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
+                    <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(prj.name || 'Project')}</strong>
+                  </div>
+                  <span class="dev-tab-pill vercel" style="font-size: 10px; padding: 2px 8px;">${escapeHtml(framework)}</span>
+                </div>
+
+                <div style="font-size: 11.5px; color: #a1a1aa; margin: 8px 0;">
+                  ${repo ? `<div style="display:flex;align-items:center;gap:6px;font-family:monospace;color:#58a6ff;margin-bottom:6px;"><i class="fab fa-github"></i> ${escapeHtml(repo)}</div>` : ''}
+                  <div style="font-family:monospace;color:#71717a;word-break:break-all;"><i class="fas fa-globe" style="font-size:10px;margin-right:4px;"></i> ${escapeHtml(liveUrl.replace(/^https?:\/\//i, ''))}</div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 6px;">
+                <span class="vercel-status-beacon" style="font-size: 10.5px;">Production Domain</span>
                 <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
-                  Launch App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
+                  Open App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
                 </a>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
 
     async function pingSupabaseDatabase() {
@@ -10747,52 +11077,205 @@
     }
 
     
-    /* ===== EXACT SUPABASE CONSOLE LOGIC ===== */
+    /* ===== USER-SPECIFIC SUPABASE ACCOUNT & CONSOLE ENGINE ===== */
     let supabaseConsoleSortAsc = true;
     let supabaseConsoleSearchQuery = '';
+
+    function getSupabaseAccountStorageKey() {
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      return 'placeai_supabase_account_' + uid;
+    }
 
     function getSupabaseConsoleProjectsKey() {
       const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
       return 'placeai_supabase_console_projects_' + uid;
     }
 
-    // Default Supabase projects matching user screenshot
-    function getDefaultSupabaseConsoleProjects() {
-      const name = (userProfile && userProfile.full_name) ? userProfile.full_name.toLowerCase() : '';
-      if (name.includes('parth') || (currentUser && currentUser.email && currentUser.email.includes('parth'))) {
-        return [
-          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
-          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
-        ];
-      } else if (name.includes('arpit')) {
-        return [
-          { name: 'codeloom-cloud-db', region: 'ap-south-1', tier: 'NANO', db_size: '18 MB', tables: 6, active: true },
-          { name: 'ats-analytics-db', region: 'ap-southeast-1', tier: 'NANO', db_size: '22 MB', tables: 9, active: true }
-        ];
-      } else if (name.includes('bhushan')) {
-        return [
-          { name: 'omnishop-prod-db', region: 'ap-south-1', tier: 'NANO', db_size: '25 MB', tables: 7, active: true },
-          { name: 'kanban-stream-db', region: 'ap-southeast-1', tier: 'NANO', db_size: '11 MB', tables: 4, active: true }
-        ];
-      } else {
-        return [
-          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
-          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
-        ];
-      }
-    }
-
     function getSupabaseConsoleProjects() {
-      const raw = localStorage.getItem(getSupabaseConsoleProjectsKey());
+      const key = getSupabaseConsoleProjectsKey();
+      const raw = localStorage.getItem(key);
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         } catch (e) {}
       }
-      const def = getDefaultSupabaseConsoleProjects();
-      localStorage.setItem(getSupabaseConsoleProjectsKey(), JSON.stringify(def));
-      return def;
+
+      // Check if current user is Parth and has not disconnected or switched:
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      const isDisconnected = localStorage.getItem('placeai_supabase_disconnected_' + uid);
+      const isParth = (currentUser && currentUser.email && currentUser.email.includes('parth')) ||
+                      (userProfile && userProfile.full_name && userProfile.full_name.toLowerCase().includes('parth'));
+
+      if (isParth && !isDisconnected) {
+        const def = [
+          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
+          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
+        ];
+        localStorage.setItem(key, JSON.stringify(def));
+        return def;
+      }
+
+      // Any other user or disconnected user gets an empty list, ready for their own projects!
+      return [];
+    }
+
+    function openSupabaseAccountModal() {
+      const modal = document.getElementById('supabaseAccountModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+
+      const accRaw = localStorage.getItem(getSupabaseAccountStorageKey());
+      let acc = {};
+      try { if (accRaw) acc = JSON.parse(accRaw); } catch (e) {}
+
+      const tokInp = document.getElementById('supabaseAccountTokenInput');
+      const urlInp = document.getElementById('supabaseAccountUrlInput');
+      const keyInp = document.getElementById('supabaseAccountKeyInput');
+      const hndInp = document.getElementById('supabaseAccountHandleInput');
+
+      if (tokInp) tokInp.value = acc.token || '';
+      if (urlInp) urlInp.value = acc.url || '';
+      if (keyInp) keyInp.value = acc.anonKey || '';
+      if (hndInp) hndInp.value = acc.handle || (document.getElementById('supabaseConsoleOrgUser')?.textContent || '');
+    }
+
+    function closeSupabaseAccountModal() {
+      const modal = document.getElementById('supabaseAccountModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function saveSupabaseAccount() {
+      const tokInp = document.getElementById('supabaseAccountTokenInput');
+      const urlInp = document.getElementById('supabaseAccountUrlInput');
+      const keyInp = document.getElementById('supabaseAccountKeyInput');
+      const hndInp = document.getElementById('supabaseAccountHandleInput');
+      const btn = document.getElementById('btnSaveSupabaseAccount');
+
+      const token = tokInp ? tokInp.value.trim() : '';
+      const url = urlInp ? urlInp.value.trim() : '';
+      const anonKey = keyInp ? keyInp.value.trim() : '';
+      let handle = hndInp ? hndInp.value.trim() : '';
+
+      if (!token && !url && !handle) {
+        showToast('Please provide a Supabase token, project URL, or account name', 'error');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Fetching...';
+      }
+
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      localStorage.removeItem('placeai_supabase_disconnected_' + uid);
+
+      try {
+        let fetchedProjects = [];
+
+        // 1. If Personal Access Token provided, fetch via Management API
+        if (token) {
+          showToast('Connecting to Supabase Management API...', 'info');
+          const cleanToken = token.startsWith('Bearer ') ? token : ('Bearer ' + token);
+
+          let res = await fetch('/api/supabase-proxy', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': cleanToken
+            }
+          });
+
+          if (!res.ok) {
+            res = await fetch('https://api.supabase.com/v1/projects', {
+              headers: { 'Authorization': cleanToken }
+            });
+          }
+
+          if (res.ok) {
+            const list = await res.json();
+            if (Array.isArray(list)) {
+              fetchedProjects = list.map(p => ({
+                name: p.name || p.id,
+                region: p.region || 'ap-south-1',
+                tier: (p.tier || 'FREE').toUpperCase(),
+                db_size: 'Active',
+                tables: 0,
+                active: p.status === 'ACTIVE_HEALTHY' || p.status === 'ACTIVE' || !p.status,
+                ref: p.id
+              }));
+              if (!handle && list[0] && list[0].organization_id) {
+                handle = `org-${list[0].organization_id.substring(0, 8)}`;
+              }
+            }
+          }
+        }
+
+        // 2. If Project URL provided, add single project
+        if (url && fetchedProjects.length === 0) {
+          const ref = url.replace(/^https?:\/\//i, '').replace(/\.supabase\.co.*$/i, '').trim();
+          fetchedProjects.push({
+            name: ref || 'supabase-db',
+            region: 'cloud',
+            tier: 'FREE',
+            db_size: 'Connected',
+            tables: 0,
+            active: true,
+            ref: ref
+          });
+          if (!handle) handle = ref;
+        }
+
+        if (!handle) {
+          handle = (currentUser && currentUser.email) ? currentUser.email.split('@')[0] : 'developer';
+        }
+
+        // Save account metadata
+        localStorage.setItem(getSupabaseAccountStorageKey(), JSON.stringify({
+          token,
+          url,
+          anonKey,
+          handle,
+          connectedAt: Date.now()
+        }));
+
+        // If we fetched projects, overwrite this user's projects
+        if (fetchedProjects.length > 0) {
+          localStorage.setItem(getSupabaseConsoleProjectsKey(), JSON.stringify(fetchedProjects));
+        }
+
+        const orgUserEl = document.getElementById('supabaseConsoleOrgUser');
+        if (orgUserEl) orgUserEl.textContent = handle;
+
+        showToast(`🎉 Supabase connected for @${handle}! Loaded ${fetchedProjects.length} projects.`, 'success');
+        closeSupabaseAccountModal();
+        renderSupabaseConsole();
+      } catch (err) {
+        showToast('Supabase connection note: ' + err.message, 'info');
+        closeSupabaseAccountModal();
+        renderSupabaseConsole();
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-bolt"></i> Connect & Fetch Projects';
+        }
+      }
+    }
+
+    function disconnectCustomSupabaseAccount() {
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      localStorage.setItem('placeai_supabase_disconnected_' + uid, 'true');
+      localStorage.removeItem(getSupabaseAccountStorageKey());
+      localStorage.removeItem(getSupabaseConsoleProjectsKey());
+
+      const orgUserEl = document.getElementById('supabaseConsoleOrgUser');
+      if (orgUserEl) {
+        orgUserEl.textContent = (currentUser && currentUser.email) ? currentUser.email.split('@')[0] : 'developer';
+      }
+
+      closeSupabaseAccountModal();
+      renderSupabaseConsole();
+      showToast('Supabase account disconnected. Showing clean workspace.', 'info');
     }
 
     function renderSupabaseConsole() {
@@ -10800,18 +11283,24 @@
       const avatarEl = document.getElementById('supabaseConsoleAvatar');
       const grid = document.getElementById('supabaseConsoleProjectsGrid');
 
-      // 1. Update user handle in topbar: e.g. parthd45
-      let handle = 'parthd45';
-      if (activeGitHubUser && activeGitHubUser.username) {
-        handle = activeGitHubUser.username;
-      } else if (userProfile && userProfile.github_url) {
-        handle = userProfile.github_url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/.*$/, '');
-      } else if (currentUser && currentUser.email) {
-        handle = currentUser.email.split('@')[0];
-      } else if (userProfile && userProfile.full_name) {
-        handle = userProfile.full_name.toLowerCase().replace(/\s+/g, '');
+      // Update user handle in topbar
+      const accRaw = localStorage.getItem(getSupabaseAccountStorageKey());
+      let savedHandle = '';
+      try { if (accRaw) savedHandle = JSON.parse(accRaw).handle; } catch (e) {}
+
+      let handle = savedHandle;
+      if (!handle) {
+        if (activeGitHubUser && activeGitHubUser.username) {
+          handle = activeGitHubUser.username;
+        } else if (userProfile && userProfile.github_url) {
+          handle = userProfile.github_url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/.*$/, '');
+        } else if (currentUser && currentUser.email) {
+          handle = currentUser.email.split('@')[0];
+        } else if (userProfile && userProfile.full_name) {
+          handle = userProfile.full_name.toLowerCase().replace(/\s+/g, '');
+        }
       }
-      if (orgUserEl) orgUserEl.textContent = handle || 'parthd45';
+      if (orgUserEl) orgUserEl.textContent = handle || 'developer';
 
       if (avatarEl) {
         if (userProfile && userProfile.profile_image) {
@@ -10828,7 +11317,7 @@
       // Search filter
       if (supabaseConsoleSearchQuery) {
         const q = supabaseConsoleSearchQuery.toLowerCase();
-        projects = projects.filter(p => p.name.toLowerCase().includes(q) || p.region.toLowerCase().includes(q));
+        projects = projects.filter(p => p.name.toLowerCase().includes(q) || (p.region && p.region.toLowerCase().includes(q)));
       }
 
       // Sort by name
@@ -10839,17 +11328,22 @@
       if (projects.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 28px; text-align: center; background: #171717; border: 1px dashed #2e2e2e; border-radius: 8px;">
-            <p style="color: #a1a1a1; font-size: 13px; margin-bottom: 8px;">No Supabase projects match your search.</p>
-            <button type="button" class="btn-supabase-new-project" onclick="openCreateSupabaseProjectModal()">
-              <i class="fas fa-plus"></i> Create project
-            </button>
+            <p style="color: #a1a1a1; font-size: 13px; margin-bottom: 12px;">No Supabase projects connected to this account.</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button type="button" class="btn-supabase-new-project" onclick="openSupabaseAccountModal()">
+                <i class="fas fa-link"></i> Connect Supabase Token / DB
+              </button>
+              <button type="button" class="btn-supabase-action" onclick="openCreateSupabaseProjectModal()">
+                <i class="fas fa-plus"></i> New project
+              </button>
+            </div>
           </div>
         `;
         return;
       }
 
       grid.innerHTML = projects.map((p, idx) => `
-        <div class="supabase-project-box" onclick="handleSupabaseProjectClick('${escapeHtml(p.name)}', '${escapeHtml(p.region)}')">
+        <div class="supabase-project-box" onclick="handleSupabaseProjectClick('${escapeHtml(p.name)}', '${escapeHtml(p.region || 'cloud')}')">
           <div>
             <div class="supabase-project-box-header">
               <h3 class="supabase-project-name">${escapeHtml(p.name)}</h3>
@@ -10857,10 +11351,10 @@
                 ⋮
               </div>
             </div>
-            <div class="supabase-project-region">${escapeHtml(p.region)}</div>
+            <div class="supabase-project-region">${escapeHtml(p.region || 'ap-south-1')}</div>
           </div>
           <div>
-            <span class="supabase-project-tier">${escapeHtml(p.tier || 'NANO')}</span>
+            <span class="supabase-project-tier">${escapeHtml(p.tier || 'FREE')}</span>
           </div>
         </div>
       `).join('');
@@ -10882,7 +11376,6 @@
 
     function handleSupabaseProjectClick(name, region) {
       showToast(`⚡ Opening Supabase project "${name}" (${region})...`, 'info');
-      // Open project inspection or link to Supabase console
       setTimeout(() => {
         openSupabaseTableInspector();
       }, 300);
@@ -10954,13 +11447,7 @@
     }
 
     function connectCustomSupabaseAccount() {
-      const current = document.getElementById('supabaseConsoleOrgUser').textContent || 'parthd45';
-      const newHandle = prompt('Enter your Supabase organization or username:', current);
-      if (newHandle && newHandle.trim()) {
-        const clean = newHandle.trim();
-        document.getElementById('supabaseConsoleOrgUser').textContent = clean;
-        showToast(`Connected Supabase account: ${clean}`, 'success');
-      }
+      openSupabaseAccountModal();
     }
 
     async function connectGitHubAccount() {
@@ -15366,6 +15853,126 @@ ${projStr}
     </div>
   </div>
 
+
+  <!-- Supabase Account Connection Modal -->
+  <div class="community-chat-overlay" id="supabaseAccountModal" style="display: none;" onclick="if(event.target===this)closeSupabaseAccountModal()">
+    <div class="supabase-inspector-card" style="width: 520px; background: #171717; border-color: #2e2e2e;">
+      <div class="supabase-inspector-header" style="background: #1c1c1c; border-color: #2e2e2e;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg width="22" height="22" viewBox="0 0 109 113" fill="none">
+            <path d="M63.7076 110.284C60.848 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0675L99.1936 40.0675C104.973 40.0675 108.144 46.8028 104.479 51.288L63.7076 110.284Z" fill="#3ECF8E"/>
+            <path d="M45.317 2.71603C48.1766 -0.885233 53.9744 1.08779 54.0433 5.68612L54.3475 72.9325H9.83109C4.05199 72.9325 0.880911 66.1972 4.54589 61.712L45.317 2.71603Z" fill="#3ECF8E" fill-opacity="0.7"/>
+          </svg>
+          <div>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ededed; margin: 0;">Connect Supabase Account</h3>
+            <p style="font-size: 11.5px; color: #888888; margin: 2px 0 0 0;">Link your personal Supabase account to view your cloud projects</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeSupabaseAccountModal()" style="background:none;border:none;color:#707070;font-size:16px;cursor:pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">
+            Personal Access Token (Recommended)
+          </label>
+          <input type="password" id="supabaseAccountTokenInput" class="supabase-console-input" placeholder="sbp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+          <p style="font-size: 11px; color: #71717a; margin: 4px 0 0 0;">
+            Generate from <a href="https://supabase.com/dashboard/account/tokens" target="_blank" rel="noopener noreferrer" style="color: #3ecf8e; text-decoration: underline;">supabase.com/dashboard/account/tokens</a> to auto-load all your cloud projects.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0;">
+          <div style="flex: 1; height: 1px; background: #27272a;"></div>
+          <span style="font-size: 11px; color: #71717a; text-transform: uppercase;">or connect by project URL</span>
+          <div style="flex: 1; height: 1px; background: #27272a;"></div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Supabase Project URL</label>
+          <input type="text" id="supabaseAccountUrlInput" class="supabase-console-input" placeholder="https://xyzprojectref.supabase.co" />
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Supabase Anon / Service Key</label>
+          <input type="password" id="supabaseAccountKeyInput" class="supabase-console-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Organization or Username Display</label>
+          <input type="text" id="supabaseAccountHandleInput" class="supabase-console-input" placeholder="e.g. your-github-or-team-name" />
+        </div>
+      </div>
+
+      <div class="supabase-inspector-footer" style="background: #1c1c1c; border-color: #2e2e2e; justify-content: space-between;">
+        <button type="button" class="btn-vercel-disconnect" onclick="disconnectCustomSupabaseAccount()" style="padding: 6px 12px; font-size: 12px;">
+          <i class="fas fa-trash"></i> Disconnect / Clear
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-secondary" onclick="closeSupabaseAccountModal()" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
+          <button type="button" class="btn-supabase-new-project" id="btnSaveSupabaseAccount" onclick="saveSupabaseAccount()">
+            <i class="fas fa-bolt"></i> Connect & Fetch Projects
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vercel Account & Real Deployments Modal -->
+  <div class="community-chat-overlay" id="vercelConnectModal" style="display: none;" onclick="if(event.target===this)closeVercelConnectModal()">
+    <div class="supabase-inspector-card" style="width: 520px; background: #121214; border-color: #27272a;">
+      <div class="supabase-inspector-header" style="background: #18181b; border-color: #27272a;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 24px; height: 24px; background: #000; border: 1px solid #3f3f46; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 900;">▲</div>
+          <div>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ededed; margin: 0;">Connect Vercel Cloud Account</h3>
+            <p style="font-size: 11.5px; color: #888888; margin: 2px 0 0 0;">View your real projects and real-time production deployments</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeVercelConnectModal()" style="background:none;border:none;color:#707070;font-size:16px;cursor:pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">
+            Vercel Personal Access Token (Recommended)
+          </label>
+          <input type="password" id="vercelModalTokenInput" class="supabase-console-input" placeholder="Enter your Vercel Access Token" />
+          <p style="font-size: 11px; color: #71717a; margin: 4px 0 0 0;">
+            Create token at <a href="https://vercel.com/account/tokens" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">vercel.com/account/tokens</a> to stream live deployment build statuses, git branches, and domains.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0;">
+          <div style="flex: 1; height: 1px; background: #27272a;"></div>
+          <span style="font-size: 11px; color: #71717a; text-transform: uppercase;">or link by username / team</span>
+          <div style="flex: 1; height: 1px; background: #27272a;"></div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Vercel Username or Team Slug</label>
+          <div class="vercel-input-group" style="width: 100%;">
+            <span class="vercel-prefix"><span style="font-size: 11px;">▲</span> vercel.com/</span>
+            <input type="text" id="vercelModalUsernameInput" class="vercel-input" style="flex: 1;" placeholder="username" />
+          </div>
+        </div>
+      </div>
+
+      <div class="supabase-inspector-footer" style="background: #18181b; border-color: #27272a; justify-content: space-between;">
+        <button type="button" class="btn-vercel-disconnect" onclick="disconnectVercelAccount()" style="padding: 6px 12px; font-size: 12px;">
+          <i class="fas fa-trash"></i> Disconnect
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-secondary" onclick="closeVercelConnectModal()" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
+          <button type="button" class="btn-vercel-connect" id="btnSaveVercelAccount" onclick="saveVercelAccountFromModal()" style="padding: 6px 16px; font-size: 12.5px;">
+            <span>▲</span> Connect & Stream
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- New Supabase Project Modal (Matches Supabase Console) -->
   <div class="community-chat-overlay" id="newSupabaseProjectModal" style="display: none;" onclick="if(event.target===this)closeCreateSupabaseProjectModal()">
