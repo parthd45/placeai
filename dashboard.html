@@ -3542,6 +3542,564 @@
       margin: 0;
     }
 
+  
+    /* ===== PLACEAI PEER CONNECT & CHAT MESSENGER ===== */
+
+    /* Floating Chat Launcher */
+    .floating-peer-chat-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 998;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      padding: 10px 18px 10px 14px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.45), 0 0 20px rgba(79, 70, 229, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+    .floating-peer-chat-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 14px 40px rgba(124, 58, 237, 0.6), 0 0 25px rgba(79, 70, 229, 0.45);
+    }
+    .floating-chat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .floating-chat-label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+      text-align: left;
+    }
+    .floating-chat-label span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .floating-chat-label small {
+      font-size: 10.5px;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .floating-chat-label small::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      display: inline-block;
+      box-shadow: 0 0 6px #34d399;
+    }
+    .floating-chat-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 2px solid #0f172a;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Contact Card Peer Chat Button */
+    .contact-action-btn.peer-chat-btn {
+      background: rgba(124, 58, 237, 0.18);
+      border-color: rgba(124, 58, 237, 0.45);
+      color: #c4b5fd;
+      position: relative;
+    }
+    .contact-action-btn.peer-chat-btn:hover {
+      background: rgba(124, 58, 237, 0.32);
+      border-color: rgba(124, 58, 237, 0.7);
+      color: #fff;
+    }
+    .peer-chat-badge {
+      background: #ef4444;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 999px;
+      margin-left: 4px;
+    }
+
+    /* Peer Chat Modal Window */
+    .peer-chat-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 14, 26, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 10050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .peer-chat-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+    .peer-chat-container {
+      width: 100%;
+      max-width: 960px;
+      height: 640px;
+      max-height: 90vh;
+      background: #0f172a;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(139, 92, 246, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modalPopIn {
+      0% { transform: scale(0.94); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .peer-chat-topbar {
+      background: #1e293b;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .peer-chat-topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .peer-chat-topbar-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0;
+    }
+    .peer-chat-topbar-title p {
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .peer-chat-close-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .peer-chat-close-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+    }
+
+    /* Chat Body Split */
+    .peer-chat-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar: Peer List */
+    .peer-list-panel {
+      width: 340px;
+      background: rgba(15, 23, 42, 0.95);
+      border-right: 1px solid rgba(51, 65, 85, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+    .peer-search-box {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+    }
+    .peer-search-input-wrap {
+      position: relative;
+    }
+    .peer-search-input-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 12px;
+    }
+    .peer-search-input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 8px;
+      padding: 8px 12px 8px 32px;
+      color: #f1f5f9;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .peer-search-input:focus {
+      border-color: #8b5cf6;
+    }
+    .peer-filter-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 8px 14px;
+      overflow-x: auto;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      scrollbar-width: none;
+    }
+    .peer-filter-tab {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .peer-filter-tab.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.6);
+      color: #c4b5fd;
+    }
+    .peer-conversation-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .peer-item-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      margin-bottom: 4px;
+    }
+    .peer-item-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .peer-item-card.active {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+    .peer-avatar-wrapper {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .peer-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 16px;
+    }
+    .peer-status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid #0f172a;
+    }
+    .peer-status-dot.online {
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+    .peer-status-dot.away {
+      background: #f59e0b;
+    }
+    .peer-item-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .peer-item-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .peer-item-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .peer-item-time {
+      font-size: 10.5px;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .peer-item-tag {
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .peer-item-preview {
+      font-size: 11.5px;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Right Area: Conversation Stream */
+    .peer-chat-thread-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0b1120;
+    }
+    .peer-thread-header {
+      padding: 12px 18px;
+      background: rgba(30, 41, 59, 0.4);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .peer-thread-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .peer-thread-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0 0 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .peer-thread-info p {
+      font-size: 11px;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .peer-thread-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .peer-thread-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .peer-thread-btn:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #fff;
+    }
+
+    /* Quick Prompts / Icebreakers */
+    .peer-icebreakers-bar {
+      padding: 8px 18px;
+      background: rgba(15, 23, 42, 0.7);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .peer-icebreaker-chip {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #c4b5fd;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .peer-icebreaker-chip:hover {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.6);
+      color: #fff;
+    }
+
+    /* Messages History */
+    .peer-messages-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .peer-msg-row {
+      display: flex;
+      gap: 10px;
+      max-width: 80%;
+    }
+    .peer-msg-row.sent {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .peer-msg-row.received {
+      align-self: flex-start;
+    }
+    .peer-msg-bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      position: relative;
+    }
+    .peer-msg-row.sent .peer-msg-bubble {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+    }
+    .peer-msg-row.received .peer-msg-bubble {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      border-bottom-left-radius: 2px;
+    }
+    .peer-msg-meta {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+    .peer-msg-row.received .peer-msg-meta {
+      color: #64748b;
+      justify-content: flex-start;
+    }
+
+    /* Typing indicator */
+    .peer-typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: #94a3b8;
+      width: fit-content;
+      margin-bottom: 6px;
+    }
+    .peer-typing-dots span {
+      width: 4px;
+      height: 4px;
+      background: #94a3b8;
+      border-radius: 50%;
+      display: inline-block;
+      animation: typingBlink 1.4s infinite;
+    }
+    .peer-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .peer-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBlink {
+      0%, 100% { opacity: 0.2; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    /* Message Input Box */
+    .peer-input-bar {
+      padding: 12px 18px;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(51, 65, 85, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .peer-input-field {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #f1f5f9;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .peer-input-field:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+    }
+    .peer-send-btn {
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+    }
+    .peer-send-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(139, 92, 246, 0.5);
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -3801,9 +4359,9 @@
                 </div>
               </div>
               <div class="contact-tile-actions">
-                <a id="whatsappDirectBtn" class="contact-action-btn whatsapp" target="_blank" title="Chat on WhatsApp" style="display: none;">
-                  <i class="fab fa-whatsapp"></i> Chat
-                </a>
+                <button type="button" class="contact-action-btn peer-chat-btn" onclick="openPeerChatModal()" title="Connect & Chat with Placed Seniors and Peers">
+                  <i class="fas fa-comments"></i> <span>Peer Chat</span> <span class="peer-chat-badge" id="peerChatBadge">3</span>
+                </button>
                 <button type="button" class="contact-action-btn" id="quickEditPhoneBtn" title="Update Mobile Number">
                   <i class="fas fa-pencil-alt"></i> Update
                 </button>
@@ -6257,6 +6815,355 @@ ${projStr}
           }).join('')}
         </div>
       `;
+    }
+
+    
+    // ============================================
+    // PLACEAI PEER CONNECT & CHAT ENGINE
+    // ============================================
+    const PEER_DIRECTORY = [
+      {
+        id: 'aarav_sharma',
+        name: 'Aarav Sharma',
+        role: 'SDE 1 @ Microsoft',
+        company: 'Microsoft',
+        category: 'alumni',
+        avatarBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
+        avatarText: 'AS',
+        online: true,
+        statusText: 'Active now',
+        tags: ['DSA', 'System Design', 'C++'],
+        initialMsg: 'Hey! Make sure to practice Graphs & DP for the upcoming Microsoft & Amazon drive on campus.',
+        initialTime: '10:42 AM',
+        responses: [
+          "Focus on NeetCode 150 and LeetCode Mediums. Graph BFS/DFS and Dynamic Programming are asked in almost every technical round!",
+          "For Microsoft, they look closely at code cleanliness, edge case handling, and explaining your thought process out loud.",
+          "Your GitHub portfolio looks solid! I'd recommend highlighting your Full-Stack architecture and live deployment links.",
+          "Let me know if you want to do a 15-minute mock interview before your round."
+        ]
+      },
+      {
+        id: 'neha_patel',
+        name: 'Neha Patel',
+        role: 'Cloud Engineer @ Google',
+        company: 'Google',
+        category: 'alumni',
+        avatarBg: 'linear-gradient(135deg, #ea4335, #fbbc05)',
+        avatarText: 'NP',
+        online: true,
+        statusText: 'Active now',
+        tags: ['Python', 'GCP', 'Full-Stack'],
+        initialMsg: 'Reviewed your profile summary. Your Python & Web systems skills are well aligned with Google Cloud intern roles!',
+        initialTime: 'Yesterday',
+        responses: [
+          "For Google, focus heavily on algorithmic complexity (Big O notation) and data structure trade-offs.",
+          "Make sure your resume lists measurable impact—e.g., 'reduced API latency by 40%' rather than just 'built an API'.",
+          "Try solving at least 2 medium problems daily on PlaceAI Code Practice to maintain speed under exam time pressure!"
+        ]
+      },
+      {
+        id: 'rohan_verma',
+        name: 'Rohan Verma',
+        role: 'Campus Peer • MCA Final Year',
+        company: 'PlaceAI Study Buddy',
+        category: 'peers',
+        avatarBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+        avatarText: 'RV',
+        online: true,
+        statusText: 'Active now',
+        tags: ['React', 'Node.js', 'SQL'],
+        initialMsg: 'Did you solve problem #14 on PlaceAI Code Practice? Let us compare our time complexity!',
+        initialTime: '11:15 AM',
+        responses: [
+          "Nice! I used a hash map approach for O(n) time. How did you optimize the space complexity?",
+          "Are you applying for the TCS Digital or Cognizant GenC drive this Friday?",
+          "Let's jump into Code Practice in strict exam mode together this evening!"
+        ]
+      },
+      {
+        id: 'priya_tpo',
+        name: 'Priya Deshmukh',
+        role: 'TPO Placement Coordinator',
+        company: 'Campus Placement Cell',
+        category: 'tpo',
+        avatarBg: 'linear-gradient(135deg, #059669, #10b981)',
+        avatarText: 'PD',
+        online: false,
+        statusText: 'Away • Replies in 1h',
+        tags: ['TPO', 'Drives', 'Shortlists'],
+        initialMsg: 'Attention candidates: Keep your PlaceAI ATS resume updated. Shortlist for the FinTech drive will be declared tomorrow at 2 PM.',
+        initialTime: '09:00 AM',
+        responses: [
+          "Please verify that your 10-digit mobile number and primary email in Contact Information are up to date.",
+          "The upcoming drive requires a minimum Profile Health Score of 75% on PlaceAI.",
+          "Best of luck with your preparation! The placement cell is here to support you."
+        ]
+      },
+      {
+        id: 'vikram_malhotra',
+        name: 'Vikram Malhotra',
+        role: 'System Engineer @ TCS Digital',
+        company: 'TCS Digital',
+        category: 'alumni',
+        avatarBg: 'linear-gradient(135deg, #ec4899, #be185d)',
+        avatarText: 'VM',
+        online: true,
+        statusText: 'Active now',
+        tags: ['Java', 'NQT', 'Aptitude'],
+        initialMsg: 'Hey! The TCS NQT aptitude section tests speed above all. Don\'t spend more than 90 seconds per question.',
+        initialTime: 'Sep 23',
+        responses: [
+          "For TCS Digital coding rounds, Java and Python are ideal. Practice string manipulation and matrix algorithms.",
+          "They will definitely ask you about your final year project architecture during the managerial round."
+        ]
+      }
+    ];
+
+    let currentActivePeerId = 'aarav_sharma';
+    let currentPeerCategory = 'all';
+
+    function getPeerChatStorage() {
+      try {
+        const data = localStorage.getItem('placeai_peer_chat_history');
+        if (data) return JSON.parse(data);
+      } catch (e) {}
+
+      // Seed initial history
+      const initial = {};
+      PEER_DIRECTORY.forEach(peer => {
+        initial[peer.id] = [
+          {
+            sender: 'peer',
+            text: peer.initialMsg,
+            time: peer.initialTime
+          }
+        ];
+      });
+      localStorage.setItem('placeai_peer_chat_history', JSON.stringify(initial));
+      return initial;
+    }
+
+    function savePeerChatStorage(history) {
+      try {
+        localStorage.setItem('placeai_peer_chat_history', JSON.stringify(history));
+      } catch (e) {}
+    }
+
+    function openPeerChatModal(targetPeerId) {
+      if (targetPeerId) {
+        currentActivePeerId = targetPeerId;
+      }
+      renderPeerDirectory();
+      renderActivePeerThread();
+      const modal = document.getElementById('peerChatModal');
+      if (modal) modal.classList.add('active');
+
+      // Clear unread badge
+      const b1 = document.getElementById('peerChatBadge');
+      const b2 = document.getElementById('floatingChatBadge');
+      if (b1) b1.style.display = 'none';
+      if (b2) b2.style.display = 'none';
+    }
+
+    function closePeerChatModal() {
+      const modal = document.getElementById('peerChatModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function setPeerFilter(cat, btn) {
+      currentPeerCategory = cat;
+      document.querySelectorAll('.peer-filter-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderPeerDirectory();
+    }
+
+    function filterPeerList() {
+      renderPeerDirectory();
+    }
+
+    function selectPeerConversation(peerId) {
+      currentActivePeerId = peerId;
+      renderPeerDirectory();
+      renderActivePeerThread();
+    }
+
+    function renderPeerDirectory() {
+      const listEl = document.getElementById('peerConversationList');
+      if (!listEl) return;
+
+      const q = (document.getElementById('peerSearchInput')?.value || '').toLowerCase().trim();
+      const history = getPeerChatStorage();
+
+      const filtered = PEER_DIRECTORY.filter(p => {
+        if (currentPeerCategory !== 'all' && p.category !== currentPeerCategory) return false;
+        if (q) {
+          const matchName = p.name.toLowerCase().includes(q);
+          const matchRole = p.role.toLowerCase().includes(q);
+          const matchCompany = p.company.toLowerCase().includes(q);
+          const matchTags = p.tags.some(t => t.toLowerCase().includes(q));
+          if (!matchName && !matchRole && !matchCompany && !matchTags) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;padding:30px 10px;color:#64748b;font-size:12px;">No matching peers found.</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(peer => {
+        const msgs = history[peer.id] || [];
+        const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : { text: peer.initialMsg, time: peer.initialTime };
+        const isActive = peer.id === currentActivePeerId;
+
+        return `
+          <div class="peer-item-card ${isActive ? 'active' : ''}" onclick="selectPeerConversation('${peer.id}')">
+            <div class="peer-avatar-wrapper">
+              <div class="peer-avatar-img" style="background: ${peer.avatarBg};">${peer.avatarText}</div>
+              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
+            </div>
+            <div class="peer-item-meta">
+              <div class="peer-item-name-row">
+                <span class="peer-item-name">${peer.name}</span>
+                <span class="peer-item-time">${lastMsg.time}</span>
+              </div>
+              <div class="peer-item-tag">
+                <i class="fas fa-briefcase" style="font-size:10px;"></i> ${peer.company}
+              </div>
+              <div class="peer-item-preview">${lastMsg.sender === 'user' ? 'You: ' : ''}${lastMsg.text}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderActivePeerThread() {
+      const peer = PEER_DIRECTORY.find(p => p.id === currentActivePeerId) || PEER_DIRECTORY[0];
+      const headerEl = document.getElementById('peerThreadHeader');
+      const icebreakersEl = document.getElementById('peerIcebreakersBar');
+      const streamEl = document.getElementById('peerMessagesStream');
+      const inputEl = document.getElementById('peerMessageInput');
+
+      if (inputEl) {
+        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + '...';
+        inputEl.focus();
+      }
+
+      if (headerEl) {
+        headerEl.innerHTML = `
+          <div class="peer-thread-profile">
+            <div class="peer-avatar-wrapper" style="width:38px;height:38px;">
+              <div class="peer-avatar-img" style="background: ${peer.avatarBg};font-size:14px;">${peer.avatarText}</div>
+              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
+            </div>
+            <div class="peer-thread-info">
+              <h4>
+                <span>${peer.name}</span>
+                <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${peer.company}</span>
+              </h4>
+              <p>${peer.role} • <span style="color:${peer.online ? '#34d399' : '#f59e0b'};">${peer.statusText}</span></p>
+            </div>
+          </div>
+          <div class="peer-thread-actions">
+            <a href="code-practice.html" class="peer-thread-btn" title="Practice coding together">
+              <i class="fas fa-code"></i> Practice DSA
+            </a>
+          </div>
+        `;
+      }
+
+      // Icebreaker Prompts
+      if (icebreakersEl) {
+        const prompts = [
+          "Can you share your interview experience?",
+          "Review my profile for " + peer.company,
+          "What DSA topics are asked most?",
+          "Tips for final round manager interview"
+        ];
+        icebreakersEl.innerHTML = prompts.map(p =>
+          `<div class="peer-icebreaker-chip" onclick="sendIcebreakerMessage('${p.replace(/'/g, "\\'")}')"><i class="fas fa-comment-dots" style="margin-right:4px;"></i>${p}</div>`
+        ).join('');
+      }
+
+      // Messages Stream
+      const history = getPeerChatStorage();
+      const msgs = history[peer.id] || [];
+
+      if (streamEl) {
+        streamEl.innerHTML = msgs.map(m => {
+          const isSent = m.sender === 'user';
+          return `
+            <div class="peer-msg-row ${isSent ? 'sent' : 'received'}">
+              <div class="peer-msg-bubble">
+                <div>${m.text}</div>
+                <div class="peer-msg-meta">
+                  <span>${m.time}</span>
+                  ${isSent ? '<i class="fas fa-check-double" style="font-size:9px;color:#a7f3d0;"></i>' : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        streamEl.scrollTop = streamEl.scrollHeight;
+      }
+    }
+
+    function sendIcebreakerMessage(text) {
+      const input = document.getElementById('peerMessageInput');
+      if (input) input.value = text;
+      sendPeerMessage();
+    }
+
+    function sendPeerMessage() {
+      const input = document.getElementById('peerMessageInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const peer = PEER_DIRECTORY.find(p => p.id === currentActivePeerId) || PEER_DIRECTORY[0];
+      const history = getPeerChatStorage();
+      if (!history[peer.id]) history[peer.id] = [];
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      history[peer.id].push({
+        sender: 'user',
+        text,
+        time: timeStr
+      });
+
+      savePeerChatStorage(history);
+      input.value = '';
+      renderActivePeerThread();
+      renderPeerDirectory();
+
+      // Show typing indicator and generate simulated contextual reply after 1.5s
+      const typingEl = document.getElementById('peerTypingIndicator');
+      const typingName = document.getElementById('typingPeerName');
+      if (typingName) typingName.textContent = peer.name.split(' ')[0];
+      if (typingEl) typingEl.style.display = 'inline-flex';
+
+      setTimeout(() => {
+        if (typingEl) typingEl.style.display = 'none';
+
+        const replyPool = peer.responses || [
+          "That's a great question! Consistent daily practice and strong DSA fundamentals make all the difference.",
+          "Keep pushing! The campus placement rounds reward persistence and solid system fundamentals."
+        ];
+        const randomReply = replyPool[Math.floor(Math.random() * replyPool.length)];
+
+        history[peer.id].push({
+          sender: 'peer',
+          text: randomReply,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        savePeerChatStorage(history);
+        renderActivePeerThread();
+        renderPeerDirectory();
+      }, 1500);
     }
 
     // Calculate Profile Score
