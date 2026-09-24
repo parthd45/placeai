@@ -5456,166 +5456,64 @@
     // PLACEAI CAMPUS & DIRECT CHAT ENGINE (MESSAGE ALL / SPECIFIC USER)
     // ==========================================================
     let currentChatMode = 'all'; // 'all' or 'direct'
-    let currentDirectPeerId = 'aarav_sharma';
+    let currentDirectPeerId = null;
+    let realRegisteredUsers = [];
     let currentDirectFilter = 'all';
 
-    // Broadcast (Message to All) Seed Feed
-    const SEED_BROADCAST_POSTS = [
-      {
-        id: 'post_1',
-        author: 'Aarav Sharma',
-        role: 'SDE 1 @ Microsoft',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
-        avatarText: 'AS',
-        time: '12 mins ago',
-        text: '📢 Tip for upcoming campus drives: Most tech rounds are prioritizing Binary Trees and Graph traversals (BFS/DFS). Make sure you practice at least 5 medium problems on PlaceAI Code Practice this week!',
-        likes: 18,
-        liked: false
-      },
-      {
-        id: 'post_2',
-        author: 'Priya Deshmukh (TPO)',
-        role: 'Placement Coordinator',
-        category: 'tpo',
-        avatarBg: 'linear-gradient(135deg, #059669, #10b981)',
-        avatarText: 'PD',
-        time: '45 mins ago',
-        text: '🔥 Important Announcement: Cognizant and TCS Digital shortlists for our batch will be finalized this Friday. Ensure your PlaceAI Profile Score is above 80% with an uploaded ATS resume.',
-        likes: 34,
-        liked: false
-      },
-      {
-        id: 'post_3',
-        author: 'Neha Patel',
-        role: 'Cloud Engineer @ Google',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #ea4335, #fbbc05)',
-        avatarText: 'NP',
-        time: '2 hours ago',
-        text: 'Hey everyone! If anyone wants quick feedback on their system architecture projects or GitHub repositories before company submissions, feel free to DM me directly!',
-        likes: 27,
-        liked: false
-      },
-      {
-        id: 'post_4',
-        author: 'Rohan Verma',
-        role: 'MCA Final Year Peer',
-        category: 'peer',
-        avatarBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-        avatarText: 'RV',
-        time: '3 hours ago',
-        text: 'Just solved Problem #12 (Longest Palindromic Substring) in O(n) space! Anyone interested in pairing up for daily evening problem solving on Code Practice?',
-        likes: 9,
-        liked: false
-      }
-    ];
+    // Fetch real registered users from Supabase user_profiles
+    async function fetchRealCommunityUsers() {
+      try {
+        const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
+        if (!supabase) return [];
 
-    // Direct Chat Directory (Specific Users)
-    const DIRECT_PEERS = [
-      {
-        id: 'aarav_sharma',
-        name: 'Aarav Sharma',
-        role: 'SDE 1 @ Microsoft',
-        company: 'Microsoft',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
-        avatarText: 'AS',
-        online: true,
-        statusText: 'Active now',
-        lastMsg: 'Practice graphs & dynamic programming for the upcoming technical round.',
-        time: '10:42 AM',
-        replies: [
-          "Focus on LeetCode Mediums and explaining your approach out loud. Communication is 50% of the interview!",
-          "For Microsoft, clean code and edge case handling (null inputs, empty strings) are critical.",
-          "I checked your PlaceAI profile—strong full-stack foundation! Keep practicing DSA."
-        ]
-      },
-      {
-        id: 'neha_patel',
-        name: 'Neha Patel',
-        role: 'Cloud Engineer @ Google',
-        company: 'Google',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #ea4335, #fbbc05)',
-        avatarText: 'NP',
-        online: true,
-        statusText: 'Active now',
-        lastMsg: 'Your Python & Web skills are well aligned with Google Cloud intern roles!',
-        time: 'Yesterday',
-        replies: [
-          "Google interviewers evaluate Big O complexity deeply. Always state your time and space complexity upfront.",
-          "Make sure your resume quantifies impact (e.g. latency reduced, user load handled).",
-          "You're making great progress! Let me know if you need mock interview questions."
-        ]
-      },
-      {
-        id: 'rohan_verma',
-        name: 'Rohan Verma',
-        role: 'Campus Peer • MCA Final Year',
-        company: 'PlaceAI Study Buddy',
-        category: 'peers',
-        avatarBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-        avatarText: 'RV',
-        online: true,
-        statusText: 'Active now',
-        lastMsg: 'Did you solve problem #14 on PlaceAI Code Practice? Let us compare our time complexity!',
-        time: '11:15 AM',
-        replies: [
-          "Awesome! I used a hash map approach for O(n) time. Let's do 2 more problems tonight.",
-          "Are you appearing for the campus drive on Friday?",
-          "Check out the Code Practice platform—strict exam mode is intense!"
-        ]
-      },
-      {
-        id: 'priya_tpo',
-        name: 'Priya Deshmukh',
-        role: 'TPO Placement Coordinator',
-        company: 'Campus Placement Cell',
-        category: 'tpo',
-        avatarBg: 'linear-gradient(135deg, #059669, #10b981)',
-        avatarText: 'PD',
-        online: false,
-        statusText: 'Away • Replies in 1h',
-        lastMsg: 'Keep your PlaceAI ATS resume updated. FinTech shortlist out tomorrow.',
-        time: '09:00 AM',
-        replies: [
-          "Please ensure your contact mobile number and email in Contact Info are accurate.",
-          "All students with a Profile Score above 80% are eligible for the upcoming drive.",
-          "The placement cell is tracking your test submissions. Keep up the high score!"
-        ]
-      },
-      {
-        id: 'vikram_malhotra',
-        name: 'Vikram Malhotra',
-        role: 'System Engineer @ TCS Digital',
-        company: 'TCS Digital',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #ec4899, #be185d)',
-        avatarText: 'VM',
-        online: true,
-        statusText: 'Active now',
-        lastMsg: 'TCS NQT aptitude tests speed above all. 90s per question max.',
-        time: 'Sep 23',
-        replies: [
-          "In TCS Digital coding rounds, Java and Python are ideal choices.",
-          "Make sure you can explain every detail of your final year project during the interview."
-        ]
-      }
-    ];
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('user_id, first_name, last_name, email, city, college_name, profile_image_url, skills, current_designation, created_at')
+          .order('created_at', { ascending: false });
 
-    // Open & Close
-    window.openCampusChatModal = function(initialMode = 'all') {
+        if (error) {
+          console.warn('Could not fetch real users from database:', error);
+          return [];
+        }
+
+        const myId = currentUser ? currentUser.id : null;
+        const list = (data || []).filter(u => u.user_id !== myId && (u.first_name || u.email));
+
+        realRegisteredUsers = list.map(u => {
+          const name = (u.first_name ? (u.first_name + ' ' + (u.last_name || '')).trim() : u.email.split('@')[0]);
+          const initials = (u.first_name ? (u.first_name[0] + (u.last_name ? u.last_name[0] : '')) : name.slice(0, 2)).toUpperCase();
+          const role = u.current_designation || (u.college_name ? u.college_name : (u.city ? 'Student in ' + u.city : 'PlaceAI Candidate'));
+
+          return {
+            id: u.user_id,
+            name: name,
+            email: u.email,
+            role: role,
+            college: u.college_name || u.city || 'Verified Student',
+            avatarText: initials,
+            avatarImg: u.profile_image_url || null,
+            skills: u.skills || []
+          };
+        });
+
+        return realRegisteredUsers;
+      } catch (e) {
+        console.error('fetchRealCommunityUsers error:', e);
+        return [];
+      }
+    }
+
+    // Open & Close Modal
+    window.openCampusChatModal = async function(initialMode = 'all') {
       const modal = document.getElementById('communityChatModal');
       if (!modal) {
         console.error('communityChatModal element not found');
         return;
       }
       modal.classList.add('active');
-      switchChatMode(initialMode);
+      await switchChatMode(initialMode);
     };
 
-    // Backward compatibility alias for peer chat buttons
     window.openPeerChatModal = function() {
       window.openCampusChatModal('all');
     };
@@ -5626,7 +5524,7 @@
     };
 
     // Mode Switcher
-    function switchChatMode(mode) {
+    async function switchChatMode(mode) {
       currentChatMode = mode;
       const btnAll = document.getElementById('tabModeAll');
       const btnDirect = document.getElementById('tabModeDirect');
@@ -5644,24 +5542,28 @@
         if (btnDirect) btnDirect.classList.add('active');
         if (bView) bView.style.display = 'none';
         if (dView) dView.style.display = 'flex';
+        
+        await fetchRealCommunityUsers();
+        if (!currentDirectPeerId && realRegisteredUsers.length > 0) {
+          currentDirectPeerId = realRegisteredUsers[0].id;
+        }
         renderDirectUserList();
         renderDirectThread();
       }
     }
 
-    // ===== BROADCAST (MESSAGE TO ALL) LOGIC =====
+    // ===== MODE 1: MESSAGE TO ALL (REAL COMMUNITY STREAM) =====
     function getBroadcastFeed() {
       try {
-        const stored = localStorage.getItem('placeai_broadcast_feed');
+        const stored = localStorage.getItem('placeai_real_community_feed');
         if (stored) return JSON.parse(stored);
       } catch (e) {}
-      localStorage.setItem('placeai_broadcast_feed', JSON.stringify(SEED_BROADCAST_POSTS));
-      return SEED_BROADCAST_POSTS;
+      return [];
     }
 
     function saveBroadcastFeed(feed) {
       try {
-        localStorage.setItem('placeai_broadcast_feed', JSON.stringify(feed));
+        localStorage.setItem('placeai_real_community_feed', JSON.stringify(feed));
       } catch (e) {}
     }
 
@@ -5670,21 +5572,35 @@
       if (!feedEl) return;
 
       const posts = getBroadcastFeed();
-      feedEl.innerHTML = posts.map(p => {
-        const badgeClass = p.category === 'alumni' ? 'alumni' : (p.category === 'tpo' ? 'tpo' : (p.category === 'mine' ? 'you' : 'peer'));
-        const badgeLabel = p.category === 'alumni' ? 'Placed Senior' : (p.category === 'tpo' ? 'Placement Cell' : (p.category === 'mine' ? 'You' : 'Student Peer'));
 
+      if (posts.length === 0) {
+        feedEl.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px; color: #94a3b8;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #8b5cf6; font-size: 24px;">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <h4 style="font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;">Campus Public Stream</h4>
+            <p style="font-size: 13px; max-width: 420px; margin: 0 auto 16px; line-height: 1.6; color: #94a3b8;">
+              No messages posted yet. Post a question, drive update, or tip below—every registered PlaceAI student will see it!
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      feedEl.innerHTML = posts.map(p => {
+        const isMine = currentUser && (p.userId === currentUser.id);
         return `
-          <div class="broadcast-card ${p.category === 'mine' ? 'mine' : ''}">
+          <div class="broadcast-card ${isMine ? 'mine' : ''}">
             <div class="broadcast-author-row">
               <div class="broadcast-author-info">
-                <div class="broadcast-avatar" style="background: ${p.avatarBg};">${p.avatarText}</div>
+                <div class="broadcast-avatar" style="background: ${p.avatarBg || 'linear-gradient(135deg, #7c3aed, #4f46e5)'};">${p.avatarText || 'U'}</div>
                 <div>
                   <div class="broadcast-author-name">
                     <span>${p.author}</span>
-                    <span class="broadcast-badge ${badgeClass}">${badgeLabel}</span>
+                    <span class="broadcast-badge ${isMine ? 'you' : 'peer'}">${isMine ? 'You' : 'Student'}</span>
                   </div>
-                  <div style="font-size: 11px; color: #94a3b8;">${p.role}</div>
+                  <div style="font-size: 11px; color: #94a3b8;">${p.role || 'PlaceAI Member'}</div>
                 </div>
               </div>
               <span class="broadcast-time">${p.time}</span>
@@ -5692,10 +5608,7 @@
             <div class="broadcast-content">${p.text}</div>
             <div class="broadcast-actions">
               <button class="broadcast-action-btn ${p.liked ? 'active' : ''}" onclick="togglePostLike('${p.id}')">
-                <i class="${p.liked ? 'fas' : 'far'} fa-thumbs-up"></i> ${p.likes} Helpful
-              </button>
-              <button class="broadcast-action-btn" onclick="openDirectFromPost('${p.author}')">
-                <i class="fas fa-reply"></i> Reply Privately
+                <i class="${p.liked ? 'fas' : 'far'} fa-thumbs-up"></i> ${p.likes || 0} Helpful
               </button>
             </div>
           </div>
@@ -5711,21 +5624,24 @@
       const text = input.value.trim();
       if (!text) return;
 
-      const myName = (userProfile && userProfile.first_name) ? (userProfile.first_name + ' ' + (userProfile.last_name || '')) : (currentUser ? currentUser.email.split('@')[0] : 'You');
-      const myRole = (userProfile && userProfile.current_designation) ? userProfile.current_designation : 'Full-Stack Candidate';
-      const initials = myName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ME';
+      const myName = (userProfile && userProfile.first_name) ? (userProfile.first_name + ' ' + (userProfile.last_name || '')).trim() : (currentUser ? currentUser.email.split('@')[0] : 'You');
+      const myRole = (userProfile && userProfile.current_designation) ? userProfile.current_designation : ((userProfile && userProfile.college_name) ? userProfile.college_name : 'PlaceAI Candidate');
+      const initials = (userProfile && userProfile.first_name) ? (userProfile.first_name[0] + (userProfile.last_name ? userProfile.last_name[0] : '')).toUpperCase() : 'ME';
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + now.toLocaleDateString();
 
       const newPost = {
         id: 'post_' + Date.now(),
-        author: myName + ' (You)',
+        userId: currentUser ? currentUser.id : null,
+        author: myName,
         role: myRole,
-        category: 'mine',
         avatarBg: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
         avatarText: initials,
-        time: 'Just now',
+        time: timeStr,
         text: text,
-        likes: 1,
-        liked: true
+        likes: 0,
+        liked: false
       };
 
       const feed = getBroadcastFeed();
@@ -5733,45 +5649,6 @@
       saveBroadcastFeed(feed);
       input.value = '';
       renderBroadcastFeed();
-
-      // Simulated realistic peer response to your public question after 2.5 seconds
-      setTimeout(() => {
-        const replyPool = [
-          {
-            author: 'Aarav Sharma',
-            role: 'SDE 1 @ Microsoft',
-            category: 'alumni',
-            avatarBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
-            avatarText: 'AS',
-            text: `@${myName.split(' ')[0]} Great point! Also make sure your GitHub README clearly showcases the system architecture and live demo.`
-          },
-          {
-            author: 'Rohan Verma',
-            role: 'MCA Final Year Peer',
-            category: 'peer',
-            avatarBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-            avatarText: 'RV',
-            text: `@${myName.split(' ')[0]} +1 to this. Let's solve the related problem on PlaceAI Code Practice today!`
-          }
-        ];
-        const randomReply = replyPool[Math.floor(Math.random() * replyPool.length)];
-        const simPost = {
-          id: 'post_reply_' + Date.now(),
-          author: randomReply.author,
-          role: randomReply.role,
-          category: randomReply.category,
-          avatarBg: randomReply.avatarBg,
-          avatarText: randomReply.avatarText,
-          time: 'Just now',
-          text: randomReply.text,
-          likes: 2,
-          liked: false
-        };
-        const currentFeed = getBroadcastFeed();
-        currentFeed.push(simPost);
-        saveBroadcastFeed(currentFeed);
-        renderBroadcastFeed();
-      }, 2500);
     }
 
     function togglePostLike(postId) {
@@ -5779,39 +5656,24 @@
       const p = feed.find(x => x.id === postId);
       if (p) {
         p.liked = !p.liked;
-        p.likes += p.liked ? 1 : -1;
+        p.likes = (p.likes || 0) + (p.liked ? 1 : -1);
         saveBroadcastFeed(feed);
         renderBroadcastFeed();
       }
     }
 
-    function openDirectFromPost(authorName) {
-      const match = DIRECT_PEERS.find(p => authorName.includes(p.name));
-      if (match) {
-        currentDirectPeerId = match.id;
-      }
-      switchChatMode('direct');
-    }
-
-    // ===== DIRECT CHAT (SPECIFIC USER) LOGIC =====
-    function getDirectChatHistory() {
+    // ===== MODE 2: DIRECT MESSAGE (REAL SPECIFIC USERS) =====
+    function getDirectChatHistory(peerId) {
       try {
-        const d = localStorage.getItem('placeai_direct_chat_history');
+        const d = localStorage.getItem('placeai_real_chat_' + peerId);
         if (d) return JSON.parse(d);
       } catch (e) {}
-      const initial = {};
-      DIRECT_PEERS.forEach(peer => {
-        initial[peer.id] = [
-          { sender: 'peer', text: peer.lastMsg, time: peer.time }
-        ];
-      });
-      localStorage.setItem('placeai_direct_chat_history', JSON.stringify(initial));
-      return initial;
+      return [];
     }
 
-    function saveDirectChatHistory(history) {
+    function saveDirectChatHistory(peerId, history) {
       try {
-        localStorage.setItem('placeai_direct_chat_history', JSON.stringify(history));
+        localStorage.setItem('placeai_real_chat_' + peerId, JSON.stringify(history));
       } catch (e) {}
     }
 
@@ -5831,39 +5693,44 @@
       if (!listEl) return;
 
       const q = (document.getElementById('directUserSearchInput')?.value || '').toLowerCase().trim();
-      const history = getDirectChatHistory();
 
-      const filtered = DIRECT_PEERS.filter(p => {
-        if (currentDirectFilter !== 'all' && p.category !== currentDirectFilter) return false;
+      const filtered = realRegisteredUsers.filter(p => {
+        if (currentDirectFilter === 'college' && !p.college) return false;
+        if (currentDirectFilter === 'skills' && (!p.skills || p.skills.length === 0)) return false;
         if (q) {
           const matchName = p.name.toLowerCase().includes(q);
+          const matchEmail = (p.email || '').toLowerCase().includes(q);
           const matchRole = p.role.toLowerCase().includes(q);
-          const matchCompany = p.company.toLowerCase().includes(q);
-          if (!matchName && !matchRole && !matchCompany) return false;
+          if (!matchName && !matchEmail && !matchRole) return false;
         }
         return true;
       });
 
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;padding:30px 10px;color:#64748b;font-size:12px;">No registered users match your search.</div>';
+        return;
+      }
+
       listEl.innerHTML = filtered.map(peer => {
-        const msgs = history[peer.id] || [];
-        const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : { text: peer.lastMsg, time: peer.time };
+        const msgs = getDirectChatHistory(peer.id);
+        const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
         const isActive = peer.id === currentDirectPeerId;
 
         return `
           <div class="peer-item-card ${isActive ? 'active' : ''}" onclick="selectDirectUser('${peer.id}')">
             <div class="peer-avatar-wrapper">
-              <div class="peer-avatar-img" style="background: ${peer.avatarBg};">${peer.avatarText}</div>
-              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #6366f1, #38bdf8);">${peer.avatarText}</div>
+              <span class="peer-status-dot online"></span>
             </div>
             <div class="peer-item-meta">
               <div class="peer-item-name-row">
                 <span class="peer-item-name">${peer.name}</span>
-                <span class="peer-item-time">${lastMsg.time}</span>
+                <span class="peer-item-time">${lastMsg ? lastMsg.time : ''}</span>
               </div>
               <div class="peer-item-tag">
-                <i class="fas fa-briefcase" style="font-size:10px;"></i> ${peer.company}
+                <i class="fas fa-graduation-cap" style="font-size:10px;"></i> ${peer.college}
               </div>
-              <div class="peer-item-preview">${lastMsg.sender === 'user' ? 'You: ' : ''}${lastMsg.text}</div>
+              <div class="peer-item-preview">${lastMsg ? (lastMsg.sender === 'user' ? 'You: ' : '') + lastMsg.text : 'Click to start conversation'}</div>
             </div>
           </div>
         `;
@@ -5877,14 +5744,20 @@
     }
 
     function renderDirectThread() {
-      const peer = DIRECT_PEERS.find(p => p.id === currentDirectPeerId) || DIRECT_PEERS[0];
+      const peer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
       const headerEl = document.getElementById('directThreadHeader');
       const icebreakersEl = document.getElementById('directIcebreakersBar');
       const streamEl = document.getElementById('directMessagesStream');
       const inputEl = document.getElementById('directMessageInput');
 
+      if (!peer) {
+        if (headerEl) headerEl.innerHTML = '<div style="color:#94a3b8;font-size:13px;">Select a user from the directory to start chatting</div>';
+        if (streamEl) streamEl.innerHTML = '<div style="text-align:center;padding:50px;color:#64748b;">No conversation selected.</div>';
+        return;
+      }
+
       if (inputEl) {
-        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + ' privately...';
+        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + ' directly...';
         inputEl.focus();
       }
 
@@ -5892,15 +5765,15 @@
         headerEl.innerHTML = `
           <div class="peer-thread-profile">
             <div class="peer-avatar-wrapper" style="width:38px;height:38px;">
-              <div class="peer-avatar-img" style="background: ${peer.avatarBg};font-size:14px;">${peer.avatarText}</div>
-              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
+              <div class="peer-avatar-img" style="background: linear-gradient(135deg, #6366f1, #38bdf8);font-size:14px;">${peer.avatarText}</div>
+              <span class="peer-status-dot online"></span>
             </div>
             <div class="peer-thread-info">
               <h4>
                 <span>${peer.name}</span>
-                <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${peer.company}</span>
+                <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${peer.college}</span>
               </h4>
-              <p>${peer.role} • <span style="color:${peer.online ? '#34d399' : '#f59e0b'};">${peer.statusText}</span></p>
+              <p>${peer.role} • <span style="color:#34d399;">Registered User</span></p>
             </div>
           </div>
           <div class="peer-thread-actions">
@@ -5912,96 +5785,68 @@
       }
 
       if (icebreakersEl) {
-        const prompts = [
-          "Can you share your interview experience at " + peer.company + "?",
-          "Review my profile for placement readiness",
-          "What DSA topics are asked most frequently?"
-        ];
-        icebreakersEl.innerHTML = prompts.map(p =>
-          `<div class="peer-icebreaker-chip" onclick="sendDirectIcebreaker('${p.replace(/'/g, "\\'")}')"><i class="fas fa-comment-dots" style="margin-right:4px;"></i>${p}</div>`
-        ).join('');
+        icebreakersEl.style.display = 'none';
       }
 
-      const history = getDirectChatHistory();
-      const msgs = history[peer.id] || [];
+      const msgs = getDirectChatHistory(peer.id);
 
       if (streamEl) {
-        streamEl.innerHTML = msgs.map(m => {
-          const isSent = m.sender === 'user';
-          return `
-            <div class="peer-msg-row ${isSent ? 'sent' : 'received'}">
-              <div class="peer-msg-bubble">
-                <div>${m.text}</div>
-                <div class="peer-msg-meta">
-                  <span>${m.time}</span>
-                  ${isSent ? '<i class="fas fa-check-double" style="font-size:9px;color:#a7f3d0;"></i>' : ''}
-                </div>
+        if (msgs.length === 0) {
+          streamEl.innerHTML = `
+            <div style="text-align:center;padding:50px 20px;color:#94a3b8;">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:18px;">
+                <i class="fas fa-envelope-open-text"></i>
               </div>
+              <h5 style="color:#f1f5f9;font-size:14px;margin-bottom:4px;">No messages yet with ${peer.name}</h5>
+              <p style="font-size:12px;color:#94a3b8;margin:0;">Send a message below to start your direct conversation!</p>
             </div>
           `;
-        }).join('');
+        } else {
+          streamEl.innerHTML = msgs.map(m => {
+            const isSent = m.sender === 'user';
+            return `
+              <div class="peer-msg-row ${isSent ? 'sent' : 'received'}">
+                <div class="peer-msg-bubble">
+                  <div>${m.text}</div>
+                  <div class="peer-msg-meta">
+                    <span>${m.time}</span>
+                    ${isSent ? '<i class="fas fa-check-double" style="font-size:9px;color:#a7f3d0;"></i>' : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
 
         streamEl.scrollTop = streamEl.scrollHeight;
       }
-    }
-
-    function sendDirectIcebreaker(text) {
-      const input = document.getElementById('directMessageInput');
-      if (input) input.value = text;
-      sendDirectMessage();
     }
 
     function sendDirectMessage() {
       const input = document.getElementById('directMessageInput');
       if (!input) return;
       const text = input.value.trim();
-      if (!text) return;
+      if (!text || !currentDirectPeerId) return;
 
-      const peer = DIRECT_PEERS.find(p => p.id === currentDirectPeerId) || DIRECT_PEERS[0];
-      const history = getDirectChatHistory();
-      if (!history[peer.id]) history[peer.id] = [];
+      const history = getDirectChatHistory(currentDirectPeerId);
 
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      history[peer.id].push({
+      history.push({
         sender: 'user',
         text,
         time: timeStr
       });
 
-      saveDirectChatHistory(history);
+      saveDirectChatHistory(currentDirectPeerId, history);
       input.value = '';
       renderDirectThread();
       renderDirectUserList();
-
-      const typingEl = document.getElementById('directTypingIndicator');
-      const typingName = document.getElementById('directTypingName');
-      if (typingName) typingName.textContent = peer.name.split(' ')[0];
-      if (typingEl) typingEl.style.display = 'inline-flex';
-
-      setTimeout(() => {
-        if (typingEl) typingEl.style.display = 'none';
-
-        const pool = peer.replies || [
-          "Got your message! Consistent daily problem solving and system design basics make all the difference.",
-          "Keep pushing! The campus placement rounds reward persistence."
-        ];
-        const randomReply = pool[Math.floor(Math.random() * pool.length)];
-
-        history[peer.id].push({
-          sender: 'peer',
-          text: randomReply,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-
-        saveDirectChatHistory(history);
-        renderDirectThread();
-        renderDirectUserList();
-      }, 1500);
     }
 
-    // =========================================================
+    // ==========================================================
+// =========================================================
     // GITHUB CONTRIBUTION HEATMAP LOGIC
     // =========================================================
     let currentHeatmapYear = 'last12';
@@ -7904,354 +7749,6 @@ ${projStr}
     }
 
     
-    // ============================================
-    // PLACEAI PEER CONNECT & CHAT ENGINE
-    // ============================================
-    const PEER_DIRECTORY = [
-      {
-        id: 'aarav_sharma',
-        name: 'Aarav Sharma',
-        role: 'SDE 1 @ Microsoft',
-        company: 'Microsoft',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
-        avatarText: 'AS',
-        online: true,
-        statusText: 'Active now',
-        tags: ['DSA', 'System Design', 'C++'],
-        initialMsg: 'Hey! Make sure to practice Graphs & DP for the upcoming Microsoft & Amazon drive on campus.',
-        initialTime: '10:42 AM',
-        responses: [
-          "Focus on NeetCode 150 and LeetCode Mediums. Graph BFS/DFS and Dynamic Programming are asked in almost every technical round!",
-          "For Microsoft, they look closely at code cleanliness, edge case handling, and explaining your thought process out loud.",
-          "Your GitHub portfolio looks solid! I'd recommend highlighting your Full-Stack architecture and live deployment links.",
-          "Let me know if you want to do a 15-minute mock interview before your round."
-        ]
-      },
-      {
-        id: 'neha_patel',
-        name: 'Neha Patel',
-        role: 'Cloud Engineer @ Google',
-        company: 'Google',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #ea4335, #fbbc05)',
-        avatarText: 'NP',
-        online: true,
-        statusText: 'Active now',
-        tags: ['Python', 'GCP', 'Full-Stack'],
-        initialMsg: 'Reviewed your profile summary. Your Python & Web systems skills are well aligned with Google Cloud intern roles!',
-        initialTime: 'Yesterday',
-        responses: [
-          "For Google, focus heavily on algorithmic complexity (Big O notation) and data structure trade-offs.",
-          "Make sure your resume lists measurable impact—e.g., 'reduced API latency by 40%' rather than just 'built an API'.",
-          "Try solving at least 2 medium problems daily on PlaceAI Code Practice to maintain speed under exam time pressure!"
-        ]
-      },
-      {
-        id: 'rohan_verma',
-        name: 'Rohan Verma',
-        role: 'Campus Peer • MCA Final Year',
-        company: 'PlaceAI Study Buddy',
-        category: 'peers',
-        avatarBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-        avatarText: 'RV',
-        online: true,
-        statusText: 'Active now',
-        tags: ['React', 'Node.js', 'SQL'],
-        initialMsg: 'Did you solve problem #14 on PlaceAI Code Practice? Let us compare our time complexity!',
-        initialTime: '11:15 AM',
-        responses: [
-          "Nice! I used a hash map approach for O(n) time. How did you optimize the space complexity?",
-          "Are you applying for the TCS Digital or Cognizant GenC drive this Friday?",
-          "Let's jump into Code Practice in strict exam mode together this evening!"
-        ]
-      },
-      {
-        id: 'priya_tpo',
-        name: 'Priya Deshmukh',
-        role: 'TPO Placement Coordinator',
-        company: 'Campus Placement Cell',
-        category: 'tpo',
-        avatarBg: 'linear-gradient(135deg, #059669, #10b981)',
-        avatarText: 'PD',
-        online: false,
-        statusText: 'Away • Replies in 1h',
-        tags: ['TPO', 'Drives', 'Shortlists'],
-        initialMsg: 'Attention candidates: Keep your PlaceAI ATS resume updated. Shortlist for the FinTech drive will be declared tomorrow at 2 PM.',
-        initialTime: '09:00 AM',
-        responses: [
-          "Please verify that your 10-digit mobile number and primary email in Contact Information are up to date.",
-          "The upcoming drive requires a minimum Profile Health Score of 75% on PlaceAI.",
-          "Best of luck with your preparation! The placement cell is here to support you."
-        ]
-      },
-      {
-        id: 'vikram_malhotra',
-        name: 'Vikram Malhotra',
-        role: 'System Engineer @ TCS Digital',
-        company: 'TCS Digital',
-        category: 'alumni',
-        avatarBg: 'linear-gradient(135deg, #ec4899, #be185d)',
-        avatarText: 'VM',
-        online: true,
-        statusText: 'Active now',
-        tags: ['Java', 'NQT', 'Aptitude'],
-        initialMsg: 'Hey! The TCS NQT aptitude section tests speed above all. Don\'t spend more than 90 seconds per question.',
-        initialTime: 'Sep 23',
-        responses: [
-          "For TCS Digital coding rounds, Java and Python are ideal. Practice string manipulation and matrix algorithms.",
-          "They will definitely ask you about your final year project architecture during the managerial round."
-        ]
-      }
-    ];
-
-    let currentActivePeerId = 'aarav_sharma';
-    let currentPeerCategory = 'all';
-
-    function getPeerChatStorage() {
-      try {
-        const data = localStorage.getItem('placeai_peer_chat_history');
-        if (data) return JSON.parse(data);
-      } catch (e) {}
-
-      // Seed initial history
-      const initial = {};
-      PEER_DIRECTORY.forEach(peer => {
-        initial[peer.id] = [
-          {
-            sender: 'peer',
-            text: peer.initialMsg,
-            time: peer.initialTime
-          }
-        ];
-      });
-      localStorage.setItem('placeai_peer_chat_history', JSON.stringify(initial));
-      return initial;
-    }
-
-    function savePeerChatStorage(history) {
-      try {
-        localStorage.setItem('placeai_peer_chat_history', JSON.stringify(history));
-      } catch (e) {}
-    }
-
-    function openPeerChatModal(targetPeerId) {
-      if (targetPeerId) {
-        currentActivePeerId = targetPeerId;
-      }
-      renderPeerDirectory();
-      renderActivePeerThread();
-      const modal = document.getElementById('peerChatModal');
-      if (modal) modal.classList.add('active');
-
-      // Clear unread badge
-      const b1 = document.getElementById('peerChatBadge');
-      const b2 = document.getElementById('floatingChatBadge');
-      if (b1) b1.style.display = 'none';
-      if (b2) b2.style.display = 'none';
-    }
-
-    function closePeerChatModal() {
-      const modal = document.getElementById('peerChatModal');
-      if (modal) modal.classList.remove('active');
-    }
-
-    function setPeerFilter(cat, btn) {
-      currentPeerCategory = cat;
-      document.querySelectorAll('.peer-filter-tab').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderPeerDirectory();
-    }
-
-    function filterPeerList() {
-      renderPeerDirectory();
-    }
-
-    function selectPeerConversation(peerId) {
-      currentActivePeerId = peerId;
-      renderPeerDirectory();
-      renderActivePeerThread();
-    }
-
-    function renderPeerDirectory() {
-      const listEl = document.getElementById('peerConversationList');
-      if (!listEl) return;
-
-      const q = (document.getElementById('peerSearchInput')?.value || '').toLowerCase().trim();
-      const history = getPeerChatStorage();
-
-      const filtered = PEER_DIRECTORY.filter(p => {
-        if (currentPeerCategory !== 'all' && p.category !== currentPeerCategory) return false;
-        if (q) {
-          const matchName = p.name.toLowerCase().includes(q);
-          const matchRole = p.role.toLowerCase().includes(q);
-          const matchCompany = p.company.toLowerCase().includes(q);
-          const matchTags = p.tags.some(t => t.toLowerCase().includes(q));
-          if (!matchName && !matchRole && !matchCompany && !matchTags) return false;
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center;padding:30px 10px;color:#64748b;font-size:12px;">No matching peers found.</div>';
-        return;
-      }
-
-      listEl.innerHTML = filtered.map(peer => {
-        const msgs = history[peer.id] || [];
-        const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : { text: peer.initialMsg, time: peer.initialTime };
-        const isActive = peer.id === currentActivePeerId;
-
-        return `
-          <div class="peer-item-card ${isActive ? 'active' : ''}" onclick="selectPeerConversation('${peer.id}')">
-            <div class="peer-avatar-wrapper">
-              <div class="peer-avatar-img" style="background: ${peer.avatarBg};">${peer.avatarText}</div>
-              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
-            </div>
-            <div class="peer-item-meta">
-              <div class="peer-item-name-row">
-                <span class="peer-item-name">${peer.name}</span>
-                <span class="peer-item-time">${lastMsg.time}</span>
-              </div>
-              <div class="peer-item-tag">
-                <i class="fas fa-briefcase" style="font-size:10px;"></i> ${peer.company}
-              </div>
-              <div class="peer-item-preview">${lastMsg.sender === 'user' ? 'You: ' : ''}${lastMsg.text}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderActivePeerThread() {
-      const peer = PEER_DIRECTORY.find(p => p.id === currentActivePeerId) || PEER_DIRECTORY[0];
-      const headerEl = document.getElementById('peerThreadHeader');
-      const icebreakersEl = document.getElementById('peerIcebreakersBar');
-      const streamEl = document.getElementById('peerMessagesStream');
-      const inputEl = document.getElementById('peerMessageInput');
-
-      if (inputEl) {
-        inputEl.placeholder = 'Message ' + peer.name.split(' ')[0] + '...';
-        inputEl.focus();
-      }
-
-      if (headerEl) {
-        headerEl.innerHTML = `
-          <div class="peer-thread-profile">
-            <div class="peer-avatar-wrapper" style="width:38px;height:38px;">
-              <div class="peer-avatar-img" style="background: ${peer.avatarBg};font-size:14px;">${peer.avatarText}</div>
-              <span class="peer-status-dot ${peer.online ? 'online' : 'away'}"></span>
-            </div>
-            <div class="peer-thread-info">
-              <h4>
-                <span>${peer.name}</span>
-                <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">${peer.company}</span>
-              </h4>
-              <p>${peer.role} • <span style="color:${peer.online ? '#34d399' : '#f59e0b'};">${peer.statusText}</span></p>
-            </div>
-          </div>
-          <div class="peer-thread-actions">
-            <a href="code-practice.html" class="peer-thread-btn" title="Practice coding together">
-              <i class="fas fa-code"></i> Practice DSA
-            </a>
-          </div>
-        `;
-      }
-
-      // Icebreaker Prompts
-      if (icebreakersEl) {
-        const prompts = [
-          "Can you share your interview experience?",
-          "Review my profile for " + peer.company,
-          "What DSA topics are asked most?",
-          "Tips for final round manager interview"
-        ];
-        icebreakersEl.innerHTML = prompts.map(p =>
-          `<div class="peer-icebreaker-chip" onclick="sendIcebreakerMessage('${p.replace(/'/g, "\\'")}')"><i class="fas fa-comment-dots" style="margin-right:4px;"></i>${p}</div>`
-        ).join('');
-      }
-
-      // Messages Stream
-      const history = getPeerChatStorage();
-      const msgs = history[peer.id] || [];
-
-      if (streamEl) {
-        streamEl.innerHTML = msgs.map(m => {
-          const isSent = m.sender === 'user';
-          return `
-            <div class="peer-msg-row ${isSent ? 'sent' : 'received'}">
-              <div class="peer-msg-bubble">
-                <div>${m.text}</div>
-                <div class="peer-msg-meta">
-                  <span>${m.time}</span>
-                  ${isSent ? '<i class="fas fa-check-double" style="font-size:9px;color:#a7f3d0;"></i>' : ''}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        streamEl.scrollTop = streamEl.scrollHeight;
-      }
-    }
-
-    function sendIcebreakerMessage(text) {
-      const input = document.getElementById('peerMessageInput');
-      if (input) input.value = text;
-      sendPeerMessage();
-    }
-
-    function sendPeerMessage() {
-      const input = document.getElementById('peerMessageInput');
-      if (!input) return;
-      const text = input.value.trim();
-      if (!text) return;
-
-      const peer = PEER_DIRECTORY.find(p => p.id === currentActivePeerId) || PEER_DIRECTORY[0];
-      const history = getPeerChatStorage();
-      if (!history[peer.id]) history[peer.id] = [];
-
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      history[peer.id].push({
-        sender: 'user',
-        text,
-        time: timeStr
-      });
-
-      savePeerChatStorage(history);
-      input.value = '';
-      renderActivePeerThread();
-      renderPeerDirectory();
-
-      // Show typing indicator and generate simulated contextual reply after 1.5s
-      const typingEl = document.getElementById('peerTypingIndicator');
-      const typingName = document.getElementById('typingPeerName');
-      if (typingName) typingName.textContent = peer.name.split(' ')[0];
-      if (typingEl) typingEl.style.display = 'inline-flex';
-
-      setTimeout(() => {
-        if (typingEl) typingEl.style.display = 'none';
-
-        const replyPool = peer.responses || [
-          "That's a great question! Consistent daily practice and strong DSA fundamentals make all the difference.",
-          "Keep pushing! The campus placement rounds reward persistence and solid system fundamentals."
-        ];
-        const randomReply = replyPool[Math.floor(Math.random() * replyPool.length)];
-
-        history[peer.id].push({
-          sender: 'peer',
-          text: randomReply,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-
-        savePeerChatStorage(history);
-        renderActivePeerThread();
-        renderPeerDirectory();
-      }, 1500);
-    }
-
     // Calculate Profile Score
     
     function copyContactValue(type, btn) {

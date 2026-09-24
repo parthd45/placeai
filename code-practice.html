@@ -2845,18 +2845,25 @@
     }
 
     // ============================================
-    // LEADERBOARD
+    // LEADERBOARD (REAL REGISTERED USERS)
     // ============================================
-    const MOCK_USERS = [
-      { name: "Aarav Sharma", e: 12, m: 8, h: 3, streak: 15, pts: 890 },
-      { name: "Priya Patel", e: 10, m: 9, h: 4, streak: 22, pts: 950 },
-      { name: "Rohan Mehta", e: 11, m: 7, h: 2, streak: 8, pts: 720 },
-      { name: "Ananya Singh", e: 9, m: 6, h: 5, streak: 18, pts: 870 },
-      { name: "Vikram Desai", e: 8, m: 5, h: 1, streak: 5, pts: 510 },
-      { name: "Sneha Kulkarni", e: 7, m: 4, h: 2, streak: 12, pts: 560 },
-      { name: "Arjun Reddy", e: 6, m: 3, h: 1, streak: 3, pts: 380 },
-      { name: "Kavya Nair", e: 5, m: 2, h: 0, streak: 7, pts: 280 },
-    ];
+    let realLeaderboardUsers = [];
+
+    async function fetchRealLeaderboardUsers() {
+      try {
+        const res = await fetch('https://igilmfqfxsiaggkgkwoq.supabase.co/rest/v1/user_profiles?select=user_id,first_name,last_name,email,college_name,city,created_at&order=created_at.desc', {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnaWxtZnFmeHNpYWdna2drd29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNjMxNTUsImV4cCI6MjA4MjkzOTE1NX0._NgbNTEtefMiuOfaubTRugIKd9I9IzyKvEYrWe4cKxQ',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnaWxtZnFmeHNpYWdna2drd29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNjMxNTUsImV4cCI6MjA4MjkzOTE1NX0._NgbNTEtefMiuOfaubTRugIKd9I9IzyKvEYrWe4cKxQ'
+          }
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data || [];
+      } catch (e) {
+        return [];
+      }
+    }
 
     function renderLeaderboard() {
       const mySolved = Object.values(solvedProblems).filter(s => s === 'solved').length;
@@ -2866,15 +2873,21 @@
       const myStreak = parseInt(localStorage.getItem('placeai_streak') || '0');
       const myPts = myEasy * 10 + myMed * 20 + myHard * 40;
 
-      const allUsers = [...MOCK_USERS, { name: "You", e: myEasy, m: myMed, h: myHard, streak: myStreak, pts: myPts, isYou: true }];
+      // Real users list
+      const allUsers = [
+        { name: "You", e: myEasy, m: myMed, h: myHard, streak: myStreak, pts: myPts, isYou: true },
+        ...realLeaderboardUsers
+      ];
       allUsers.sort((a, b) => b.pts - a.pts);
 
       const tbody = document.getElementById('lbBody');
+      if (!tbody) return;
+
       tbody.innerHTML = allUsers.map((u, i) => {
         const rank = i + 1;
         const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
         const total = u.e + u.m + u.h;
-        const initial = u.name.split(' ').map(n => n[0]).join('');
+        const initial = u.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
         return `<tr class="${u.isYou ? 'you' : ''}">
           <td class="lb-rank ${rankClass}">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : '#' + rank}</td>
           <td><div class="lb-user"><div class="lb-avatar">${initial}</div><span class="lb-name">${u.name}${u.isYou ? ' <span style="font-size:10px;background:var(--accent-purple);color:white;padding:1px 6px;border-radius:4px;margin-left:4px;">YOU</span>' : ''}</span></div></td>
@@ -2884,6 +2897,27 @@
           <td class="lb-points">${u.pts}</td>
         </tr>`;
       }).join('');
+
+      // Fetch real users if not loaded yet
+      if (realLeaderboardUsers.length === 0) {
+        fetchRealLeaderboardUsers().then(profiles => {
+          if (profiles && profiles.length > 0) {
+            realLeaderboardUsers = profiles.map(p => {
+              const fullName = (p.first_name ? (p.first_name + ' ' + (p.last_name || '')).trim() : (p.email ? p.email.split('@')[0] : 'Student'));
+              return {
+                name: fullName,
+                e: 0,
+                m: 0,
+                h: 0,
+                streak: 0,
+                pts: 0,
+                isYou: false
+              };
+            });
+            renderLeaderboard();
+          }
+        });
+      }
     }
 
     function setLBPeriod(period, btn) {
