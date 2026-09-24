@@ -4600,10 +4600,10 @@
       line-height: 1;
     }
     .wp-tick-single {
-      color: rgba(233, 237, 239, 0.55);
+      color: rgba(233, 237, 239, 0.35);
     }
     .wp-tick-delivered {
-      color: rgba(233, 237, 239, 0.55);
+      color: rgba(233, 237, 239, 0.7);
     }
     .wp-tick-read {
       color: #53bdeb !important; /* WhatsApp Iconic Blue Double Tick */
@@ -6193,12 +6193,23 @@
     // Realtime WebSocket & Cloud Synchronization State
     let campusRealtimeChannel = null;
     let peerUnreadCounts = {}; // peerId -> count
+    let peerLastSeenTimes = {}; // peerId -> ISO timestamp (tracked from presence leave events)
     let typingTimeouts = {};
     let cloudSyncInterval = null;
     let presenceRefreshInterval = null;
     let heartbeatInterval = null;
     let currentVoicePlaybackOsc = null;
     window.liveOnlineUserIds = new Set();
+
+    // Load persisted last-seen times from localStorage
+    try {
+      const stored = localStorage.getItem('placeai_peer_last_seen');
+      if (stored) peerLastSeenTimes = JSON.parse(stored);
+    } catch(e) {}
+
+    function savePeerLastSeenTimes() {
+      try { localStorage.setItem('placeai_peer_last_seen', JSON.stringify(peerLastSeenTimes)); } catch(e) {}
+    }
 
     // 1. Fetch registered users from Supabase user_profiles
     async function fetchRealCommunityUsers() {
@@ -6285,12 +6296,18 @@
           })
           .on('presence', { event: 'join' }, ({ key }) => {
             window.liveOnlineUserIds.add(key);
+            // Remove last-seen entry since they're now online
+            delete peerLastSeenTimes[key];
+            savePeerLastSeenTimes();
             upgradeSentMessagesToDelivered();
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
           .on('presence', { event: 'leave' }, ({ key }) => {
             window.liveOnlineUserIds.delete(key);
+            // Record the exact moment they went offline
+            peerLastSeenTimes[key] = new Date().toISOString();
+            savePeerLastSeenTimes();
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
@@ -6689,14 +6706,16 @@
     // 10. Presence & Status Helpers: Accurate Online vs Real Last Seen
     function isPeerOnline(peer) {
       if (!peer) return false;
-      // 1. Direct WebSocket presence
-      if (window.liveOnlineUserIds && window.liveOnlineUserIds.has(peer.id)) return true;
-      // 2. Heartbeat active in last 60 seconds
-      if (peer.updatedAt) {
-        const diffMs = Date.now() - new Date(peer.updatedAt).getTime();
-        if (diffMs >= 0 && diffMs < 60 * 1000) return true;
-      }
-      return false;
+      // Only trust live WebSocket presence — nothing else
+      return !!(window.liveOnlineUserIds && window.liveOnlineUserIds.has(peer.id));
+    }
+
+    function getPeerLastSeen(peer) {
+      if (!peer) return null;
+      // 1. If we tracked their leave event, use that
+      if (peerLastSeenTimes[peer.id]) return peerLastSeenTimes[peer.id];
+      // 2. Fallback to DB updated_at (profile edit time — not ideal but better than nothing)
+      return peer.updatedAt || peer.createdAt || null;
     }
 
     function formatWpLastSeen(dateStr) {
@@ -6957,7 +6976,7 @@
         const isActive = peer.id === currentDirectPeerId;
 
         const online = isPeerOnline(peer);
-        const lastSeenText = online ? 'Online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+        const lastSeenText = online ? 'Online' : formatWpLastSeen(getPeerLastSeen(peer));
         const unreadCount = peerUnreadCounts[peer.id] || 0;
 
         // Accurate tick for last message:
@@ -7051,7 +7070,7 @@
 
       if (dotEl) {
         dotEl.className = 'peer-status-dot ' + (online ? 'online' : 'offline');
-        dotEl.title = online ? 'Online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+        dotEl.title = online ? 'Online' : formatWpLastSeen(getPeerLastSeen(peer));
       }
 
       if (statusEl) {
@@ -7061,7 +7080,7 @@
             <span style="color:#00a884;font-weight:600;">online</span> • ${peer.role}
           `;
         } else {
-          const lastSeenText = formatWpLastSeen(peer.updatedAt || peer.createdAt);
+          const lastSeenText = formatWpLastSeen(getPeerLastSeen(peer));
           statusEl.innerHTML = `
             <span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;margin-right:4px;"></span>
             <span style="color:#8696a0;">${lastSeenText}</span> • ${peer.role}
@@ -7131,7 +7150,7 @@
       }
 
       const online = isPeerOnline(peer);
-      const lastSeenText = online ? 'online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
+      const lastSeenText = online ? 'online' : formatWpLastSeen(getPeerLastSeen(peer));
 
       if (headerEl) {
         headerEl.innerHTML = `
@@ -8433,6 +8452,9 @@
         }
 
         await loadUserProfile();
+
+        // Initialize realtime presence immediately after auth so status/ticks work
+        initRealtimeCampusNetwork();
       } catch (error) {
         console.error('Authentication failed:', error);
         alert('Authentication error. Please login again.');
