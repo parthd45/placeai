@@ -6079,6 +6079,293 @@
       font-family: monospace;
     }
 
+  
+    /* ===== SUPABASE PROJECTS CONSOLE (EXACT REPLICA FROM SCREENSHOT) ===== */
+    .supabase-console-container {
+      background: #121212;
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 22px 24px;
+      color: #ededed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .supabase-console-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #222222;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .supabase-org-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #ededed;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .supabase-plan-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: #242424;
+      border: 1px solid #333333;
+      color: #a1a1a1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .supabase-projects-main-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 32px;
+    }
+
+    @media (max-width: 960px) {
+      .supabase-projects-main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .supabase-section-heading {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ededed;
+      margin: 0 0 18px 0;
+    }
+
+    .supabase-toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .supabase-filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .supabase-search-input-wrap {
+      position: relative;
+      min-width: 200px;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .supabase-search-input-wrap i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #707070;
+      font-size: 12px;
+    }
+
+    .supabase-console-input {
+      width: 100%;
+      background: #171717;
+      border: 1px solid #2e2e2e;
+      border-radius: 6px;
+      padding: 7px 10px 7px 30px;
+      color: #ededed;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .supabase-console-input:focus {
+      border-color: #3ecf8e;
+    }
+
+    .supabase-dropdown-btn {
+      background: #171717;
+      border: 1px solid #2e2e2e;
+      color: #a1a1a1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .supabase-dropdown-btn:hover {
+      border-color: #444444;
+      color: #ededed;
+    }
+
+    .btn-supabase-new-project {
+      background: #3ecf8e;
+      color: #121212;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-supabase-new-project:hover {
+      background: #34b27b;
+      transform: translateY(-1px);
+    }
+
+    .supabase-projects-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .supabase-project-box {
+      background: #1c1c1c;
+      border: 1px solid #2e2e2e;
+      border-radius: 8px;
+      padding: 16px 18px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+    }
+
+    .supabase-project-box:hover {
+      border-color: #4a4a4a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .supabase-project-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .supabase-project-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f5f5f5;
+      margin: 0;
+    }
+
+    .supabase-project-region {
+      font-size: 12px;
+      color: #888888;
+      margin: 2px 0 16px 0;
+      font-family: monospace;
+    }
+
+    .supabase-project-tier {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      background: #151515;
+      border: 1px solid #2e2e2e;
+      color: #999999;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Free Plan Usage Sidebar */
+    .supabase-usage-card {
+      background: transparent;
+      padding-top: 4px;
+    }
+
+    .supabase-usage-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .supabase-usage-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ededed;
+      margin: 0;
+    }
+
+    .supabase-usage-sub {
+      font-size: 11px;
+      color: #707070;
+      margin: 2px 0 0 0;
+    }
+
+    .supabase-upgrade-link {
+      font-size: 12px;
+      color: #ededed;
+      text-decoration: none;
+      font-weight: 500;
+      border: 1px solid #333333;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .supabase-upgrade-link:hover {
+      background: #242424;
+      border-color: #444444;
+    }
+
+    .supabase-usage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .supabase-usage-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+    }
+
+    .supabase-usage-item-label {
+      color: #a1a1a1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .supabase-usage-circle {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid #444444;
+      display: inline-block;
+    }
+
+    .supabase-usage-item-val {
+      color: #ededed;
+      font-weight: 600;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -6744,173 +7031,123 @@
 
           <!-- PANEL 3: Supabase Cloud PostgreSQL & Auth Backend -->
           <div id="supabaseCardPanel" class="dev-suite-panel" style="display: none;">
-            <div class="supabase-dashboard-card">
-              <!-- Top Header -->
-              <div class="github-card-topbar">
-                <div class="heatmap-header-title">
-                  <div class="supabase-brand-icon">
-                    <i class="fas fa-bolt"></i>
-                  </div>
-                  <div>
-                    <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0;">
-                      Supabase Cloud Databases & Tables
-                      <span class="supabase-verified-badge">
-                        <i class="fas fa-database" style="font-size: 10px;"></i> User Created DB
-                      </span>
-                    </h3>
-                    <p style="font-size: 12.5px; color: #94a3b8; margin: 2px 0 0 0;">
-                      Databases, PostgreSQL schemas & custom tables created by this particular candidate.
-                    </p>
+            <div class="supabase-console-container">
+              <!-- Top Navbar Replica: Organization, User, Plan & Actions -->
+              <div class="supabase-console-topbar">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div class="supabase-org-pill">
+                    <svg width="20" height="20" viewBox="0 0 109 113" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M63.7076 110.284C60.848 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0675L99.1936 40.0675C104.973 40.0675 108.144 46.8028 104.479 51.288L63.7076 110.284Z" fill="#3ECF8E"/>
+                      <path d="M45.317 2.71603C48.1766 -0.885233 53.9744 1.08779 54.0433 5.68612L54.3475 72.9325H9.83109C4.05199 72.9325 0.880911 66.1972 4.54589 61.712L45.317 2.71603Z" fill="#3ECF8E" fill-opacity="0.7"/>
+                    </svg>
+                    <span style="color: #64748b;">/</span>
+                    <span id="supabaseConsoleOrgUser" style="color: #ededed; font-weight: 600;">parthd45</span>
+                    <span class="supabase-plan-badge" id="supabasePlanBadge">FREE</span>
+                    <i class="fas fa-chevron-down" style="font-size: 10px; color: #707070; cursor: pointer;"></i>
                   </div>
                 </div>
 
-                <!-- User Personal Supabase Connection Box -->
-                <div id="supabaseConnectionBox" class="vercel-connection-pill" style="border-color: rgba(62, 207, 142, 0.35); background: rgba(15, 28, 22, 0.9);">
-                  <!-- Disconnected View: Connect your own Supabase project -->
-                  <div id="supabaseDisconnectedView" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div class="supabase-input-group">
-                      <span class="supabase-prefix"><i class="fas fa-bolt" style="font-size: 10px;"></i> supabase.co/</span>
-                      <input type="text" id="supabaseUserProjectInput" class="supabase-input" placeholder="project-ref or name" autocomplete="off" />
-                    </div>
-                    <button type="button" id="btnConnectUserSupabase" class="btn-supabase-connect" onclick="connectUserSupabaseProject()">
-                      <i class="fas fa-plug"></i> Connect My DB
-                    </button>
-                  </div>
-
-                  <!-- Connected View: Shows user's personal project & tables -->
-                  <div id="supabaseConnectedView" style="display: none; align-items: center; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                      <span style="font-weight: 800; font-size: 13px; color: #6ee7b7;">⚡ <span id="supabaseUserProjectDisplay">my-database</span></span>
-                      <span class="dev-tab-pill supabase"><span id="supabaseUserTablesPillCount">0</span> Tables</span>
-                    </div>
-                    <button type="button" class="btn-supabase-action" onclick="openAddCustomTableModal()" title="Declare a new table created in your Supabase DB">
-                      <i class="fas fa-plus"></i> Add Table
-                    </button>
-                    <button type="button" class="btn-github-resync" onclick="renderUserSupabaseTables(true)" title="Resync your tables">
-                      <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button type="button" class="btn-vercel-disconnect" onclick="disconnectUserSupabaseProject()" title="Disconnect Supabase Project">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Stats Bar -->
-              <div class="heatmap-stats-group" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(62, 207, 142, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                  <div class="heatmap-stat-item">
-                    <i class="fas fa-database" style="color: #3ecf8e;"></i>
-                    Cloud DB: <strong style="color: #3ecf8e;">PostgreSQL 15</strong>
-                  </div>
-                  <div class="heatmap-stat-item">
-                    <i class="fas fa-tachometer-alt" style="color: #38bdf8;"></i>
-                    REST Latency: <strong id="supabaseLatencyDisplay" style="color: #38bdf8;">28ms • Excellent</strong>
-                  </div>
-                  <div class="heatmap-stat-item">
-                    <i class="fas fa-wifi" style="color: #eab308;"></i>
-                    Campus Realtime: <strong style="color: #eab308;">Broadcasting</strong>
-                  </div>
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <button type="button" class="btn-supabase-action" onclick="openSupabaseTableInspector()" style="background: rgba(62, 207, 142, 0.25); color: #a7f3d0; border-color: rgba(62, 207, 142, 0.5);">
-                    <i class="fas fa-table-columns"></i> Inspect My Cloud Tables
+                <!-- Right Top Bar Utilities -->
+                <div style="display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: #a1a1a1;">
+                  <button type="button" class="btn-github-resync" onclick="connectCustomSupabaseAccount()" style="padding: 4px 10px; font-size: 11.5px;">
+                    <i class="fas fa-link"></i> Change Account
                   </button>
-                  <button type="button" class="btn-supabase-action" onclick="syncSupabaseDataDirectly()">
-                    <i class="fas fa-sync-alt"></i> Direct Cloud Sync
-                  </button>
+                  <span style="cursor: pointer;" onclick="showToast('Feedback submitted to Supabase Cloud team', 'info')">Feedback</span>
+                  <div style="display: flex; align-items: center; gap: 4px; background: #171717; border: 1px solid #2e2e2e; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; color: #707070;">
+                    <i class="fas fa-search" style="font-size: 10px;"></i> Search... <span style="font-size: 10px; background: #262626; padding: 1px 4px; border-radius: 3px;">Ctrl K</span>
+                  </div>
+                  <i class="far fa-question-circle" style="cursor: pointer;" title="Supabase Documentation" onclick="window.open('https://supabase.com/docs', '_blank')"></i>
+                  <img id="supabaseConsoleAvatar" src="images/parth.jpg" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;" onerror="this.src='images/default-avatar.png'" />
                 </div>
               </div>
 
-              <!-- 3 Service Architecture Grid -->
-              <!-- Databases & Tables Created by This Particular User -->
-              <div style="margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span class="github-languages-title" style="color: #6ee7b7;">
-                    <i class="fas fa-table" style="color: #3ecf8e;"></i> Custom Databases & Tables Created by This Candidate
-                  </span>
-                  <div style="display: flex; gap: 8px; align-items: center;">
-                    <button type="button" class="btn-supabase-action" onclick="openAddCustomTableModal()" style="padding: 4px 10px; font-size: 11px;">
-                      <i class="fas fa-plus"></i> New Table
-                    </button>
-                    <button type="button" class="btn-supabase-action" onclick="openSupabaseTableInspector()" style="padding: 4px 10px; font-size: 11px; background: rgba(62, 207, 142, 0.25);">
-                      <i class="fas fa-table-columns"></i> Table Explorer
-                    </button>
-                  </div>
-                </div>
+              <!-- Main Section: Projects List & Free Plan Usage -->
+              <div class="supabase-projects-main-layout">
+                <!-- Left Column: Projects & Filters -->
+                <div>
+                  <h2 class="supabase-section-heading">Projects</h2>
 
-                <div id="supabaseUserTablesGrid" class="supabase-tables-grid">
-                  <!-- Rendered dynamically -->
-                </div>
-              </div>
-
-              <!-- Shared Platform Core Services & Health Status -->
-              <div style="margin-bottom: 8px; margin-top: 18px;">
-                <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">
-                  <i class="fas fa-server" style="color: #38bdf8; margin-right: 5px;"></i> Cloud Infrastructure & Realtime Status
-                </span>
-              </div>
-              <div class="supabase-service-grid">
-                <!-- Service 1: PostgreSQL Cloud Database -->
-                <div class="supabase-service-card">
-                  <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="openSupabaseTableInspector()" title="Click to view your tables">
-                        <i class="fas fa-table" style="color: #3ecf8e;"></i> Cloud Tables <i class="fas fa-search" style="font-size: 10px; color: #3ecf8e; margin-left: 4px;"></i>
-                      </span>
-                      <span class="dev-tab-pill supabase">Online</span>
+                  <!-- Toolbar Row -->
+                  <div class="supabase-toolbar-row">
+                    <div class="supabase-filter-controls">
+                      <div class="supabase-search-input-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="supabaseProjectSearch" class="supabase-console-input" placeholder="Search for a project" oninput="filterSupabaseConsoleProjects(this.value)" />
+                      </div>
+                      <div class="supabase-dropdown-btn">
+                        <span>Status</span>
+                        <i class="fas fa-chevron-down" style="font-size: 9px;"></i>
+                      </div>
+                      <div class="supabase-dropdown-btn" onclick="toggleSupabaseProjectSort()">
+                        <i class="fas fa-sort-alpha-down"></i>
+                        <span id="supabaseSortLabel">Sorted by name</span>
+                      </div>
                     </div>
-                    <p style="font-size: 11.5px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">
-                      Syncs <code>user_profiles</code>, <code>projects</code>, <code>skills</code> and <code>certifications</code> directly.
-                    </p>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <button type="button" class="btn-supabase-new-project" onclick="openCreateSupabaseProjectModal()">
+                        <i class="fas fa-plus"></i> New project
+                      </button>
+                    </div>
                   </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; border-top: 1px solid rgba(62, 207, 142, 0.15); padding-top: 8px;">
-                    <span>Last Synced: <strong id="supabaseLastSyncTime" style="color: #a7f3d0;">Live</strong></span>
-                    <i class="fas fa-check" style="color: #3ecf8e;"></i>
+
+                  <!-- Projects Grid -->
+                  <div id="supabaseConsoleProjectsGrid" class="supabase-projects-cards-grid">
+                    <!-- Populated dynamically: dcpe-erp, PlaceWiseAI, etc. -->
                   </div>
                 </div>
 
-                <!-- Service 2: Campus Realtime Presence Engine -->
-                <div class="supabase-service-card">
-                  <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-broadcast-tower" style="color: #38bdf8;"></i> Realtime Engine
-                      </span>
-                      <span class="dev-tab-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">Active</span>
+                <!-- Right Column: Free Plan Usage Sidebar (Exact replica from screenshot) -->
+                <div>
+                  <div class="supabase-usage-card">
+                    <div class="supabase-usage-title-row">
+                      <div>
+                        <h4 class="supabase-usage-title">Free plan usage</h4>
+                        <p class="supabase-usage-sub">Current billing cycle</p>
+                      </div>
+                      <a href="https://supabase.com/pricing" target="_blank" rel="noopener noreferrer" class="supabase-upgrade-link">
+                        Upgrade to Pro
+                      </a>
                     </div>
-                    <p style="font-size: 11.5px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">
-                      Channel <code>campus-network</code> coordinates live peer chat, placement pulses and profile views.
-                    </p>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; border-top: 1px solid rgba(62, 207, 142, 0.15); padding-top: 8px;">
-                    <span>Status: <strong style="color: #7dd3fc;">Subscribed</strong></span>
-                    <i class="fas fa-signal" style="color: #38bdf8;"></i>
-                  </div>
-                </div>
 
-                <!-- Service 3: Row-Level Security & Auth -->
-                <div class="supabase-service-card">
-                  <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-user-shield" style="color: #eab308;"></i> RLS & Identity
-                      </span>
-                      <span class="dev-tab-pill" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3);">Enforced</span>
+                    <div class="supabase-usage-list">
+                      <div class="supabase-usage-item">
+                        <span class="supabase-usage-item-label">
+                          <span class="supabase-usage-circle"></span> Egress
+                        </span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageEgress">0.00 / 5 GB</span>
+                      </div>
+                      <div class="supabase-usage-item">
+                        <span class="supabase-usage-item-label">
+                          <span class="supabase-usage-circle" style="border-color: #3ecf8e;"></span> Database size
+                        </span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageDbSize">29 / 500 MB</span>
+                      </div>
+                      <div class="supabase-usage-item">
+                        <span class="supabase-usage-item-label">
+                          <span class="supabase-usage-circle" style="border-color: #38bdf8;"></span> Monthly active users
+                        </span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageMau">13 / 50,000</span>
+                      </div>
+                      <div class="supabase-usage-item">
+                        <span class="supabase-usage-item-label">
+                          <span class="supabase-usage-circle"></span> File storage
+                        </span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageStorage">0.00 / 1 GB</span>
+                      </div>
                     </div>
-                    <p style="font-size: 11.5px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">
-                      UID: <span id="supabaseCloudUidShort" style="font-family: monospace; color: #fde047;">auth.uid()</span>
-                    </p>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; border-top: 1px solid rgba(62, 207, 142, 0.15); padding-top: 8px;">
-                    <span>Security: <strong style="color: #fde047;">Candidate Isolated</strong></span>
-                    <i class="fas fa-lock" style="color: #eab308;"></i>
+
+                    <!-- Bottom Preview Notification Card -->
+                    <div style="margin-top: 36px; background: rgba(23, 23, 23, 0.8); border: 1px solid #282828; border-radius: 8px; padding: 12px 14px; position: relative;">
+                      <span style="font-size: 9.5px; font-weight: 800; color: #3ecf8e; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">PREVIEW</span>
+                      <strong style="font-size: 12px; color: #f5f5f5; display: block; margin-bottom: 2px;">User growth</strong>
+                      <p style="font-size: 11px; color: #888888; margin: 0;">Track how your user base is trending across connected cloud projects.</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </div></div>
         </div>
 
         <!-- Navigation Tabs: Instant zero-scroll workspace tabs -->
@@ -10043,7 +10280,7 @@
         renderVercelDeployments();
       } else if (service === 'supabase') {
         initSupabaseCardStatus();
-        renderUserSupabaseTables();
+        renderSupabaseConsole();
       }
     }
 
@@ -10507,6 +10744,216 @@
 
         renderInspectorContent();
       }, 150);
+    }
+
+    
+    /* ===== EXACT SUPABASE CONSOLE LOGIC ===== */
+    let supabaseConsoleSortAsc = true;
+    let supabaseConsoleSearchQuery = '';
+
+    function getSupabaseConsoleProjectsKey() {
+      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
+      return 'placeai_supabase_console_projects_' + uid;
+    }
+
+    // Default Supabase projects matching user screenshot
+    function getDefaultSupabaseConsoleProjects() {
+      const name = (userProfile && userProfile.full_name) ? userProfile.full_name.toLowerCase() : '';
+      if (name.includes('parth') || (currentUser && currentUser.email && currentUser.email.includes('parth'))) {
+        return [
+          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
+          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
+        ];
+      } else if (name.includes('arpit')) {
+        return [
+          { name: 'codeloom-cloud-db', region: 'ap-south-1', tier: 'NANO', db_size: '18 MB', tables: 6, active: true },
+          { name: 'ats-analytics-db', region: 'ap-southeast-1', tier: 'NANO', db_size: '22 MB', tables: 9, active: true }
+        ];
+      } else if (name.includes('bhushan')) {
+        return [
+          { name: 'omnishop-prod-db', region: 'ap-south-1', tier: 'NANO', db_size: '25 MB', tables: 7, active: true },
+          { name: 'kanban-stream-db', region: 'ap-southeast-1', tier: 'NANO', db_size: '11 MB', tables: 4, active: true }
+        ];
+      } else {
+        return [
+          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
+          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
+        ];
+      }
+    }
+
+    function getSupabaseConsoleProjects() {
+      const raw = localStorage.getItem(getSupabaseConsoleProjectsKey());
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+      const def = getDefaultSupabaseConsoleProjects();
+      localStorage.setItem(getSupabaseConsoleProjectsKey(), JSON.stringify(def));
+      return def;
+    }
+
+    function renderSupabaseConsole() {
+      const orgUserEl = document.getElementById('supabaseConsoleOrgUser');
+      const avatarEl = document.getElementById('supabaseConsoleAvatar');
+      const grid = document.getElementById('supabaseConsoleProjectsGrid');
+
+      // 1. Update user handle in topbar: e.g. parthd45
+      const handle = (activeGitHubUser && activeGitHubUser.username) ? activeGitHubUser.username : (
+        (userProfile && userProfile.github_url) ? userProfile.github_url.replace(/^https?:\/\/github\.com\//i, '').replace(/\/.*$/, '') : 'parthd45'
+      );
+      if (orgUserEl) orgUserEl.textContent = handle || 'parthd45';
+
+      if (avatarEl) {
+        if (userProfile && userProfile.profile_image) {
+          avatarEl.src = userProfile.profile_image;
+        } else if (activeGitHubUser && activeGitHubUser.avatar_url) {
+          avatarEl.src = activeGitHubUser.avatar_url;
+        }
+      }
+
+      if (!grid) return;
+
+      let projects = getSupabaseConsoleProjects();
+
+      // Search filter
+      if (supabaseConsoleSearchQuery) {
+        const q = supabaseConsoleSearchQuery.toLowerCase();
+        projects = projects.filter(p => p.name.toLowerCase().includes(q) || p.region.toLowerCase().includes(q));
+      }
+
+      // Sort by name
+      projects.sort((a, b) => {
+        return supabaseConsoleSortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+      });
+
+      if (projects.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 28px; text-align: center; background: #171717; border: 1px dashed #2e2e2e; border-radius: 8px;">
+            <p style="color: #a1a1a1; font-size: 13px; margin-bottom: 8px;">No Supabase projects match your search.</p>
+            <button type="button" class="btn-supabase-new-project" onclick="openCreateSupabaseProjectModal()">
+              <i class="fas fa-plus"></i> Create project
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = projects.map((p, idx) => `
+        <div class="supabase-project-box" onclick="handleSupabaseProjectClick('${escapeHtml(p.name)}', '${escapeHtml(p.region)}')">
+          <div>
+            <div class="supabase-project-box-header">
+              <h3 class="supabase-project-name">${escapeHtml(p.name)}</h3>
+              <div style="color: #707070; font-size: 14px; cursor: pointer; padding: 2px 6px;" onclick="event.stopPropagation(); openSupabaseProjectMenu(${idx})">
+                ⋮
+              </div>
+            </div>
+            <div class="supabase-project-region">${escapeHtml(p.region)}</div>
+          </div>
+          <div>
+            <span class="supabase-project-tier">${escapeHtml(p.tier || 'NANO')}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterSupabaseConsoleProjects(val) {
+      supabaseConsoleSearchQuery = (val || '').trim();
+      renderSupabaseConsole();
+    }
+
+    function toggleSupabaseProjectSort() {
+      supabaseConsoleSortAsc = !supabaseConsoleSortAsc;
+      const label = document.getElementById('supabaseSortLabel');
+      if (label) {
+        label.textContent = supabaseConsoleSortAsc ? 'Sorted by name (A-Z)' : 'Sorted by name (Z-A)';
+      }
+      renderSupabaseConsole();
+    }
+
+    function handleSupabaseProjectClick(name, region) {
+      showToast(`⚡ Opening Supabase project "${name}" (${region})...`, 'info');
+      // Open project inspection or link to Supabase console
+      setTimeout(() => {
+        openSupabaseTableInspector();
+      }, 300);
+    }
+
+    function openSupabaseProjectMenu(idx) {
+      const projects = getSupabaseConsoleProjects();
+      const p = projects[idx];
+      if (!p) return;
+
+      const act = confirm(`Manage Supabase Project: "${p.name}"\n\nClick OK to open Project Tables & Schema, or Cancel to delete project.`);
+      if (act) {
+        openSupabaseTableInspector();
+      } else {
+        const reallyDelete = confirm(`Are you sure you want to remove "${p.name}" from your projects list?`);
+        if (reallyDelete) {
+          projects.splice(idx, 1);
+          localStorage.setItem(getSupabaseConsoleProjectsKey(), JSON.stringify(projects));
+          renderSupabaseConsole();
+          showToast(`Project "${p.name}" removed`, 'info');
+        }
+      }
+    }
+
+    function openCreateSupabaseProjectModal() {
+      const modal = document.getElementById('newSupabaseProjectModal');
+      if (modal) modal.style.display = 'flex';
+      const input = document.getElementById('newSupabaseProjName');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    function closeCreateSupabaseProjectModal() {
+      const modal = document.getElementById('newSupabaseProjectModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function saveNewSupabaseConsoleProject() {
+      const nameInp = document.getElementById('newSupabaseProjName');
+      const regInp = document.getElementById('newSupabaseProjRegion');
+      const tierInp = document.getElementById('newSupabaseProjTier');
+
+      const name = nameInp ? nameInp.value.trim() : '';
+      const region = regInp ? regInp.value : 'ap-south-1';
+      const tier = tierInp ? tierInp.value : 'NANO';
+
+      if (!name) {
+        showToast('Please enter a project name', 'error');
+        if (nameInp) nameInp.focus();
+        return;
+      }
+
+      const projects = getSupabaseConsoleProjects();
+      projects.unshift({
+        name: name.replace(/\s+/g, '-'),
+        region: region,
+        tier: tier,
+        db_size: '0 MB',
+        tables: 0,
+        active: true
+      });
+
+      localStorage.setItem(getSupabaseConsoleProjectsKey(), JSON.stringify(projects));
+      closeCreateSupabaseProjectModal();
+      renderSupabaseConsole();
+      showToast(`🎉 Supabase project "${name}" created successfully!`, 'success');
+    }
+
+    function connectCustomSupabaseAccount() {
+      const current = document.getElementById('supabaseConsoleOrgUser').textContent || 'parthd45';
+      const newHandle = prompt('Enter your Supabase organization or username:', current);
+      if (newHandle && newHandle.trim()) {
+        const clean = newHandle.trim();
+        document.getElementById('supabaseConsoleOrgUser').textContent = clean;
+        showToast(`Connected Supabase account: ${clean}`, 'success');
+      }
     }
 
     async function connectGitHubAccount() {
@@ -14892,6 +15339,60 @@ ${projStr}
         <button type="button" class="btn-secondary" onclick="closeAddCustomTableModal()" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
         <button type="button" class="btn-supabase-connect" onclick="saveNewCustomTable()">
           <i class="fas fa-check"></i> Save Table
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- New Supabase Project Modal (Matches Supabase Console) -->
+  <div class="community-chat-overlay" id="newSupabaseProjectModal" style="display: none;" onclick="if(event.target===this)closeCreateSupabaseProjectModal()">
+    <div class="supabase-inspector-card" style="width: 500px; background: #171717; border-color: #2e2e2e;">
+      <div class="supabase-inspector-header" style="background: #1c1c1c; border-color: #2e2e2e;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg width="20" height="20" viewBox="0 0 109 113" fill="none">
+            <path d="M63.7076 110.284C60.848 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0675L99.1936 40.0675C104.973 40.0675 108.144 46.8028 104.479 51.288L63.7076 110.284Z" fill="#3ECF8E"/>
+            <path d="M45.317 2.71603C48.1766 -0.885233 53.9744 1.08779 54.0433 5.68612L54.3475 72.9325H9.83109C4.05199 72.9325 0.880911 66.1972 4.54589 61.712L45.317 2.71603Z" fill="#3ECF8E" fill-opacity="0.7"/>
+          </svg>
+          <div>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ededed; margin: 0;">Create a new Supabase project</h3>
+            <p style="font-size: 11.5px; color: #888888; margin: 2px 0 0 0;">Add your PostgreSQL database to this organization</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCreateSupabaseProjectModal()" style="background:none;border:none;color:#707070;font-size:16px;cursor:pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Project Name</label>
+          <input type="text" id="newSupabaseProjName" class="supabase-console-input" placeholder="e.g. dcpe-erp, PlaceWiseAI, my-production-db" />
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Region</label>
+          <select id="newSupabaseProjRegion" class="supabase-console-input" style="padding-left: 10px;">
+            <option value="ap-southeast-1">Singapore (ap-southeast-1)</option>
+            <option value="ap-northeast-2">Seoul (ap-northeast-2)</option>
+            <option value="ap-south-1" selected>Mumbai (ap-south-1)</option>
+            <option value="us-east-1">North Virginia (us-east-1)</option>
+            <option value="eu-central-1">Frankfurt (eu-central-1)</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Compute Size / Tier</label>
+          <select id="newSupabaseProjTier" class="supabase-console-input" style="padding-left: 10px;">
+            <option value="NANO" selected>Nano (Shared CPU, 0.5 GB RAM)</option>
+            <option value="MICRO">Micro (2-core ARM, 1 GB RAM)</option>
+            <option value="SMALL">Small (2-core, 2 GB RAM)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="supabase-inspector-footer" style="background: #1c1c1c; border-color: #2e2e2e;">
+        <button type="button" class="btn-secondary" onclick="closeCreateSupabaseProjectModal()" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
+        <button type="button" class="btn-supabase-new-project" onclick="saveNewSupabaseConsoleProject()">
+          <i class="fas fa-plus"></i> Create project
         </button>
       </div>
     </div>
