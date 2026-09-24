@@ -5106,6 +5106,71 @@
       box-shadow: 0 1px 4px rgba(0, 168, 132, 0.4);
     }
 
+  
+    /* Red Unread Badge with Pulsing Red Dot */
+    .wp-unread-badge.red-dot {
+      background: #ef4444 !important;
+      color: #ffffff !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      border-radius: 12px !important;
+      padding: 2px 7px !important;
+      margin-left: auto !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6) !important;
+      animation: wpBadgeBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .wp-unread-pulsing-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: inline-block;
+      animation: wpDotPulse 1.2s infinite;
+    }
+    @keyframes wpDotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.6); }
+    }
+    @keyframes wpBadgeBounce {
+      0% { transform: scale(0.5); }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Red Badges for Header & Floating Button */
+    .wp-header-unread-badge {
+      background: #ef4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 1px 6px;
+      margin-left: 6px;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+      animation: wpBadgeBounce 0.3s;
+    }
+    .wp-floating-unread-dot {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #ef4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #0f172a;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      animation: wpBadgeBounce 0.4s;
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -5204,6 +5269,7 @@
       <div class="header-actions">
         <button class="header-chat-btn" onclick="openCampusChatModal('all')" title="Community Chat & Direct Messaging">
           <i class="fas fa-comments"></i> <span>Community Chat</span>
+          <span class="wp-header-unread-badge" id="headerChatUnreadBadge" style="display:none;">0</span>
         </button>
         <button class="btn-logout" id="logoutBtn">
           <i class="fa fa-sign-out-alt"></i>
@@ -5899,9 +5965,10 @@
 
   
   <!-- Floating Community Chat Button (Bottom Right) -->
-  <div class="floating-campus-chat-btn" id="floatingCampusChatBtn" onclick="openCampusChatModal('all')" title="PlaceAI Community Chat: Message All or Specific User">
-    <div class="floating-chat-icon">
+  <div class="floating-campus-chat-btn" id="floatingCampusChatBtn" onclick="openCampusChatModal('all')" title="PlaceAI Community Chat: Message All or Specific User" style="position:relative;">
+    <div class="floating-chat-icon" style="position:relative;">
       <i class="fas fa-comments"></i>
+      <span class="wp-floating-unread-dot" id="floatingUnreadDot" style="display:none;">0</span>
     </div>
     <div class="floating-chat-label">
       <span>Community Chat</span>
@@ -6129,6 +6196,7 @@
     let typingTimeouts = {};
     let cloudSyncInterval = null;
     let presenceRefreshInterval = null;
+    let heartbeatInterval = null;
     let currentVoicePlaybackOsc = null;
     window.liveOnlineUserIds = new Set();
 
@@ -6190,7 +6258,7 @@
           try { supabase.removeChannel(campusRealtimeChannel); } catch (e) {}
         }
 
-        // Global Realtime Campus Channel
+        // Connect to shared real-time campus room
         campusRealtimeChannel = supabase.channel('placeai_campus_network', {
           config: {
             presence: { key: myId },
@@ -6199,7 +6267,7 @@
         });
 
         campusRealtimeChannel
-          // Presence: Sync active online students
+          // Presence sync
           .on('presence', { event: 'sync' }, () => {
             const state = campusRealtimeChannel.presenceState();
             window.liveOnlineUserIds.clear();
@@ -6209,11 +6277,15 @@
               window.liveOnlineUserIds.add(uid);
             });
 
+            // If a peer came online, upgrade any 'sent' (single tick) messages to 'delivered' (double tick)
+            upgradeSentMessagesToDelivered();
+
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
           .on('presence', { event: 'join' }, ({ key }) => {
             window.liveOnlineUserIds.add(key);
+            upgradeSentMessagesToDelivered();
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
@@ -6223,12 +6295,12 @@
             updateCurrentThreadPresence();
           })
 
-          // Live Direct Messages: Sent immediately between users
+          // Live Direct Messages received from peers
           .on('broadcast', { event: 'direct_msg' }, ({ payload }) => {
             handleIncomingDirectMessage(payload);
           })
 
-          // Live Message Status Receipts: Sent -> Delivered -> Read
+          // Live Status Receipts (Delivered / Read Acknowledgements)
           .on('broadcast', { event: 'msg_ack' }, ({ payload }) => {
             handleIncomingAck(payload);
           })
@@ -6255,27 +6327,59 @@
                 online_at: new Date().toISOString()
               });
 
-              // Initial Cloud Sync
               syncChatFromCloud();
             }
           });
 
+        // Background Presence & Heartbeat Refresh
+        if (!heartbeatInterval) {
+          heartbeatInterval = setInterval(async () => {
+            if (!currentUser || !campusRealtimeChannel) return;
+            try {
+              await campusRealtimeChannel.track({
+                user_id: currentUser.id,
+                online_at: new Date().toISOString()
+              });
+            } catch (e) {}
+          }, 15000);
+        }
+
         if (!cloudSyncInterval) {
-          cloudSyncInterval = setInterval(syncChatFromCloud, 10000);
+          cloudSyncInterval = setInterval(syncChatFromCloud, 8000);
         }
 
         if (!presenceRefreshInterval) {
           presenceRefreshInterval = setInterval(() => {
             renderDirectUserList();
             updateCurrentThreadPresence();
-          }, 15000);
+          }, 10000);
         }
       } catch (err) {
         console.warn('Realtime campus network init error:', err);
       }
     }
 
-    // 3. Handle Incoming Direct Message in Real Time
+    // Upgrade single-tick messages to double-tick if recipient is confirmed online
+    function upgradeSentMessagesToDelivered() {
+      realRegisteredUsers.forEach(peer => {
+        if (isPeerOnline(peer)) {
+          const history = getDirectChatHistory(peer.id);
+          let changed = false;
+          history.forEach(m => {
+            if (m.sender === 'user' && m.status === 'sent') {
+              m.status = 'delivered';
+              changed = true;
+            }
+          });
+          if (changed) {
+            saveDirectChatHistory(peer.id, history);
+            if (currentDirectPeerId === peer.id) renderDirectThread();
+          }
+        }
+      });
+    }
+
+    // 3. Handle Incoming Direct Message
     function handleIncomingDirectMessage(payload) {
       if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
       const peerId = payload.fromUserId;
@@ -6307,18 +6411,20 @@
       // Play WhatsApp incoming audio
       playWpIncomingSound();
 
-      // Immediately send ACK back to sender
+      // If thread is currently open: send 'read' (double blue tick). Otherwise send 'delivered' (double grey tick).
       sendAckToPeer(peerId, payload.id, isThreadOpen ? 'read' : 'delivered');
 
       if (isThreadOpen) {
         renderDirectThread();
       } else {
+        // Red dot unread badge
         peerUnreadCounts[peerId] = (peerUnreadCounts[peerId] || 0) + 1;
+        updateGlobalUnreadBadges();
       }
       renderDirectUserList();
     }
 
-    // 4. Handle Incoming Acknowledgements (Ticks: Delivered / Read)
+    // 4. Handle Incoming Acknowledgements (Single -> Double Grey -> Double Blue Tick)
     function handleIncomingAck(payload) {
       if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
       const peerId = payload.fromUserId;
@@ -6337,6 +6443,8 @@
               tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-read" title="Read"></i>';
             } else if (payload.status === 'delivered') {
               tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
+            } else {
+              tickEl.innerHTML = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent"></i>';
             }
           }
         }
@@ -6360,6 +6468,35 @@
           });
         } catch (e) {
           console.warn('Could not send ack:', e);
+        }
+      }
+    }
+
+    // Update global red badges (floating button & top header)
+    function updateGlobalUnreadBadges() {
+      let total = 0;
+      Object.keys(peerUnreadCounts).forEach(pid => {
+        total += (peerUnreadCounts[pid] || 0);
+      });
+
+      const headerBadge = document.getElementById('headerChatUnreadBadge');
+      const floatingDot = document.getElementById('floatingUnreadDot');
+
+      if (headerBadge) {
+        if (total > 0) {
+          headerBadge.style.display = 'inline-block';
+          headerBadge.textContent = total;
+        } else {
+          headerBadge.style.display = 'none';
+        }
+      }
+
+      if (floatingDot) {
+        if (total > 0) {
+          floatingDot.style.display = 'flex';
+          floatingDot.textContent = total;
+        } else {
+          floatingDot.style.display = 'none';
         }
       }
     }
@@ -6451,6 +6588,7 @@
               if (msg.toUserId === myId) {
                 const exists = history.some(m => m.id === msg.id);
                 if (!exists) {
+                  const isThreadOpen = (currentChatMode === 'direct' && currentDirectPeerId === peerId);
                   history.push({
                     id: msg.id,
                     sender: 'peer',
@@ -6461,11 +6599,17 @@
                     duration: msg.duration,
                     problemTitle: msg.problemTitle,
                     time: msg.time,
-                    status: 'delivered',
+                    status: isThreadOpen ? 'read' : 'delivered',
                     timestamp: msg.timestamp || Date.now()
                   });
                   hasNew = true;
-                  sendAckToPeer(peerId, msg.id, 'delivered');
+
+                  if (isThreadOpen) {
+                    sendAckToPeer(peerId, msg.id, 'read');
+                  } else {
+                    sendAckToPeer(peerId, msg.id, 'delivered');
+                    peerUnreadCounts[peerId] = (peerUnreadCounts[peerId] || 0) + 1;
+                  }
                 }
               }
 
@@ -6485,6 +6629,7 @@
         });
 
         if (hasNew) {
+          updateGlobalUnreadBadges();
           renderDirectUserList();
           if (currentChatMode === 'direct') renderDirectThread();
           else if (currentChatMode === 'all') renderBroadcastFeed();
@@ -6541,13 +6686,15 @@
       } catch (e) {}
     }
 
-    // 10. Presence & Status Helpers
+    // 10. Presence & Status Helpers: Accurate Online vs Real Last Seen
     function isPeerOnline(peer) {
       if (!peer) return false;
+      // 1. Direct WebSocket presence
       if (window.liveOnlineUserIds && window.liveOnlineUserIds.has(peer.id)) return true;
+      // 2. Heartbeat active in last 60 seconds
       if (peer.updatedAt) {
         const diffMs = Date.now() - new Date(peer.updatedAt).getTime();
-        if (diffMs >= 0 && diffMs < 5 * 60 * 1000) return true;
+        if (diffMs >= 0 && diffMs < 60 * 1000) return true;
       }
       return false;
     }
@@ -6564,7 +6711,7 @@
 
         const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        if (diffMins < 5) return 'online';
+        if (diffMins < 2) return 'online';
         if (diffMins < 60) return `last seen ${diffMins}m ago`;
         if (diffHours < 24 && d.getDate() === now.getDate()) {
           return `last seen today at ${timeStr}`;
@@ -6728,7 +6875,6 @@
       renderBroadcastFeed();
       playWpSentSound();
 
-      // Instant WebSocket Broadcast to all students
       if (campusRealtimeChannel) {
         try {
           campusRealtimeChannel.send({
@@ -6739,7 +6885,6 @@
         } catch(e) {}
       }
 
-      // Sync outbox to cloud
       syncOutboxToCloud(currentUser.id, {
         ...newPost,
         toUserId: 'all'
@@ -6815,6 +6960,10 @@
         const lastSeenText = online ? 'Online' : formatWpLastSeen(peer.updatedAt || peer.createdAt);
         const unreadCount = peerUnreadCounts[peer.id] || 0;
 
+        // Accurate tick for last message:
+        // single tick if offline ('sent')
+        // double tick if online ('delivered')
+        // blue tick if read ('read')
         let tickIconHtml = '';
         if (lastMsg && lastMsg.sender === 'user') {
           if (lastMsg.status === 'read') {
@@ -6852,7 +7001,12 @@
               </div>
               <div class="peer-item-preview" style="display:flex; align-items:center;">
                 ${lastMsg ? (tickIconHtml + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + previewText + '</span>') : `<span style="color:#64748b;font-style:italic;font-size:11px;">${lastSeenText}</span>`}
-                ${unreadCount > 0 ? `<span class="wp-unread-badge">${unreadCount}</span>` : ''}
+                ${unreadCount > 0 ? `
+                  <span class="wp-unread-badge red-dot" id="peerUnread_${peer.id}">
+                    <span class="wp-unread-pulsing-dot"></span>
+                    ${unreadCount}
+                  </span>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -6863,6 +7017,7 @@
     function selectDirectUser(peerId) {
       currentDirectPeerId = peerId;
       peerUnreadCounts[peerId] = 0;
+      updateGlobalUnreadBadges();
       renderDirectUserList();
       renderDirectThread();
       markThreadAsRead(peerId);
@@ -7031,7 +7186,7 @@
               </div>
               <h5 style="color:#e9edef;font-size:15px;margin-bottom:6px;">Direct Chat with ${peer.name}</h5>
               <p style="font-size:12.5px;color:#8696a0;max-width:320px;margin:0 auto;line-height:1.5;">
-                Real-time WebSocket connection active. Messages and read receipts arrive immediately!
+                Real-time WebSocket active. Single tick when offline, double tick when online, blue tick when read!
               </p>
             </div>
           `;
@@ -7041,6 +7196,10 @@
           htmlContent += msgs.map(m => {
             const isSent = m.sender === 'user';
             
+            // Accurate WhatsApp Ticks:
+            // - single tick if recipient is offline (status: 'sent')
+            // - double grey tick if recipient is online (status: 'delivered')
+            // - double blue tick if recipient has read (status: 'read')
             let tickHtml = '';
             if (isSent) {
               if (m.status === 'read') {
@@ -7048,7 +7207,7 @@
               } else if (m.status === 'delivered') {
                 tickHtml = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
               } else {
-                tickHtml = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent"></i>';
+                tickHtml = '<i class="fas fa-check wp-tick-icon wp-tick-single" title="Sent (Offline)"></i>';
               }
             }
 
@@ -7135,12 +7294,21 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // 14. Send Direct Message with Instant Realtime Broadcast & Cloud Outbox
+    // 14. Send Direct Message with Accurate WhatsApp Ticks:
+    // - Recipient OFFLINE: SINGLE GREY TICK ('sent')
+    // - Recipient ONLINE: DOUBLE GREY TICK ('delivered')
+    // - Recipient READS (opens thread): DOUBLE BLUE TICK ('read')
     function sendDirectMessage() {
       const input = document.getElementById('directMessageInput');
       if (!input) return;
       const text = input.value.trim();
       if (!text || !currentDirectPeerId || !currentUser) return;
+
+      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientOnline = isPeerOnline(recipientPeer);
+
+      // Single tick if offline, double tick if online
+      const initialStatus = recipientOnline ? 'delivered' : 'sent';
 
       const history = getDirectChatHistory(currentDirectPeerId);
       const now = new Date();
@@ -7153,7 +7321,7 @@
         type: 'text',
         text: text,
         time: timeStr,
-        status: 'sent',
+        status: initialStatus,
         timestamp: Date.now()
       };
 
@@ -7165,7 +7333,7 @@
       renderDirectThread();
       renderDirectUserList();
 
-      // 1. Instant WebSocket Broadcast to recipient
+      // Instant WebSocket Broadcast to recipient
       if (campusRealtimeChannel) {
         try {
           campusRealtimeChannel.send({
@@ -7186,7 +7354,7 @@
         }
       }
 
-      // 2. Sync to cloud outbox
+      // Sync to cloud outbox
       syncOutboxToCloud(currentUser.id, {
         id: msgId,
         fromUserId: currentUser.id,
@@ -7198,9 +7366,13 @@
       });
     }
 
-    // 15. Send Voice Note with Realtime Broadcast
+    // 15. Send Voice Note with Accurate Status
     window.sendWpVoiceNote = function() {
       if (!currentDirectPeerId || !currentUser) return;
+      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientOnline = isPeerOnline(recipientPeer);
+      const initialStatus = recipientOnline ? 'delivered' : 'sent';
+
       const history = getDirectChatHistory(currentDirectPeerId);
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -7213,7 +7385,7 @@
         text: '[Voice Note 0:07]',
         duration: '0:07',
         time: timeStr,
-        status: 'sent',
+        status: initialStatus,
         timestamp: Date.now()
       };
 
@@ -7325,6 +7497,10 @@
       const sampleCode = prompt("Paste your Code Snippet to share directly in chat:", "def two_sum(nums, target):\n    lookup = {}\n    for i, num in enumerate(nums):\n        if target - num in lookup:\n            return [lookup[target - num], i]\n        lookup[num] = i");
       if (!sampleCode || !currentDirectPeerId || !currentUser) return;
 
+      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientOnline = isPeerOnline(recipientPeer);
+      const initialStatus = recipientOnline ? 'delivered' : 'sent';
+
       const history = getDirectChatHistory(currentDirectPeerId);
       const now = new Date();
       const msgId = 'code_' + Date.now();
@@ -7338,7 +7514,7 @@
         code: sampleCode,
         text: '[Code Snippet]',
         time: timeStr,
-        status: 'sent',
+        status: initialStatus,
         timestamp: Date.now()
       };
 
@@ -7377,6 +7553,10 @@
       const problem = prompt("Enter DSA Problem to challenge your peer:", "Problem #14: Longest Palindromic Substring (Medium)");
       if (!problem) return;
 
+      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientOnline = isPeerOnline(recipientPeer);
+      const initialStatus = recipientOnline ? 'delivered' : 'sent';
+
       const history = getDirectChatHistory(currentDirectPeerId);
       const now = new Date();
       const msgId = 'chal_' + Date.now();
@@ -7389,7 +7569,7 @@
         problemTitle: problem,
         text: 'I just challenged you to solve ' + problem + ' on PlaceAI Code Practice! Let us compare approaches.',
         time: timeStr,
-        status: 'sent',
+        status: initialStatus,
         timestamp: Date.now()
       };
 
@@ -7425,6 +7605,10 @@
       if (drawer) drawer.classList.remove('active');
       if (!currentDirectPeerId || !currentUser) return;
 
+      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientOnline = isPeerOnline(recipientPeer);
+      const initialStatus = recipientOnline ? 'delivered' : 'sent';
+
       const history = getDirectChatHistory(currentDirectPeerId);
       const now = new Date();
       const msgId = 'res_' + Date.now();
@@ -7437,7 +7621,7 @@
         type: 'text',
         text: '📄 Here is my verified PlaceAI Profile & ATS Resume card: ' + score + ' • View my portfolio and skills!',
         time: timeStr,
-        status: 'sent',
+        status: initialStatus,
         timestamp: Date.now()
       };
 
