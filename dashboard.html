@@ -4600,14 +4600,14 @@
       line-height: 1;
     }
     .wp-tick-single {
-      color: rgba(233, 237, 239, 0.35);
+      color: rgba(233, 237, 239, 0.45);
     }
     .wp-tick-delivered {
-      color: rgba(233, 237, 239, 0.7);
+      color: rgba(233, 237, 239, 0.85);
     }
     .wp-tick-read {
       color: #53bdeb !important; /* WhatsApp Iconic Blue Double Tick */
-      text-shadow: 0 0 5px rgba(83, 189, 235, 0.5);
+      text-shadow: 0 0 6px rgba(83, 189, 235, 0.7);
       animation: wpTickPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     @keyframes wpTickPop {
@@ -6227,8 +6227,8 @@
           return [];
         }
 
-        const myId = currentUser ? currentUser.id : null;
-        const list = (data || []).filter(u => u.user_id !== myId && (u.first_name || u.email));
+        const myId = currentUser ? String(currentUser.id).toLowerCase() : null;
+        const list = (data || []).filter(u => u.user_id && String(u.user_id).toLowerCase() !== myId && (u.first_name || u.email));
 
         realRegisteredUsers = list.map(u => {
           const name = (u.first_name ? (u.first_name + ' ' + (u.last_name || '')).trim() : u.email.split('@')[0]);
@@ -6249,10 +6249,119 @@
           };
         });
 
+        // Upgrade any pending sent messages for all loaded peers if online or replied
+        upgradeSentMessagesToDelivered();
+
         return realRegisteredUsers;
       } catch (e) {
         console.error('fetchRealCommunityUsers error:', e);
         return [];
+      }
+    }
+
+    // 1b. Presence & Status Helpers: Accurate Online vs Real Last Seen
+    function isPeerOnline(peer) {
+      if (!peer || !peer.id) return false;
+      const idRaw = String(peer.id);
+      const idLower = idRaw.toLowerCase();
+      if (!window.liveOnlineUserIds) return false;
+      return window.liveOnlineUserIds.has(idRaw) || window.liveOnlineUserIds.has(idLower);
+    }
+
+    function getPeerLastSeen(peer) {
+      if (!peer || !peer.id) return null;
+      const idRaw = String(peer.id);
+      const idLower = idRaw.toLowerCase();
+      if (peerLastSeenTimes[idRaw]) return peerLastSeenTimes[idRaw];
+      if (peerLastSeenTimes[idLower]) return peerLastSeenTimes[idLower];
+      return peer.updatedAt || peer.createdAt || null;
+    }
+
+    function formatWpLastSeen(dateStr) {
+      if (!dateStr) return 'offline';
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return 'offline';
+        const now = new Date();
+        const diffMs = now - d;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        if (diffMins < 1) return 'last seen just now';
+        if (diffMins < 60) return `last seen ${diffMins}m ago`;
+        if (diffHours < 24 && d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+          return `last seen today at ${timeStr}`;
+        }
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        if (d.getDate() === yesterday.getDate() && d.getMonth() === yesterday.getMonth() && d.getFullYear() === yesterday.getFullYear()) {
+          return `last seen yesterday at ${timeStr}`;
+        }
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `last seen ${d.getDate()} ${months[d.getMonth()]} at ${timeStr}`;
+      } catch (e) {
+        return 'offline';
+      }
+    }
+
+    // 1c. Upgrade Direct Messages (Real-time WhatsApp Ticks Rule)
+    // - If peer is confirmed online -> all 'sent' (single tick) upgrade to 'delivered' (double grey tick)
+    // - If peer replied in conversation -> all user messages sent up to that reply upgrade to 'read' (double blue tick)
+    function upgradeDirectMessages(peerId) {
+      if (!peerId) return false;
+      const history = getDirectChatHistory(peerId);
+      if (!history || history.length === 0) return false;
+
+      const peer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(peerId).toLowerCase());
+      const peerOnline = isPeerOnline(peer);
+
+      let latestPeerMsgTimestamp = 0;
+      history.forEach(m => {
+        if (m.sender === 'peer') {
+          const ts = m.timestamp || 0;
+          if (ts > latestPeerMsgTimestamp) latestPeerMsgTimestamp = ts;
+        }
+      });
+
+      let changed = false;
+      history.forEach(m => {
+        if (m.sender !== 'user') return;
+
+        // Rule 1: Recipient replied -> all user messages sent before or at that reply are read!
+        if (latestPeerMsgTimestamp > 0 && (m.timestamp || 0) <= latestPeerMsgTimestamp) {
+          if (m.status !== 'read') {
+            m.status = 'read';
+            changed = true;
+          }
+        }
+        // Rule 2: Recipient is online -> any single-tick 'sent' message is delivered!
+        else if (peerOnline && m.status === 'sent') {
+          m.status = 'delivered';
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        saveDirectChatHistory(peerId, history);
+      }
+      return changed;
+    }
+
+    function upgradeSentMessagesToDelivered(targetPeerId = null) {
+      if (targetPeerId) {
+        const changed = upgradeDirectMessages(targetPeerId);
+        if (changed && currentDirectPeerId && String(currentDirectPeerId).toLowerCase() === String(targetPeerId).toLowerCase()) {
+          renderDirectThread();
+        }
+      } else {
+        let anyChanged = false;
+        realRegisteredUsers.forEach(peer => {
+          if (upgradeDirectMessages(peer.id)) anyChanged = true;
+        });
+        if (anyChanged && currentDirectPeerId) {
+          renderDirectThread();
+        }
       }
     }
 
@@ -6262,8 +6371,24 @@
         const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
         if (!supabase || !currentUser) return;
 
-        const myId = currentUser.id;
+        const myId = String(currentUser.id).toLowerCase();
         window.liveOnlineUserIds.add(myId);
+        window.liveOnlineUserIds.add(currentUser.id);
+
+        // If channel is already joined and active, refresh presence and return
+        if (campusRealtimeChannel && campusRealtimeChannel.state === 'joined') {
+          const myName = (userProfile && userProfile.first_name) 
+            ? (userProfile.first_name + ' ' + (userProfile.last_name || '')).trim() 
+            : (currentUser.email ? currentUser.email.split('@')[0] : 'Student');
+
+          campusRealtimeChannel.track({
+            user_id: currentUser.id,
+            name: myName,
+            online_at: new Date().toISOString()
+          }).catch(() => {});
+          upgradeSentMessagesToDelivered();
+          return;
+        }
 
         if (campusRealtimeChannel) {
           try { supabase.removeChannel(campusRealtimeChannel); } catch (e) {}
@@ -6272,7 +6397,7 @@
         // Connect to shared real-time campus room
         campusRealtimeChannel = supabase.channel('placeai_campus_network', {
           config: {
-            presence: { key: myId },
+            presence: { key: currentUser.id },
             broadcast: { ack: true }
           }
         });
@@ -6282,32 +6407,72 @@
           .on('presence', { event: 'sync' }, () => {
             const state = campusRealtimeChannel.presenceState();
             window.liveOnlineUserIds.clear();
-            if (currentUser) window.liveOnlineUserIds.add(currentUser.id);
+            if (currentUser) {
+              window.liveOnlineUserIds.add(currentUser.id);
+              window.liveOnlineUserIds.add(String(currentUser.id).toLowerCase());
+            }
 
-            Object.keys(state).forEach(uid => {
-              window.liveOnlineUserIds.add(uid);
+            Object.keys(state).forEach(key => {
+              window.liveOnlineUserIds.add(key);
+              window.liveOnlineUserIds.add(String(key).toLowerCase());
+              const presences = state[key];
+              if (Array.isArray(presences)) {
+                presences.forEach(p => {
+                  if (p.user_id) {
+                    window.liveOnlineUserIds.add(p.user_id);
+                    window.liveOnlineUserIds.add(String(p.user_id).toLowerCase());
+                  }
+                  if (p.userId) {
+                    window.liveOnlineUserIds.add(p.userId);
+                    window.liveOnlineUserIds.add(String(p.userId).toLowerCase());
+                  }
+                });
+              }
             });
 
-            // If a peer came online, upgrade any 'sent' (single tick) messages to 'delivered' (double tick)
+            // If a peer came online, upgrade any 'sent' (single tick) messages to 'delivered'
             upgradeSentMessagesToDelivered();
 
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
-          .on('presence', { event: 'join' }, ({ key }) => {
-            window.liveOnlineUserIds.add(key);
-            // Remove last-seen entry since they're now online
-            delete peerLastSeenTimes[key];
+          .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+            if (key) {
+              window.liveOnlineUserIds.add(key);
+              window.liveOnlineUserIds.add(String(key).toLowerCase());
+              delete peerLastSeenTimes[key];
+              delete peerLastSeenTimes[String(key).toLowerCase()];
+            }
+            if (Array.isArray(newPresences)) {
+              newPresences.forEach(p => {
+                const uid = p.user_id || p.userId;
+                if (uid) {
+                  window.liveOnlineUserIds.add(uid);
+                  window.liveOnlineUserIds.add(String(uid).toLowerCase());
+                  delete peerLastSeenTimes[uid];
+                  delete peerLastSeenTimes[String(uid).toLowerCase()];
+                }
+              });
+            }
             savePeerLastSeenTimes();
-            upgradeSentMessagesToDelivered();
+            upgradeSentMessagesToDelivered(key);
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
-          .on('presence', { event: 'leave' }, ({ key }) => {
-            window.liveOnlineUserIds.delete(key);
-            // Record the exact moment they went offline
-            peerLastSeenTimes[key] = new Date().toISOString();
-            savePeerLastSeenTimes();
+          .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+            let targetId = key;
+            if (Array.isArray(leftPresences) && leftPresences[0] && (leftPresences[0].user_id || leftPresences[0].userId)) {
+              targetId = leftPresences[0].user_id || leftPresences[0].userId;
+            }
+            if (targetId) {
+              const norm = String(targetId).toLowerCase();
+              window.liveOnlineUserIds.delete(targetId);
+              window.liveOnlineUserIds.delete(norm);
+              const nowIso = new Date().toISOString();
+              peerLastSeenTimes[targetId] = nowIso;
+              peerLastSeenTimes[norm] = nowIso;
+              savePeerLastSeenTimes();
+            }
             renderDirectUserList();
             updateCurrentThreadPresence();
           })
@@ -6339,7 +6504,7 @@
                 : (currentUser.email ? currentUser.email.split('@')[0] : 'Student');
 
               await campusRealtimeChannel.track({
-                user_id: myId,
+                user_id: currentUser.id,
                 name: myName,
                 online_at: new Date().toISOString()
               });
@@ -6367,6 +6532,7 @@
 
         if (!presenceRefreshInterval) {
           presenceRefreshInterval = setInterval(() => {
+            upgradeSentMessagesToDelivered();
             renderDirectUserList();
             updateCurrentThreadPresence();
           }, 10000);
@@ -6376,29 +6542,10 @@
       }
     }
 
-    // Upgrade single-tick messages to double-tick if recipient is confirmed online
-    function upgradeSentMessagesToDelivered() {
-      realRegisteredUsers.forEach(peer => {
-        if (isPeerOnline(peer)) {
-          const history = getDirectChatHistory(peer.id);
-          let changed = false;
-          history.forEach(m => {
-            if (m.sender === 'user' && m.status === 'sent') {
-              m.status = 'delivered';
-              changed = true;
-            }
-          });
-          if (changed) {
-            saveDirectChatHistory(peer.id, history);
-            if (currentDirectPeerId === peer.id) renderDirectThread();
-          }
-        }
-      });
-    }
-
     // 3. Handle Incoming Direct Message
     function handleIncomingDirectMessage(payload) {
-      if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
+      if (!currentUser || !payload) return;
+      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
       const peerId = payload.fromUserId;
       const history = getDirectChatHistory(peerId);
 
@@ -6406,7 +6553,7 @@
       if (history.some(m => m.id === payload.id)) return;
 
       const isModalActive = document.getElementById('communityChatModal')?.classList.contains('active');
-      const isThreadOpen = isModalActive && currentChatMode === 'direct' && currentDirectPeerId === peerId;
+      const isThreadOpen = isModalActive && currentChatMode === 'direct' && currentDirectPeerId && String(currentDirectPeerId).toLowerCase() === String(peerId).toLowerCase();
 
       const incomingMsg = {
         id: payload.id,
@@ -6425,19 +6572,20 @@
       history.push(incomingMsg);
       saveDirectChatHistory(peerId, history);
 
+      // If peer sent a message, all our prior sent messages to peer are now read
+      upgradeDirectMessages(peerId);
+
       // Play WhatsApp incoming audio
       playWpIncomingSound();
 
       // If thread is currently open: send 'read' (double blue tick). Otherwise send 'delivered' (double grey tick).
       const ackStatus = isThreadOpen ? 'read' : 'delivered';
       sendAckToPeer(peerId, payload.id, ackStatus);
-      // Also persist ack to cloud so sender sees tick update even if they were offline
       syncAckToCloud(payload.id, peerId, ackStatus);
 
       if (isThreadOpen) {
         renderDirectThread();
       } else {
-        // Red dot unread badge
         peerUnreadCounts[peerId] = (peerUnreadCounts[peerId] || 0) + 1;
         updateGlobalUnreadBadges();
       }
@@ -6445,10 +6593,10 @@
     }
 
     // 4. Handle Incoming Acknowledgements (Single -> Double Grey -> Double Blue Tick)
-    // Status can only UPGRADE: sent(0) -> delivered(1) -> read(2). Never downgrade.
     const STATUS_RANK = { 'sent': 0, 'delivered': 1, 'read': 2 };
 
     function upgradeMessageStatus(peerId, msgId, newStatus) {
+      if (!peerId || !msgId) return false;
       const history = getDirectChatHistory(peerId);
       const msg = history.find(m => m.id === msgId);
       if (!msg || msg.sender !== 'user') return false;
@@ -6461,7 +6609,7 @@
       saveDirectChatHistory(peerId, history);
 
       // Update live tick in DOM if thread is open
-      if (currentDirectPeerId === peerId) {
+      if (currentDirectPeerId && String(currentDirectPeerId).toLowerCase() === String(peerId).toLowerCase()) {
         const tickEl = document.getElementById('wpTick_' + msgId);
         if (tickEl) {
           if (newStatus === 'read') {
@@ -6469,13 +6617,16 @@
           } else if (newStatus === 'delivered') {
             tickEl.innerHTML = '<i class="fas fa-check-double wp-tick-icon wp-tick-delivered" title="Delivered"></i>';
           }
+        } else {
+          renderDirectThread();
         }
       }
       return true;
     }
 
     function handleIncomingAck(payload) {
-      if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
+      if (!currentUser || !payload) return;
+      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
       const peerId = payload.fromUserId;
       if (upgradeMessageStatus(peerId, payload.msgId, payload.status)) {
         renderDirectUserList();
@@ -6505,8 +6656,11 @@
     // Update global red badges (floating button & top header)
     function updateGlobalUnreadBadges() {
       let total = 0;
-      Object.keys(peerUnreadCounts).forEach(pid => {
-        total += (peerUnreadCounts[pid] || 0);
+      realRegisteredUsers.forEach(p => {
+        const msgs = getDirectChatHistory(p.id);
+        const unreadInHistory = msgs.filter(m => m.sender === 'peer' && m.status !== 'read').length;
+        const count = Math.max(peerUnreadCounts[p.id] || 0, unreadInHistory);
+        total += count;
       });
 
       const headerBadge = document.getElementById('headerChatUnreadBadge');
@@ -6533,7 +6687,7 @@
 
     // 6. Handle Incoming Campus Public Stream Broadcast
     function handleIncomingCampusBroadcast(newPost) {
-      if (!currentUser || !newPost || newPost.userId === currentUser.id) return;
+      if (!currentUser || !newPost || String(newPost.userId).toLowerCase() === String(currentUser.id).toLowerCase()) return;
       const feed = getBroadcastFeed();
       if (feed.some(p => p.id === newPost.id)) return;
 
@@ -6546,7 +6700,7 @@
     }
 
     // 7. Handle Typing Indicators
-    function broadcastTypingStatus() {
+    function broadcastTypingStatus(isTyping = true) {
       if (campusRealtimeChannel && currentUser && currentDirectPeerId) {
         try {
           campusRealtimeChannel.send({
@@ -6554,7 +6708,8 @@
             event: 'typing',
             payload: {
               fromUserId: currentUser.id,
-              toUserId: currentDirectPeerId
+              toUserId: currentDirectPeerId,
+              isTyping: isTyping
             }
           });
         } catch (e) {}
@@ -6562,10 +6717,11 @@
     }
 
     function handleIncomingTyping(payload) {
-      if (!currentUser || !payload || payload.toUserId !== currentUser.id) return;
+      if (!currentUser || !payload) return;
+      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
       const peerId = payload.fromUserId;
 
-      if (currentChatMode === 'direct' && currentDirectPeerId === peerId) {
+      if (currentChatMode === 'direct' && currentDirectPeerId && String(currentDirectPeerId).toLowerCase() === String(peerId).toLowerCase()) {
         const statusEl = document.getElementById('peerHeaderStatus');
         if (statusEl) {
           statusEl.innerHTML = '<span style="color:#00a884;font-style:italic;font-weight:600;"><i class="fas fa-pencil-alt" style="font-size:10px;margin-right:4px;"></i>typing...</span>';
@@ -6585,7 +6741,7 @@
         if (!supabase || !myUserId) return;
 
         const { data } = await supabase.from('user_profiles').select('certifications').eq('user_id', myUserId).single();
-        const existing = (data && Array.isArray(data.certifications)) ? data.certifications : [];
+        const existing = (data && Array.isArray(data.certifications)) ? [...data.certifications] : [];
         existing.push(msgPayload);
         const trimmed = existing.slice(-150);
 
@@ -6595,35 +6751,46 @@
       }
     }
 
-    // 8b. Persist ACK to cloud so sender sees tick updates even when offline
-    async function syncAckToCloud(msgId, originalSenderId, status) {
+    // 8b. Persist ACK(s) to cloud so sender sees tick updates even when offline
+    async function syncBatchAcksToCloud(ackList) {
+      if (!Array.isArray(ackList) || ackList.length === 0) return;
       try {
         const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
         if (!supabase || !currentUser) return;
 
         const myUserId = currentUser.id;
         const { data } = await supabase.from('user_profiles').select('certifications').eq('user_id', myUserId).single();
-        const existing = (data && Array.isArray(data.certifications)) ? data.certifications : [];
+        const existing = (data && Array.isArray(data.certifications)) ? [...data.certifications] : [];
 
-        // Prevent duplicate acks — use unique ack ID
-        const ackId = 'ack_' + msgId + '_' + status;
-        if (existing.some(e => e.id === ackId)) return;
-
-        existing.push({
-          id: ackId,
-          _isAck: true,
-          msgId: msgId,
-          fromUserId: myUserId,
-          toUserId: originalSenderId,
-          status: status,
-          timestamp: Date.now()
+        let added = false;
+        ackList.forEach(({ msgId, originalSenderId, status }) => {
+          if (!msgId || !originalSenderId || !status) return;
+          const ackId = 'ack_' + msgId + '_' + status;
+          if (!existing.some(e => e.id === ackId)) {
+            existing.push({
+              id: ackId,
+              _isAck: true,
+              msgId: msgId,
+              fromUserId: myUserId,
+              toUserId: originalSenderId,
+              status: status,
+              timestamp: Date.now()
+            });
+            added = true;
+          }
         });
-        const trimmed = existing.slice(-150);
 
-        await supabase.from('user_profiles').update({ certifications: trimmed }).eq('user_id', myUserId);
+        if (added) {
+          const trimmed = existing.slice(-150);
+          await supabase.from('user_profiles').update({ certifications: trimmed }).eq('user_id', myUserId);
+        }
       } catch (e) {
-        console.warn('syncAckToCloud error:', e);
+        console.warn('syncBatchAcksToCloud error:', e);
       }
+    }
+
+    async function syncAckToCloud(msgId, originalSenderId, status) {
+      return syncBatchAcksToCloud([{ msgId, originalSenderId, status }]);
     }
 
     async function syncChatFromCloud() {
@@ -6631,22 +6798,26 @@
         const supabase = window.supabaseClient || (window.DBService ? window.DBService.getSupabaseClient() : null);
         if (!supabase || !currentUser) return;
 
-        const { data } = await supabase.from('user_profiles').select('user_id, certifications');
-        if (!data) return;
+        const { data, error } = await supabase.from('user_profiles').select('user_id, certifications');
+        if (error || !data) return;
 
         let hasNew = false;
-        const myId = currentUser.id;
+        const myId = String(currentUser.id).toLowerCase();
 
         data.forEach(peerProfile => {
-          if (peerProfile.user_id === myId) return;
+          if (!peerProfile || !peerProfile.user_id) return;
+          const peerId = peerProfile.user_id;
+          if (String(peerId).toLowerCase() === myId) return;
 
           if (Array.isArray(peerProfile.certifications)) {
-            const peerId = peerProfile.user_id;
+            let historyChanged = false;
             const history = getDirectChatHistory(peerId);
 
             peerProfile.certifications.forEach(msg => {
+              if (!msg) return;
+
               // Cloud-persisted ACK record: upgrade our sent message ticks
-              if (msg._isAck && msg.toUserId === myId) {
+              if (msg._isAck && msg.toUserId && String(msg.toUserId).toLowerCase() === myId) {
                 if (upgradeMessageStatus(peerId, msg.msgId, msg.status)) {
                   hasNew = true;
                 }
@@ -6654,11 +6825,13 @@
               }
 
               // Direct message sent to me
-              if (msg.toUserId === myId) {
+              if (msg.toUserId && String(msg.toUserId).toLowerCase() === myId) {
                 const exists = history.some(m => m.id === msg.id);
                 if (!exists) {
-                  const isThreadOpen = (currentChatMode === 'direct' && currentDirectPeerId === peerId);
+                  const isModalActive = document.getElementById('communityChatModal')?.classList.contains('active');
+                  const isThreadOpen = isModalActive && currentChatMode === 'direct' && currentDirectPeerId && String(currentDirectPeerId).toLowerCase() === String(peerId).toLowerCase();
                   const ackStatus = isThreadOpen ? 'read' : 'delivered';
+
                   history.push({
                     id: msg.id,
                     sender: 'peer',
@@ -6672,6 +6845,7 @@
                     status: ackStatus,
                     timestamp: msg.timestamp || Date.now()
                   });
+                  historyChanged = true;
                   hasNew = true;
 
                   sendAckToPeer(peerId, msg.id, ackStatus);
@@ -6694,7 +6868,10 @@
               }
             });
 
-            saveDirectChatHistory(peerId, history);
+            if (historyChanged) {
+              saveDirectChatHistory(peerId, history);
+              upgradeDirectMessages(peerId);
+            }
           }
         });
 
@@ -6756,56 +6933,15 @@
       } catch (e) {}
     }
 
-    // 10. Presence & Status Helpers: Accurate Online vs Real Last Seen
-    function isPeerOnline(peer) {
-      if (!peer) return false;
-      // Only trust live WebSocket presence — nothing else
-      return !!(window.liveOnlineUserIds && window.liveOnlineUserIds.has(peer.id));
-    }
-
-    function getPeerLastSeen(peer) {
-      if (!peer) return null;
-      // 1. If we tracked their leave event, use that
-      if (peerLastSeenTimes[peer.id]) return peerLastSeenTimes[peer.id];
-      // 2. Fallback to DB updated_at (profile edit time — not ideal but better than nothing)
-      return peer.updatedAt || peer.createdAt || null;
-    }
-
-    function formatWpLastSeen(dateStr) {
-      if (!dateStr) return 'offline';
-      try {
-        const d = new Date(dateStr);
-        const now = new Date();
-        const diffMs = now - d;
-        if (diffMs < 0) return 'online';
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-
-        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        if (diffMins < 2) return 'online';
-        if (diffMins < 60) return `last seen ${diffMins}m ago`;
-        if (diffHours < 24 && d.getDate() === now.getDate()) {
-          return `last seen today at ${timeStr}`;
-        }
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        if (d.getDate() === yesterday.getDate() && d.getMonth() === yesterday.getMonth() && d.getFullYear() === yesterday.getFullYear()) {
-          return `last seen yesterday at ${timeStr}`;
-        }
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return `last seen ${d.getDate()} ${months[d.getMonth()]} at ${timeStr}`;
-      } catch (e) {
-        return 'offline';
-      }
-    }
-
     // 11. Modal Controls & Mode Switching
     window.openCampusChatModal = async function(initialMode = 'all') {
       const modal = document.getElementById('communityChatModal');
       if (!modal) return;
       modal.classList.add('active');
       initRealtimeCampusNetwork();
+      if (!realRegisteredUsers || realRegisteredUsers.length === 0) {
+        await fetchRealCommunityUsers();
+      }
       await switchChatMode(initialMode);
     };
 
@@ -6837,13 +6973,18 @@
         if (bView) bView.style.display = 'none';
         if (dView) dView.style.display = 'flex';
         
-        await fetchRealCommunityUsers();
+        if (!realRegisteredUsers || realRegisteredUsers.length === 0) {
+          await fetchRealCommunityUsers();
+        }
         if (!currentDirectPeerId && realRegisteredUsers.length > 0) {
           currentDirectPeerId = realRegisteredUsers[0].id;
         }
+        if (currentDirectPeerId) {
+          upgradeDirectMessages(currentDirectPeerId);
+          markThreadAsRead(currentDirectPeerId);
+        }
         renderDirectUserList();
         renderDirectThread();
-        if (currentDirectPeerId) markThreadAsRead(currentDirectPeerId);
       }
     }
 
@@ -7026,11 +7167,11 @@
       listEl.innerHTML = filtered.map(peer => {
         const msgs = getDirectChatHistory(peer.id);
         const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
-        const isActive = peer.id === currentDirectPeerId;
+        const isActive = currentDirectPeerId && String(peer.id).toLowerCase() === String(currentDirectPeerId).toLowerCase();
 
         const online = isPeerOnline(peer);
         const lastSeenText = online ? 'Online' : formatWpLastSeen(getPeerLastSeen(peer));
-        const unreadCount = peerUnreadCounts[peer.id] || 0;
+        const unreadCount = Math.max(peerUnreadCounts[peer.id] || 0, msgs.filter(m => m.sender === 'peer' && m.status !== 'read').length);
 
         // Accurate tick for last message:
         // single tick if offline ('sent')
@@ -7090,14 +7231,17 @@
       currentDirectPeerId = peerId;
       peerUnreadCounts[peerId] = 0;
       updateGlobalUnreadBadges();
+      upgradeDirectMessages(peerId);
+      markThreadAsRead(peerId);
       renderDirectUserList();
       renderDirectThread();
-      markThreadAsRead(peerId);
     }
 
     function markThreadAsRead(peerId) {
+      if (!peerId) return;
       const history = getDirectChatHistory(peerId);
       let updatedAny = false;
+      const acksToSync = [];
 
       history.forEach(m => {
         if (m.sender === 'peer' && m.status !== 'read') {
@@ -7105,18 +7249,22 @@
           updatedAny = true;
           // Send ack via both WebSocket (instant) AND cloud (persistent)
           sendAckToPeer(peerId, m.id, 'read');
-          syncAckToCloud(m.id, peerId, 'read');
+          acksToSync.push({ msgId: m.id, originalSenderId: peerId, status: 'read' });
         }
       });
 
       if (updatedAny) {
         saveDirectChatHistory(peerId, history);
       }
+
+      if (acksToSync.length > 0) {
+        syncBatchAcksToCloud(acksToSync);
+      }
     }
 
     function updateCurrentThreadPresence() {
       if (!currentDirectPeerId) return;
-      const peer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const peer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       if (!peer) return;
 
       const online = isPeerOnline(peer);
@@ -7125,7 +7273,7 @@
 
       if (dotEl) {
         dotEl.className = 'peer-status-dot ' + (online ? 'online' : 'offline');
-        dotEl.title = online ? 'Online' : formatWpLastSeen(getPeerLastSeen(peer));
+        dotEl.title = online ? 'Online now' : formatWpLastSeen(getPeerLastSeen(peer));
       }
 
       if (statusEl) {
@@ -7187,7 +7335,10 @@
     }
 
     function renderDirectThread() {
-      const peer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      if (currentDirectPeerId) {
+        upgradeDirectMessages(currentDirectPeerId);
+      }
+      const peer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const headerEl = document.getElementById('directThreadHeader');
       const icebreakersEl = document.getElementById('directIcebreakersBar');
       const streamEl = document.getElementById('directMessagesStream');
@@ -7212,7 +7363,7 @@
           <div class="peer-thread-profile">
             <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
               <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
-              <span class="peer-status-dot ${online ? 'online' : 'offline'}" id="peerHeaderDot" title="${online ? 'Online' : lastSeenText}"></span>
+              <span class="peer-status-dot ${online ? 'online' : 'offline'}" id="peerHeaderDot" title="${online ? 'Online now' : lastSeenText}"></span>
             </div>
             <div class="peer-thread-info">
               <h4 style="display:flex; align-items:center; gap:8px;">
@@ -7378,7 +7529,7 @@
       const text = input.value.trim();
       if (!text || !currentDirectPeerId || !currentUser) return;
 
-      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientPeer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const recipientOnline = isPeerOnline(recipientPeer);
 
       // Single tick if offline, double tick if online
@@ -7443,7 +7594,7 @@
     // 15. Send Voice Note with Accurate Status
     window.sendWpVoiceNote = function() {
       if (!currentDirectPeerId || !currentUser) return;
-      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientPeer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const recipientOnline = isPeerOnline(recipientPeer);
       const initialStatus = recipientOnline ? 'delivered' : 'sent';
 
@@ -7571,7 +7722,7 @@
       const sampleCode = prompt("Paste your Code Snippet to share directly in chat:", "def two_sum(nums, target):\n    lookup = {}\n    for i, num in enumerate(nums):\n        if target - num in lookup:\n            return [lookup[target - num], i]\n        lookup[num] = i");
       if (!sampleCode || !currentDirectPeerId || !currentUser) return;
 
-      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientPeer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const recipientOnline = isPeerOnline(recipientPeer);
       const initialStatus = recipientOnline ? 'delivered' : 'sent';
 
@@ -7627,7 +7778,7 @@
       const problem = prompt("Enter DSA Problem to challenge your peer:", "Problem #14: Longest Palindromic Substring (Medium)");
       if (!problem) return;
 
-      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientPeer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const recipientOnline = isPeerOnline(recipientPeer);
       const initialStatus = recipientOnline ? 'delivered' : 'sent';
 
@@ -7679,7 +7830,7 @@
       if (drawer) drawer.classList.remove('active');
       if (!currentDirectPeerId || !currentUser) return;
 
-      const recipientPeer = realRegisteredUsers.find(p => p.id === currentDirectPeerId);
+      const recipientPeer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
       const recipientOnline = isPeerOnline(recipientPeer);
       const initialStatus = recipientOnline ? 'delivered' : 'sent';
 
@@ -8507,6 +8658,9 @@
         }
 
         await loadUserProfile();
+
+        // Load community users immediately so presence and chats match registered peers
+        await fetchRealCommunityUsers();
 
         // Initialize realtime presence immediately after auth so status/ticks work
         initRealtimeCampusNetwork();
