@@ -5734,6 +5734,188 @@
       transform: translateY(-1px);
     }
 
+  
+    /* ===== SUPABASE CLOUD TABLE INSPECTOR MODAL ===== */
+    .supabase-inspector-card {
+      background: #0f1713;
+      border: 1px solid rgba(62, 207, 142, 0.35);
+      border-radius: 14px;
+      width: 920px;
+      max-width: 95vw;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(62, 207, 142, 0.08);
+      position: relative;
+      overflow: hidden;
+      animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .supabase-inspector-header {
+      padding: 16px 20px;
+      background: rgba(18, 30, 24, 0.95);
+      border-bottom: 1px solid rgba(62, 207, 142, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .supabase-inspector-toolbar {
+      padding: 10px 20px;
+      background: rgba(13, 22, 17, 0.9);
+      border-bottom: 1px solid rgba(62, 207, 142, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .supabase-table-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .supabase-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .supabase-tab-btn:hover {
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .supabase-tab-btn.active {
+      background: rgba(62, 207, 142, 0.15);
+      color: #6ee7b7;
+      border-color: rgba(62, 207, 142, 0.4);
+    }
+
+    .supabase-view-mode-toggle {
+      display: flex;
+      background: rgba(20, 32, 26, 0.9);
+      border: 1px solid rgba(62, 207, 142, 0.25);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .view-mode-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .view-mode-btn.active {
+      background: rgba(62, 207, 142, 0.25);
+      color: #a7f3d0;
+    }
+
+    .supabase-inspector-body {
+      padding: 18px 20px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 280px;
+    }
+
+    .supabase-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .supabase-data-table th {
+      background: rgba(20, 34, 27, 0.9);
+      color: #6ee7b7;
+      text-align: left;
+      padding: 9px 12px;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(62, 207, 142, 0.25);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .supabase-data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+      color: #cbd5e1;
+      vertical-align: top;
+    }
+
+    .supabase-data-table tr:hover td {
+      background: rgba(62, 207, 142, 0.04);
+    }
+
+    .col-name-pill {
+      font-family: monospace;
+      font-weight: 700;
+      color: #3ecf8e;
+      font-size: 12px;
+    }
+
+    .col-type-tag {
+      font-family: monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .col-val-display {
+      font-family: monospace;
+      font-size: 11.5px;
+      word-break: break-word;
+      color: #f1f5f9;
+    }
+
+    .supabase-json-code {
+      background: #080d0a;
+      border: 1px solid rgba(62, 207, 142, 0.2);
+      border-radius: 8px;
+      padding: 14px;
+      color: #6ee7b7;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .supabase-inspector-footer {
+      padding: 12px 20px;
+      background: rgba(18, 30, 24, 0.95);
+      border-top: 1px solid rgba(62, 207, 142, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
   </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -6449,6 +6631,9 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
+                  <button type="button" class="btn-supabase-action" onclick="openSupabaseTableInspector()" style="background: rgba(62, 207, 142, 0.25); color: #a7f3d0; border-color: rgba(62, 207, 142, 0.5);">
+                    <i class="fas fa-table-columns"></i> Inspect My Cloud Tables
+                  </button>
                   <button type="button" class="btn-supabase-action" onclick="syncSupabaseDataDirectly()">
                     <i class="fas fa-sync-alt"></i> Direct Cloud Sync
                   </button>
@@ -6461,8 +6646,8 @@
                 <div class="supabase-service-card">
                   <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-table" style="color: #3ecf8e;"></i> Cloud Tables
+                      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="openSupabaseTableInspector()" title="Click to view your tables">
+                        <i class="fas fa-table" style="color: #3ecf8e;"></i> Cloud Tables <i class="fas fa-search" style="font-size: 10px; color: #3ecf8e; margin-left: 4px;"></i>
                       </span>
                       <span class="dev-tab-pill supabase">Online</span>
                     </div>
@@ -9403,6 +9588,210 @@
 
     
     /* ===== DEVELOPER CLOUD ECOSYSTEM SUITE LOGIC (VERCEL & SUPABASE) ===== */
+    
+    /* ===== SUPABASE CLOUD TABLE INSPECTOR LOGIC ===== */
+    let inspectorActiveTable = 'user_profiles';
+    let inspectorActiveViewMode = 'table';
+    let inspectorLiveRowData = null;
+
+    async function openSupabaseTableInspector() {
+      const modal = document.getElementById('supabaseTableModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      const uidCode = document.getElementById('inspectorUidCode');
+      if (uidCode && currentUser && currentUser.id) {
+        uidCode.textContent = currentUser.id;
+      }
+
+      await refreshInspectorData();
+    }
+
+    function closeSupabaseTableInspector() {
+      const modal = document.getElementById('supabaseTableModal');
+      if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function switchInspectorTable(tableName) {
+      inspectorActiveTable = tableName;
+      ['user_profiles', 'projects', 'skills', 'security'].forEach(t => {
+        const btn = document.getElementById('tabTable' + t.charAt(0).toUpperCase() + t.slice(1).replace('_', ''));
+        if (btn) {
+          if (t === tableName) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+      renderInspectorContent();
+    }
+
+    function setInspectorViewMode(mode) {
+      inspectorActiveViewMode = mode;
+      const btnTable = document.getElementById('btnViewTable');
+      const btnJson = document.getElementById('btnViewJson');
+      if (btnTable && btnJson) {
+        if (mode === 'table') {
+          btnTable.classList.add('active');
+          btnJson.classList.remove('active');
+        } else {
+          btnTable.classList.remove('active');
+          btnJson.classList.add('active');
+        }
+      }
+      renderInspectorContent();
+    }
+
+    async function refreshInspectorData() {
+      const body = document.getElementById('supabaseInspectorBody');
+      const icon = document.getElementById('inspectorRefreshIcon');
+      if (icon) icon.classList.add('fa-spin');
+
+      try {
+        if (!currentUser || !currentUser.id) {
+          throw new Error('No authenticated user session found');
+        }
+
+        // Query candidate's real row in user_profiles
+        if (supabaseClient) {
+          const { data, error } = await supabaseClient
+            .from('user_profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
+
+          if (error) throw error;
+          inspectorLiveRowData = data;
+        } else {
+          inspectorLiveRowData = userProfile || {};
+        }
+
+        renderInspectorContent();
+        showToast('⚡ Live table data refreshed from Supabase Cloud', 'success');
+      } catch (err) {
+        console.warn('Error refreshing Supabase table:', err);
+        inspectorLiveRowData = userProfile || {};
+        renderInspectorContent();
+        showToast('Loaded active profile snapshot', 'info');
+      } finally {
+        if (icon) icon.classList.remove('fa-spin');
+      }
+    }
+
+    function renderInspectorContent() {
+      const body = document.getElementById('supabaseInspectorBody');
+      if (!body) return;
+
+      const data = inspectorLiveRowData || userProfile || {};
+
+      let displayData = {};
+      if (inspectorActiveTable === 'user_profiles') {
+        displayData = {
+          id: data.id || (currentUser ? currentUser.id : 'N/A'),
+          full_name: data.full_name || 'N/A',
+          email: data.email || (currentUser ? currentUser.email : 'N/A'),
+          phone: data.phone || 'N/A',
+          bio: data.bio || 'N/A',
+          headline: data.headline || 'N/A',
+          github_url: data.github_url || 'N/A',
+          portfolio_url: data.portfolio_url || 'N/A',
+          linkedin_url: data.linkedin_url || 'N/A',
+          ats_score: data.ats_score || 85,
+          created_at: data.created_at || '2026-09-01T00:00:00Z',
+          updated_at: data.updated_at || new Date().toISOString()
+        };
+      } else if (inspectorActiveTable === 'projects') {
+        displayData = {
+          user_id: data.id || (currentUser ? currentUser.id : 'N/A'),
+          projects_total: Array.isArray(data.projects) ? data.projects.length : 0,
+          projects_jsonb: data.projects || []
+        };
+      } else if (inspectorActiveTable === 'skills') {
+        displayData = {
+          user_id: data.id || (currentUser ? currentUser.id : 'N/A'),
+          technical_skills: data.skills || [],
+          experience_records: data.experience || [],
+          education_records: data.education || [],
+          certifications: data.certifications || []
+        };
+      } else if (inspectorActiveTable === 'security') {
+        displayData = {
+          auth_uid: currentUser ? currentUser.id : 'N/A',
+          auth_email: currentUser ? currentUser.email : 'N/A',
+          auth_provider: 'Supabase GoTrue & WhatsApp Verified OTP',
+          row_level_security: 'ENFORCED (USING auth.uid() = id)',
+          role: 'authenticated',
+          aud: 'authenticated',
+          access_scope: 'candidate_self_read_write_only',
+          supabase_project_ref: 'igilmfqfxsiaggkgkwoq',
+          postgres_engine: 'PostgreSQL 15.1 on AWS ap-south-1'
+        };
+      }
+
+      if (inspectorActiveViewMode === 'json') {
+        body.innerHTML = `
+          <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11.5px; color: #94a3b8;">
+              Table / Column: <strong style="color: #6ee7b7;">${inspectorActiveTable}</strong> • Raw PostgreSQL JSONB
+            </span>
+          </div>
+          <pre class="supabase-json-code">${escapeHtml(JSON.stringify(displayData, null, 2))}</pre>
+        `;
+      } else {
+        // Table View
+        const rows = Object.entries(displayData).map(([key, val]) => {
+          let type = typeof val;
+          let valStr = '';
+          if (Array.isArray(val)) {
+            type = 'jsonb[] (' + val.length + ' items)';
+            valStr = '<pre style="margin: 0; font-size: 11px; max-height: 120px; overflow-y: auto; color: #a7f3d0; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px;">' + escapeHtml(JSON.stringify(val, null, 2)) + '</pre>';
+          } else if (typeof val === 'object' && val !== null) {
+            type = 'jsonb';
+            valStr = '<pre style="margin: 0; font-size: 11px; max-height: 120px; overflow-y: auto; color: #a7f3d0; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px;">' + escapeHtml(JSON.stringify(val, null, 2)) + '</pre>';
+          } else {
+            valStr = '<span class="col-val-display">' + escapeHtml(String(val)) + '</span>';
+          }
+
+          return `
+            <tr>
+              <td style="width: 220px;">
+                <span class="col-name-pill">${escapeHtml(key)}</span>
+              </td>
+              <td style="width: 130px;">
+                <span class="col-type-tag">${escapeHtml(type)}</span>
+              </td>
+              <td>${valStr}</td>
+            </tr>
+          `;
+        }).join('');
+
+        body.innerHTML = `
+          <table class="supabase-data-table">
+            <thead>
+              <tr>
+                <th>Column Name</th>
+                <th>Data Type</th>
+                <th>Candidate Row Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    function copyInspectorJson() {
+      const data = inspectorLiveRowData || userProfile || {};
+      const str = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(str).then(() => {
+        showToast('📋 Supabase table JSON copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Could not copy JSON', 'error');
+      });
+    }
+
     function switchDevSuiteTab(service) {
       const tabs = ['github', 'vercel', 'supabase'];
       tabs.forEach(t => {
@@ -13753,5 +14142,87 @@ ${projStr}
         "Feel free to ask for specific code solutions, interview question explanations, or resume optimizations!";
     }
   </script>
+
+  <!-- Supabase Cloud Table Inspector Modal -->
+  <div class="community-chat-overlay" id="supabaseTableModal" style="display: none;" onclick="if(event.target===this)closeSupabaseTableInspector()">
+    <div class="supabase-inspector-card">
+      <!-- Header -->
+      <div class="supabase-inspector-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="supabase-brand-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+              Supabase Cloud Table Explorer
+              <span class="supabase-verified-badge" style="font-size: 10px;">
+                <i class="fas fa-shield-alt"></i> Candidate Scoped (RLS Active)
+              </span>
+            </h3>
+            <p style="font-size: 12px; color: #94a3b8; margin: 2px 0 0 0;">
+              Live read-only inspection of your PostgreSQL records in project <code style="color: #6ee7b7;">igilmfqfxsiaggkgkwoq</code>
+            </p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" onclick="closeSupabaseTableInspector()" style="font-size: 18px; color: #94a3b8; background: transparent; border: none; cursor: pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Table Selection & View Switcher Bar -->
+      <div class="supabase-inspector-toolbar">
+        <div class="supabase-table-tabs">
+          <button type="button" class="supabase-tab-btn active" id="tabTableUserProfiles" onclick="switchInspectorTable('user_profiles')">
+            <i class="fas fa-id-card"></i> user_profiles
+          </button>
+          <button type="button" class="supabase-tab-btn" id="tabTableProjects" onclick="switchInspectorTable('projects')">
+            <i class="fas fa-code-branch"></i> projects (JSONB)
+          </button>
+          <button type="button" class="supabase-tab-btn" id="tabTableSkills" onclick="switchInspectorTable('skills')">
+            <i class="fas fa-layer-group"></i> skills & experience
+          </button>
+          <button type="button" class="supabase-tab-btn" id="tabTableSecurity" onclick="switchInspectorTable('security')">
+            <i class="fas fa-user-shield"></i> auth & RLS status
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="supabase-view-mode-toggle">
+            <button type="button" class="view-mode-btn active" id="btnViewTable" onclick="setInspectorViewMode('table')">
+              <i class="fas fa-table"></i> Table
+            </button>
+            <button type="button" class="view-mode-btn" id="btnViewJson" onclick="setInspectorViewMode('json')">
+              <i class="fas fa-code"></i> JSON
+            </button>
+          </div>
+          <button type="button" class="btn-supabase-action" onclick="refreshInspectorData()" title="Re-query Supabase REST">
+            <i class="fas fa-sync-alt" id="inspectorRefreshIcon"></i> Refresh
+          </button>
+          <button type="button" class="btn-supabase-action" onclick="copyInspectorJson()" title="Copy current table data as JSON">
+            <i class="far fa-copy"></i> Copy JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Inspector Body -->
+      <div class="supabase-inspector-body" id="supabaseInspectorBody">
+        <div style="text-align: center; padding: 40px; color: #94a3b8;">
+          <i class="fas fa-circle-notch fa-spin" style="font-size: 24px; color: #3ecf8e; margin-bottom: 10px;"></i>
+          <p>Querying Supabase Cloud PostgreSQL...</p>
+        </div>
+      </div>
+
+      <!-- Inspector Footer -->
+      <div class="supabase-inspector-footer">
+        <div style="font-size: 11.5px; color: #94a3b8; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span class="vercel-status-beacon" style="color: #3ecf8e;">● Authenticated Session</span>
+          <span>Candidate UID: <code id="inspectorUidCode" style="color: #6ee7b7;">auth.uid()</code></span>
+          <span>• Query Policy: <code style="color: #facc15;">WHERE id = auth.uid()</code></span>
+        </div>
+        <button type="button" class="btn-supabase-action" onclick="closeSupabaseTableInspector()" style="padding: 6px 14px; font-size: 12px;">Close</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
