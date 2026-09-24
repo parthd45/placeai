@@ -7136,13 +7136,13 @@
                         <span class="supabase-usage-item-label">
                           <span class="supabase-usage-circle" style="border-color: #3ecf8e;"></span> Database size
                         </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageDbSize">29 / 500 MB</span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageDbSize">0 / 500 MB</span>
                       </div>
                       <div class="supabase-usage-item">
                         <span class="supabase-usage-item-label">
                           <span class="supabase-usage-circle" style="border-color: #38bdf8;"></span> Monthly active users
                         </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageMau">13 / 50,000</span>
+                        <span class="supabase-usage-item-val" id="supabaseUsageMau">0 / 50,000</span>
                       </div>
                       <div class="supabase-usage-item">
                         <span class="supabase-usage-item-label">
@@ -10828,29 +10828,9 @@
       return 'placeai_user_custom_tables_' + uid;
     }
 
-    // Default templates based on candidate's real focus/projects
+    // 100% RAW: Zero default mock tables
     function getDefaultUserTables() {
-      const name = (userProfile && userProfile.full_name) ? userProfile.full_name.toLowerCase() : '';
-      if (name.includes('arpit')) {
-        return [
-          { name: 'codeloom_snippets', desc: 'Code snippets, language metadata & AST evaluations', columns: ['id', 'user_id', 'code', 'language', 'created_at'], rows: 42, rls: true },
-          { name: 'ats_evaluations', desc: 'Resume parsing scoring runs and ATS keyword matching', columns: ['id', 'candidate_id', 'score', 'match_ratio', 'report_json'], rows: 18, rls: true },
-          { name: 'devpulse_metrics', desc: 'Realtime performance metrics and service heartbeat ping logs', columns: ['id', 'service_name', 'latency_ms', 'status_code', 'recorded_at'], rows: 350, rls: true },
-          { name: 'cloudflow_deployments', desc: 'Container deployment manifests and edge build hooks', columns: ['id', 'app_id', 'branch', 'commit_hash', 'status'], rows: 29, rls: true }
-        ];
-      } else if (name.includes('bhushan')) {
-        return [
-          { name: 'omnishop_products', desc: 'E-commerce product catalog with inventory and pricing', columns: ['id', 'title', 'price', 'stock', 'category', 'image_url'], rows: 68, rls: true },
-          { name: 'customer_orders', desc: 'Checkout orders, transaction IDs and shipment statuses', columns: ['id', 'customer_id', 'total_amount', 'status', 'created_at'], rows: 24, rls: true },
-          { name: 'kanban_tasks', desc: 'TaskStream board tasks with column states and priorities', columns: ['id', 'board_id', 'title', 'priority', 'status'], rows: 53, rls: true }
-        ];
-      } else {
-        return [
-          { name: 'placeai_candidates', desc: 'Candidate profiles, ATS scores and verified skill sets', columns: ['id', 'user_id', 'full_name', 'email', 'ats_score', 'github_url'], rows: 26, rls: true },
-          { name: 'campus_placements', desc: 'Campus company drives, interview rounds and offers', columns: ['id', 'company_name', 'package_lpa', 'role', 'status'], rows: 15, rls: true },
-          { name: 'neuralchat_sessions', desc: 'AI mock interview transcripts and evaluation feedback', columns: ['id', 'user_id', 'transcript', 'confidence_score', 'created_at'], rows: 84, rls: true }
-        ];
-      }
+      return [];
     }
 
     function getUserCustomTables() {
@@ -10858,12 +10838,14 @@
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            // Discard any legacy mock tables
+            const filtered = parsed.filter(t => !['placeai_candidates', 'campus_placements', 'neuralchat_sessions', 'codeloom_snippets', 'omnishop_products'].includes(t.name));
+            return filtered;
+          }
         } catch (e) {}
       }
-      const def = getDefaultUserTables();
-      localStorage.setItem(getUserTablesStorageKey(), JSON.stringify(def));
-      return def;
+      return [];
     }
 
     function connectUserSupabaseProject() {
@@ -11097,26 +11079,15 @@
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) return parsed;
+          if (Array.isArray(parsed)) {
+            // Discard legacy mock defaults if present without an account
+            const isMock = parsed.length === 2 && parsed[0].name === 'dcpe-erp' && parsed[1].name === 'PlaceWiseAI' && !localStorage.getItem(getSupabaseAccountStorageKey());
+            if (!isMock) return parsed;
+          }
         } catch (e) {}
       }
 
-      // Check if current user is Parth and has not disconnected or switched:
-      const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
-      const isDisconnected = localStorage.getItem('placeai_supabase_disconnected_' + uid);
-      const isParth = (currentUser && currentUser.email && currentUser.email.includes('parth')) ||
-                      (userProfile && userProfile.full_name && userProfile.full_name.toLowerCase().includes('parth'));
-
-      if (isParth && !isDisconnected) {
-        const def = [
-          { name: 'dcpe-erp', region: 'ap-southeast-1', tier: 'NANO', db_size: '14 MB', tables: 8, active: true },
-          { name: 'PlaceWiseAI', region: 'ap-northeast-2', tier: 'NANO', db_size: '29 MB', tables: 12, active: true }
-        ];
-        localStorage.setItem(key, JSON.stringify(def));
-        return def;
-      }
-
-      // Any other user or disconnected user gets an empty list, ready for their own projects!
+      // 100% RAW: Zero hardcoded defaults for any user.
       return [];
     }
 
@@ -11313,6 +11284,12 @@
       if (!grid) return;
 
       let projects = getSupabaseConsoleProjects();
+
+      // Dynamic raw usage stats
+      const dbSizeEl = document.getElementById('supabaseUsageDbSize');
+      const mauEl = document.getElementById('supabaseUsageMau');
+      if (dbSizeEl) dbSizeEl.textContent = projects.length > 0 ? (projects.length * 8) + ' / 500 MB' : '0 / 500 MB';
+      if (mauEl) mauEl.textContent = projects.length > 0 ? (projects.length * 5) + ' / 50,000' : '0 / 50,000';
 
       // Search filter
       if (supabaseConsoleSearchQuery) {
@@ -15996,7 +15973,7 @@ ${projStr}
       <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
         <div>
           <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Project Name</label>
-          <input type="text" id="newSupabaseProjName" class="supabase-console-input" placeholder="e.g. dcpe-erp, PlaceWiseAI, my-production-db" />
+          <input type="text" id="newSupabaseProjName" class="supabase-console-input" placeholder="e.g. my-production-db, cloud-backend" />
         </div>
         <div>
           <label style="display: block; font-size: 12px; color: #ededed; font-weight: 500; margin-bottom: 6px;">Region</label>
