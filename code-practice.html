@@ -1457,7 +1457,46 @@
       padding-top: 4px;
     }
 
-  </style>
+  
+  /* ===== MOBILE RESPONSIVE OPTIMIZATIONS ===== */
+  @media (max-width: 768px) {
+    html, body {
+      width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+    .header {
+      padding: calc(env(safe-area-inset-top, 0px) + 8px) 12px 8px 12px !important;
+    }
+    .editor-split {
+      flex-direction: column !important;
+      height: auto !important;
+    }
+    .pane-left {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      max-height: 38vh !important;
+      border-right: none !important;
+      border-bottom: 2px solid var(--border) !important;
+      overflow-y: auto !important;
+    }
+    .pane-right {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      min-height: 50vh !important;
+    }
+    .editor-toolbar {
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+      padding: 8px 10px !important;
+    }
+    .editor-actions {
+      flex-wrap: wrap !important;
+    }
+  }
+
+</style>
 </head>
 
 <body>

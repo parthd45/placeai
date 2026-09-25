@@ -2,6 +2,25 @@
 <html lang="en">
 
 <head>
+  <script>
+    (function() {
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && (k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1 || k === 'supabase.auth.token')) {
+            var val = localStorage.getItem(k);
+            if (val && val.indexOf('access_token') !== -1) {
+              var p = JSON.parse(val);
+              if (p && (p.access_token || (p.currentSession && p.currentSession.access_token))) {
+                window.location.replace('dashboard.html');
+                return;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <title>Place Wise- AI-Driven Training and Placement Support System</title>
   <link rel="icon" href="images/icon.webp" type="image/gif" sizes="16x16" />
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
@@ -38,6 +57,87 @@
         bottom: -50px !important;
       }
     }
+  
+  /* ===== PLACEAI MOBILE LANDING OPTIMIZATIONS ===== */
+  @media (max-width: 768px) {
+    html, body {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+      touch-action: pan-y !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    header {
+      background: rgba(10, 15, 29, 0.95) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      padding: calc(env(safe-area-inset-top, 0px) + 8px) 12px 8px 12px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    
+    header #logo img {
+      height: 32px !important;
+      max-width: 140px !important;
+    }
+
+    #section-hero {
+      min-height: 90vh !important;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 90px) !important;
+      padding-bottom: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+    }
+
+    #section-hero .abs.abs-centered {
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      transform: none !important;
+      width: 100% !important;
+      padding: 0 16px !important;
+    }
+
+    #section-hero h1,
+    .fs-120 {
+      font-size: 38px !important;
+      line-height: 1.15 !important;
+      margin-bottom: 14px !important;
+    }
+
+    .grad-cap-icon {
+      width: 32px !important;
+      height: auto !important;
+      vertical-align: middle !important;
+    }
+
+    #section-hero .subtitle {
+      font-size: 13px !important;
+      letter-spacing: 2px !important;
+      margin-bottom: 8px !important;
+    }
+
+    #section-hero h4 {
+      font-size: 14px !important;
+    }
+
+    #section-hero .btn-main {
+      display: block !important;
+      width: 100% !important;
+      margin: 8px 0 !important;
+      padding: 12px 20px !important;
+      font-size: 15px !important;
+      text-align: center !important;
+      border-radius: 12px !important;
+    }
+
+    #section-hero .abs.bottom-0 {
+      display: none !important; /* Hide cluttered desktop banner bar on mobile */
+    }
+  }
+
   </style>
 </head>
 

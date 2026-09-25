@@ -569,7 +569,29 @@
       color: #94a3b8;
       line-height: 1.5;
     }
-  </style>
+  
+  /* ===== MOBILE RESPONSIVE OPTIMIZATIONS ===== */
+  @media (max-width: 768px) {
+    html, body {
+      width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+    .header {
+      padding: calc(env(safe-area-inset-top, 0px) + 8px) 12px 8px 12px !important;
+    }
+    .main-container {
+      padding: 12px !important;
+    }
+    .categories-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .card {
+      padding: 16px 14px !important;
+      border-radius: 16px !important;
+    }
+  }
+
+</style>
 </head>
 
 <body>

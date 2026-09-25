@@ -7625,7 +7625,122 @@
       font-size: 12px;
     }
 
-  </style>
+  
+  /* ===== PLACEAI EXTENDED MOBILE APP OPTIMIZATIONS ===== */
+  .wp-mobile-back-btn {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    /* Full-screen native feel for Community Chat Modal */
+    .community-chat-overlay {
+      padding: 0 !important;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+    }
+    .community-chat-card {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      height: 100% !important;
+      max-height: 100dvh !important;
+      border-radius: 0 !important;
+      border: none !important;
+      margin: 0 !important;
+    }
+
+    .community-chat-header {
+      padding: 10px 14px !important;
+      gap: 8px !important;
+    }
+
+    /* Single pane WhatsApp style navigation for Direct Chat */
+    .direct-view {
+      display: flex !important;
+      width: 100% !important;
+      height: 100% !important;
+      position: relative !important;
+      overflow: hidden !important;
+      flex-direction: row !important;
+    }
+
+    .direct-user-list {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      flex: 1 1 100% !important;
+      display: flex !important;
+      border-right: none !important;
+    }
+
+    .direct-thread-pane {
+      display: none !important;
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      flex: 1 1 100% !important;
+    }
+
+    .direct-view.mobile-thread-open .direct-user-list {
+      display: none !important;
+    }
+
+    .direct-view.mobile-thread-open .direct-thread-pane {
+      display: flex !important;
+    }
+
+    .wp-mobile-back-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 50% !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #e2e8f0 !important;
+      margin-right: 8px !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      cursor: pointer !important;
+    }
+
+    /* GitHub Heatmap mobile overflow containment */
+    .github-heatmap-card {
+      max-width: 100% !important;
+      overflow: hidden !important;
+    }
+    .heatmap-scroll {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      width: 100% !important;
+    }
+
+    /* Grids to single-column on mobile */
+    .vercel-apps-grid,
+    .supabase-projects-cards-grid,
+    .stats-row,
+    .telemetry-grid,
+    .quick-stats-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* WebRTC Call Overlays on Mobile */
+    .placeai-call-overlay {
+      padding: 10px !important;
+    }
+    .placeai-voice-card,
+    .placeai-video-card {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px !important;
+      padding: 24px 16px !important;
+    }
+    .placeai-video-streams {
+      height: 340px !important;
+      max-height: 50vh !important;
+    }
+  }
+
+</style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
     function toggleSidebar() {
@@ -10257,8 +10372,20 @@
       listEl.innerHTML = (showAiInList ? aiCardHtml : '') + peersHtml;
     }
 
+    
+    window.closeMobileDirectThread = function() {
+      const directView = document.getElementById('directView');
+      if (directView) {
+        directView.classList.remove('mobile-thread-open');
+      }
+    };
+  
     function selectDirectUser(peerId) {
       currentDirectPeerId = peerId;
+      const directView = document.getElementById('directView');
+      if (directView) {
+        directView.classList.add('mobile-thread-open');
+      }
       if (peerId !== 'placeai_copilot') {
         peerUnreadCounts[peerId] = 0;
         updateGlobalUnreadBadges();
@@ -10411,6 +10538,7 @@
         if (headerEl) {
           headerEl.innerHTML = `
             <div class="peer-thread-profile">
+              <button class="wp-mobile-back-btn" onclick="closeMobileDirectThread()" title="Back to chats"><i class="fas fa-arrow-left"></i></button>
               <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
                 <div class="peer-avatar-img ai-avatar-icon" style="font-size:16px;"><i class="fas fa-robot"></i></div>
               </div>
@@ -10542,6 +10670,7 @@
       if (headerEl) {
         headerEl.innerHTML = `
           <div class="peer-thread-profile">
+            <button class="wp-mobile-back-btn" onclick="closeMobileDirectThread()" title="Back to chats"><i class="fas fa-arrow-left"></i></button>
             <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
               <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
             </div>
