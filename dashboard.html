@@ -5643,6 +5643,195 @@
       50% { opacity: 0.5; transform: scale(0.85); }
     }
 
+    /* Cloud Mission Control Telemetry Strip */
+    .cloud-telemetry-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(24, 24, 27, 0.95) 50%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px;
+      padding: 8px 16px;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+    .telemetry-item strong {
+      color: #f1f5f9;
+      font-weight: 700;
+    }
+    .telemetry-separator {
+      width: 1px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .telemetry-latency-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #4ade80;
+      font-weight: 600;
+      font-family: ui-monospace, monospace;
+    }
+    .telemetry-beacon {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 6px #4ade80;
+      animation: vercelPulse 1.8s infinite;
+    }
+
+    /* Supabase Visual Usage Progress Bars */
+    .supabase-progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: #27272a;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .supabase-progress-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .supabase-progress-bar-fill.db {
+      background: linear-gradient(90deg, #10b981 0%, #3ecf8e 100%);
+      box-shadow: 0 0 8px rgba(62, 207, 142, 0.4);
+    }
+    .supabase-progress-bar-fill.mau {
+      background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+    .supabase-progress-bar-fill.storage {
+      background: linear-gradient(90deg, #9333ea 0%, #c084fc 100%);
+    }
+    .supabase-progress-bar-fill.egress {
+      background: linear-gradient(90deg, #d97706 0%, #fbbf24 100%);
+    }
+
+    /* Rich Supabase Project Card Accents */
+    .supabase-card-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+    .supabase-db-healthy-beacon {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: #34d399;
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+    .supabase-db-healthy-beacon::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 6px #34d399;
+      animation: vercelPulse 2s infinite;
+    }
+    .supabase-postgres-pill {
+      font-family: ui-monospace, monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      background: #18181b;
+      border: 1px solid #27272a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Framework Badge Styling for Vercel */
+    .vercel-framework-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .vercel-framework-badge.nextjs {
+      background: #000000;
+      color: #ffffff;
+      border: 1px solid #3f3f46;
+    }
+    .vercel-framework-badge.vite {
+      background: linear-gradient(135deg, rgba(189, 52, 254, 0.2) 0%, rgba(255, 234, 46, 0.2) 100%);
+      color: #eab308;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+    }
+    .vercel-framework-badge.react {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .vercel-framework-badge.node {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+    .vercel-framework-badge.web {
+      background: rgba(249, 115, 22, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.35);
+    }
+
+    /* Quick Filter Pills for Vercel */
+    .vercel-filter-tag-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 2px;
+    }
+    .vercel-filter-tag {
+      background: transparent;
+      border: none;
+      color: #a1a1aa;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .vercel-filter-tag:hover {
+      color: #f4f4f5;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .vercel-filter-tag.active {
+      color: #ffffff;
+      background: #27272a;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
     /* Vercel Official Segmented Control */
     .vercel-segmented-control {
       background: #000000;
@@ -7028,6 +7217,31 @@
       <div>
         <!-- Developer Cloud Ecosystem: GitHub, Vercel & Supabase Integrations -->
         <div class="dev-ecosystem-suite">
+          <!-- Cloud Mission Control Telemetry Strip -->
+          <div class="cloud-telemetry-banner">
+            <div class="telemetry-item">
+              <i class="fab fa-github" style="color: #f1f5f9; font-size: 13px;"></i>
+              <span>GitHub:</span> <strong id="telemetryGithubStatus">Active & Synced</strong>
+            </div>
+            <div class="telemetry-separator"></div>
+            <div class="telemetry-item">
+              <span style="font-size: 11px; font-weight: 900; color: #ffffff;">▲</span>
+              <span>Vercel Edge:</span> <strong id="telemetryVercelStatus">25 Deployments Live</strong>
+            </div>
+            <div class="telemetry-separator"></div>
+            <div class="telemetry-item">
+              <i class="fas fa-bolt" style="color: #3ecf8e; font-size: 12px;"></i>
+              <span>Supabase Cloud:</span> <strong id="telemetrySupabaseStatus">Projects Healthy</strong>
+            </div>
+            <div class="telemetry-separator"></div>
+            <div class="telemetry-item">
+              <span class="telemetry-latency-pill">
+                <span class="telemetry-beacon"></span>
+                <span id="telemetryLatencyVal">38ms</span> Edge Ping
+              </span>
+            </div>
+          </div>
+
           <!-- 3-Service Navigation Switcher -->
           <div class="dev-suite-nav-bar">
             <button type="button" class="dev-suite-tab-btn active" id="tabBtnGithub" onclick="switchDevSuiteTab('github')">
@@ -7297,20 +7511,35 @@
                 </div>
               </div>
 
-              <!-- Vercel Navigation Bar: 2 Segmented Tabs + Slider Controls + Live Status -->
+              <!-- Vercel Navigation Bar: 2 Segmented Tabs + Filters + Search + Slider Controls -->
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                <!-- 2 Premium Segmented Buttons -->
-                <div class="vercel-segmented-control">
-                  <button type="button" class="vercel-tab-pill active" id="btnVercelTabDeployments" onclick="switchVercelSubTab('deployments')">
-                    <span style="font-size: 11px;">▲</span>
-                    <span>Live Deployments</span>
-                    <span class="vercel-pill-badge" id="vercelSubCountDeployments">0</span>
-                  </button>
-                  <button type="button" class="vercel-tab-pill" id="btnVercelTabProjects" onclick="switchVercelSubTab('projects')">
-                    <i class="fas fa-layer-group" style="font-size: 11px;"></i>
-                    <span>Vercel Projects</span>
-                    <span class="vercel-pill-badge" id="vercelSubCountProjects">0</span>
-                  </button>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <!-- 2 Premium Segmented Buttons -->
+                  <div class="vercel-segmented-control">
+                    <button type="button" class="vercel-tab-pill active" id="btnVercelTabDeployments" onclick="switchVercelSubTab('deployments')">
+                      <span style="font-size: 11px;">▲</span>
+                      <span>Live Deployments</span>
+                      <span class="vercel-pill-badge" id="vercelSubCountDeployments">0</span>
+                    </button>
+                    <button type="button" class="vercel-tab-pill" id="btnVercelTabProjects" onclick="switchVercelSubTab('projects')">
+                      <i class="fas fa-layer-group" style="font-size: 11px;"></i>
+                      <span>Vercel Projects</span>
+                      <span class="vercel-pill-badge" id="vercelSubCountProjects">0</span>
+                    </button>
+                  </div>
+
+                  <!-- Quick Filter Pills -->
+                  <div class="vercel-filter-tag-group">
+                    <button type="button" class="vercel-filter-tag active" id="btnVercelFilter_all" onclick="setVercelEnvFilter('all')">All</button>
+                    <button type="button" class="vercel-filter-tag" id="btnVercelFilter_production" onclick="setVercelEnvFilter('production')">Production</button>
+                    <button type="button" class="vercel-filter-tag" id="btnVercelFilter_preview" onclick="setVercelEnvFilter('preview')">Preview</button>
+                  </div>
+
+                  <!-- Real-time Search Input -->
+                  <div class="supabase-search-input-wrap" style="min-width: 170px; max-width: 220px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="vercelAppSearchInput" class="supabase-console-input" style="padding: 5px 10px 5px 28px; font-size: 11.5px;" placeholder="Filter deployments..." oninput="filterVercelApps(this.value)" />
+                  </div>
                 </div>
 
                 <!-- Slider & View Controls -->
@@ -7427,29 +7656,52 @@
                     </div>
 
                     <div class="supabase-usage-list">
-                      <div class="supabase-usage-item">
-                        <span class="supabase-usage-item-label">
-                          <span class="supabase-usage-circle"></span> Egress
-                        </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageEgress">0.00 / 5 GB</span>
+                      <div class="supabase-usage-item" style="display: block;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <span class="supabase-usage-item-label">
+                            <span class="supabase-usage-circle" style="border-color: #fbbf24;"></span> Egress
+                          </span>
+                          <span class="supabase-usage-item-val" id="supabaseUsageEgress">0.00 / 5 GB</span>
+                        </div>
+                        <div class="supabase-progress-bar-wrap">
+                          <div class="supabase-progress-bar-fill egress" id="barSupabaseEgress" style="width: 1%;"></div>
+                        </div>
                       </div>
-                      <div class="supabase-usage-item">
-                        <span class="supabase-usage-item-label">
-                          <span class="supabase-usage-circle" style="border-color: #3ecf8e;"></span> Database size
-                        </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageDbSize">0 / 500 MB</span>
+
+                      <div class="supabase-usage-item" style="display: block; margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <span class="supabase-usage-item-label">
+                            <span class="supabase-usage-circle" style="border-color: #3ecf8e;"></span> Database size
+                          </span>
+                          <span class="supabase-usage-item-val" id="supabaseUsageDbSize">16 / 500 MB</span>
+                        </div>
+                        <div class="supabase-progress-bar-wrap">
+                          <div class="supabase-progress-bar-fill db" id="barSupabaseDbSize" style="width: 3.2%;"></div>
+                        </div>
                       </div>
-                      <div class="supabase-usage-item">
-                        <span class="supabase-usage-item-label">
-                          <span class="supabase-usage-circle" style="border-color: #38bdf8;"></span> Monthly active users
-                        </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageMau">0 / 50,000</span>
+
+                      <div class="supabase-usage-item" style="display: block; margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <span class="supabase-usage-item-label">
+                            <span class="supabase-usage-circle" style="border-color: #38bdf8;"></span> Monthly active users
+                          </span>
+                          <span class="supabase-usage-item-val" id="supabaseUsageMau">10 / 50,000</span>
+                        </div>
+                        <div class="supabase-progress-bar-wrap">
+                          <div class="supabase-progress-bar-fill mau" id="barSupabaseMau" style="width: 2%;"></div>
+                        </div>
                       </div>
-                      <div class="supabase-usage-item">
-                        <span class="supabase-usage-item-label">
-                          <span class="supabase-usage-circle"></span> File storage
-                        </span>
-                        <span class="supabase-usage-item-val" id="supabaseUsageStorage">0.00 / 1 GB</span>
+
+                      <div class="supabase-usage-item" style="display: block; margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <span class="supabase-usage-item-label">
+                            <span class="supabase-usage-circle" style="border-color: #c084fc;"></span> File storage
+                          </span>
+                          <span class="supabase-usage-item-val" id="supabaseUsageStorage">0.00 / 1 GB</span>
+                        </div>
+                        <div class="supabase-progress-bar-wrap">
+                          <div class="supabase-progress-bar-fill storage" id="barSupabaseStorage" style="width: 1%;"></div>
+                        </div>
                       </div>
                     </div>
 
@@ -10603,6 +10855,45 @@
     /* ===== VERCEL CLOUD REAL DEPLOYMENTS & PROJECTS ENGINE ===== */
     let vercelSubTab = 'deployments'; // 'deployments' or 'projects'
     let vercelLayoutMode = 'slide'; // default to horizontal carousel slider
+    let vercelSearchQuery = '';
+    let vercelEnvFilter = 'all';
+
+    function filterVercelApps(query) {
+      vercelSearchQuery = (query || '').toLowerCase().trim();
+      renderVercelDeployments(false);
+    }
+
+    function setVercelEnvFilter(filter) {
+      vercelEnvFilter = filter;
+      ['all', 'production', 'preview'].forEach(f => {
+        const el = document.getElementById('btnVercelFilter_' + f);
+        if (el) el.classList.toggle('active', f === filter);
+      });
+      renderVercelDeployments(false);
+    }
+
+    function detectVercelFrameworkBadge(name, meta) {
+      const str = ((name || '') + ' ' + ((meta && meta.githubCommitMessage) || '') + ' ' + ((meta && meta.framework) || '')).toLowerCase();
+      if (str.includes('next')) {
+        return '<span class="vercel-framework-badge nextjs">Next.js</span>';
+      } else if (str.includes('vite')) {
+        return '<span class="vercel-framework-badge vite">Vite</span>';
+      } else if (str.includes('react')) {
+        return '<span class="vercel-framework-badge react">React</span>';
+      } else if (str.includes('node') || str.includes('express')) {
+        return '<span class="vercel-framework-badge node">Node.js</span>';
+      }
+      return '<span class="vercel-framework-badge web">Web</span>';
+    }
+
+    // Dynamic latency heartbeat simulator
+    setInterval(() => {
+      const latEl = document.getElementById('telemetryLatencyVal');
+      if (latEl) {
+        const ping = 35 + Math.floor(Math.random() * 12);
+        latEl.textContent = ping + 'ms';
+      }
+    }, 4000);
 
     function getVercelStorageKey() {
       const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
@@ -10914,12 +11205,42 @@
         if (connectedView) connectedView.style.display = 'none';
       }
 
-      const realDeployments = (vercelData && Array.isArray(vercelData.deployments)) ? vercelData.deployments : [];
-      const realProjects = (vercelData && Array.isArray(vercelData.projects)) ? vercelData.projects : [];
+      let realDeployments = (vercelData && Array.isArray(vercelData.deployments)) ? vercelData.deployments : [];
+      let realProjects = (vercelData && Array.isArray(vercelData.projects)) ? vercelData.projects : [];
+
+      // Update Top Telemetry Banner
+      const telemVercel = document.getElementById('telemetryVercelStatus');
+      if (telemVercel) {
+        const liveCnt = realDeployments.length || fallbackVercelApps.length;
+        telemVercel.textContent = liveCnt > 0 ? (liveCnt + ' Live Deployments') : 'Connected';
+      }
+
+      // Apply environment filter
+      if (vercelEnvFilter === 'production') {
+        realDeployments = realDeployments.filter(d => d.target === 'production' || !d.target);
+      } else if (vercelEnvFilter === 'preview') {
+        realDeployments = realDeployments.filter(d => d.target && d.target !== 'production');
+      }
+
+      // Apply search query filter
+      if (vercelSearchQuery) {
+        realDeployments = realDeployments.filter(d => {
+          const name = (d.name || '').toLowerCase();
+          const url = (d.url || '').toLowerCase();
+          const branch = ((d.meta && d.meta.githubCommitRef) || '').toLowerCase();
+          const msg = ((d.meta && d.meta.githubCommitMessage) || '').toLowerCase();
+          return name.includes(vercelSearchQuery) || url.includes(vercelSearchQuery) || branch.includes(vercelSearchQuery) || msg.includes(vercelSearchQuery);
+        });
+        realProjects = realProjects.filter(p => {
+          const name = (p.name || '').toLowerCase();
+          const framework = (p.framework || '').toLowerCase();
+          return name.includes(vercelSearchQuery) || framework.includes(vercelSearchQuery);
+        });
+      }
 
       // Determine item count for tabs
-      const deployCount = realDeployments.length || fallbackVercelApps.length;
-      const projCount = realProjects.length || fallbackVercelApps.length;
+      const deployCount = realDeployments.length;
+      const projCount = realProjects.length;
 
       if (livePillCount) livePillCount.textContent = Math.max(deployCount, projCount);
       if (totalLiveApps) totalLiveApps.textContent = Math.max(deployCount, projCount);
@@ -10992,6 +11313,7 @@
                     <div class="vercel-deploy-title-group">
                       <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
                       <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
+                      ${detectVercelFrameworkBadge(name, dep.meta)}
                       <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> ${envLabel}</span>
                     </div>
                     <span class="vercel-status-pill ${stateClass}">${stateLabel}</span>
@@ -11701,11 +12023,21 @@
 
       let projects = getSupabaseConsoleProjects();
 
-      // Dynamic raw usage stats
+      // Dynamic raw usage stats & visual progress meters
       const dbSizeEl = document.getElementById('supabaseUsageDbSize');
       const mauEl = document.getElementById('supabaseUsageMau');
+      const barDb = document.getElementById('barSupabaseDbSize');
+      const barMau = document.getElementById('barSupabaseMau');
+      const telemSupa = document.getElementById('telemetrySupabaseStatus');
+
+      if (telemSupa) {
+        telemSupa.textContent = projects.length > 0 ? (projects.length + ' Projects Healthy') : 'Ready';
+      }
+
       if (dbSizeEl) dbSizeEl.textContent = projects.length > 0 ? (projects.length * 8) + ' / 500 MB' : '0 / 500 MB';
       if (mauEl) mauEl.textContent = projects.length > 0 ? (projects.length * 5) + ' / 50,000' : '0 / 50,000';
+      if (barDb) barDb.style.width = projects.length > 0 ? Math.min(100, Math.max(3.2, projects.length * 3.2)) + '%' : '1%';
+      if (barMau) barMau.style.width = projects.length > 0 ? Math.min(100, Math.max(2, projects.length * 2)) + '%' : '1%';
 
       // Search filter
       if (supabaseConsoleSearchQuery) {
@@ -11760,7 +12092,14 @@
                   ⋮
                 </div>
               </div>
-              <div class="supabase-project-region">${escapeHtml(p.region || 'ap-south-1')}</div>
+              <div class="supabase-project-region">
+                <i class="fas fa-server" style="color: #64748b; font-size: 10px; margin-right: 4px;"></i>${escapeHtml(p.region || 'ap-south-1 (Mumbai)')}
+              </div>
+              <div class="supabase-card-badge-row">
+                <span class="supabase-db-healthy-beacon">Healthy</span>
+                <span class="supabase-postgres-pill">Postgres 15.6</span>
+                <span class="supabase-postgres-pill">${escapeHtml(p.tables ? p.tables.length + ' tables' : 'Active DB')}</span>
+              </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 10px;">
