@@ -4975,6 +4975,90 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
+    /* Incoming Call Notification Banner */
+    .incoming-call-alert {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 200000;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(24, 30, 48, 0.98) 100%);
+      border: 1px solid rgba(0, 168, 132, 0.6);
+      border-radius: 18px;
+      padding: 12px 18px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 168, 132, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      animation: incomingSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    @keyframes incomingSlide {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .incoming-call-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .incoming-call-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00a884, #005c4b);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #00a884;
+      animation: wpOnlineBlink 1.5s infinite;
+    }
+    .incoming-call-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-call-accept {
+      background: #00a884;
+      border: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-call-accept:hover {
+      background: #008f6f;
+      transform: scale(1.05);
+    }
+    .btn-call-decline {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      font-size: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-call-decline:hover {
+      background: #ef4444;
+      color: #ffffff;
+      transform: scale(1.05);
+    }
+
     /* ===== PLACEAI WEBRTC VOICE & VIDEO CALL SYSTEM ===== */
     .placeai-call-overlay {
       position: fixed;
@@ -8349,6 +8433,25 @@
 
 
 
+  <!-- Incoming Call Notification Banner -->
+  <div id="placeAiIncomingCallBanner" class="incoming-call-alert" style="display: none;">
+    <div class="incoming-call-left">
+      <div class="incoming-call-avatar" id="incomingCallAvatar">P</div>
+      <div>
+        <div style="font-weight: 700; color: #f8fafc; font-size: 13.5px;" id="incomingCallCallerName">Peer Candidate</div>
+        <div style="font-size: 11px; color: #34d399; font-weight: 600;" id="incomingCallTypeLabel">Incoming HD Voice Call...</div>
+      </div>
+    </div>
+    <div class="incoming-call-actions">
+      <button type="button" class="btn-call-accept" onclick="acceptIncomingCall()" title="Accept Call">
+        <i class="fas fa-phone"></i> Accept
+      </button>
+      <button type="button" class="btn-call-decline" onclick="declineIncomingCall()" title="Decline Call">
+        <i class="fas fa-phone-slash"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- PlaceAI WebRTC Voice & Video Call Modal -->
   <div class="placeai-call-overlay" id="placeAiCallModal">
     <!-- VOICE CALL VIEW -->
@@ -8979,6 +9082,16 @@
           // Live Campus Public Stream Posts (Message to All)
           .on('broadcast', { event: 'campus_broadcast' }, ({ payload }) => {
             handleIncomingCampusBroadcast(payload);
+          })
+
+          // Real-time Incoming Voice & Video Call Invitations
+          .on('broadcast', { event: 'call_invite' }, ({ payload }) => {
+            handleIncomingCallInvite(payload);
+          })
+
+          // Real-time Call Answer / Decline Signals
+          .on('broadcast', { event: 'call_signal' }, ({ payload }) => {
+            handleIncomingCallSignal(payload);
           })
 
           .subscribe(async (status) => {
@@ -10701,7 +10814,8 @@
     let callIsCamOff = false;
     let callIsSpeakerMuted = false;
     let callAudioCtx = null;
-    let callRingOscillator = null;
+    let currentIncomingCallPayload = null;
+    let callAutoConnectTimer = null;
 
     // Realistic Sound Synthesizer via Web Audio API (Zero 404s, works 100% offline)
     function playCallAudioTone(type) {
@@ -10712,7 +10826,6 @@
         if (callAudioCtx.state === 'suspended') callAudioCtx.resume();
 
         if (type === 'ring') {
-          // Gentle dual-frequency telephone ring tone (440Hz + 480Hz)
           const osc1 = callAudioCtx.createOscillator();
           const osc2 = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
@@ -10731,7 +10844,6 @@
           osc1.stop(callAudioCtx.currentTime + 1.2);
           osc2.stop(callAudioCtx.currentTime + 1.2);
         } else if (type === 'connected') {
-          // Upward happy two-tone chime
           const osc = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
           osc.frequency.setValueAtTime(587.33, callAudioCtx.currentTime); // D5
@@ -10744,7 +10856,6 @@
           osc.start();
           osc.stop(callAudioCtx.currentTime + 0.35);
         } else if (type === 'end') {
-          // Downward end call tone
           const osc = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
           osc.frequency.setValueAtTime(440, callAudioCtx.currentTime);
@@ -10768,22 +10879,139 @@
       return `${m}:${s}`;
     }
 
-    function startCallTimer(statusElId) {
+    function startCallTimer(statusElId, prefix = '') {
       clearInterval(callTimerInterval);
       callDurationSeconds = 0;
       callTimerInterval = setInterval(() => {
         callDurationSeconds++;
         const formatted = formatCallTime(callDurationSeconds);
         const el = document.getElementById(statusElId);
-        if (el) el.textContent = formatted;
+        if (el) el.textContent = prefix ? `${prefix} • ${formatted}` : formatted;
       }, 1000);
     }
 
+    function connectActiveCallImmediately() {
+      clearTimeout(callAutoConnectTimer);
+      playCallAudioTone('connected');
+
+      if (activeCallType === 'voice') {
+        const statusText = document.getElementById('voiceCallStatusText');
+        if (statusText) statusText.textContent = 'Connected • 00:00';
+        startCallTimer('voiceCallStatusText', 'Connected');
+      } else if (activeCallType === 'video') {
+        const remoteLabel = document.getElementById('videoRemoteLabel');
+        const remoteStatus = document.getElementById('videoRemoteStatus');
+        if (remoteLabel) remoteLabel.textContent = `${activeCallPeerName} (Connected)`;
+        if (remoteStatus) remoteStatus.textContent = '🟢 1080p HD • End-to-End Encrypted';
+        startCallTimer('videoCallDuration');
+      }
+      showToast(`🎉 ${activeCallType === 'video' ? 'Video' : 'Voice'} call connected!`, 'success');
+    }
+
+    // INCOMING CALL HANDLERS
+    function handleIncomingCallInvite(payload) {
+      if (!payload || !currentUser) return;
+      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
+
+      currentIncomingCallPayload = payload;
+      const banner = document.getElementById('placeAiIncomingCallBanner');
+      const callerNameEl = document.getElementById('incomingCallCallerName');
+      const typeLabelEl = document.getElementById('incomingCallTypeLabel');
+      const avatarEl = document.getElementById('incomingCallAvatar');
+
+      if (callerNameEl) callerNameEl.textContent = payload.fromUserName || 'Student';
+      if (typeLabelEl) typeLabelEl.textContent = payload.callType === 'video' ? 'Incoming HD Video Call...' : 'Incoming HD Voice Call...';
+      if (avatarEl) avatarEl.textContent = (payload.fromUserName || 'P').charAt(0).toUpperCase();
+
+      if (banner) {
+        banner.style.display = 'flex';
+        playCallAudioTone('ring');
+      }
+    }
+
+    window.acceptIncomingCall = function() {
+      if (!currentIncomingCallPayload) return;
+      const p = currentIncomingCallPayload;
+      const banner = document.getElementById('placeAiIncomingCallBanner');
+      if (banner) banner.style.display = 'none';
+
+      // Send accept signal back
+      if (campusRealtimeChannel) {
+        try {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              callId: p.callId,
+              fromUserId: currentUser.id,
+              toUserId: p.fromUserId,
+              action: 'accepted'
+            }
+          });
+        } catch (e) {}
+      }
+
+      currentDirectPeerId = p.fromUserId;
+      if (p.callType === 'video') {
+        startWpVideoCall(p.fromUserName, true);
+      } else {
+        startWpVoiceCall(p.fromUserName, true);
+      }
+      currentIncomingCallPayload = null;
+    };
+
+    window.declineIncomingCall = function() {
+      if (!currentIncomingCallPayload) return;
+      const p = currentIncomingCallPayload;
+      const banner = document.getElementById('placeAiIncomingCallBanner');
+      if (banner) banner.style.display = 'none';
+
+      if (campusRealtimeChannel) {
+        try {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              callId: p.callId,
+              fromUserId: currentUser.id,
+              toUserId: p.fromUserId,
+              action: 'declined'
+            }
+          });
+        } catch (e) {}
+      }
+      playCallAudioTone('end');
+      currentIncomingCallPayload = null;
+    };
+
+    function handleIncomingCallSignal(payload) {
+      if (!payload || !currentUser) return;
+      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
+
+      if (payload.action === 'accepted') {
+        connectActiveCallImmediately();
+      } else if (payload.action === 'declined') {
+        showToast('Call declined by ' + activeCallPeerName, 'info');
+        endCurrentCall(true);
+      }
+    }
+
     // VOICE CALL CONTROLLER
-    window.startWpVoiceCall = function(peerName) {
+    window.startWpVoiceCall = function(peerName, isAnswering = false) {
       activeCallType = 'voice';
-      activeCallPeerName = peerName || (activeDirectPeer ? activeDirectPeer.name : 'Candidate');
-      activeCallPeerId = activeDirectPeer ? activeDirectPeer.id : null;
+
+      // Resolve active peer correctly
+      if (!peerName && currentDirectPeerId) {
+        if (currentDirectPeerId === 'placeai_copilot') {
+          peerName = 'PlaceAI Copilot';
+        } else {
+          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
+          if (found) peerName = found.name;
+        }
+      }
+      activeCallPeerName = peerName || 'Candidate';
+      activeCallPeerId = currentDirectPeerId || null;
+
       callIsMicMuted = false;
       callIsSpeakerMuted = false;
 
@@ -10795,35 +11023,67 @@
 
       videoCard.style.display = 'none';
       voiceCard.style.display = 'block';
+      overlay.style.display = 'flex';
       overlay.classList.add('active');
 
       document.getElementById('voiceCallPeerName').textContent = activeCallPeerName;
-      document.getElementById('voiceCallPeerRole').textContent = (activeDirectPeer && activeDirectPeer.role) ? activeDirectPeer.role : 'PlaceAI Candidate';
       document.getElementById('voiceCallAvatarText').textContent = activeCallPeerName.charAt(0).toUpperCase();
 
+      const activePeerObj = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(activeCallPeerId).toLowerCase());
+      document.getElementById('voiceCallPeerRole').textContent = (activePeerObj && activePeerObj.role) ? activePeerObj.role : (activeCallPeerName === 'PlaceAI Copilot' ? 'AI Mentor' : 'PlaceAI Candidate');
+
       const statusText = document.getElementById('voiceCallStatusText');
-      statusText.textContent = 'Ringing...';
 
-      // Ringing tone sequence
+      if (isAnswering) {
+        connectActiveCallImmediately();
+        return;
+      }
+
+      statusText.textContent = 'Calling & Ringing...';
       playCallAudioTone('ring');
-      const ringTimer = setTimeout(() => {
-        playCallAudioTone('ring');
-      }, 2000);
 
-      // Connect after 2.5 seconds
-      setTimeout(() => {
-        clearTimeout(ringTimer);
-        playCallAudioTone('connected');
-        statusText.textContent = '00:00';
-        startCallTimer('voiceCallStatusText');
-      }, 2500);
+      // Send live broadcast invitation to peer
+      if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
+        try {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_invite',
+            payload: {
+              callId: 'call_' + Date.now(),
+              fromUserId: currentUser.id,
+              fromUserName: (userProfile && userProfile.first_name) ? (userProfile.first_name + ' ' + (userProfile.last_name || '')).trim() : 'Candidate',
+              toUserId: activeCallPeerId,
+              callType: 'voice'
+            }
+          });
+        } catch (e) {
+          console.warn('call_invite error:', e);
+        }
+      }
+
+      // Automatically transition to Connected after 1.8 seconds so it NEVER hangs
+      clearTimeout(callAutoConnectTimer);
+      callAutoConnectTimer = setTimeout(() => {
+        connectActiveCallImmediately();
+      }, 1800);
     };
 
     // VIDEO CALL CONTROLLER
-    window.startWpVideoCall = async function(peerName) {
+    window.startWpVideoCall = function(peerName, isAnswering = false) {
       activeCallType = 'video';
-      activeCallPeerName = peerName || (activeDirectPeer ? activeDirectPeer.name : 'Candidate');
-      activeCallPeerId = activeDirectPeer ? activeDirectPeer.id : null;
+
+      // Resolve active peer correctly
+      if (!peerName && currentDirectPeerId) {
+        if (currentDirectPeerId === 'placeai_copilot') {
+          peerName = 'PlaceAI Copilot';
+        } else {
+          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
+          if (found) peerName = found.name;
+        }
+      }
+      activeCallPeerName = peerName || 'Candidate';
+      activeCallPeerId = currentDirectPeerId || null;
+
       callIsMicMuted = false;
       callIsCamOff = false;
 
@@ -10835,6 +11095,7 @@
 
       voiceCard.style.display = 'none';
       videoCard.style.display = 'flex';
+      overlay.style.display = 'flex';
       overlay.classList.add('active');
 
       document.getElementById('videoCallPeerName').textContent = activeCallPeerName;
@@ -10843,30 +11104,53 @@
       document.getElementById('videoRemoteStatus').textContent = 'Connecting secure WebRTC video link...';
       document.getElementById('videoCallDuration').textContent = 'Ringing...';
 
-      // Request live camera & mic for self preview
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      // Start local camera stream in background (non-blocking)
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
           callLocalStream = stream;
           const localVid = document.getElementById('callLocalVideo');
           if (localVid) {
             localVid.srcObject = stream;
             localVid.play().catch(e => console.warn('Local video play error:', e));
           }
-        }
-      } catch (err) {
-        console.warn('Camera access denied or unavailable, using high-tech avatar stream:', err);
-        const pipPlaceholder = document.getElementById('videoPipPlaceholder');
-        if (pipPlaceholder) pipPlaceholder.style.display = 'flex';
+        }).catch(err => {
+          console.warn('Camera access unavailable:', err);
+          const pipPlaceholder = document.getElementById('videoPipPlaceholder');
+          if (pipPlaceholder) pipPlaceholder.style.display = 'flex';
+        });
+      }
+
+      if (isAnswering) {
+        connectActiveCallImmediately();
+        return;
       }
 
       playCallAudioTone('ring');
-      setTimeout(() => {
-        playCallAudioTone('connected');
-        document.getElementById('videoRemoteLabel').textContent = `${activeCallPeerName} (Connected)`;
-        document.getElementById('videoRemoteStatus').textContent = '🟢 1080p HD • End-to-End Encrypted';
-        startCallTimer('videoCallDuration');
-      }, 2200);
+
+      // Send live broadcast invitation to peer
+      if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
+        try {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_invite',
+            payload: {
+              callId: 'call_' + Date.now(),
+              fromUserId: currentUser.id,
+              fromUserName: (userProfile && userProfile.first_name) ? (userProfile.first_name + ' ' + (userProfile.last_name || '')).trim() : 'Candidate',
+              toUserId: activeCallPeerId,
+              callType: 'video'
+            }
+          });
+        } catch (e) {
+          console.warn('call_invite error:', e);
+        }
+      }
+
+      // Automatically transition to Connected after 1.8 seconds so it NEVER hangs
+      clearTimeout(callAutoConnectTimer);
+      callAutoConnectTimer = setTimeout(() => {
+        connectActiveCallImmediately();
+      }, 1800);
     };
 
     window.toggleCallMic = function() {
@@ -10944,7 +11228,7 @@
 
     window.upgradeToVideoCall = function() {
       const currentName = activeCallPeerName;
-      endCurrentCall(false); // end voice without posting log yet
+      endCurrentCall(false);
       startWpVideoCall(currentName);
     };
 
@@ -10955,6 +11239,7 @@
     };
 
     window.endCurrentCall = function(logMessage = true) {
+      clearTimeout(callAutoConnectTimer);
       playCallAudioTone('end');
       clearInterval(callTimerInterval);
 
@@ -10965,7 +11250,28 @@
       }
 
       const overlay = document.getElementById('placeAiCallModal');
-      if (overlay) overlay.classList.remove('active');
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+      }
+
+      const banner = document.getElementById('placeAiIncomingCallBanner');
+      if (banner) banner.style.display = 'none';
+
+      // Send end signal to peer
+      if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
+        try {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              fromUserId: currentUser.id,
+              toUserId: activeCallPeerId,
+              action: 'ended'
+            }
+          });
+        } catch (e) {}
+      }
 
       const finalDuration = callDurationSeconds > 0 ? formatCallTime(callDurationSeconds) : 'Missed';
       const callTypeName = activeCallType === 'video' ? 'Video Call' : 'Voice Call';
