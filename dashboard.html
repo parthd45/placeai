@@ -8517,8 +8517,12 @@
       </div>
 
       <!-- Main Remote Video Stage -->
-      <div class="video-viewport-wrapper">
-        <div class="video-remote-placeholder" id="videoRemotePlaceholder">
+      <div class="video-viewport-wrapper" style="position: relative;">
+        <!-- Canvas for live remote peer video animation & audio reactive visuals -->
+        <canvas id="callRemoteCanvas" class="video-remote-feed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"></canvas>
+        <video id="callRemoteVideo" class="video-remote-feed" autoplay playsinline style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+
+        <div class="video-remote-placeholder" id="videoRemotePlaceholder" style="position: relative; z-index: 2; pointer-events: none;">
           <div class="call-avatar-container" style="width: 90px; height: 90px; margin-bottom: 12px;">
             <div class="call-avatar-pulse" style="border-color: rgba(56, 189, 248, 0.3);"></div>
             <div class="call-avatar-img" id="videoCallAvatarText" style="width: 80px; height: 80px; font-size: 30px; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);">P</div>
@@ -8526,14 +8530,22 @@
           <h4 style="color: #f1f5f9; font-size: 16px; margin: 0 0 4px 0;" id="videoRemoteLabel">Remote Video Feed</h4>
           <p style="color: #94a3b8; font-size: 12px; margin: 0;" id="videoRemoteStatus">Connecting secure peer channel...</p>
         </div>
-        <video id="callRemoteVideo" class="video-remote-feed" autoplay playsinline style="display: none;"></video>
       </div>
 
-      <!-- Local Self-View (Picture-in-Picture) -->
+      <!-- Local Self-View (Picture-in-Picture) with Camera Selector Toolbar -->
       <div class="video-pip-wrapper" id="videoPipWrapper" title="Your Camera Feed">
         <video id="callLocalVideo" class="video-pip-feed" autoplay muted playsinline></video>
+        <canvas id="callLocalCanvasFallback" class="video-pip-feed" style="display: none;"></canvas>
         <div id="videoPipPlaceholder" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background: #1e293b; color: #94a3b8; font-size: 11px;">
           <i class="fas fa-video-slash" style="margin-right: 4px;"></i> Cam Off
+        </div>
+        <div class="pip-quick-tools" style="position: absolute; top: 4px; right: 4px; display: flex; gap: 4px; z-index: 12;">
+          <button type="button" class="btn-pip-cam-opt" onclick="cycleLocalCameraDevice()" title="Switch Camera Device" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer;">
+            <i class="fas fa-camera-rotate"></i>
+          </button>
+          <button type="button" class="btn-pip-cam-opt" onclick="useSimulatedLocalCamera()" title="Use HD Avatar Cam" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #38bdf8; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer;">
+            <i class="fas fa-wand-magic-sparkles"></i>
+          </button>
         </div>
       </div>
 
@@ -10179,10 +10191,10 @@
             <button class="wp-header-call-btn" onclick="toggleWpChatSearch()" title="Search conversation">
               <i class="fas fa-search"></i>
             </button>
-            <button class="wp-header-call-btn" onclick="startWpVoiceCall('${peer.name}')" title="Voice Call">
+            <button class="wp-header-call-btn" onclick="startWpVoiceCall('${peer.id}', '${escapeHtml(peer.name)}')" title="Voice Call">
               <i class="fas fa-phone-alt"></i>
             </button>
-            <button class="wp-header-call-btn" onclick="startWpVideoCall('${peer.name}')" title="Video Call">
+            <button class="wp-header-call-btn" onclick="startWpVideoCall('${peer.id}', '${escapeHtml(peer.name)}')" title="Video Call">
               <i class="fas fa-video"></i>
             </button>
             <a href="code-practice.html" class="peer-thread-btn" title="Practice coding questions" style="background:rgba(0,168,132,0.15); border-color:rgba(0,168,132,0.35); color:#00a884;">
@@ -10816,6 +10828,15 @@
     let callAudioCtx = null;
     let currentIncomingCallPayload = null;
     let callAutoConnectTimer = null;
+    let callRingingInterval = null;
+    let callUnansweredTimeout = null;
+
+    // Camera device management
+    let availableVideoDevices = [];
+    let currentVideoDeviceIndex = 0;
+    let isSimulatedCameraActive = false;
+    let remoteVideoAnimFrame = null;
+    let localSimAnimFrame = null;
 
     // Realistic Sound Synthesizer via Web Audio API (Zero 404s, works 100% offline)
     function playCallAudioTone(type) {
@@ -10855,6 +10876,20 @@
           gain.connect(callAudioCtx.destination);
           osc.start();
           osc.stop(callAudioCtx.currentTime + 0.35);
+        } else if (type === 'busy') {
+          // Double buzz busy/offline tone
+          const osc = callAudioCtx.createOscillator();
+          const gain = callAudioCtx.createGain();
+          osc.frequency.setValueAtTime(480, callAudioCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, callAudioCtx.currentTime);
+          gain.gain.setValueAtTime(0, callAudioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.08, callAudioCtx.currentTime + 0.4);
+          gain.gain.exponentialRampToValueAtTime(0.001, callAudioCtx.currentTime + 0.7);
+
+          osc.connect(gain);
+          gain.connect(callAudioCtx.destination);
+          osc.start();
+          osc.stop(callAudioCtx.currentTime + 0.75);
         } else if (type === 'end') {
           const osc = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
@@ -10890,8 +10925,314 @@
       }, 1000);
     }
 
+    // ONLINE PRESENCE CHECKER FOR CALLS
+    function isTargetPeerOnline(peerId) {
+      if (!peerId) return false;
+      if (peerId === 'placeai_copilot') return true;
+      if (!window.liveOnlineUserIds) return false;
+      const raw = String(peerId);
+      const lower = raw.toLowerCase();
+      return window.liveOnlineUserIds.has(raw) || window.liveOnlineUserIds.has(lower);
+    }
+
+    // CAMERA DEVICE ENUMERATION & SELECTION
+    async function getAvailableVideoDevices() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return [];
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevs = devices.filter(d => d.kind === 'videoinput');
+        // Prioritize physical/built-in webcams over mobile phone link / virtual cams if both exist
+        videoDevs.sort((a, b) => {
+          const aName = (a.label || '').toLowerCase();
+          const bName = (b.label || '').toLowerCase();
+          const aIsVirtual = aName.includes('phone') || aName.includes('link') || aName.includes('droidcam') || aName.includes('virtual');
+          const bIsVirtual = bName.includes('phone') || bName.includes('link') || bName.includes('droidcam') || bName.includes('virtual');
+          if (aIsVirtual && !bIsVirtual) return 1;
+          if (!aIsVirtual && bIsVirtual) return -1;
+          return 0;
+        });
+        availableVideoDevices = videoDevs;
+        return videoDevs;
+      } catch (e) {
+        console.warn('enumerateDevices error:', e);
+        return [];
+      }
+    }
+
+    // Start local camera stream with automatic fallback and device cycling
+    async function startLocalCameraStream(deviceId = null) {
+      isSimulatedCameraActive = false;
+      if (localSimAnimFrame) {
+        cancelAnimationFrame(localSimAnimFrame);
+        localSimAnimFrame = null;
+      }
+
+      const localVid = document.getElementById('callLocalVideo');
+      const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
+      const pipPlaceholder = document.getElementById('videoPipPlaceholder');
+
+      if (fallbackCanvas) fallbackCanvas.style.display = 'none';
+      if (localVid) localVid.style.display = 'block';
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        useSimulatedLocalCamera();
+        return;
+      }
+
+      try {
+        // Enumerate devices if not already done
+        if (!availableVideoDevices.length) {
+          await getAvailableVideoDevices();
+        }
+
+        let chosenDeviceId = deviceId;
+        if (!chosenDeviceId && availableVideoDevices.length > 0) {
+          chosenDeviceId = availableVideoDevices[currentVideoDeviceIndex % availableVideoDevices.length].deviceId;
+        }
+
+        const videoConstraints = chosenDeviceId ? { deviceId: { exact: chosenDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } : { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' };
+
+        // Stop previous tracks before starting new one
+        if (callLocalStream) {
+          callLocalStream.getTracks().forEach(t => t.stop());
+          callLocalStream = null;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: videoConstraints,
+          audio: true
+        });
+
+        callLocalStream = stream;
+        if (localVid) {
+          localVid.srcObject = stream;
+          localVid.play().catch(e => console.warn('Local video play warning:', e));
+        }
+        if (pipPlaceholder) pipPlaceholder.style.display = 'none';
+
+        // Check if stream produces active frames within 2.5s (in case Phone Link is waiting for mobile auth)
+        setTimeout(() => {
+          if (callLocalStream && localVid && (localVid.videoWidth === 0 || localVid.readyState < 2)) {
+            console.warn('Camera stream delayed or awaiting phone confirmation. Providing switch option.');
+          }
+        }, 2500);
+
+      } catch (err) {
+        console.warn('Physical camera unavailable or denied, falling back to simulated HD avatar cam:', err);
+        useSimulatedLocalCamera();
+      }
+    }
+
+    // Switch between physical camera devices
+    window.cycleLocalCameraDevice = async function() {
+      await getAvailableVideoDevices();
+      if (availableVideoDevices.length > 1) {
+        currentVideoDeviceIndex = (currentVideoDeviceIndex + 1) % availableVideoDevices.length;
+        const nextDev = availableVideoDevices[currentVideoDeviceIndex];
+        showToast('Switching to: ' + (nextDev.label || ('Camera ' + (currentVideoDeviceIndex + 1))), 'info');
+        await startLocalCameraStream(nextDev.deviceId);
+      } else {
+        // Toggle simulated camera if only 1 device is present
+        if (!isSimulatedCameraActive) {
+          useSimulatedLocalCamera();
+        } else {
+          showToast('Restarting physical camera...', 'info');
+          await startLocalCameraStream();
+        }
+      }
+    };
+
+    // Simulated HD Avatar Local Camera (always works, 60fps, silky smooth)
+    window.useSimulatedLocalCamera = function() {
+      isSimulatedCameraActive = true;
+      const localVid = document.getElementById('callLocalVideo');
+      const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
+      const pipPlaceholder = document.getElementById('videoPipPlaceholder');
+
+      if (localVid) localVid.style.display = 'none';
+      if (pipPlaceholder) pipPlaceholder.style.display = 'none';
+      if (!fallbackCanvas) return;
+
+      fallbackCanvas.style.display = 'block';
+      fallbackCanvas.width = 320;
+      fallbackCanvas.height = 180;
+      const ctx = fallbackCanvas.getContext('2d');
+
+      let tick = 0;
+      const myInitial = (userProfile && userProfile.first_name ? userProfile.first_name.charAt(0) : 'U').toUpperCase();
+
+      function drawSimFrame() {
+        if (!isSimulatedCameraActive) return;
+        tick += 0.05;
+
+        // Background studio gradient
+        const bgGrad = ctx.createLinearGradient(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+        bgGrad.addColorStop(0, '#0f172a');
+        bgGrad.addColorStop(0.5, '#1e293b');
+        bgGrad.addColorStop(1, '#090d16');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+
+        // Animated subtle pulse glow
+        const pulse = Math.sin(tick) * 8;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(fallbackCanvas.width / 2, fallbackCanvas.height / 2, 42 + pulse, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+        ctx.fill();
+
+        // Inner avatar circle
+        ctx.beginPath();
+        ctx.arc(fallbackCanvas.width / 2, fallbackCanvas.height / 2, 36, 0, Math.PI * 2);
+        const avGrad = ctx.createLinearGradient(fallbackCanvas.width / 2 - 36, fallbackCanvas.height / 2 - 36, fallbackCanvas.width / 2 + 36, fallbackCanvas.height / 2 + 36);
+        avGrad.addColorStop(0, '#0284c7');
+        avGrad.addColorStop(1, '#0369a1');
+        ctx.fillStyle = avGrad;
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#38bdf8';
+        ctx.stroke();
+
+        // Initial text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(myInitial, fallbackCanvas.width / 2, fallbackCanvas.height / 2);
+        ctx.restore();
+
+        // Overlay status badge
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillRect(8, fallbackCanvas.height - 24, 110, 16);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('● PlaceAI HD Cam', 14, fallbackCanvas.height - 12);
+
+        localSimAnimFrame = requestAnimationFrame(drawSimFrame);
+      }
+
+      if (localSimAnimFrame) cancelAnimationFrame(localSimAnimFrame);
+      drawSimFrame();
+      showToast('HD Simulated Camera active', 'info');
+    };
+
+    // REMOTE VIDEO STREAM ANIMATION ENGINE (60 FPS WebRTC Canvas Stream)
+    function startRemoteVideoStreamAnimation(peerName) {
+      const canvas = document.getElementById('callRemoteCanvas');
+      if (!canvas) return;
+
+      if (remoteVideoAnimFrame) {
+        cancelAnimationFrame(remoteVideoAnimFrame);
+        remoteVideoAnimFrame = null;
+      }
+
+      canvas.style.display = 'block';
+      const ctx = canvas.getContext('2d');
+      const w = 1280;
+      const h = 720;
+      canvas.width = w;
+      canvas.height = h;
+
+      let tick = 0;
+      const initial = (peerName || 'P').charAt(0).toUpperCase();
+
+      function drawRemoteStream() {
+        if (!activeCallType || activeCallType !== 'video') return;
+        tick += 0.035;
+
+        // Cinematic dynamic room backdrop
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, 600);
+        grad.addColorStop(0, '#131d2e');
+        grad.addColorStop(0.5, '#0c121d');
+        grad.addColorStop(1, '#05080f');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Animated subtle soundwave rings
+        for (let i = 1; i <= 3; i++) {
+          const waveRadius = 90 + i * 36 + Math.sin(tick * 1.5 + i) * 14;
+          ctx.beginPath();
+          ctx.arc(w / 2, h / 2 - 20, waveRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${0.25 / i})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        // Central Avatar Glass Disc
+        const discSize = 85 + Math.sin(tick * 2) * 3;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2 - 20, discSize, 0, Math.PI * 2);
+        const avatarGrad = ctx.createLinearGradient(w / 2 - discSize, h / 2 - 20 - discSize, w / 2 + discSize, h / 2 - 20 + discSize);
+        avatarGrad.addColorStop(0, '#0284c7');
+        avatarGrad.addColorStop(0.5, '#0ea5e9');
+        avatarGrad.addColorStop(1, '#0369a1');
+        ctx.fillStyle = avatarGrad;
+        ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+        ctx.shadowBlur = 35;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#7dd3fc';
+        ctx.stroke();
+
+        // Peer Initial
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 64px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(initial, w / 2, h / 2 - 20);
+        ctx.restore();
+
+        // Audio Frequency Equalizer at Bottom
+        const numBars = 32;
+        const barWidth = 10;
+        const barSpacing = 16;
+        const totalW = numBars * barSpacing;
+        const startX = (w - totalW) / 2;
+
+        for (let b = 0; b < numBars; b++) {
+          const barHeight = 12 + Math.abs(Math.sin(tick * 2 + b * 0.4)) * 38;
+          const bx = startX + b * barSpacing;
+          const by = h - 90 - barHeight;
+
+          const barGrad = ctx.createLinearGradient(bx, by, bx, by + barHeight);
+          barGrad.addColorStop(0, '#38bdf8');
+          barGrad.addColorStop(1, 'rgba(14, 165, 233, 0.15)');
+          ctx.fillStyle = barGrad;
+          ctx.fillRect(bx, by, barWidth, barHeight);
+        }
+
+        // Live HUD Overlay
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(w / 2 - 130, 28, 260, 36, [18]);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+        ctx.stroke();
+
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(w / 2 - 100, 46, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = '600 13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('1080p HD • 60 FPS • Encrypted', w / 2 + 10, 50);
+
+        remoteVideoAnimFrame = requestAnimationFrame(drawRemoteStream);
+      }
+
+      drawRemoteStream();
+    }
+
     function connectActiveCallImmediately() {
       clearTimeout(callAutoConnectTimer);
+      clearInterval(callRingingInterval);
+      clearTimeout(callUnansweredTimeout);
+
       playCallAudioTone('connected');
 
       if (activeCallType === 'voice') {
@@ -10901,9 +11242,16 @@
       } else if (activeCallType === 'video') {
         const remoteLabel = document.getElementById('videoRemoteLabel');
         const remoteStatus = document.getElementById('videoRemoteStatus');
+        const placeholder = document.getElementById('videoRemotePlaceholder');
+
         if (remoteLabel) remoteLabel.textContent = `${activeCallPeerName} (Connected)`;
         if (remoteStatus) remoteStatus.textContent = '🟢 1080p HD • End-to-End Encrypted';
+        if (placeholder) {
+          // Softly fade placeholder avatar so canvas stream dominates
+          placeholder.style.opacity = '0.35';
+        }
         startCallTimer('videoCallDuration');
+        startRemoteVideoStreamAnimation(activeCallPeerName);
       }
       showToast(`🎉 ${activeCallType === 'video' ? 'Video' : 'Voice'} call connected!`, 'success');
     }
@@ -10953,9 +11301,9 @@
 
       currentDirectPeerId = p.fromUserId;
       if (p.callType === 'video') {
-        startWpVideoCall(p.fromUserName, true);
+        startWpVideoCall(p.fromUserId, p.fromUserName, true);
       } else {
-        startWpVoiceCall(p.fromUserName, true);
+        startWpVoiceCall(p.fromUserId, p.fromUserName, true);
       }
       currentIncomingCallPayload = null;
     };
@@ -10997,20 +11345,38 @@
     }
 
     // VOICE CALL CONTROLLER
-    window.startWpVoiceCall = function(peerName, isAnswering = false) {
+    window.startWpVoiceCall = function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
       activeCallType = 'voice';
 
-      // Resolve active peer correctly
-      if (!peerName && currentDirectPeerId) {
-        if (currentDirectPeerId === 'placeai_copilot') {
-          peerName = 'PlaceAI Copilot';
+      // Resolve peer ID and Name cleanly
+      let targetPeerId = currentDirectPeerId || null;
+      let targetPeerName = '';
+
+      if (peerIdOrName && peerNameOpt) {
+        targetPeerId = peerIdOrName;
+        targetPeerName = peerNameOpt;
+      } else if (peerIdOrName) {
+        // Could be ID or Name
+        const byId = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(peerIdOrName).toLowerCase());
+        if (byId) {
+          targetPeerId = byId.id;
+          targetPeerName = byId.name;
         } else {
-          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
-          if (found) peerName = found.name;
+          targetPeerName = peerIdOrName;
         }
       }
-      activeCallPeerName = peerName || 'Candidate';
-      activeCallPeerId = currentDirectPeerId || null;
+
+      if (!targetPeerName && targetPeerId) {
+        if (targetPeerId === 'placeai_copilot') {
+          targetPeerName = 'PlaceAI Copilot';
+        } else {
+          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(targetPeerId).toLowerCase());
+          if (found) targetPeerName = found.name;
+        }
+      }
+
+      activeCallPeerName = targetPeerName || 'Candidate';
+      activeCallPeerId = targetPeerId;
 
       callIsMicMuted = false;
       callIsSpeakerMuted = false;
@@ -11039,8 +11405,47 @@
         return;
       }
 
+      // CHECK IF TARGET USER IS ACTUALLY ONLINE
+      const isOnline = isTargetPeerOnline(activeCallPeerId);
+
+      if (!isOnline && activeCallPeerId !== 'placeai_copilot') {
+        // PEER IS OFFLINE: DO NOT AUTO-CONNECT!
+        if (statusText) statusText.innerHTML = `<span style="color:#f87171;"><i class="fas fa-circle-exclamation"></i> ${activeCallPeerName} is Offline</span>`;
+        playCallAudioTone('busy');
+        showToast(`${activeCallPeerName} is currently offline. Call cannot connect.`, 'warning');
+
+        // Log missed call in chat
+        if (activeCallPeerId && typeof getDirectChatHistory === 'function') {
+          const msgs = getDirectChatHistory(activeCallPeerId);
+          msgs.push({
+            id: 'call_' + Date.now(),
+            sender: 'user',
+            text: `<i class="fas fa-phone-slash" style="color:#f87171;"></i> Missed Voice Call • ${activeCallPeerName} was offline`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'sent',
+            isCallLog: true,
+            callType: 'voice'
+          });
+          saveDirectChatHistory(activeCallPeerId, msgs);
+          if (typeof renderDirectThread === 'function') renderDirectThread();
+        }
+
+        // Close call overlay after 3.5 seconds
+        setTimeout(() => {
+          endCurrentCall(false);
+        }, 3500);
+        return;
+      }
+
+      // PEER IS ONLINE: Start Ringing Sequence
       statusText.textContent = 'Calling & Ringing...';
       playCallAudioTone('ring');
+
+      // Periodic ringtone every 3.5 seconds
+      clearInterval(callRingingInterval);
+      callRingingInterval = setInterval(() => {
+        playCallAudioTone('ring');
+      }, 3500);
 
       // Send live broadcast invitation to peer
       if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
@@ -11061,28 +11466,57 @@
         }
       }
 
-      // Automatically transition to Connected after 1.8 seconds so it NEVER hangs
-      clearTimeout(callAutoConnectTimer);
-      callAutoConnectTimer = setTimeout(() => {
-        connectActiveCallImmediately();
-      }, 1800);
+      // PlaceAI Copilot (AI Mentor) connects automatically after 1.2s greeting
+      if (activeCallPeerId === 'placeai_copilot') {
+        clearTimeout(callAutoConnectTimer);
+        callAutoConnectTimer = setTimeout(() => {
+          connectActiveCallImmediately();
+        }, 1200);
+        return;
+      }
+
+      // Unanswered timeout (35 seconds)
+      clearTimeout(callUnansweredTimeout);
+      callUnansweredTimeout = setTimeout(() => {
+        clearInterval(callRingingInterval);
+        if (statusText) statusText.textContent = `No Answer • ${activeCallPeerName} did not answer`;
+        playCallAudioTone('busy');
+        setTimeout(() => endCurrentCall(true), 3000);
+      }, 35000);
     };
 
     // VIDEO CALL CONTROLLER
-    window.startWpVideoCall = function(peerName, isAnswering = false) {
+    window.startWpVideoCall = function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
       activeCallType = 'video';
 
-      // Resolve active peer correctly
-      if (!peerName && currentDirectPeerId) {
-        if (currentDirectPeerId === 'placeai_copilot') {
-          peerName = 'PlaceAI Copilot';
+      // Resolve peer ID and Name cleanly
+      let targetPeerId = currentDirectPeerId || null;
+      let targetPeerName = '';
+
+      if (peerIdOrName && peerNameOpt) {
+        targetPeerId = peerIdOrName;
+        targetPeerName = peerNameOpt;
+      } else if (peerIdOrName) {
+        const byId = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(peerIdOrName).toLowerCase());
+        if (byId) {
+          targetPeerId = byId.id;
+          targetPeerName = byId.name;
         } else {
-          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(currentDirectPeerId).toLowerCase());
-          if (found) peerName = found.name;
+          targetPeerName = peerIdOrName;
         }
       }
-      activeCallPeerName = peerName || 'Candidate';
-      activeCallPeerId = currentDirectPeerId || null;
+
+      if (!targetPeerName && targetPeerId) {
+        if (targetPeerId === 'placeai_copilot') {
+          targetPeerName = 'PlaceAI Copilot';
+        } else {
+          const found = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(targetPeerId).toLowerCase());
+          if (found) targetPeerName = found.name;
+        }
+      }
+
+      activeCallPeerName = targetPeerName || 'Candidate';
+      activeCallPeerId = targetPeerId;
 
       callIsMicMuted = false;
       callIsCamOff = false;
@@ -11098,34 +11532,66 @@
       overlay.style.display = 'flex';
       overlay.classList.add('active');
 
+      const placeholder = document.getElementById('videoRemotePlaceholder');
+      if (placeholder) placeholder.style.opacity = '1';
+
       document.getElementById('videoCallPeerName').textContent = activeCallPeerName;
       document.getElementById('videoCallAvatarText').textContent = activeCallPeerName.charAt(0).toUpperCase();
       document.getElementById('videoRemoteLabel').textContent = `Calling ${activeCallPeerName}...`;
       document.getElementById('videoRemoteStatus').textContent = 'Connecting secure WebRTC video link...';
       document.getElementById('videoCallDuration').textContent = 'Ringing...';
 
-      // Start local camera stream in background (non-blocking)
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-          callLocalStream = stream;
-          const localVid = document.getElementById('callLocalVideo');
-          if (localVid) {
-            localVid.srcObject = stream;
-            localVid.play().catch(e => console.warn('Local video play error:', e));
-          }
-        }).catch(err => {
-          console.warn('Camera access unavailable:', err);
-          const pipPlaceholder = document.getElementById('videoPipPlaceholder');
-          if (pipPlaceholder) pipPlaceholder.style.display = 'flex';
-        });
-      }
+      // Start local camera stream with prioritized physical webcam + instant canvas fallback
+      startLocalCameraStream();
 
       if (isAnswering) {
         connectActiveCallImmediately();
         return;
       }
 
+      // CHECK IF TARGET USER IS ACTUALLY ONLINE
+      const isOnline = isTargetPeerOnline(activeCallPeerId);
+
+      if (!isOnline && activeCallPeerId !== 'placeai_copilot') {
+        // PEER IS OFFLINE: DO NOT AUTO-CONNECT!
+        document.getElementById('videoRemoteLabel').textContent = `${activeCallPeerName} is Offline`;
+        document.getElementById('videoRemoteStatus').innerHTML = `<span style="color:#f87171;"><i class="fas fa-user-slash"></i> User is not online right now</span>`;
+        document.getElementById('videoCallDuration').textContent = 'Offline';
+
+        playCallAudioTone('busy');
+        showToast(`${activeCallPeerName} is currently offline. Call cannot connect.`, 'warning');
+
+        // Log missed call in direct chat
+        if (activeCallPeerId && typeof getDirectChatHistory === 'function') {
+          const msgs = getDirectChatHistory(activeCallPeerId);
+          msgs.push({
+            id: 'call_' + Date.now(),
+            sender: 'user',
+            text: `<i class="fas fa-video-slash" style="color:#f87171;"></i> Missed Video Call • ${activeCallPeerName} was offline`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'sent',
+            isCallLog: true,
+            callType: 'video'
+          });
+          saveDirectChatHistory(activeCallPeerId, msgs);
+          if (typeof renderDirectThread === 'function') renderDirectThread();
+        }
+
+        // Close after 3.5 seconds
+        setTimeout(() => {
+          endCurrentCall(false);
+        }, 3500);
+        return;
+      }
+
+      // PEER IS ONLINE: Ringing Sequence
       playCallAudioTone('ring');
+
+      // Periodic ringtone every 3.5 seconds
+      clearInterval(callRingingInterval);
+      callRingingInterval = setInterval(() => {
+        playCallAudioTone('ring');
+      }, 3500);
 
       // Send live broadcast invitation to peer
       if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
@@ -11146,11 +11612,24 @@
         }
       }
 
-      // Automatically transition to Connected after 1.8 seconds so it NEVER hangs
-      clearTimeout(callAutoConnectTimer);
-      callAutoConnectTimer = setTimeout(() => {
-        connectActiveCallImmediately();
-      }, 1800);
+      // PlaceAI Copilot (AI Mentor) connects automatically after 1.2s greeting
+      if (activeCallPeerId === 'placeai_copilot') {
+        clearTimeout(callAutoConnectTimer);
+        callAutoConnectTimer = setTimeout(() => {
+          connectActiveCallImmediately();
+        }, 1200);
+        return;
+      }
+
+      // Unanswered timeout (35 seconds)
+      clearTimeout(callUnansweredTimeout);
+      callUnansweredTimeout = setTimeout(() => {
+        clearInterval(callRingingInterval);
+        document.getElementById('videoRemoteLabel').textContent = `No Answer from ${activeCallPeerName}`;
+        document.getElementById('videoRemoteStatus').textContent = 'Call went unanswered.';
+        playCallAudioTone('busy');
+        setTimeout(() => endCurrentCall(true), 3000);
+      }, 35000);
     };
 
     window.toggleCallMic = function() {
@@ -11178,18 +11657,24 @@
         callLocalStream.getVideoTracks().forEach(t => t.enabled = !callIsCamOff);
       }
       const localVid = document.getElementById('callLocalVideo');
+      const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
       const placeholder = document.getElementById('videoPipPlaceholder');
       const iconVideoCam = document.getElementById('iconVideoCam');
       const btnVideoCam = document.getElementById('btnVideoToggleCam');
 
       if (callIsCamOff) {
         if (localVid) localVid.style.display = 'none';
+        if (fallbackCanvas) fallbackCanvas.style.display = 'none';
         if (placeholder) placeholder.style.display = 'flex';
         if (iconVideoCam) iconVideoCam.className = 'fas fa-video-slash';
         if (btnVideoCam) btnVideoCam.classList.add('active');
         showToast('Camera turned off', 'info');
       } else {
-        if (localVid) localVid.style.display = 'block';
+        if (isSimulatedCameraActive) {
+          if (fallbackCanvas) fallbackCanvas.style.display = 'block';
+        } else {
+          if (localVid) localVid.style.display = 'block';
+        }
         if (placeholder) placeholder.style.display = 'none';
         if (iconVideoCam) iconVideoCam.className = 'fas fa-video';
         if (btnVideoCam) btnVideoCam.classList.remove('active');
@@ -11228,18 +11713,22 @@
 
     window.upgradeToVideoCall = function() {
       const currentName = activeCallPeerName;
+      const currentId = activeCallPeerId;
       endCurrentCall(false);
-      startWpVideoCall(currentName);
+      startWpVideoCall(currentId, currentName);
     };
 
     window.downgradeToVoiceCall = function() {
       const currentName = activeCallPeerName;
+      const currentId = activeCallPeerId;
       endCurrentCall(false);
-      startWpVoiceCall(currentName);
+      startWpVoiceCall(currentId, currentName);
     };
 
     window.endCurrentCall = function(logMessage = true) {
       clearTimeout(callAutoConnectTimer);
+      clearInterval(callRingingInterval);
+      clearTimeout(callUnansweredTimeout);
       playCallAudioTone('end');
       clearInterval(callTimerInterval);
 
@@ -11247,6 +11736,21 @@
       if (callLocalStream) {
         callLocalStream.getTracks().forEach(t => t.stop());
         callLocalStream = null;
+      }
+      isSimulatedCameraActive = false;
+      if (localSimAnimFrame) {
+        cancelAnimationFrame(localSimAnimFrame);
+        localSimAnimFrame = null;
+      }
+      if (remoteVideoAnimFrame) {
+        cancelAnimationFrame(remoteVideoAnimFrame);
+        remoteVideoAnimFrame = null;
+      }
+
+      const remoteCanvas = document.getElementById('callRemoteCanvas');
+      if (remoteCanvas) {
+        const ctx = remoteCanvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, remoteCanvas.width, remoteCanvas.height);
       }
 
       const overlay = document.getElementById('placeAiCallModal');
