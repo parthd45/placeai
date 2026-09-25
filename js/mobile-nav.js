@@ -1,176 +1,80 @@
 /**
- * Mobile Navigation Handler
- * Handles hamburger menu, sidebar toggle, and mobile overlay
+ * PlaceAI Mobile Navigation & Android Back Button Handler
+ * Intercepts physical back button & gestures to close modals and navigate smoothly like a native app.
  */
-
 (function () {
-    'use strict';
-
-    // Create mobile header and hamburger menu
-    function createMobileHeader() {
-        // Check if mobile header already exists
-        if (document.querySelector('.mobile-header')) {
-            return;
-        }
-
-        const mobileHeader = document.createElement('div');
-        mobileHeader.className = 'mobile-header mobile-only';
-        mobileHeader.innerHTML = `
-            <div class="hamburger-menu" id="hamburgerMenu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 18px; font-weight: 700; color: white;">P</span>
-                </div>
-                <span style="font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PlaceAI</span>
-            </div>
-            <div style="width: 40px;"></div>
-        `;
-
-        // Insert at the beginning of body
-        document.body.insertBefore(mobileHeader, document.body.firstChild);
-
-        // Create mobile overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-overlay';
-        overlay.id = 'mobileOverlay';
-        document.body.appendChild(overlay);
-
-        // Add event listeners
-        setupMobileNavigation();
+  function handleBack() {
+    // 1. If WebRTC Call Overlay is active, do not close casually
+    const callOverlay = document.querySelector('.placeai-call-overlay.active');
+    if (callOverlay) {
+      if (confirm('Do you want to end or minimize the ongoing call?')) {
+        if (typeof window.endPlaceAICall === 'function') window.endPlaceAICall();
+      }
+      return true;
     }
 
-    // Setup mobile navigation event listeners
-    function setupMobileNavigation() {
-        const hamburger = document.getElementById('hamburgerMenu');
-        const overlay = document.getElementById('mobileOverlay');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (!hamburger || !overlay || !sidebar) {
-            return;
-        }
-
-        // Toggle sidebar on hamburger click
-        hamburger.addEventListener('click', function () {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        });
-
-        // Close sidebar on overlay click
-        overlay.addEventListener('click', function () {
-            sidebar.classList.remove('mobile-open');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // Close sidebar when clicking menu items on mobile
-        const menuItems = sidebar.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-            item.addEventListener('click', function () {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('mobile-open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        });
-
-        // Handle window resize
-        let resizeTimer;
-        window.addEventListener('resize', function () {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function () {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('mobile-open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            }, 250);
-        });
+    // 2. If in Direct Chat Thread on mobile, back goes to contact list
+    const directView = document.getElementById('directView');
+    if (directView && directView.classList.contains('mobile-thread-open')) {
+      if (typeof window.closeMobileDirectThread === 'function') {
+        window.closeMobileDirectThread();
+        return true;
+      }
     }
 
-    // Create mobile filter toggle for job matching page
-    function createMobileFilterToggle() {
-        const filtersContainer = document.querySelector('.filters-sidebar');
-        if (!filtersContainer) {
-            return;
-        }
-
-        // Create filter toggle button
-        const filterToggle = document.createElement('button');
-        filterToggle.className = 'mobile-filter-toggle mobile-only';
-        filterToggle.innerHTML = '<i class="fas fa-filter"></i> Filters';
-        filterToggle.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-            color: white;
-            border: none;
-            border-radius: 24px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-            cursor: pointer;
-            display: none;
-        `;
-
-        document.body.appendChild(filterToggle);
-
-        // Show button on mobile
-        if (window.innerWidth <= 768) {
-            filterToggle.style.display = 'flex';
-        }
-
-        // Toggle filters
-        filterToggle.addEventListener('click', function () {
-            filtersContainer.classList.toggle('mobile-open');
-            const overlay = document.getElementById('mobileOverlay') || createOverlay();
-            overlay.classList.toggle('active');
-        });
-
-        // Close on overlay click
-        const overlay = document.getElementById('mobileOverlay');
-        if (overlay) {
-            overlay.addEventListener('click', function () {
-                filtersContainer.classList.remove('mobile-open');
-            });
-        }
+    // 3. If Community Chat modal is open, back closes the modal
+    const chatModal = document.getElementById('communityChatModal');
+    if (chatModal && (chatModal.classList.contains('active') || chatModal.style.display === 'flex')) {
+      if (typeof window.closeCampusChatModal === 'function') {
+        window.closeCampusChatModal();
+        return true;
+      }
     }
 
-    // Create overlay if it doesn't exist
-    function createOverlay() {
-        let overlay = document.getElementById('mobileOverlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.className = 'mobile-overlay';
-            overlay.id = 'mobileOverlay';
-            document.body.appendChild(overlay);
-        }
-        return overlay;
+    // 4. If App Updates modal is open, back closes it
+    const updateModal = document.getElementById('placeaiUpdateModal');
+    if (updateModal && (updateModal.classList.contains('active') || updateModal.style.display === 'flex')) {
+      if (typeof window.closePlaceAIUpdateModal === 'function') {
+        window.closePlaceAIUpdateModal();
+        return true;
+      }
     }
 
-    // Initialize on DOM load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+    // 5. If any custom table or vercel modal is open, close it
+    const customModals = document.querySelectorAll('.community-chat-overlay');
+    for (let m of customModals) {
+      if (m.id !== 'communityChatModal' && m.style.display !== 'none' && m.style.display !== '') {
+        m.style.display = 'none';
+        return true;
+      }
     }
 
-    function init() {
-        createMobileHeader();
-        createMobileFilterToggle();
+    // 6. If on a subpage (code-practice, resume, etc.), go back to dashboard.html
+    const pathname = window.location.pathname;
+    if (pathname.includes('code-practice') || pathname.includes('resume-analyzer') || pathname.includes('mock-interview') || pathname.includes('career-recommendations') || pathname.includes('skill-analysis') || pathname.includes('learning-paths')) {
+      window.location.href = 'dashboard.html';
+      return true;
     }
 
-    // Export for manual initialization if needed
-    window.MobileNav = {
-        init: init,
-        createMobileHeader: createMobileHeader,
-        createMobileFilterToggle: createMobileFilterToggle
-    };
+    return false;
+  }
+
+  window.handleGlobalMobileBack = handleBack;
+
+  // Listen to Capacitor native Android back button if available
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', function (state) {
+      const handled = handleBack();
+      if (!handled && !state.canGoBack) {
+        window.Capacitor.Plugins.App.exitApp();
+      }
+    });
+  }
+
+  // Push state for browser history back navigation
+  if (window.history && window.history.pushState) {
+    window.addEventListener('popstate', function (e) {
+      handleBack();
+    });
+  }
 })();

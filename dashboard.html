@@ -8004,6 +8004,166 @@
       }
     }
 
+
+  /* ===== SUPER CLEAN MOBILE REFINEMENTS (CHAT, PROFILE, BACK BUTTONS) ===== */
+  .chat-back-to-dashboard-btn {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    /* Top Chat Bar Back Button */
+    .chat-back-to-dashboard-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 50% !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #ffffff !important;
+      font-size: 15px !important;
+      margin-right: 8px !important;
+      cursor: pointer !important;
+    }
+
+    .community-header-sub {
+      display: none !important;
+    }
+    .community-header-titles h3 {
+      font-size: 15px !important;
+      margin: 0 !important;
+    }
+
+    /* Mode Switcher Tabs inside Chat */
+    .community-mode-switcher {
+      width: 100% !important;
+      display: flex !important;
+      gap: 4px !important;
+      padding: 4px !important;
+      background: rgba(15, 23, 42, 0.95) !important;
+      border-radius: 12px !important;
+      border: 1px solid rgba(51, 65, 85, 0.6) !important;
+    }
+    .mode-tab-btn {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      padding: 7px 6px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+      justify-content: center !important;
+      border-radius: 8px !important;
+      white-space: nowrap !important;
+    }
+
+    /* Ultra Clean Profile Card on Mobile */
+    .profile-card {
+      border-radius: 18px !important;
+      background: rgba(15, 23, 42, 0.9) !important;
+      border: 1px solid rgba(139, 92, 246, 0.25) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+      margin-bottom: 8px !important;
+      overflow: hidden !important;
+    }
+    .profile-cover-banner {
+      height: 48px !important;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%) !important;
+    }
+    .cover-badge-top {
+      display: none !important;
+    }
+    .cover-edit-btn {
+      top: 8px !important;
+      right: 10px !important;
+      padding: 3px 8px !important;
+      font-size: 10.5px !important;
+      border-radius: 8px !important;
+    }
+    .profile-card-body {
+      padding: 0 12px 12px 12px !important;
+    }
+    .profile-avatar-wrapper {
+      margin-top: -24px !important;
+      margin-bottom: 4px !important;
+    }
+    .profile-avatar-large {
+      width: 52px !important;
+      height: 52px !important;
+      font-size: 17px !important;
+      border: 2.5px solid #0f172a !important;
+    }
+    .profile-name {
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      margin-bottom: 2px !important;
+    }
+    .profile-role-tag {
+      font-size: 11px !important;
+      margin-bottom: 6px !important;
+    }
+    .profile-chips-ribbon {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 4px !important;
+      margin-bottom: 8px !important;
+    }
+    .profile-chip {
+      font-size: 10px !important;
+      padding: 2px 7px !important;
+      border-radius: 6px !important;
+    }
+    .profile-availability-glow {
+      display: inline-flex !important;
+      font-size: 10.5px !important;
+      padding: 3px 8px !important;
+      margin-bottom: 8px !important;
+      border-radius: 6px !important;
+    }
+    .profile-connect-strip {
+      display: flex !important;
+      gap: 8px !important;
+      margin-bottom: 8px !important;
+    }
+    .connect-circle {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 11.5px !important;
+    }
+    .profile-divider {
+      margin: 8px 0 !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    .profile-stats-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 5px !important;
+      margin-bottom: 8px !important;
+    }
+    .stat-item {
+      padding: 5px 2px !important;
+      border-radius: 8px !important;
+    }
+    .stat-value {
+      font-size: 13.5px !important;
+      font-weight: 800 !important;
+    }
+    .stat-label {
+      font-size: 9px !important;
+      color: #94a3b8 !important;
+    }
+    .profile-actions {
+      margin-top: 6px !important;
+    }
+    .profile-actions .btn-primary {
+      height: 36px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      border-radius: 10px !important;
+    }
+  }
+
 </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -9346,12 +9506,15 @@
       <!-- Header -->
       <div class="community-chat-header">
         <div class="community-header-left">
+          <button type="button" class="chat-back-to-dashboard-btn" onclick="closeCampusChatModal()" title="Back to Dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
           <div class="community-header-icon">
             <i class="fas fa-comments"></i>
           </div>
           <div class="community-header-titles">
-            <h3>PlaceAI Campus & Peer Chat</h3>
-            <p>Connect with all students on PlaceAI or direct message a specific user</p>
+            <h3>Campus & Peer Chat</h3>
+            <p class="community-header-sub">Connect with students & direct message peers</p>
           </div>
         </div>
 
@@ -19611,5 +19774,6 @@ ${projStr}
     });
   </script>
 
+  <script src="js/mobile-nav.js"></script>
 </body>
 
