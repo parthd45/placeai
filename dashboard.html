@@ -8463,6 +8463,8 @@
 
   <!-- PlaceAI WebRTC Voice & Video Call Modal -->
   <div class="placeai-call-overlay" id="placeAiCallModal">
+    <!-- Dedicated WebRTC Remote Audio Player (Unmuted, 48kHz Stereo) -->
+    <audio id="callRemoteAudio" autoplay playsinline style="display: none;"></audio>
     <!-- VOICE CALL VIEW -->
     <div class="placeai-voice-card" id="placeAiVoiceCallCard" style="display: none;">
       <div class="call-security-ribbon">
@@ -10862,7 +10864,7 @@
       ]
     };
 
-    // Camera device management
+    // Camera & Audio device management
     let availableVideoDevices = [];
     let currentVideoDeviceIndex = 0;
     let isSimulatedCameraActive = true;
@@ -10870,7 +10872,7 @@
     let localSimAnimFrame = null;
     let micAudioLevel = 0.3;
 
-    // Realistic Web Audio Tone Synthesizer
+    // Web Audio Tone Synthesizer
     function playCallAudioTone(type) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -10962,7 +10964,96 @@
     }
 
     // =========================================================
-    // REAL WEBRTC PEER CONNECTION PIPELINE
+    // HIGH-FIDELITY MICROPHONE AUDIO ACQUISITION
+    // =========================================================
+    async function acquireMicrophoneStream() {
+      // Check if active audio track already exists
+      if (callLocalStream && callLocalStream.getAudioTracks().length > 0) {
+        const existingTrack = callLocalStream.getAudioTracks()[0];
+        if (existingTrack.readyState === 'live') {
+          existingTrack.enabled = !callIsMicMuted;
+          return callLocalStream;
+        }
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.warn('getUserMedia not supported in this environment');
+        return null;
+      }
+
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            channelCount: 1
+          },
+          video: false
+        });
+
+        const newAudioTrack = audioStream.getAudioTracks()[0];
+        newAudioTrack.enabled = !callIsMicMuted;
+
+        if (callLocalStream) {
+          // Add audio track to existing local stream
+          callLocalStream.addTrack(newAudioTrack);
+        } else {
+          callLocalStream = audioStream;
+        }
+
+        // Attach audio analyzer for speech wave visualizer
+        setupMicAudioAnalyzer(callLocalStream);
+
+        // If WebRTC connection is already open, attach/replace audio track
+        if (activeRtcPeerConnection) {
+          const audioSender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'audio');
+          if (audioSender) {
+            audioSender.replaceTrack(newAudioTrack).catch(() => {});
+          } else {
+            activeRtcPeerConnection.addTrack(newAudioTrack, callLocalStream);
+          }
+        }
+
+        console.log('✅ Local microphone stream acquired successfully (Echo cancellation & noise suppression active)');
+        return callLocalStream;
+      } catch (err) {
+        console.warn('Microphone permission or hardware note:', err.message);
+        return null;
+      }
+    }
+
+    function setupMicAudioAnalyzer(stream) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        if (!callAudioCtx) callAudioCtx = new AudioContext();
+        if (callAudioCtx.state === 'suspended') callAudioCtx.resume();
+
+        if (stream.getAudioTracks().length > 0) {
+          const micSource = callAudioCtx.createMediaStreamSource(stream);
+          const analyser = callAudioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          micSource.connect(analyser);
+          const dataArr = new Uint8Array(analyser.frequencyBinCount);
+
+          const pollMic = () => {
+            if (!callLocalStream) return;
+            analyser.getByteFrequencyData(dataArr);
+            let sum = 0;
+            for (let i = 0; i < dataArr.length; i++) sum += dataArr[i];
+            micAudioLevel = Math.max(0.15, (sum / dataArr.length) / 128);
+            requestAnimationFrame(pollMic);
+          };
+          pollMic();
+        }
+      } catch (e) {
+        console.warn('Mic analyzer note:', e);
+      }
+    }
+
+    // =========================================================
+    // REAL WEBRTC PEER CONNECTION PIPELINE (AUDIO + VIDEO)
     // =========================================================
     function createRtcPeerConnection() {
       if (activeRtcPeerConnection) {
@@ -10974,51 +11065,116 @@
       const pc = new RTCPeerConnection(rtcConfiguration);
       activeRtcPeerConnection = pc;
 
-      // Attach all local tracks to WebRTC pipe
-      let streamToSend = callLocalStream;
-      if (!streamToSend || streamToSend.getVideoTracks().length === 0) {
+      // Always add audio transceiver so two-way voice is guaranteed
+      pc.addTransceiver('audio', { direction: 'sendrecv' });
+
+      // Add video transceiver if video call
+      if (activeCallType === 'video') {
+        pc.addTransceiver('video', { direction: 'sendrecv' });
+      }
+
+      // Collect local tracks to send
+      let audioTrack = null;
+      let videoTrack = null;
+
+      if (callLocalStream) {
+        const aTracks = callLocalStream.getAudioTracks();
+        if (aTracks.length > 0) audioTrack = aTracks[0];
+
+        const vTracks = callLocalStream.getVideoTracks();
+        if (vTracks.length > 0) videoTrack = vTracks[0];
+      }
+
+      // Fallback: If in video call and physical camera has no track, use canvas stream
+      if (activeCallType === 'video' && !videoTrack) {
         const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
         if (fallbackCanvas && fallbackCanvas.captureStream) {
           try {
             const canvasStream = fallbackCanvas.captureStream(30);
-            if (callLocalStream && callLocalStream.getAudioTracks().length > 0) {
-              canvasStream.addTrack(callLocalStream.getAudioTracks()[0]);
+            if (canvasStream.getVideoTracks().length > 0) {
+              videoTrack = canvasStream.getVideoTracks()[0];
             }
-            streamToSend = canvasStream;
           } catch (e) {}
         }
       }
 
-      if (streamToSend) {
-        streamToSend.getTracks().forEach(track => {
-          try {
-            pc.addTrack(track, streamToSend);
-          } catch (e) {
-            console.warn('Error adding track to WebRTC:', e);
+      // Attach audio track to peer connection
+      if (audioTrack) {
+        try {
+          const audioSender = pc.getSenders().find(s => s.track && s.track.kind === 'audio');
+          if (audioSender) {
+            audioSender.replaceTrack(audioTrack);
+          } else {
+            pc.addTrack(audioTrack, callLocalStream || new MediaStream([audioTrack]));
           }
-        });
+          console.log('🎤 Audio track bound to WebRTC pipe');
+        } catch (e) {
+          console.warn('Error attaching audio track:', e);
+        }
       }
 
-      // Handle remote incoming video / audio stream from the other user!
+      // Attach video track to peer connection if video call
+      if (activeCallType === 'video' && videoTrack) {
+        try {
+          const videoSender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+          if (videoSender) {
+            videoSender.replaceTrack(videoTrack);
+          } else {
+            pc.addTrack(videoTrack, callLocalStream || new MediaStream([videoTrack]));
+          }
+          console.log('📹 Video track bound to WebRTC pipe');
+        } catch (e) {
+          console.warn('Error attaching video track:', e);
+        }
+      }
+
+      // HANDLE INCOMING REMOTE TRACKS (VOICE & VIDEO)
       pc.ontrack = (event) => {
         console.log('🎉 Received remote track from peer:', event.track.kind);
-        const remoteVideo = document.getElementById('callRemoteVideo');
-        const remoteCanvas = document.getElementById('callRemoteCanvas');
-        const placeholder = document.getElementById('videoRemotePlaceholder');
 
-        if (remoteVideo && event.streams && event.streams[0]) {
-          remoteVideo.srcObject = event.streams[0];
-          remoteVideo.style.display = 'block';
-          if (remoteCanvas) remoteCanvas.style.display = 'none';
-          if (placeholder) {
-            placeholder.classList.add('hidden');
-            placeholder.style.display = 'none';
+        const incomingStream = event.streams && event.streams[0] ? event.streams[0] : new MediaStream([event.track]);
+
+        // 1. ROUTE AUDIO TRACK TO DEDICATED <audio id="callRemoteAudio">
+        if (event.track.kind === 'audio') {
+          const remoteAudio = document.getElementById('callRemoteAudio');
+          if (remoteAudio) {
+            remoteAudio.srcObject = incomingStream;
+            remoteAudio.muted = callIsSpeakerMuted;
+            remoteAudio.volume = 1.0;
+            remoteAudio.play().then(() => {
+              console.log('🔊 Remote peer audio playing successfully!');
+            }).catch(e => {
+              console.warn('Remote audio autoplay note:', e);
+              // Unlock audio playback on first document touch if autoplay was restricted
+              const unlock = () => {
+                remoteAudio.play().catch(() => {});
+                document.removeEventListener('click', unlock);
+              };
+              document.addEventListener('click', unlock, { once: true });
+            });
           }
-          remoteVideo.play().catch(e => console.warn('Remote video playback note:', e));
+        }
+
+        // 2. ROUTE VIDEO TRACK TO <video id="callRemoteVideo">
+        if (event.track.kind === 'video') {
+          const remoteVideo = document.getElementById('callRemoteVideo');
+          const remoteCanvas = document.getElementById('callRemoteCanvas');
+          const placeholder = document.getElementById('videoRemotePlaceholder');
+
+          if (remoteVideo) {
+            remoteVideo.srcObject = incomingStream;
+            remoteVideo.style.display = 'block';
+            if (remoteCanvas) remoteCanvas.style.display = 'none';
+            if (placeholder) {
+              placeholder.classList.add('hidden');
+              placeholder.style.display = 'none';
+            }
+            remoteVideo.play().catch(e => console.warn('Remote video playback note:', e));
+          }
         }
       };
 
-      // Send local network ICE candidates to remote peer via Supabase Realtime
+      // Send local ICE candidates to peer
       pc.onicecandidate = (event) => {
         if (event.candidate && campusRealtimeChannel && currentUser && activeCallPeerId) {
           campusRealtimeChannel.send({
@@ -11037,7 +11193,7 @@
       pc.onconnectionstatechange = () => {
         console.log('WebRTC State change:', pc.connectionState);
         if (pc.connectionState === 'connected') {
-          showToast('🟢 Live HD peer video connected!', 'success');
+          showToast('🟢 Peer connected with live audio & video!', 'success');
         } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
           console.warn('Peer connection disconnected');
         }
@@ -11046,13 +11202,16 @@
       return pc;
     }
 
-    // Caller initiates WebRTC SDP Offer
+    // Caller creates SDP Offer
     async function initiateRtcOffer() {
+      // Ensure microphone track is ready before creating offer
+      await acquireMicrophoneStream();
+
       const pc = createRtcPeerConnection();
       try {
         const offer = await pc.createOffer({
           offerToReceiveAudio: true,
-          offerToReceiveVideo: true
+          offerToReceiveVideo: activeCallType === 'video'
         });
         await pc.setLocalDescription(offer);
 
@@ -11073,13 +11232,16 @@
       }
     }
 
-    // Callee receives SDP Offer and generates Answer
+    // Callee handles SDP Offer and creates Answer
     async function handleRtcOffer(offerSdp, fromUserId) {
+      // Ensure microphone track is ready before creating answer
+      await acquireMicrophoneStream();
+
       const pc = createRtcPeerConnection();
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(offerSdp));
 
-        // Flush any candidates received while remote description was negotiating
+        // Flush any queued ICE candidates
         while (rtcPendingIceCandidates.length > 0) {
           const candidate = rtcPendingIceCandidates.shift();
           try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
@@ -11105,7 +11267,7 @@
       }
     }
 
-    // Caller receives SDP Answer from Callee
+    // Caller handles SDP Answer from Callee
     async function handleRtcAnswer(answerSdp) {
       if (!activeRtcPeerConnection) return;
       try {
@@ -11135,7 +11297,7 @@
     }
 
     // =========================================================
-    // CAMERA DEVICE ENUMERATION & STREAM MANAGEMENT
+    // CAMERA STREAM MANAGEMENT
     // =========================================================
     async function getAvailableVideoDevices() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return [];
@@ -11182,30 +11344,14 @@
 
         const stream = await navigator.mediaDevices.getUserMedia({
           video: videoConstraints,
-          audio: true
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
         });
 
-        // Setup microphone analyzer for reactive speech meter
-        try {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext && !callAudioCtx) callAudioCtx = new AudioContext();
-          if (callAudioCtx && stream.getAudioTracks().length > 0) {
-            const micSource = callAudioCtx.createMediaStreamSource(stream);
-            const analyser = callAudioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            micSource.connect(analyser);
-            const dataArr = new Uint8Array(analyser.frequencyBinCount);
-            const pollMic = () => {
-              if (!callLocalStream) return;
-              analyser.getByteFrequencyData(dataArr);
-              let sum = 0;
-              for (let i = 0; i < dataArr.length; i++) sum += dataArr[i];
-              micAudioLevel = Math.max(0.15, (sum / dataArr.length) / 128);
-              requestAnimationFrame(pollMic);
-            };
-            pollMic();
-          }
-        } catch (e) {}
+        setupMicAudioAnalyzer(stream);
 
         const localVid = document.getElementById('callLocalVideo');
         const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
@@ -11229,7 +11375,6 @@
                   const label = activeTrack ? (activeTrack.label || 'Webcam') : 'Webcam';
                   updatePipCamBadge(label.length > 14 ? label.slice(0, 12) + '...' : label);
 
-                  // Update WebRTC track if active
                   if (activeRtcPeerConnection) {
                     const videoSender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
                     if (videoSender && activeTrack) {
@@ -11485,6 +11630,14 @@
 
       playCallAudioTone('connected');
 
+      // Ensure remote audio element is active and unmuted
+      const remoteAudio = document.getElementById('callRemoteAudio');
+      if (remoteAudio && remoteAudio.srcObject) {
+        remoteAudio.muted = callIsSpeakerMuted;
+        remoteAudio.volume = 1.0;
+        remoteAudio.play().catch(() => {});
+      }
+
       if (activeCallType === 'voice') {
         const statusText = document.getElementById('voiceCallStatusText');
         if (statusText) statusText.textContent = 'Connected • 00:00';
@@ -11501,7 +11654,6 @@
 
         startCallTimer('videoCallDuration');
 
-        // Only start canvas animation if real remote WebRTC video track isn't already playing
         const remoteVideo = document.getElementById('callRemoteVideo');
         if (!remoteVideo || remoteVideo.style.display === 'none' || !remoteVideo.srcObject) {
           startRemoteVideoStreamAnimation(activeCallPeerName);
@@ -11532,13 +11684,23 @@
       }
     }
 
-    window.acceptIncomingCall = function() {
+    window.acceptIncomingCall = async function() {
       if (!currentIncomingCallPayload) return;
       const p = currentIncomingCallPayload;
       const banner = document.getElementById('placeAiIncomingCallBanner');
       if (banner) banner.style.display = 'none';
 
       currentDirectPeerId = p.fromUserId;
+
+      // Unlock browser audio context on user click
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!callAudioCtx && AudioContext) callAudioCtx = new AudioContext();
+        if (callAudioCtx && callAudioCtx.state === 'suspended') callAudioCtx.resume();
+      } catch (e) {}
+
+      // Acquire local microphone before answering
+      await acquireMicrophoneStream();
 
       // Broadcast acceptance back to caller immediately
       if (campusRealtimeChannel && currentUser) {
@@ -11597,7 +11759,6 @@
       const fromId = payload.fromUserId ? String(payload.fromUserId).toLowerCase() : '';
       const currentPeerId = activeCallPeerId ? String(activeCallPeerId).toLowerCase() : '';
 
-      // Check if this signal is directed to me or is from my active peer
       const isForMe = (toId === myId) || (currentPeerId && currentPeerId === fromId);
       if (!isForMe) return;
 
@@ -11605,31 +11766,26 @@
 
       if (payload.action === 'accepted') {
         connectActiveCallImmediately();
-        // Caller initiates WebRTC offer as soon as peer accepts
         initiateRtcOffer();
       } else if (payload.action === 'offer') {
-        // Callee receives offer from caller, sets remote description & sends answer
         handleRtcOffer(payload.sdp, payload.fromUserId);
         connectActiveCallImmediately();
       } else if (payload.action === 'answer') {
-        // Caller receives answer from callee
         handleRtcAnswer(payload.sdp);
       } else if (payload.action === 'ice_candidate') {
-        // Exchange network routes
         handleRtcIceCandidate(payload.candidate);
       } else if (payload.action === 'declined') {
         showToast('Call declined by ' + activeCallPeerName, 'info');
         endCurrentCall(false);
       } else if (payload.action === 'ended') {
-        // CRITICAL FIX: When either user ends/cuts the call, the other user IMMEDIATELY ends!
         console.log('🔴 Remote peer ended the call. Closing local call session immediately.');
         showToast(activeCallPeerName + ' ended the call', 'info');
-        endCurrentCall(false); // pass false so we do not send duplicate 'ended' broadcast back
+        endCurrentCall(false);
       }
     }
 
     // VOICE CALL CONTROLLER
-    window.startWpVoiceCall = function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
+    window.startWpVoiceCall = async function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
       activeCallType = 'voice';
 
       let targetPeerId = currentDirectPeerId || null;
@@ -11682,6 +11838,9 @@
 
       const statusText = document.getElementById('voiceCallStatusText');
 
+      // CRITICAL: ACQUIRE LOCAL MICROPHONE STREAM FOR VOICE CALL
+      await acquireMicrophoneStream();
+
       if (isAnswering) {
         connectActiveCallImmediately();
         return;
@@ -11720,7 +11879,7 @@
     };
 
     // VIDEO CALL CONTROLLER
-    window.startWpVideoCall = function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
+    window.startWpVideoCall = async function(peerIdOrName, peerNameOpt = null, isAnswering = false) {
       activeCallType = 'video';
 
       let targetPeerId = currentDirectPeerId || null;
@@ -11777,8 +11936,9 @@
       document.getElementById('videoRemoteStatus').innerHTML = `<span class="beacon-pulse" style="width: 7px; height: 7px; background: #38bdf8;"></span> Ringing peer device...`;
       document.getElementById('videoCallDuration').textContent = 'Ringing...';
 
-      // Start local camera stream
-      startLocalCameraStream();
+      // Start local camera stream AND ensure microphone is running
+      await startLocalCameraStream();
+      await acquireMicrophoneStream();
 
       if (isAnswering) {
         connectActiveCallImmediately();
@@ -11792,7 +11952,6 @@
         playCallAudioTone('ring');
       }, 3000);
 
-      // Send live invite to peer
       if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
         try {
           campusRealtimeChannel.send({
@@ -11811,7 +11970,6 @@
         }
       }
 
-      // Smooth connect fallback for testing or single-window test
       clearTimeout(callConnectFallbackTimer);
       callConnectFallbackTimer = setTimeout(() => {
         connectActiveCallImmediately();
@@ -11870,6 +12028,11 @@
 
     window.toggleCallSpeaker = function() {
       callIsSpeakerMuted = !callIsSpeakerMuted;
+      const remoteAudio = document.getElementById('callRemoteAudio');
+      const remoteVid = document.getElementById('callRemoteVideo');
+      if (remoteAudio) remoteAudio.muted = callIsSpeakerMuted;
+      if (remoteVid) remoteVid.muted = callIsSpeakerMuted;
+
       const icon = document.getElementById('iconVoiceSpeaker');
       const btn = document.getElementById('btnVoiceToggleSpeaker');
       if (icon) icon.className = 'fas ' + (callIsSpeakerMuted ? 'fa-volume-xmark' : 'fa-volume-high');
@@ -11889,7 +12052,6 @@
           }
           if (remoteCanvas) remoteCanvas.style.display = 'none';
 
-          // If WebRTC is active, replace video track on peer connection
           if (activeRtcPeerConnection) {
             const sender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
             if (sender) sender.replaceTrack(screenStream.getVideoTracks()[0]);
@@ -11943,6 +12105,13 @@
         activeRtcPeerConnection = null;
       }
       rtcPendingIceCandidates = [];
+
+      // Stop remote audio player
+      const remoteAudio = document.getElementById('callRemoteAudio');
+      if (remoteAudio) {
+        remoteAudio.pause();
+        remoteAudio.srcObject = null;
+      }
 
       // Stop media tracks
       if (callLocalStream) {
