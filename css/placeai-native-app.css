@@ -27,6 +27,52 @@ html, body {
   display: none;
 }
 
+.community-mode-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.community-mode-bar .mode-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.community-mode-bar .mode-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.community-mode-bar .mode-tab-btn.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+  color: #ffffff;
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+}
+
+.community-mode-bar .mode-tab-btn.ai-active {
+  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+}
+
 /* ===================================================
    MOBILE APPSHELL (max-width: 768px)
    =================================================== */
@@ -299,8 +345,8 @@ html, body {
   }
 
   .feature-hub-card {
-    background: rgba(15, 23, 42, 0.88) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 16px !important;
     padding: 12px 10px !important;
     display: flex !important;
@@ -308,13 +354,14 @@ html, body {
     gap: 10px !important;
     text-decoration: none !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
-    transition: transform 0.15s ease, background 0.15s ease !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease !important;
   }
 
   .feature-hub-card:active {
     transform: scale(0.96) !important;
     background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
   }
 
   .hub-card-icon {
@@ -479,26 +526,43 @@ html, body {
     margin: 0 !important;
   }
 
-  .community-mode-switcher {
+  .community-mode-bar {
     width: 100% !important;
     display: flex !important;
-    gap: 4px !important;
-    padding: 4px !important;
-    background: rgba(15, 23, 42, 0.95) !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(51, 65, 85, 0.6) !important;
+    gap: 6px !important;
+    padding: 8px 12px !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-sizing: border-box !important;
   }
 
-  .mode-tab-btn {
+  .community-mode-bar .mode-tab-btn {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    padding: 7px 6px !important;
-    font-size: 11px !important;
+    padding: 8px 6px !important;
+    font-size: 11.5px !important;
     font-weight: 700 !important;
     text-align: center !important;
     justify-content: center !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     white-space: nowrap !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #94a3b8 !important;
+  }
+
+  .community-mode-bar .mode-tab-btn.active {
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important;
+    color: #ffffff !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.4) !important;
+  }
+
+  .community-mode-bar .mode-tab-btn.ai-active {
+    background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%) !important;
+    color: #ffffff !important;
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4) !important;
   }
 
   /* WhatsApp Single Pane Direct Chat */

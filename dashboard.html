@@ -9613,26 +9613,26 @@
             <i class="fas fa-comments"></i>
           </div>
           <div class="community-header-titles">
-            <h3>Campus & Peer Chat</h3>
-            <p class="community-header-sub">Connect with students & direct message peers</p>
+            <h3>Campus Community</h3>
+            <p class="community-header-sub">Live student stream, direct peer messaging & calls</p>
           </div>
-        </div>
-
-        <!-- 3 Mode Switchers: Message to All vs Message Specific User vs PlaceAI Copilot -->
-        <div class="community-mode-switcher">
-          <button class="mode-tab-btn active" id="tabModeAll" onclick="switchChatMode('all')">
-            <i class="fas fa-bullhorn"></i> <span>Message to All</span>
-          </button>
-          <button class="mode-tab-btn" id="tabModeDirect" onclick="switchChatMode('direct')">
-            <i class="fas fa-user-lock"></i> <span>Message Specific User</span>
-          </button>
-          <button class="mode-tab-btn" id="tabModeAi" onclick="switchChatMode('ai')">
-            <i class="fas fa-robot"></i> <span>PlaceAI Copilot</span> <span class="ai-tab-badge">AI</span>
-          </button>
         </div>
 
         <button class="community-close-btn" onclick="closeCampusChatModal()" title="Close Chat">
           <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Clean Segmented Mode Tabs (Dedicated row below header) -->
+      <div class="community-mode-bar">
+        <button class="mode-tab-btn active" id="tabModeAll" onclick="switchChatMode('all')">
+          <i class="fas fa-bullhorn"></i> <span>Campus Feed</span>
+        </button>
+        <button class="mode-tab-btn" id="tabModeDirect" onclick="switchChatMode('direct')">
+          <i class="fas fa-user-friends"></i> <span>Direct Chats</span>
+        </button>
+        <button class="mode-tab-btn" id="tabModeAi" onclick="switchChatMode('ai')">
+          <i class="fas fa-robot"></i> <span>AI Mentor</span> <span class="ai-tab-badge">AI</span>
         </button>
       </div>
 
@@ -9641,12 +9641,13 @@
         <!-- MODE 1: Message to All (Global Public Feed) -->
         <div class="broadcast-view" id="broadcastView">
           <div class="broadcast-info-strip">
-            <div>
-              <i class="fas fa-earth-americas" style="margin-right: 6px;"></i>
-              <strong>Public Campus Stream:</strong> Messages posted here are visible to all PlaceAI students & alumni.
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow: 0 0 8px #34d399;"></span>
+              <strong style="color: #f1f5f9; font-size: 12.5px;">Public Student Feed:</strong>
+              <span style="color: #94a3b8; font-size: 12px;">Visible to all campuses & alumni</span>
             </div>
-            <div style="font-weight: 700; color: #34d399;">
-              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#34d399;margin-right:5px;"></span>Live Feed
+            <div style="font-weight: 700; color: #34d399; font-size: 11.5px; background: rgba(52, 211, 153, 0.12); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(52, 211, 153, 0.3);">
+              Live Stream
             </div>
           </div>
 
@@ -19825,8 +19826,13 @@ ${projStr}
       const devSuite = document.querySelector('.dev-ecosystem-suite');
       const workspaceTabsCard = document.getElementById('profileWorkspaceTabs')?.closest('.card');
       const tabPanels = document.getElementById('profileTabPanels');
+      const featureHub = document.getElementById('mobileFeatureHub');
 
       if (window.innerWidth <= 768) {
+        if (featureHub) {
+          featureHub.style.display = (view === 'profile') ? 'grid' : 'none';
+        }
+
         if (view === 'profile') {
           if (profileCol) profileCol.style.display = 'block';
           if (rightCol) rightCol.style.display = 'block';
