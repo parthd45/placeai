@@ -863,67 +863,18 @@
   <script src="backend/backend-integration.js"></script>
   
   <script>
-    // Check if user just logged in with OAuth
+    // Check if user is already logged in
     async function checkOAuthLogin() {
       try {
         const sessionResult = await window.AuthService.getCurrentSession();
-        if (sessionResult.success && sessionResult.session && sessionResult.session.user) {
-          const session = sessionResult.session;
-          console.log('OAuth user logged in:', session.user.email);
-          
-          // User is logged in, check if they have a profile
-          const profileResponse = await getUserProfile(session.user.id);
-          
-          if (!profileResponse.success || !profileResponse.profile) {
-            console.log('No profile found for user_id, checking by email...');
-            
-            // No profile with this user_id - check if email already has a profile
-            const supabase = window.supabaseClient || window.supabase.createClient(
-              window.SUPABASE_URL,
-              window.SUPABASE_ANON_KEY
-            );
-            
-            const { data: existingProfile } = await supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('email', session.user.email)
-              .single();
-            
-            if (existingProfile) {
-              console.log('Found existing profile, linking to OAuth user...');
-              
-              // Profile exists with this email from email/password registration
-              // Update it to link with this OAuth user_id
-              await supabase
-                .from('user_profiles')
-                .update({ user_id: session.user.id })
-                .eq('email', session.user.email);
-              
-              console.log('Profile linked successfully, redirecting to dashboard...');
-              
-              // Force redirect to dashboard
-              setTimeout(() => {
-                window.location.replace('dashboard.html');
-              }, 500);
-            } else {
-              console.log('No profile found, redirecting to register...');
-              
-              // No profile exists with this email - need to register
-              await window.AuthService.logout();
-              alert('You need to sign up first! Please create an account using the registration page.');
-              window.location.href = 'register.html';
-            }
-          } else {
-            console.log('Profile exists, redirecting to dashboard...');
-            
-            // Profile exists - redirect to dashboard
-            setTimeout(() => {
-              window.location.replace('dashboard.html');
-            }, 500);
-          }
+        if (sessionResult && sessionResult.success && sessionResult.session && sessionResult.session.user) {
+          console.log('Active user session detected, redirecting to dashboard...');
+          setTimeout(() => {
+            window.location.replace('dashboard.html');
+          }, 300);
         }
       } catch (error) {
-        console.error('OAuth check error:', error);
+        console.warn('Session check warning:', error);
       }
     }
     

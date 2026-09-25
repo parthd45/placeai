@@ -243,14 +243,17 @@
         const result = await window.AuthService.registerWithEmail(email, password, metadata);
 
         if (result.success) {
-          if (result.session) {
-            // Auto-confirmed (mailer_autoconfirm is ON) - but we want OTP flow
-            // Sign out the auto-session so user must verify first
-            await window.AuthService.logout();
+          if (result.session && !result.requireOtp) {
+            showNotification('success', result.message || 'Account created! Redirecting to your dashboard...');
+            submitBtn.textContent = '✓ Redirecting to Dashboard...';
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 1000);
+            return;
           }
 
-          // Show OTP verification section on SAME SCREEN
-          showNotification('success', 'Account created! Please check your email for the 8-digit verification code.');
+          // Show OTP verification section on SAME SCREEN if OTP is strictly required
+          showNotification('success', 'Account created! Please enter your verification code.');
           
           // Keep form visible on the same screen, lock fields while verifying
           const inputsToLock = form.querySelectorAll('input:not(.otp-input)');

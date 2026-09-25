@@ -4,8 +4,8 @@
  * Once updated or dismissed, it will never show again for that version.
  */
 (function () {
-  const CURRENT_APP_VERSION = '2.2.2';
-  const CURRENT_BUILD_TS = 1727276000000;
+  const CURRENT_APP_VERSION = '2.2.6';
+  const CURRENT_BUILD_TS = 1727290000000;
   const VERSION_CHECK_URL = 'https://www.firstplacewise.tech/version.json';
   const APK_FALLBACK_URL = 'https://github.com/parthd45/placeai/raw/main/PlaceAI.apk';
 
@@ -230,7 +230,7 @@
         <div class="update-banner-left">
           <div class="update-banner-icon"><i class="fas fa-sparkles"></i></div>
           <div class="update-banner-text">
-            <span class="update-banner-title">Update Available (v\${data.version || '2.2.2'})</span>
+            <span class="update-banner-title">Update Available (v${data.version || '2.2.6'})</span>
             <span class="update-banner-sub">Tap to apply latest mobile improvements</span>
           </div>
         </div>
@@ -308,16 +308,16 @@
 
     modal.innerHTML = `
       <div class="placeai-update-modal-card">
-        <h2 class="update-modal-title">PlaceAI Version \${data.version || CURRENT_APP_VERSION}</h2>
+        <h2 class="update-modal-title">PlaceAI Version ${data.version || CURRENT_APP_VERSION}</h2>
         <p class="update-modal-desc">
-          \${isUpToDate ? 'You are running the latest streamlined mobile version.' : 'A new mobile patch is available.'}
+          ${isUpToDate ? 'You are running the latest streamlined mobile version.' : 'A new mobile patch is available.'}
         </p>
 
         <div class="update-modal-btns">
           <button class="update-modal-btn-primary" onclick="applyPlaceAIUpdate()">
             <i class="fas fa-sync-alt"></i> Apply Update & Refresh
           </button>
-          <a class="update-modal-btn-secondary" href="\${data.directDownloadUrl || data.apkUrl || APK_FALLBACK_URL}" download="PlaceAI.apk">
+          <a class="update-modal-btn-secondary" href="${data.directDownloadUrl || data.apkUrl || APK_FALLBACK_URL}" download="PlaceAI.apk">
             <i class="fas fa-download"></i> Download Full APK Binary
           </a>
           <button class="update-modal-btn-close" onclick="closePlaceAIUpdateModal()">Close</button>
