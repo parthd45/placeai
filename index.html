@@ -138,6 +138,149 @@
     }
   }
 
+  
+  /* ===== PLACEAI HOME UPDATE POP-UP MODAL ===== */
+  .home-update-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 22, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: homeUpdateFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes homeUpdateFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .home-update-modal-card {
+    background: linear-gradient(180deg, #131c2e 0%, #0d1424 100%);
+    border: 1.5px solid rgba(139, 92, 246, 0.45);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 440px;
+    padding: 26px 20px 22px 20px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(124, 58, 237, 0.3);
+    color: #f8fafc;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .home-update-icon-circle {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed 0%, #38bdf8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -48px auto 14px auto;
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5);
+    border: 3px solid #0d1424;
+  }
+  .home-update-badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.18);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #c084fc;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .home-update-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .home-update-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .home-update-features-list {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(51, 65, 85, 0.55);
+    border-radius: 14px;
+    padding: 12px 14px;
+    text-align: left;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .home-update-feat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: #cbd5e1;
+  }
+  .home-update-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-update-apply {
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+    color: #ffffff;
+    border: none;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+    transition: transform 0.15s ease;
+  }
+  .btn-update-apply:active {
+    transform: scale(0.97);
+  }
+  .btn-update-download {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    color: #e2e8f0;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-update-download:hover {
+    background: rgba(51, 65, 85, 0.85);
+    color: #ffffff;
+  }
+  .btn-update-dismiss {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 6px 0;
+    margin-top: 2px;
+  }
+
   </style>
 </head>
 
@@ -1090,6 +1233,75 @@
     });
   </script>
   <script src="js/app-updater.js"></script>
+
+  <!-- PlaceAI App Update Available Pop-up Modal on Home Page -->
+  <div class="home-update-modal-overlay" id="homeUpdateModal" style="display: none;">
+    <div class="home-update-modal-card">
+      <div class="home-update-icon-circle">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <div class="home-update-badge">PlaceAI Mobile v2.2.1 Ready</div>
+      <h3 class="home-update-title">App Update Available!</h3>
+      <p class="home-update-desc">
+        A streamlined mobile dashboard layout, WhatsApp-style Community Chat, and calling performance upgrades are ready!
+      </p>
+
+      <div class="home-update-features-list">
+        <div class="home-update-feat-item">
+          <i class="fas fa-check-circle" style="color: #34d399;"></i>
+          <span><strong>Clean Mobile Dashboard:</strong> Decluttered layout with quick tabs</span>
+        </div>
+        <div class="home-update-feat-item">
+          <i class="fas fa-check-circle" style="color: #38bdf8;"></i>
+          <span><strong>WhatsApp Community Chat:</strong> Single-pane view with Back button</span>
+        </div>
+        <div class="home-update-feat-item">
+          <i class="fas fa-check-circle" style="color: #c084fc;"></i>
+          <span><strong>Instant In-App Updates:</strong> Auto-updates over the air</span>
+        </div>
+      </div>
+
+      <div class="home-update-btn-group">
+        <button class="btn-update-apply" onclick="openUpdatedDashboardNow()">
+          <i class="fas fa-bolt"></i> Open Updated Dashboard
+        </button>
+        <a class="btn-update-download" href="https://www.firstplacewise.tech/PlaceAI.apk" download="PlaceAI.apk">
+          <i class="fas fa-download"></i> Download Latest APK (56 MB)
+        </a>
+        <button class="btn-update-dismiss" onclick="dismissHomeUpdateModal()">
+          Continue Browsing Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showHomeUpdateModal() {
+      const modal = document.getElementById('homeUpdateModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function dismissHomeUpdateModal() {
+      const modal = document.getElementById('homeUpdateModal');
+      if (modal) modal.style.display = 'none';
+      sessionStorage.setItem('placeai_home_update_dismissed', '1');
+    }
+
+    function openUpdatedDashboardNow() {
+      // Force cache flush by navigating with timestamp
+      window.location.href = 'dashboard.html?_ota=' + Date.now();
+    }
+
+    // Auto-show popup on Home Page after 1.5s if not already dismissed in this session
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (!sessionStorage.getItem('placeai_home_update_dismissed')) {
+          showHomeUpdateModal();
+        }
+      }, 1200);
+    });
+  </script>
+
 </body>
 
 </html>
