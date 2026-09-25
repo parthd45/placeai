@@ -11735,22 +11735,48 @@
         return;
       }
 
-      grid.innerHTML = projects.map((p, idx) => `
-        <div class="supabase-project-box" onclick="handleSupabaseProjectClick('${escapeHtml(p.name)}', '${escapeHtml(p.region || 'cloud')}')">
-          <div>
-            <div class="supabase-project-box-header">
-              <h3 class="supabase-project-name">${escapeHtml(p.name)}</h3>
-              <div style="color: #707070; font-size: 14px; cursor: pointer; padding: 2px 6px;" onclick="event.stopPropagation(); openSupabaseProjectMenu(${idx})">
-                ⋮
+      grid.innerHTML = projects.map((p, idx) => {
+        let ref = p.ref;
+        if (!ref) {
+          if (p.name === 'PlaceWiseAI') ref = 'igilmfqfxsiaggkgkwoq';
+          else if (p.name === 'dcpe-erp') ref = 'dcpe-erp';
+        }
+        const directUrl = ref && ref !== 'cloud'
+          ? `https://supabase.com/dashboard/project/${ref}`
+          : 'https://supabase.com/dashboard/projects';
+
+        return `
+          <div class="supabase-project-box" onclick="handleSupabaseProjectClick('${escapeHtml(p.name)}', '${escapeHtml(p.region || 'cloud')}', '${escapeHtml(ref || '')}')">
+            <div>
+              <div class="supabase-project-box-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="15" height="15" viewBox="0 0 109 113" fill="none">
+                    <path d="M63.7076 110.284C60.848 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0675L99.1936 40.0675C104.973 40.0675 108.144 46.8028 104.479 51.288L63.7076 110.284Z" fill="#3ECF8E"/>
+                    <path d="M45.317 2.71603C48.1766 -0.885233 53.9744 1.08779 54.0433 5.68612L54.3475 72.9325H9.83109C4.05199 72.9325 0.880911 66.1972 4.54589 61.712L45.317 2.71603Z" fill="#3ECF8E" fill-opacity="0.7"/>
+                  </svg>
+                  <h3 class="supabase-project-name">${escapeHtml(p.name)}</h3>
+                </div>
+                <div style="color: #707070; font-size: 14px; cursor: pointer; padding: 2px 6px;" onclick="event.stopPropagation(); openSupabaseProjectMenu(${idx})">
+                  ⋮
+                </div>
+              </div>
+              <div class="supabase-project-region">${escapeHtml(p.region || 'ap-south-1')}</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 10px;">
+              <span class="supabase-project-tier">${escapeHtml(p.tier || 'FREE')}</span>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn-github-resync" onclick="event.stopPropagation(); openSupabaseTableInspector();" style="padding: 3px 8px; font-size: 10.5px;" title="Inspect tables & SQL inside PlaceAI">
+                  <i class="fas fa-table"></i> Tables
+                </button>
+                <a href="${directUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="btn-supabase-action" style="padding: 3px 9px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Open in official Supabase dashboard">
+                  <span>Supabase</span> <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
+                </a>
               </div>
             </div>
-            <div class="supabase-project-region">${escapeHtml(p.region || 'ap-south-1')}</div>
           </div>
-          <div>
-            <span class="supabase-project-tier">${escapeHtml(p.tier || 'FREE')}</span>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function filterSupabaseConsoleProjects(val) {
@@ -11767,11 +11793,19 @@
       renderSupabaseConsole();
     }
 
-    function handleSupabaseProjectClick(name, region) {
-      showToast(`⚡ Opening Supabase project "${name}" (${region})...`, 'info');
-      setTimeout(() => {
-        openSupabaseTableInspector();
-      }, 300);
+    function handleSupabaseProjectClick(name, region, ref) {
+      let projectRef = ref;
+      if (!projectRef) {
+        if (name === 'PlaceWiseAI') projectRef = 'igilmfqfxsiaggkgkwoq';
+        else if (name === 'dcpe-erp') projectRef = 'dcpe-erp';
+      }
+
+      const targetUrl = projectRef && projectRef !== 'cloud'
+        ? `https://supabase.com/dashboard/project/${projectRef}`
+        : 'https://supabase.com/dashboard/projects';
+
+      showToast(`⚡ Launching official Supabase Cloud console for "${name}"...`, 'info');
+      window.open(targetUrl, '_blank');
     }
 
     function openSupabaseProjectMenu(idx) {
