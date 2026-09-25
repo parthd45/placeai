@@ -1,0 +1,766 @@
+/**
+ * PlaceAI Native Mobile App Design System
+ * Rebuilt from scratch for visual excellence, clean mobile hierarchy, and native app aesthetics.
+ */
+
+/* Prevent horizontal overflow across the entire app */
+html, body {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  touch-action: pan-y !important;
+  -webkit-tap-highlight-color: transparent !important;
+  box-sizing: border-box !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+/* ===================================================
+   DESKTOP DEFAULT RULES (Back buttons hidden on desktop)
+   =================================================== */
+.chat-back-to-dashboard-btn,
+.wp-mobile-back-btn,
+.mobile-section-switcher,
+.mobile-app-bottom-nav,
+.mobile-feature-hub {
+  display: none;
+}
+
+/* ===================================================
+   MOBILE APPSHELL (max-width: 768px)
+   =================================================== */
+@media (max-width: 768px) {
+  /* 1. NATIVE TOP APP BAR */
+  .header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(54px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 12px 0 12px !important;
+    z-index: 10000 !important;
+    background: rgba(10, 15, 29, 0.96) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .header-container {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .logo-section {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .hamburger-menu {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+  }
+
+  .dashboard-header-logo,
+  .logo-section img {
+    height: 26px !important;
+    width: auto !important;
+    max-width: 110px !important;
+    object-fit: contain !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .header-icon-btn,
+  .header-chat-btn,
+  .btn-logout {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8f0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: transform 0.15s ease !important;
+  }
+
+  .header-icon-btn:active,
+  .header-chat-btn:active,
+  .btn-logout:active {
+    transform: scale(0.92) !important;
+  }
+
+  .header-chat-btn span:not(.wp-header-unread-badge),
+  .btn-logout span {
+    display: none !important;
+  }
+
+  .update-icon-btn {
+    color: #c084fc !important;
+    background: rgba(168, 85, 247, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+  }
+
+  .chat-icon-btn {
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    border-color: rgba(56, 189, 248, 0.4) !important;
+  }
+
+  .logout-icon-btn {
+    color: #f87171 !important;
+    background: rgba(248, 113, 113, 0.15) !important;
+    border-color: rgba(248, 113, 113, 0.4) !important;
+  }
+
+  /* 2. MAIN CONTAINER & SPACING */
+  .main-container {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 62px) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 78px) !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  .dashboard-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  /* 3. STREAMLINED PROFILE HERO CARD */
+  .profile-card {
+    border-radius: 20px !important;
+    background: rgba(15, 23, 42, 0.92) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    margin-bottom: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .profile-cover-banner {
+    height: 48px !important;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%) !important;
+  }
+
+  .cover-badge-top {
+    display: none !important;
+  }
+
+  .cover-edit-btn {
+    top: 8px !important;
+    right: 10px !important;
+    padding: 3px 8px !important;
+    font-size: 10.5px !important;
+    border-radius: 8px !important;
+  }
+
+  .profile-card-body {
+    padding: 0 14px 14px 14px !important;
+  }
+
+  .profile-avatar-wrapper {
+    margin-top: -24px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .profile-avatar-large {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 18px !important;
+    border: 2.5px solid #0f172a !important;
+  }
+
+  .profile-name {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .profile-role-tag {
+    font-size: 11.5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .profile-chips-ribbon {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .profile-chip {
+    font-size: 10.5px !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+  }
+
+  .profile-availability-glow {
+    display: inline-flex !important;
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+    margin-bottom: 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .profile-connect-strip {
+    display: flex !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .connect-circle {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+  }
+
+  .profile-divider {
+    margin: 8px 0 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .profile-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .stat-item {
+    padding: 6px 3px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .stat-value {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+  }
+
+  .stat-label {
+    font-size: 9.5px !important;
+    color: #94a3b8 !important;
+  }
+
+  .profile-actions {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 6px !important;
+  }
+
+  .profile-actions .btn-primary {
+    flex: 1 !important;
+    height: 38px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+  }
+
+  /* 4. HIDE REDUNDANT CONTACT CARD ON MOBILE */
+  .contact-info {
+    display: none !important;
+  }
+
+  /* 5. MOBILE 4-CARD QUICK LAUNCH HUB */
+  .mobile-feature-hub {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .feature-hub-card {
+    background: rgba(15, 23, 42, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 12px 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    transition: transform 0.15s ease, background 0.15s ease !important;
+  }
+
+  .feature-hub-card:active {
+    transform: scale(0.96) !important;
+    background: rgba(30, 41, 59, 0.95) !important;
+  }
+
+  .hub-card-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+  }
+
+  .hub-icon-code {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    color: #ffffff !important;
+  }
+
+  .hub-icon-resume {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+    color: #ffffff !important;
+  }
+
+  .hub-icon-interview {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+  }
+
+  .hub-icon-chat {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #ffffff !important;
+  }
+
+  .hub-card-text {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .hub-card-title {
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #f8fafc !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .hub-card-sub {
+    font-size: 10px !important;
+    color: #94a3b8 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 6. MOBILE SECTION SWITCHER TABS */
+  .mobile-section-switcher {
+    display: flex !important;
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+    padding: 4px !important;
+    background: rgba(15, 23, 42, 0.94) !important;
+    border: 1px solid rgba(51, 65, 85, 0.6) !important;
+    border-radius: 14px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top, 0px) + 54px) !important;
+    z-index: 999 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .mob-sec-tab {
+    flex: 1 !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #94a3b8 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .mob-sec-tab.active {
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.5) !important;
+  }
+
+  /* 7. CARD PADDING & CONTENT CLEANUP */
+  .card {
+    padding: 14px 12px !important;
+    border-radius: 18px !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+  }
+
+  .section-header {
+    margin-bottom: 10px !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .section-title {
+    font-size: 15px !important;
+  }
+
+  /* 8. COMMUNITY CHAT FULLSCREEN NATIVE EXPERIENCE */
+  .community-chat-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  .community-chat-card {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+
+  .community-chat-header {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+
+  .chat-back-to-dashboard-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    margin-right: 6px !important;
+    cursor: pointer !important;
+  }
+
+  .community-header-sub {
+    display: none !important;
+  }
+
+  .community-header-titles h3 {
+    font-size: 15px !important;
+    margin: 0 !important;
+  }
+
+  .community-mode-switcher {
+    width: 100% !important;
+    display: flex !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(51, 65, 85, 0.6) !important;
+  }
+
+  .mode-tab-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 7px 6px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+  }
+
+  /* WhatsApp Single Pane Direct Chat */
+  .direct-view {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+    overflow: hidden !important;
+    flex-direction: row !important;
+  }
+
+  .direct-user-list {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    display: flex !important;
+    border-right: none !important;
+  }
+
+  .direct-thread-pane {
+    display: none !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  .direct-view.mobile-thread-open .direct-user-list {
+    display: none !important;
+  }
+
+  .direct-view.mobile-thread-open .direct-thread-pane {
+    display: flex !important;
+  }
+
+  .wp-mobile-back-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    margin-right: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    cursor: pointer !important;
+  }
+
+  /* 9. GITHUB HEATMAP SCROLL CONTAINMENT */
+  .github-heatmap-card {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .heatmap-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  /* 10. WEBRTC CALL OVERLAYS */
+  .placeai-call-overlay {
+    padding: 10px !important;
+  }
+
+  .placeai-voice-card,
+  .placeai-video-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px !important;
+    padding: 22px 16px !important;
+  }
+
+  .placeai-video-streams {
+    height: 320px !important;
+    max-height: 48vh !important;
+  }
+
+  /* 11. NATIVE BOTTOM NAVIGATION BAR */
+  .mobile-app-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    background: rgba(10, 15, 29, 0.96) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6) !important;
+    z-index: 99999 !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+  }
+
+  .mob-nav-item {
+    flex: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #94a3b8 !important;
+    padding: 6px 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .mob-nav-icon {
+    font-size: 17px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .mob-nav-label {
+    font-size: 9.5px !important;
+    font-weight: 600 !important;
+  }
+
+  .mob-nav-item.active {
+    color: #38bdf8 !important;
+  }
+
+  .mob-nav-item.active .mob-nav-icon {
+    transform: translateY(-2px) !important;
+    color: #38bdf8 !important;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6)) !important;
+  }
+
+  .mob-nav-chat .mob-nav-icon-bubble {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #00a884, #008f6f) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 17px !important;
+    margin-top: -14px !important;
+    box-shadow: 0 4px 18px rgba(0, 168, 132, 0.5) !important;
+    border: 2px solid #0a0f1d !important;
+    position: relative !important;
+  }
+
+  .mob-chat-badge {
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    background: #ef4444 !important;
+    color: white !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    padding: 1px 5px !important;
+    border: 1.5px solid #0a0f1d !important;
+  }
+}
+
+/* ===================================================
+   UNIVERSAL APP-WIDE ELEMENTS & ICONS
+   =================================================== */
+.app-topbar-back-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #f1f5f9 !important;
+  text-decoration: none !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  margin-right: 6px !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.app-topbar-back-btn:hover,
+.app-topbar-back-btn:active {
+  background: rgba(124, 58, 237, 0.35) !important;
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  color: #ffffff !important;
+  transform: scale(0.94) !important;
+}
+
+.hub-icon-career {
+  background: linear-gradient(135deg, #f43f5e, #be123c) !important;
+  color: #ffffff !important;
+}
+
+.hub-icon-skill {
+  background: linear-gradient(135deg, #6366f1, #4338ca) !important;
+  color: #ffffff !important;
+}
+
+.hub-icon-learning {
+  background: linear-gradient(135deg, #14b8a6, #0f766e) !important;
+  color: #ffffff !important;
+}
+
+.hub-icon-job {
+  background: linear-gradient(135deg, #06b6d4, #0e7490) !important;
+  color: #ffffff !important;
+}
+
+.hub-card-arrow {
+  margin-left: auto !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 768px) {
+  .header,
+  .top-header {
+    height: calc(54px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 12px 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .header-container {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .logo-section {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .logo-section img,
+  .logo-link img {
+    height: 26px !important;
+    width: auto !important;
+    max-width: 100px !important;
+    object-fit: contain !important;
+  }
+
+  .brand-logo-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .brand-name-tag {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+}

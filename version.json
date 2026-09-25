@@ -1,14 +1,15 @@
 {
-  "version": "2.2.3",
-  "buildTimestamp": 1727277000000,
+  "version": "2.2.4",
+  "buildTimestamp": 1727284000000,
   "releaseDate": "2026-09-25",
-  "name": "PlaceAI Mobile v2.2.3 (Complete Navigation & Clean App Experience)",
+  "name": "PlaceAI Native Rebuild v2.2.4 (All Features & Universal Back Navigation)",
   "changelog": [
-    "Native Back buttons added across all subpages, auth screens, and chat modal",
-    "Hardware & gesture back button support for Android to close modals gracefully",
-    "Super clean mobile profile card and streamlined single-active section switcher",
-    "Enhanced Community Chat mobile header with Back button & compact mode pills",
-    "Permanent removal of recurring home page popups"
+    "From-scratch mobile app rebuild with 8-card Quick Launch Feature Hub",
+    "Universal back buttons across every page (Dashboard, Practice, Resume ATS, Interview, Career, Skills, Chat, Login, Register)",
+    "Fixed native bottom navigation bar for instant 1-tap switching",
+    "Perfect logo scaling and modern gradient PlaceAI branding throughout the app",
+    "Android hardware & gesture back button support prevents unexpected exits",
+    "Clean single-active section switcher eliminating vertical clutter"
   ],
   "apkUrl": "https://github.com/parthd45/placeai/raw/main/PlaceAI.apk",
   "directDownloadUrl": "https://www.firstplacewise.tech/PlaceAI.apk"

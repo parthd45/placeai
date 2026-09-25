@@ -808,6 +808,7 @@
             }
         }
     </style>
+  <link rel="stylesheet" href="css/placeai-native-app.css">
 </head>
 
 <body>
@@ -815,7 +816,10 @@
     <div class="header">
         <div class="header-container">
             <div class="logo-section">
-                <button class="hamburger-menu" onclick="toggleSidebar()">
+        <a href="dashboard.html" class="app-topbar-back-btn" title="Back to Dashboard">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <button class="hamburger-menu" onclick="toggleSidebar()">
                     <div class="hamburger-icon">
                         <span></span>
                         <span></span>
@@ -823,8 +827,11 @@
                     </div>
                     Menu
                 </button>
-                <img src="images/logo1.webp" alt="Place Wise" />
-            </div>
+        <div class="brand-logo-wrapper" onclick="window.location.href='dashboard.html'" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <img src="images/logo1.webp" alt="PlaceAI" class="dashboard-header-logo" />
+          <span class="brand-name-tag">PlaceAI</span>
+        </div>
+      </div>
             <div class="header-actions">
                 <button class="btn-logout" id="logoutBtn">
                     <i class="fa fa-sign-out-alt"></i>
