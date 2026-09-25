@@ -1,0 +1,16 @@
+{
+  "version": "2.2.0",
+  "buildTimestamp": 1727273800000,
+  "releaseDate": "2026-09-25",
+  "name": "PlaceAI Mobile v2.2.0 (Live OTA Patch)",
+  "changelog": [
+    "Complete mobile UI optimization for Login, Register, Home & Dashboard",
+    "WhatsApp-style single-pane Community & Peer Chat with Back button",
+    "Full-screen touch-friendly campus messaging dialogs",
+    "Enhanced WebRTC Voice & Video calling connectivity",
+    "Horizontal scroll containment for GitHub contribution heatmap",
+    "Instant In-App Over-The-Air (OTA) automatic update system"
+  ],
+  "apkUrl": "https://github.com/parthd45/placeai/raw/main/PlaceAI.apk",
+  "directDownloadUrl": "https://www.firstplacewise.tech/PlaceAI.apk"
+}

@@ -7836,6 +7836,9 @@
           style="height: 100px; width: auto; max-width: 250px; object-fit: contain;" />
       </div>
       <div class="header-actions">
+        <button class="header-chat-btn" onclick="openPlaceAIUpdateModal()" title="App Updates & OTA Patches" style="background: rgba(124, 58, 237, 0.18); border-color: rgba(139, 92, 246, 0.4); color: #c084fc;">
+          <i class="fas fa-sparkles"></i> <span>Updates</span>
+        </button>
         <button class="header-chat-btn" onclick="openCampusChatModal('all')" title="Community Chat & Direct Messaging">
           <i class="fas fa-comments"></i> <span>Community Chat</span>
           <span class="wp-header-unread-badge" id="headerChatUnreadBadge" style="display:none;">0</span>
@@ -19269,5 +19272,6 @@ ${projStr}
     </button>
   </nav>
 
+  <script src="js/app-updater.js"></script>
 </body>
 

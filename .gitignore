@@ -5,4 +5,4 @@ android/app/build/
 android/build/
 android/.idea/
 www/
-*.apk
+!PlaceAI.apk
