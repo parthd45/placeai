@@ -1,0 +1,14 @@
+{
+  "name": "placeai-mobile",
+  "version": "1.0.0",
+  "description": "PlaceAI Mobile Application",
+  "main": "index.html",
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}

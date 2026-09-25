@@ -5,7 +5,11 @@
   <title>My Profile - Place Wise</title>
   <link rel="icon" href="images/icon.webp" type="image/webp" sizes="16x16" />
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0f1d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -5059,6 +5063,106 @@
       transform: scale(1.05);
     }
 
+    /* ===== MOBILE FULL RESPONSIVE & SCREEN ADJUSTMENT STYLES ===== */
+    @media (max-width: 768px) {
+      /* Full-Screen Video Call Card on Mobile */
+      .placeai-call-overlay {
+        padding: 0 !important;
+        background: #060911 !important;
+      }
+      .placeai-video-card {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .video-top-header {
+        top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+        left: 12px !important;
+        right: 12px !important;
+      }
+      .video-info-pill {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+      }
+      /* Picture-in-Picture on Mobile Screen */
+      .video-pip-wrapper {
+        width: 115px !important;
+        height: 78px !important;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 82px) !important;
+        right: 12px !important;
+        border-radius: 10px !important;
+      }
+      /* Bottom Call Controls Thumb-Friendly on Mobile */
+      .video-bottom-controls {
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+        gap: 12px !important;
+        padding: 8px 16px !important;
+      }
+      .call-action-btn {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 16px !important;
+      }
+      .call-action-btn.btn-hangup {
+        width: 54px !important;
+        height: 54px !important;
+      }
+      /* Voice Call Card on Mobile */
+      .placeai-voice-card {
+        width: 92vw !important;
+        max-width: 92vw !important;
+        margin: auto !important;
+        border-radius: 24px !important;
+        padding: 28px 18px !important;
+      }
+      /* Community Chat Modal on Mobile */
+      .community-chat-overlay {
+        padding: 0 !important;
+      }
+      .community-chat-card {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      .community-chat-header {
+        padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px 10px 12px !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      .community-header-titles p {
+        display: none !important;
+      }
+      .community-header-titles h3 {
+        font-size: 15px !important;
+      }
+      .community-mode-switcher {
+        width: 100% !important;
+        overflow-x: auto !important;
+        padding-bottom: 2px !important;
+      }
+      .mode-tab-btn {
+        padding: 6px 10px !important;
+        font-size: 11.5px !important;
+        white-space: nowrap !important;
+      }
+      /* Direct Chat Split Screen adjustment on Mobile */
+      .direct-chat-view {
+        flex-direction: column !important;
+      }
+      .chat-sidebar {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important;
+      }
+    }
+    
     /* ===== PLACEAI WEBRTC VOICE & VIDEO CALL SYSTEM ===== */
     .placeai-call-overlay {
       position: fixed;
