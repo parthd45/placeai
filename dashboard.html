@@ -5400,25 +5400,30 @@
     .dev-suite-nav-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 14px;
-      padding: 6px;
+      padding: 5px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(51, 65, 85, 0.7);
       border-radius: 12px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .dev-suite-nav-bar::-webkit-scrollbar {
+      display: none;
     }
 
     .dev-suite-tab-btn {
-      flex: 1;
-      min-width: 175px;
+      flex: 1 1 0;
+      min-width: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 9px;
-      padding: 10px 16px;
+      gap: 7px;
+      padding: 8px 12px;
       background: transparent;
       border: 1px solid transparent;
       border-radius: 9px;
@@ -5651,11 +5656,26 @@
       background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(24, 24, 27, 0.95) 50%, rgba(15, 23, 42, 0.95) 100%);
       border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 10px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       margin-bottom: 12px;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .cloud-telemetry-banner::-webkit-scrollbar {
+      display: none;
+    }
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .telemetry-item {
       display: flex;
@@ -7602,7 +7622,7 @@
                     <i class="fas fa-search" style="font-size: 10px;"></i> Search... <span style="font-size: 10px; background: #262626; padding: 1px 4px; border-radius: 3px;">Ctrl K</span>
                   </div>
                   <i class="far fa-question-circle" style="cursor: pointer;" title="Supabase Documentation" onclick="window.open('https://supabase.com/docs', '_blank')"></i>
-                  <img id="supabaseConsoleAvatar" src="images/parth.jpg" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;" onerror="this.src='images/default-avatar.png'" />
+                  <img id="supabaseConsoleAvatar" src="https://avatars.githubusercontent.com/parthd45" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Parth&background=10b981&color=fff';" />
                 </div>
               </div>
 
@@ -11174,7 +11194,7 @@
         });
       }
 
-      // Check if user has portfolio projects with live Vercel deployments
+      // Check user projects with live deployments
       const allProjects = (userProfile && Array.isArray(userProfile.projects)) ? userProfile.projects : [];
       const fallbackVercelApps = allProjects.filter(p => {
         if (!p) return false;
@@ -11188,8 +11208,8 @@
 
       // Update connected / disconnected view
       if (hasVercelConnected || fallbackVercelApps.length > 0) {
-        const displayUser = savedVercelUser || (vercelData && vercelData.user && vercelData.user.username) || (activeGitHubUser ? activeGitHubUser.username : (userProfile ? userProfile.github_url : 'developer'));
-        if (usernameDisplay) usernameDisplay.textContent = displayUser || 'developer';
+        const displayUser = savedVercelUser || (vercelData && vercelData.user && vercelData.user.username) || (activeGitHubUser ? activeGitHubUser.username : (userProfile ? userProfile.github_url : 'parthd45'));
+        if (usernameDisplay) usernameDisplay.textContent = displayUser || 'parthd45';
         if (userAvatar) {
           if (vercelData && vercelData.user && vercelData.user.avatar) {
             userAvatar.src = `https://vercel.com/api/www/avatar/${vercelData.user.avatar}?s=60`;
@@ -11205,42 +11225,67 @@
         if (connectedView) connectedView.style.display = 'none';
       }
 
-      let realDeployments = (vercelData && Array.isArray(vercelData.deployments)) ? vercelData.deployments : [];
-      let realProjects = (vercelData && Array.isArray(vercelData.projects)) ? vercelData.projects : [];
+      // 1. Prepare deployments list (Real API deployments or live portfolio Vercel apps)
+      let deployments = (vercelData && Array.isArray(vercelData.deployments) && vercelData.deployments.length > 0) 
+        ? vercelData.deployments 
+        : fallbackVercelApps.map(p => ({
+            name: p.name || p.title || 'Deployment',
+            url: p.live_url ? p.live_url.replace(/^https?:\/\//i, '') : '',
+            readyState: 'READY',
+            state: 'READY',
+            target: 'production',
+            createdAt: p.created_at || (Date.now() - 3600000 * 24 * 3),
+            creator: { username: savedVercelUser || (activeGitHubUser ? activeGitHubUser.username : 'parthd45') },
+            meta: {
+              githubCommitRef: 'main',
+              githubCommitMessage: p.description || `${p.name || p.title} production deployment on Vercel Edge`,
+              githubCommitAuthorName: savedVercelUser || 'Parth Deshmukh',
+              framework: p.tech || 'Web App'
+            }
+          }));
+
+      // 2. Prepare projects list
+      let projects = (vercelData && Array.isArray(vercelData.projects) && vercelData.projects.length > 0)
+        ? vercelData.projects
+        : fallbackVercelApps.map(p => ({
+            name: p.name || p.title || 'Project',
+            framework: p.tech || 'Web App',
+            url: p.live_url || '',
+            repo: (p.github_url || '').replace(/^https?:\/\/github\.com\//i, '')
+          }));
 
       // Update Top Telemetry Banner
       const telemVercel = document.getElementById('telemetryVercelStatus');
       if (telemVercel) {
-        const liveCnt = realDeployments.length || fallbackVercelApps.length;
+        const liveCnt = deployments.length;
         telemVercel.textContent = liveCnt > 0 ? (liveCnt + ' Live Deployments') : 'Connected';
       }
 
       // Apply environment filter
       if (vercelEnvFilter === 'production') {
-        realDeployments = realDeployments.filter(d => d.target === 'production' || !d.target);
+        deployments = deployments.filter(d => d.target === 'production' || !d.target);
       } else if (vercelEnvFilter === 'preview') {
-        realDeployments = realDeployments.filter(d => d.target && d.target !== 'production');
+        deployments = deployments.filter(d => d.target && d.target !== 'production');
       }
 
       // Apply search query filter
       if (vercelSearchQuery) {
-        realDeployments = realDeployments.filter(d => {
+        deployments = deployments.filter(d => {
           const name = (d.name || '').toLowerCase();
           const url = (d.url || '').toLowerCase();
           const branch = ((d.meta && d.meta.githubCommitRef) || '').toLowerCase();
           const msg = ((d.meta && d.meta.githubCommitMessage) || '').toLowerCase();
           return name.includes(vercelSearchQuery) || url.includes(vercelSearchQuery) || branch.includes(vercelSearchQuery) || msg.includes(vercelSearchQuery);
         });
-        realProjects = realProjects.filter(p => {
+        projects = projects.filter(p => {
           const name = (p.name || '').toLowerCase();
           const framework = (p.framework || '').toLowerCase();
           return name.includes(vercelSearchQuery) || framework.includes(vercelSearchQuery);
         });
       }
 
-      // Determine item count for tabs
-      const deployCount = realDeployments.length;
-      const projCount = realProjects.length;
+      const deployCount = deployments.length;
+      const projCount = projects.length;
 
       if (livePillCount) livePillCount.textContent = Math.max(deployCount, projCount);
       if (totalLiveApps) totalLiveApps.textContent = Math.max(deployCount, projCount);
@@ -11250,21 +11295,20 @@
 
       if (!grid) return;
 
-      // EMPTY STATE
       if (deployCount === 0 && projCount === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 28px; text-align: center; background: rgba(18, 18, 20, 0.7); border: 1px dashed #3f3f46; border-radius: 10px;">
             <span style="font-size: 28px; color: #ffffff; display: block; margin-bottom: 8px;">▲</span>
-            <p style="font-size: 14px; font-weight: 600; color: #f4f4f5; margin-bottom: 4px;">Connect Your Vercel Cloud Account</p>
+            <p style="font-size: 14px; font-weight: 600; color: #f4f4f5; margin-bottom: 4px;">No Deployments Found</p>
             <p style="font-size: 12px; color: #a1a1aa; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto;">
-              Connect your Personal Access Token from vercel.com/account/tokens to view all your real production deployments, build statuses, and domains in real time.
+              ${vercelSearchQuery ? 'No deployments match your filter "' + escapeHtml(vercelSearchQuery) + '".' : 'Connect your Vercel Access Token or link a project.'}
             </p>
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
               <button type="button" class="btn-vercel-connect" onclick="openVercelConnectModal()">
                 <span>▲</span> Connect Vercel Token
               </button>
               <button type="button" class="btn-supabase-action" onclick="openAddProjectModalWithVercel()">
-                <i class="fas fa-plus"></i> Add Project with Vercel Link
+                <i class="fas fa-plus"></i> Add Project
               </button>
             </div>
           </div>
@@ -11274,153 +11318,90 @@
 
       let cardsHtml = '';
 
-      // TAB 1: REAL-TIME DEPLOYMENTS (EXACT LIKE VERCEL)
+      // TAB 1: LIVE DEPLOYMENTS
       if (vercelSubTab === 'deployments') {
-        if (realDeployments.length > 0) {
-          cardsHtml = realDeployments.map(dep => {
-            const name = dep.name || 'Deployment';
-            const rawUrl = dep.url || '';
-            const liveUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://${rawUrl}` : '#');
-            const displayHost = rawUrl.replace(/^https?:\/\//i, '');
-            const state = (dep.readyState || dep.state || 'READY').toUpperCase();
-            const isReady = state === 'READY';
-            const isBuilding = state === 'BUILDING' || state === 'INITIALIZING' || state === 'QUEUED';
-            const stateClass = isReady ? 'ready' : (isBuilding ? 'building' : 'error');
-            const stateLabel = isReady ? 'Ready' : (isBuilding ? 'Building...' : 'Error');
-            const isProd = dep.target === 'production' || !dep.target;
-            const envLabel = isProd ? 'Production' : 'Preview';
+        cardsHtml = deployments.map(dep => {
+          const name = dep.name || 'Deployment';
+          const rawUrl = dep.url || '';
+          const liveUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://${rawUrl}` : '#');
+          const displayHost = rawUrl.replace(/^https?:\/\//i, '');
+          const state = (dep.readyState || dep.state || 'READY').toUpperCase();
+          const isReady = state === 'READY';
+          const isBuilding = state === 'BUILDING' || state === 'INITIALIZING' || state === 'QUEUED';
+          const stateClass = isReady ? 'ready' : (isBuilding ? 'building' : 'error');
+          const stateLabel = isReady ? 'Ready' : (isBuilding ? 'Building...' : 'Error');
+          const isProd = dep.target === 'production' || !dep.target;
+          const envLabel = isProd ? 'Production' : 'Preview';
 
-            const branch = (dep.meta && dep.meta.githubCommitRef) || 'main';
-            const commitMsg = (dep.meta && dep.meta.githubCommitMessage) || `${name} production deployment`;
-            const author = (dep.creator && dep.creator.username) || (dep.meta && dep.meta.githubCommitAuthorName) || (savedVercelUser || 'developer');
+          const branch = (dep.meta && dep.meta.githubCommitRef) || 'main';
+          const commitMsg = (dep.meta && dep.meta.githubCommitMessage) || `${name} production deployment`;
+          const author = (dep.creator && dep.creator.username) || (dep.meta && dep.meta.githubCommitAuthorName) || (savedVercelUser || 'developer');
 
-            let timeAgo = 'recently';
-            if (dep.createdAt) {
-              const diffMs = Date.now() - Number(dep.createdAt);
-              const mins = Math.floor(diffMs / 60000);
-              const hrs = Math.floor(mins / 60);
-              const days = Math.floor(hrs / 24);
-              if (days > 0) timeAgo = `${days}d ago`;
-              else if (hrs > 0) timeAgo = `${hrs}h ago`;
-              else if (mins > 0) timeAgo = `${mins}m ago`;
-              else timeAgo = 'just now';
-            }
+          let timeAgo = 'recently';
+          if (dep.createdAt) {
+            const diffMs = Date.now() - Number(dep.createdAt);
+            const mins = Math.floor(diffMs / 60000);
+            const hrs = Math.floor(mins / 60);
+            const days = Math.floor(hrs / 24);
+            if (days > 0) timeAgo = `${days}d ago`;
+            else if (hrs > 0) timeAgo = `${hrs}h ago`;
+            else if (mins > 0) timeAgo = `${mins}m ago`;
+            else timeAgo = 'just now';
+          }
 
-            return `
-              <div class="vercel-deploy-card">
-                <div>
-                  <div class="vercel-deploy-top">
-                    <div class="vercel-deploy-title-group">
-                      <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
-                      <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
-                      ${detectVercelFrameworkBadge(name, dep.meta)}
-                      <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> ${envLabel}</span>
-                    </div>
-                    <span class="vercel-status-pill ${stateClass}">${stateLabel}</span>
+          return `
+            <div class="vercel-deploy-card">
+              <div>
+                <div class="vercel-deploy-top">
+                  <div class="vercel-deploy-title-group">
+                    <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
+                    <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
+                    ${detectVercelFrameworkBadge(name, dep.meta)}
+                    <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> ${envLabel}</span>
                   </div>
-
-                  <div class="vercel-url-row">
-                    <i class="fas fa-globe" style="font-size: 11px; color: #71717a;"></i>
-                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link" title="${escapeHtml(liveUrl)}">
-                      ${escapeHtml(displayHost || 'deployment.vercel.app')}
-                    </a>
-                  </div>
-
-                  <div class="vercel-commit-box">
-                    <div class="vercel-commit-header">
-                      <i class="fab fa-git-alt" style="color: #f97316; font-size: 11.5px;"></i>
-                      <span class="vercel-branch-pill">${escapeHtml(branch)}</span>
-                      <span>by ${escapeHtml(author)}</span>
-                    </div>
-                    <div class="vercel-commit-text" title="${escapeHtml(commitMsg)}">
-                      ${escapeHtml(commitMsg)}
-                    </div>
-                  </div>
+                  <span class="vercel-status-pill ${stateClass}">${stateLabel}</span>
                 </div>
 
-                <div class="vercel-deploy-footer">
-                  <span class="vercel-deploy-age">
-                    <i class="far fa-clock" style="font-size: 10px;"></i> ${timeAgo}
-                  </span>
-                  <div class="vercel-action-btns">
-                    <button type="button" class="btn-vercel-copy" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" title="Copy URL">
-                      <i class="far fa-copy"></i>
-                    </button>
-                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
-                      Visit <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
-                    </a>
+                <div class="vercel-url-row">
+                  <i class="fas fa-globe" style="font-size: 11px; color: #71717a;"></i>
+                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link" title="${escapeHtml(liveUrl)}">
+                    ${escapeHtml(displayHost || 'deployment.vercel.app')}
+                  </a>
+                </div>
+
+                <div class="vercel-commit-box">
+                  <div class="vercel-commit-header">
+                    <i class="fab fa-git-alt" style="color: #f97316; font-size: 11.5px;"></i>
+                    <span class="vercel-branch-pill">${escapeHtml(branch)}</span>
+                    <span>by ${escapeHtml(author)}</span>
+                  </div>
+                  <div class="vercel-commit-text" title="${escapeHtml(commitMsg)}">
+                    ${escapeHtml(commitMsg)}
                   </div>
                 </div>
               </div>
-            `;
-          }).join('');
-        } else {
-          // Fallback to portfolio apps
-          cardsHtml = fallbackVercelApps.map(app => {
-            const liveUrl = app.live_url || '#';
-            const displayHost = liveUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
-            const repoUrl = app.github_url || app.repo_url || (activeGitHubUser ? `https://github.com/${activeGitHubUser.username}` : '#');
 
-            return `
-              <div class="vercel-deploy-card">
-                <div>
-                  <div class="vercel-deploy-top">
-                    <div class="vercel-deploy-title-group">
-                      <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
-                      <span class="vercel-deploy-appname">${escapeHtml(app.title || app.name || 'Deployment')}</span>
-                      <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> Production</span>
-                    </div>
-                    <span class="vercel-status-pill ready">Ready</span>
-                  </div>
-
-                  <div class="vercel-url-row">
-                    <i class="fas fa-globe" style="font-size: 11px; color: #71717a;"></i>
-                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link">
-                      ${escapeHtml(displayHost)}
-                    </a>
-                  </div>
-
-                  <div class="vercel-commit-box">
-                    <div class="vercel-commit-header">
-                      <i class="fab fa-git-alt" style="color: #f97316; font-size: 11.5px;"></i>
-                      <span class="vercel-branch-pill">main</span>
-                      <span>Production</span>
-                    </div>
-                    <div class="vercel-commit-text">
-                      ${escapeHtml(app.description || 'Verified production web application deployed on Vercel Edge Network.')}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="vercel-deploy-footer">
-                  <span class="vercel-status-beacon" style="font-size: 11px;">Production Live</span>
-                  <div class="vercel-action-btns">
-                    ${repoUrl && repoUrl !== '#' ? `
-                      <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-copy" title="View Source on GitHub">
-                        <i class="fab fa-github"></i>
-                      </a>
-                    ` : ''}
-                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
-                      Visit <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
-                    </a>
-                  </div>
+              <div class="vercel-deploy-footer">
+                <span class="vercel-deploy-age">
+                  <i class="far fa-clock" style="font-size: 10px;"></i> ${timeAgo}
+                </span>
+                <div class="vercel-action-btns">
+                  <button type="button" class="btn-vercel-copy" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" title="Copy URL">
+                    <i class="far fa-copy"></i>
+                  </button>
+                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
+                    Visit <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
+                  </a>
                 </div>
               </div>
-            `;
-          }).join('');
-        }
+            </div>
+          `;
+        }).join('');
       }
 
-      // TAB 2: VERCEL PROJECTS (EXACT LIKE VERCEL)
+      // TAB 2: PROJECTS
       if (vercelSubTab === 'projects') {
-        const projectsToRender = realProjects.length > 0 ? realProjects : fallbackVercelApps.map(p => ({
-          name: p.name || p.title,
-          framework: p.tech || 'Web App',
-          url: p.live_url,
-          repo: p.github_url
-        }));
-
-        cardsHtml = projectsToRender.map(prj => {
+        cardsHtml = projects.map(prj => {
           const name = prj.name || 'Project';
           const framework = prj.framework ? prj.framework.toUpperCase() : 'WEB';
           const rawUrl = prj.url || (prj.targets && prj.targets.production && prj.targets.production.url ? `https://${prj.targets.production.url}` : (prj.latestDeployments && prj.latestDeployments[0] && prj.latestDeployments[0].url ? `https://${prj.latestDeployments[0].url}` : '#'));
@@ -11435,6 +11416,7 @@
                   <div class="vercel-deploy-title-group">
                     <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
                     <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
+                    ${detectVercelFrameworkBadge(name, { framework: framework })}
                   </div>
                   <span class="dev-tab-pill vercel" style="font-size: 10px; padding: 2px 8px; text-transform: uppercase;">
                     ${escapeHtml(framework)}
@@ -11817,15 +11799,34 @@
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            // Discard legacy mock defaults if present without an account
-            const isMock = parsed.length === 2 && parsed[0].name === 'dcpe-erp' && parsed[1].name === 'PlaceWiseAI' && !localStorage.getItem(getSupabaseAccountStorageKey());
-            if (!isMock) return parsed;
-          }
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         } catch (e) {}
       }
 
-      // 100% RAW: Zero hardcoded defaults for any user.
+      // Check if user is Parth or has connected default PlaceAI database
+      const isParth = (activeGitHubUser && activeGitHubUser.username === 'parthd45') || 
+                      (userProfile && userProfile.github_url && userProfile.github_url.includes('parthd45')) ||
+                      (currentUser && currentUser.email && currentUser.email.includes('parth'));
+
+      if (isParth || !localStorage.getItem(getSupabaseAccountStorageKey())) {
+        return [
+          {
+            name: 'PlaceWiseAI',
+            region: 'ap-south-1 (Mumbai)',
+            ref: 'igilmfqfxsiaggkgkwoq',
+            tier: 'FREE',
+            tables: ['user_profiles', 'activity_logs', 'skills', 'projects', 'certifications', 'applications']
+          },
+          {
+            name: 'dcpe-erp',
+            region: 'ap-south-1 (Mumbai)',
+            ref: 'dcpe-erp',
+            tier: 'FREE',
+            tables: ['students', 'attendance', 'exams', 'fees', 'departments']
+          }
+        ];
+      }
+
       return [];
     }
 
