@@ -10849,6 +10849,19 @@
     let callRingingInterval = null;
     let callConnectFallbackTimer = null;
 
+    // Real WebRTC PeerConnection & ICE State
+    let activeRtcPeerConnection = null;
+    let rtcPendingIceCandidates = [];
+
+    const rtcConfiguration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:global.stun.twilio.com:3478' }
+      ]
+    };
+
     // Camera device management
     let availableVideoDevices = [];
     let currentVideoDeviceIndex = 0;
@@ -10866,7 +10879,6 @@
         if (callAudioCtx.state === 'suspended') callAudioCtx.resume();
 
         if (type === 'ring') {
-          // Standard pleasant US/EU phone ring pattern (440Hz + 480Hz)
           const osc1 = callAudioCtx.createOscillator();
           const osc2 = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
@@ -10885,7 +10897,6 @@
           osc1.stop(callAudioCtx.currentTime + 1.4);
           osc2.stop(callAudioCtx.currentTime + 1.4);
         } else if (type === 'connected') {
-          // Upward cheerful chime (D5 -> A5)
           const osc = callAudioCtx.createOscillator();
           const gain = callAudioCtx.createGain();
           osc.frequency.setValueAtTime(587.33, callAudioCtx.currentTime);
@@ -10950,13 +10961,187 @@
       if (el) el.textContent = text;
     }
 
+    // =========================================================
+    // REAL WEBRTC PEER CONNECTION PIPELINE
+    // =========================================================
+    function createRtcPeerConnection() {
+      if (activeRtcPeerConnection) {
+        try { activeRtcPeerConnection.close(); } catch (e) {}
+        activeRtcPeerConnection = null;
+      }
+      rtcPendingIceCandidates = [];
+
+      const pc = new RTCPeerConnection(rtcConfiguration);
+      activeRtcPeerConnection = pc;
+
+      // Attach all local tracks to WebRTC pipe
+      let streamToSend = callLocalStream;
+      if (!streamToSend || streamToSend.getVideoTracks().length === 0) {
+        const fallbackCanvas = document.getElementById('callLocalCanvasFallback');
+        if (fallbackCanvas && fallbackCanvas.captureStream) {
+          try {
+            const canvasStream = fallbackCanvas.captureStream(30);
+            if (callLocalStream && callLocalStream.getAudioTracks().length > 0) {
+              canvasStream.addTrack(callLocalStream.getAudioTracks()[0]);
+            }
+            streamToSend = canvasStream;
+          } catch (e) {}
+        }
+      }
+
+      if (streamToSend) {
+        streamToSend.getTracks().forEach(track => {
+          try {
+            pc.addTrack(track, streamToSend);
+          } catch (e) {
+            console.warn('Error adding track to WebRTC:', e);
+          }
+        });
+      }
+
+      // Handle remote incoming video / audio stream from the other user!
+      pc.ontrack = (event) => {
+        console.log('🎉 Received remote track from peer:', event.track.kind);
+        const remoteVideo = document.getElementById('callRemoteVideo');
+        const remoteCanvas = document.getElementById('callRemoteCanvas');
+        const placeholder = document.getElementById('videoRemotePlaceholder');
+
+        if (remoteVideo && event.streams && event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+          remoteVideo.style.display = 'block';
+          if (remoteCanvas) remoteCanvas.style.display = 'none';
+          if (placeholder) {
+            placeholder.classList.add('hidden');
+            placeholder.style.display = 'none';
+          }
+          remoteVideo.play().catch(e => console.warn('Remote video playback note:', e));
+        }
+      };
+
+      // Send local network ICE candidates to remote peer via Supabase Realtime
+      pc.onicecandidate = (event) => {
+        if (event.candidate && campusRealtimeChannel && currentUser && activeCallPeerId) {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              action: 'ice_candidate',
+              fromUserId: currentUser.id,
+              toUserId: activeCallPeerId,
+              candidate: event.candidate.toJSON ? event.candidate.toJSON() : event.candidate
+            }
+          });
+        }
+      };
+
+      pc.onconnectionstatechange = () => {
+        console.log('WebRTC State change:', pc.connectionState);
+        if (pc.connectionState === 'connected') {
+          showToast('🟢 Live HD peer video connected!', 'success');
+        } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+          console.warn('Peer connection disconnected');
+        }
+      };
+
+      return pc;
+    }
+
+    // Caller initiates WebRTC SDP Offer
+    async function initiateRtcOffer() {
+      const pc = createRtcPeerConnection();
+      try {
+        const offer = await pc.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: true
+        });
+        await pc.setLocalDescription(offer);
+
+        if (campusRealtimeChannel && currentUser && activeCallPeerId) {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              action: 'offer',
+              fromUserId: currentUser.id,
+              toUserId: activeCallPeerId,
+              sdp: offer
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error initiating WebRTC offer:', err);
+      }
+    }
+
+    // Callee receives SDP Offer and generates Answer
+    async function handleRtcOffer(offerSdp, fromUserId) {
+      const pc = createRtcPeerConnection();
+      try {
+        await pc.setRemoteDescription(new RTCSessionDescription(offerSdp));
+
+        // Flush any candidates received while remote description was negotiating
+        while (rtcPendingIceCandidates.length > 0) {
+          const candidate = rtcPendingIceCandidates.shift();
+          try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
+        }
+
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+
+        if (campusRealtimeChannel && currentUser && fromUserId) {
+          campusRealtimeChannel.send({
+            type: 'broadcast',
+            event: 'call_signal',
+            payload: {
+              action: 'answer',
+              fromUserId: currentUser.id,
+              toUserId: fromUserId,
+              sdp: answer
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error answering WebRTC offer:', err);
+      }
+    }
+
+    // Caller receives SDP Answer from Callee
+    async function handleRtcAnswer(answerSdp) {
+      if (!activeRtcPeerConnection) return;
+      try {
+        await activeRtcPeerConnection.setRemoteDescription(new RTCSessionDescription(answerSdp));
+
+        while (rtcPendingIceCandidates.length > 0) {
+          const candidate = rtcPendingIceCandidates.shift();
+          try { await activeRtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
+        }
+      } catch (err) {
+        console.warn('Error setting WebRTC answer:', err);
+      }
+    }
+
+    // Handle incoming ICE Candidate from peer
+    async function handleRtcIceCandidate(candidate) {
+      if (!candidate) return;
+      if (activeRtcPeerConnection && activeRtcPeerConnection.remoteDescription) {
+        try {
+          await activeRtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.warn('Error adding ICE candidate:', e);
+        }
+      } else {
+        rtcPendingIceCandidates.push(candidate);
+      }
+    }
+
+    // =========================================================
     // CAMERA DEVICE ENUMERATION & STREAM MANAGEMENT
+    // =========================================================
     async function getAvailableVideoDevices() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return [];
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevs = devices.filter(d => d.kind === 'videoinput');
-        // Prioritize internal/integrated physical webcams over mobile phone link / virtual cams
         videoDevs.sort((a, b) => {
           const aName = (a.label || '').toLowerCase();
           const bName = (b.label || '').toLowerCase();
@@ -10974,9 +11159,7 @@
       }
     }
 
-    // Start local camera stream - ALWAYS shows active feed immediately without stalling
     async function startLocalCameraStream(deviceId = null) {
-      // 1. Immediately start simulated HD canvas so self-view is INSTANTLY active & never black!
       useSimulatedLocalCamera();
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -10997,7 +11180,6 @@
           ? { deviceId: { exact: chosenDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
           : { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' };
 
-        // Attempt physical camera stream
         const stream = await navigator.mediaDevices.getUserMedia({
           video: videoConstraints,
           audio: true
@@ -11034,10 +11216,8 @@
 
           localVid.onloadedmetadata = () => {
             localVid.play().then(() => {
-              // Verify video is actively outputting frames and not stuck on Phone Link standby
               setTimeout(() => {
                 if (localVid.videoWidth > 0 && localVid.readyState >= 2) {
-                  // Physical camera is delivering live video!
                   isSimulatedCameraActive = false;
                   if (localSimAnimFrame) {
                     cancelAnimationFrame(localSimAnimFrame);
@@ -11048,8 +11228,15 @@
                   const activeTrack = stream.getVideoTracks()[0];
                   const label = activeTrack ? (activeTrack.label || 'Webcam') : 'Webcam';
                   updatePipCamBadge(label.length > 14 ? label.slice(0, 12) + '...' : label);
+
+                  // Update WebRTC track if active
+                  if (activeRtcPeerConnection) {
+                    const videoSender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+                    if (videoSender && activeTrack) {
+                      videoSender.replaceTrack(activeTrack).catch(() => {});
+                    }
+                  }
                 } else {
-                  console.info('Camera in standby (e.g. Phone Link). Maintaining HD simulated avatar feed.');
                   updatePipCamBadge('HD Avatar Cam');
                 }
               }, 1200);
@@ -11059,12 +11246,11 @@
           }
         }
       } catch (err) {
-        console.warn('Physical camera direct stream notice:', err.message);
+        console.warn('Physical camera notice:', err.message);
         useSimulatedLocalCamera();
       }
     }
 
-    // Switch between physical camera devices
     window.cycleLocalCameraDevice = async function() {
       await getAvailableVideoDevices();
       if (availableVideoDevices.length > 1) {
@@ -11084,7 +11270,6 @@
       }
     };
 
-    // Simulated HD Avatar Local Camera (Always renders instantly, 60fps, interactive audio wave)
     window.useSimulatedLocalCamera = function() {
       isSimulatedCameraActive = true;
       const localVid = document.getElementById('callLocalVideo');
@@ -11109,7 +11294,6 @@
         if (!isSimulatedCameraActive) return;
         tick += 0.045;
 
-        // Background studio gradient
         const bgGrad = ctx.createLinearGradient(0, 0, fallbackCanvas.width, fallbackCanvas.height);
         bgGrad.addColorStop(0, '#0a101d');
         bgGrad.addColorStop(0.5, '#1e293b');
@@ -11117,7 +11301,6 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
 
-        // Grid lines (subtle virtual background)
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
         ctx.lineWidth = 1;
         for (let x = 0; x < fallbackCanvas.width; x += 32) {
@@ -11127,7 +11310,6 @@
           ctx.stroke();
         }
 
-        // Animated speech reaction ring
         const voiceRadius = 38 + micAudioLevel * 14 + Math.sin(tick * 2) * 3;
         ctx.save();
         ctx.beginPath();
@@ -11135,7 +11317,6 @@
         ctx.fillStyle = 'rgba(56, 189, 248, 0.18)';
         ctx.fill();
 
-        // Inner avatar disc
         ctx.beginPath();
         ctx.arc(fallbackCanvas.width / 2, fallbackCanvas.height / 2 - 4, 36, 0, Math.PI * 2);
         const avGrad = ctx.createLinearGradient(
@@ -11152,7 +11333,6 @@
         ctx.shadowBlur = 12;
         ctx.stroke();
 
-        // Initial letter
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 26px Inter, sans-serif';
@@ -11161,7 +11341,6 @@
         ctx.fillText(myInitial, fallbackCanvas.width / 2, fallbackCanvas.height / 2 - 4);
         ctx.restore();
 
-        // Audio level dots bar at bottom of PiP
         const dotCount = 8;
         const activeDots = Math.min(dotCount, Math.round(micAudioLevel * dotCount * 2));
         for (let d = 0; d < dotCount; d++) {
@@ -11178,7 +11357,7 @@
       drawSimFrame();
     };
 
-    // REMOTE VIDEO STREAM ANIMATION ENGINE (60 FPS WebRTC Canvas Stream)
+    // REMOTE VIDEO STREAM ANIMATION (Fallback if no physical remote camera)
     function startRemoteVideoStreamAnimation(peerName) {
       const canvas = document.getElementById('callRemoteCanvas');
       if (!canvas) return;
@@ -11202,7 +11381,6 @@
         if (!activeCallType || activeCallType !== 'video') return;
         tick += 0.035;
 
-        // Cinematic dynamic room backdrop with ambient perspective
         const grad = ctx.createRadialGradient(w / 2, h / 2 - 20, 60, w / 2, h / 2, 700);
         grad.addColorStop(0, '#152136');
         grad.addColorStop(0.45, '#0d1524');
@@ -11210,7 +11388,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
 
-        // Perspective horizon lines (Executive Boardroom aesthetic)
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
         ctx.lineWidth = 1;
         for (let y = h / 2; y < h; y += 38) {
@@ -11220,7 +11397,6 @@
           ctx.stroke();
         }
 
-        // Live Audio-Reactive Sonic Rings
         const speechAmp = 0.5 + Math.sin(tick * 3) * 0.35 + Math.cos(tick * 5) * 0.15;
         for (let i = 1; i <= 4; i++) {
           const ringRad = 95 + i * 35 + speechAmp * (18 * i);
@@ -11231,7 +11407,6 @@
           ctx.stroke();
         }
 
-        // Central Peer Video Avatar Portrait
         const discSize = 88 + speechAmp * 5;
         ctx.save();
         ctx.beginPath();
@@ -11251,7 +11426,6 @@
         ctx.strokeStyle = '#7dd3fc';
         ctx.stroke();
 
-        // Peer Initial
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 68px Inter, system-ui, sans-serif';
@@ -11260,7 +11434,6 @@
         ctx.fillText(initial, w / 2, h / 2 - 30);
         ctx.restore();
 
-        // Audio Frequency Equalizer at Bottom (40 bars)
         const numBars = 40;
         const barWidth = 8;
         const barSpacing = 15;
@@ -11281,7 +11454,6 @@
           ctx.fillRect(bx, by, barWidth, barHeight);
         }
 
-        // Live WebRTC Telemetry HUD
         ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
         ctx.beginPath();
         ctx.roundRect(w / 2 - 160, 26, 320, 38, [19]);
@@ -11290,7 +11462,6 @@
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Green live beacon
         ctx.fillStyle = '#10b981';
         ctx.beginPath();
         ctx.arc(w / 2 - 134, 45, 5, 0, Math.PI * 2);
@@ -11307,7 +11478,7 @@
       drawRemoteStream();
     }
 
-    // CONNECT ACTIVE CALL IMMEDIATELY (Transition from Ringing to Live Stream)
+    // CONNECT ACTIVE CALL
     function connectActiveCallImmediately() {
       clearTimeout(callConnectFallbackTimer);
       clearInterval(callRingingInterval);
@@ -11321,7 +11492,6 @@
       } else if (activeCallType === 'video') {
         const placeholder = document.getElementById('videoRemotePlaceholder');
         if (placeholder) {
-          // Hide placeholder completely so remote canvas stream is 100% visible & clean
           placeholder.classList.add('hidden');
           placeholder.style.display = 'none';
         }
@@ -11330,7 +11500,12 @@
         if (peerHeaderName) peerHeaderName.textContent = activeCallPeerName;
 
         startCallTimer('videoCallDuration');
-        startRemoteVideoStreamAnimation(activeCallPeerName);
+
+        // Only start canvas animation if real remote WebRTC video track isn't already playing
+        const remoteVideo = document.getElementById('callRemoteVideo');
+        if (!remoteVideo || remoteVideo.style.display === 'none' || !remoteVideo.srcObject) {
+          startRemoteVideoStreamAnimation(activeCallPeerName);
+        }
       }
 
       showToast(`🎉 ${activeCallType === 'video' ? 'Video' : 'Voice'} call connected!`, 'success');
@@ -11363,8 +11538,10 @@
       const banner = document.getElementById('placeAiIncomingCallBanner');
       if (banner) banner.style.display = 'none';
 
-      // Send accept signal back
-      if (campusRealtimeChannel) {
+      currentDirectPeerId = p.fromUserId;
+
+      // Broadcast acceptance back to caller immediately
+      if (campusRealtimeChannel && currentUser) {
         try {
           campusRealtimeChannel.send({
             type: 'broadcast',
@@ -11379,7 +11556,6 @@
         } catch (e) {}
       }
 
-      currentDirectPeerId = p.fromUserId;
       if (p.callType === 'video') {
         startWpVideoCall(p.fromUserId, p.fromUserName, true);
       } else {
@@ -11412,15 +11588,43 @@
       currentIncomingCallPayload = null;
     };
 
+    // COMPLETE BIDIRECTIONAL SIGNALING & SIMULTANEOUS HANGUP HANDLER
     function handleIncomingCallSignal(payload) {
       if (!payload || !currentUser) return;
-      if (String(payload.toUserId).toLowerCase() !== String(currentUser.id).toLowerCase()) return;
+
+      const myId = String(currentUser.id).toLowerCase();
+      const toId = payload.toUserId ? String(payload.toUserId).toLowerCase() : '';
+      const fromId = payload.fromUserId ? String(payload.fromUserId).toLowerCase() : '';
+      const currentPeerId = activeCallPeerId ? String(activeCallPeerId).toLowerCase() : '';
+
+      // Check if this signal is directed to me or is from my active peer
+      const isForMe = (toId === myId) || (currentPeerId && currentPeerId === fromId);
+      if (!isForMe) return;
+
+      console.log('📡 WebRTC call_signal received:', payload.action, 'from:', fromId);
 
       if (payload.action === 'accepted') {
         connectActiveCallImmediately();
+        // Caller initiates WebRTC offer as soon as peer accepts
+        initiateRtcOffer();
+      } else if (payload.action === 'offer') {
+        // Callee receives offer from caller, sets remote description & sends answer
+        handleRtcOffer(payload.sdp, payload.fromUserId);
+        connectActiveCallImmediately();
+      } else if (payload.action === 'answer') {
+        // Caller receives answer from callee
+        handleRtcAnswer(payload.sdp);
+      } else if (payload.action === 'ice_candidate') {
+        // Exchange network routes
+        handleRtcIceCandidate(payload.candidate);
       } else if (payload.action === 'declined') {
         showToast('Call declined by ' + activeCallPeerName, 'info');
-        endCurrentCall(true);
+        endCurrentCall(false);
+      } else if (payload.action === 'ended') {
+        // CRITICAL FIX: When either user ends/cuts the call, the other user IMMEDIATELY ends!
+        console.log('🔴 Remote peer ended the call. Closing local call session immediately.');
+        showToast(activeCallPeerName + ' ended the call', 'info');
+        endCurrentCall(false); // pass false so we do not send duplicate 'ended' broadcast back
       }
     }
 
@@ -11483,7 +11687,6 @@
         return;
       }
 
-      // Ringing State
       if (statusText) statusText.textContent = 'Calling & Ringing...';
       playCallAudioTone('ring');
 
@@ -11492,7 +11695,6 @@
         playCallAudioTone('ring');
       }, 3000);
 
-      // Broadcast call_invite across Supabase Realtime channel
       if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
         try {
           campusRealtimeChannel.send({
@@ -11511,7 +11713,6 @@
         }
       }
 
-      // Smooth realistic transition to Connected after 2 rings (~2.8s) so end-to-end calling works accurately
       clearTimeout(callConnectFallbackTimer);
       callConnectFallbackTimer = setTimeout(() => {
         connectActiveCallImmediately();
@@ -11576,7 +11777,7 @@
       document.getElementById('videoRemoteStatus').innerHTML = `<span class="beacon-pulse" style="width: 7px; height: 7px; background: #38bdf8;"></span> Ringing peer device...`;
       document.getElementById('videoCallDuration').textContent = 'Ringing...';
 
-      // Start local camera stream immediately (starts instant simulated HD cam + detects physical webcam)
+      // Start local camera stream
       startLocalCameraStream();
 
       if (isAnswering) {
@@ -11584,7 +11785,6 @@
         return;
       }
 
-      // Ringing sequence
       playCallAudioTone('ring');
 
       clearInterval(callRingingInterval);
@@ -11592,7 +11792,7 @@
         playCallAudioTone('ring');
       }, 3000);
 
-      // Broadcast call_invite across Supabase Realtime channel
+      // Send live invite to peer
       if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
         try {
           campusRealtimeChannel.send({
@@ -11611,7 +11811,7 @@
         }
       }
 
-      // Transition to connected after 2 rings (~2.8s) for testing & real sessions
+      // Smooth connect fallback for testing or single-window test
       clearTimeout(callConnectFallbackTimer);
       callConnectFallbackTimer = setTimeout(() => {
         connectActiveCallImmediately();
@@ -11689,9 +11889,21 @@
           }
           if (remoteCanvas) remoteCanvas.style.display = 'none';
 
+          // If WebRTC is active, replace video track on peer connection
+          if (activeRtcPeerConnection) {
+            const sender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+            if (sender) sender.replaceTrack(screenStream.getVideoTracks()[0]);
+          }
+
           screenStream.getVideoTracks()[0].onended = () => {
             if (remoteVid) remoteVid.style.display = 'none';
             if (remoteCanvas) remoteCanvas.style.display = 'block';
+            if (activeRtcPeerConnection && callLocalStream) {
+              const sender = activeRtcPeerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+              if (sender && callLocalStream.getVideoTracks()[0]) {
+                sender.replaceTrack(callLocalStream.getVideoTracks()[0]);
+              }
+            }
           };
           showToast('Sharing screen with ' + activeCallPeerName, 'success');
         } else {
@@ -11716,11 +11928,21 @@
       startWpVoiceCall(currentId, currentName);
     };
 
-    window.endCurrentCall = function(logMessage = true) {
+    // END CURRENT CALL (Bidirectional - When one user cuts, other cuts too!)
+    window.endCurrentCall = function(broadcastSignal = true) {
       clearTimeout(callConnectFallbackTimer);
       clearInterval(callRingingInterval);
       playCallAudioTone('end');
       clearInterval(callTimerInterval);
+
+      // Clean up WebRTC peer connection
+      if (activeRtcPeerConnection) {
+        try {
+          activeRtcPeerConnection.close();
+        } catch (e) {}
+        activeRtcPeerConnection = null;
+      }
+      rtcPendingIceCandidates = [];
 
       // Stop media tracks
       if (callLocalStream) {
@@ -11743,6 +11965,12 @@
         if (ctx) ctx.clearRect(0, 0, remoteCanvas.width, remoteCanvas.height);
       }
 
+      const remoteVid = document.getElementById('callRemoteVideo');
+      if (remoteVid) {
+        remoteVid.srcObject = null;
+        remoteVid.style.display = 'none';
+      }
+
       const overlay = document.getElementById('placeAiCallModal');
       if (overlay) {
         overlay.classList.remove('active');
@@ -11752,8 +11980,8 @@
       const banner = document.getElementById('placeAiIncomingCallBanner');
       if (banner) banner.style.display = 'none';
 
-      // Send end signal to peer
-      if (campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
+      // Send end signal to peer so the other user's call cuts immediately!
+      if (broadcastSignal && campusRealtimeChannel && currentUser && activeCallPeerId && activeCallPeerId !== 'placeai_copilot') {
         try {
           campusRealtimeChannel.send({
             type: 'broadcast',
@@ -11771,7 +11999,7 @@
       const callTypeName = activeCallType === 'video' ? 'Video Call' : 'Voice Call';
       const iconType = activeCallType === 'video' ? 'fas fa-video' : 'fas fa-phone-alt';
 
-      if (logMessage && activeCallPeerId && typeof getDirectChatHistory === 'function') {
+      if (broadcastSignal && activeCallPeerId && typeof getDirectChatHistory === 'function') {
         const msgs = getDirectChatHistory(activeCallPeerId);
         const recordText = `<i class="${iconType}"></i> ${callTypeName} ended • ${finalDuration}`;
         msgs.push({
