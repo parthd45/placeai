@@ -5643,6 +5643,281 @@
       50% { opacity: 0.5; transform: scale(0.85); }
     }
 
+    /* Vercel Official Segmented Control */
+    .vercel-segmented-control {
+      background: #000000;
+      border: 1px solid #27272a;
+      padding: 3px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+    .vercel-tab-pill {
+      background: transparent;
+      border: none;
+      color: #a1a1aa;
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+    }
+    .vercel-tab-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .vercel-tab-pill.active {
+      background: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      box-shadow: 0 1px 6px rgba(255, 255, 255, 0.2);
+    }
+    .vercel-pill-badge {
+      background: #27272a;
+      color: #a1a1aa;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .vercel-tab-pill.active .vercel-pill-badge {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* Vercel Carousel Slider */
+    .vercel-slider-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .vercel-slider-track {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 4px 2px 14px 2px;
+      scroll-behavior: smooth;
+    }
+    .vercel-slider-track::-webkit-scrollbar {
+      height: 5px;
+    }
+    .vercel-slider-track::-webkit-scrollbar-track {
+      background: rgba(24, 24, 27, 0.5);
+      border-radius: 4px;
+    }
+    .vercel-slider-track::-webkit-scrollbar-thumb {
+      background: #3f3f46;
+      border-radius: 4px;
+    }
+    .vercel-slider-track::-webkit-scrollbar-thumb:hover {
+      background: #71717a;
+    }
+    .vercel-slider-track .vercel-deploy-card,
+    .vercel-slider-track .vercel-app-card {
+      flex: 0 0 360px;
+      min-width: 360px;
+      max-width: 380px;
+      scroll-snap-align: start;
+      margin-bottom: 0;
+    }
+
+    /* Authentic Vercel Deployment Card */
+    .vercel-deploy-card {
+      background: #0a0a0c;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .vercel-deploy-card:hover {
+      border-color: #52525b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+    .vercel-deploy-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .vercel-deploy-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vercel-deploy-appname {
+      color: #f4f4f5;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .vercel-env-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .vercel-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+    .vercel-status-pill.ready {
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+    .vercel-status-pill.ready::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 6px #34d399;
+      animation: vercelPulse 2s infinite;
+    }
+    .vercel-status-pill.building {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    .vercel-status-pill.error {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .vercel-url-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+    }
+    .vercel-url-link {
+      color: #38bdf8;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 270px;
+      transition: color 0.15s;
+    }
+    .vercel-url-link:hover {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+    .vercel-commit-box {
+      background: rgba(24, 24, 27, 0.7);
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 12px;
+    }
+    .vercel-commit-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #a1a1aa;
+      margin-bottom: 4px;
+    }
+    .vercel-branch-pill {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      color: #e4e4e7;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .vercel-commit-text {
+      font-size: 11.5px;
+      color: #d4d4d8;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .vercel-deploy-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #27272a;
+      padding-top: 10px;
+      margin-top: 4px;
+    }
+    .vercel-deploy-age {
+      font-size: 11px;
+      color: #71717a;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .vercel-action-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-vercel-visit {
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-vercel-visit:hover {
+      background: #e4e4e7;
+      transform: translateY(-1px);
+    }
+    .btn-vercel-copy {
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-vercel-copy:hover {
+      color: #ffffff;
+      border-color: #3f3f46;
+    }
+
     /* Supabase Cloud Card Aesthetic */
     .supabase-dashboard-card {
       background: linear-gradient(135deg, #0f1c16 0%, #0a130f 100%);
@@ -7022,18 +7297,44 @@
                 </div>
               </div>
 
-              <!-- Sub-Tabs: Real-Time Deployments vs Projects -->
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                <div class="vercel-subtabs-bar">
-                  <button type="button" class="vercel-subtab-btn active" id="btnVercelTabDeployments" onclick="switchVercelSubTab('deployments')">
-                    <i class="fas fa-satellite-dish"></i> Live Deployments (<span id="vercelSubCountDeployments">0</span>)
+              <!-- Vercel Navigation Bar: 2 Segmented Tabs + Slider Controls + Live Status -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                <!-- 2 Premium Segmented Buttons -->
+                <div class="vercel-segmented-control">
+                  <button type="button" class="vercel-tab-pill active" id="btnVercelTabDeployments" onclick="switchVercelSubTab('deployments')">
+                    <span style="font-size: 11px;">▲</span>
+                    <span>Live Deployments</span>
+                    <span class="vercel-pill-badge" id="vercelSubCountDeployments">0</span>
                   </button>
-                  <button type="button" class="vercel-subtab-btn" id="btnVercelTabProjects" onclick="switchVercelSubTab('projects')">
-                    <i class="fas fa-folder-tree"></i> Vercel Projects (<span id="vercelSubCountProjects">0</span>)
+                  <button type="button" class="vercel-tab-pill" id="btnVercelTabProjects" onclick="switchVercelSubTab('projects')">
+                    <i class="fas fa-layer-group" style="font-size: 11px;"></i>
+                    <span>Vercel Projects</span>
+                    <span class="vercel-pill-badge" id="vercelSubCountProjects">0</span>
                   </button>
                 </div>
-                <div id="vercelRealApiNotice" style="font-size: 11.5px; color: #a1a1aa; display: flex; align-items: center; gap: 6px;">
-                  <span class="beacon-pulse" style="width: 6px; height: 6px; background: #34d399;"></span> Real-time Vercel Cloud Sync
+
+                <!-- Slider & View Controls -->
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                  <div class="projects-slider-nav" id="vercelSliderNavControls" style="display: flex; align-items: center; gap: 6px;">
+                    <div class="view-mode-toggle" style="display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid #27272a; border-radius: 6px; padding: 2px;">
+                      <button type="button" class="view-mode-btn active" id="btnVercelModeSlide" onclick="setVercelLayoutMode('slide')" title="Horizontal Carousel Slider">
+                        <i class="fas fa-arrows-left-right"></i> Slide
+                      </button>
+                      <button type="button" class="view-mode-btn" id="btnVercelModeGrid" onclick="setVercelLayoutMode('grid')" title="Multi-Row Grid">
+                        <i class="fas fa-table-cells"></i> Grid
+                      </button>
+                    </div>
+                    <button type="button" class="slider-arrow-btn" onclick="slideVercelTrack(-1)" title="Previous Vercel App">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="slider-counter-pill" id="vercelSlideCounter">1 of 1</span>
+                    <button type="button" class="slider-arrow-btn" onclick="slideVercelTrack(1)" title="Next Vercel App">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div id="vercelRealApiNotice" style="font-size: 11.5px; color: #a1a1aa; display: flex; align-items: center; gap: 6px;">
+                    <span class="beacon-pulse" style="width: 6px; height: 6px; background: #34d399;"></span> Live Cloud Sync
+                  </div>
                 </div>
               </div>
 
@@ -10301,6 +10602,7 @@
 
     /* ===== VERCEL CLOUD REAL DEPLOYMENTS & PROJECTS ENGINE ===== */
     let vercelSubTab = 'deployments'; // 'deployments' or 'projects'
+    let vercelLayoutMode = 'slide'; // default to horizontal carousel slider
 
     function getVercelStorageKey() {
       const uid = (currentUser && currentUser.id) ? currentUser.id : 'guest';
@@ -10324,6 +10626,53 @@
       if (btnDep) btnDep.classList.toggle('active', tab === 'deployments');
       if (btnPrj) btnPrj.classList.toggle('active', tab === 'projects');
       renderVercelDeployments(false);
+    }
+
+    function setVercelLayoutMode(mode) {
+      vercelLayoutMode = mode;
+      const btnSlide = document.getElementById('btnVercelModeSlide');
+      const btnGrid = document.getElementById('btnVercelModeGrid');
+      if (btnSlide && btnGrid) {
+        btnSlide.classList.toggle('active', mode === 'slide');
+        btnGrid.classList.toggle('active', mode === 'grid');
+      }
+      renderVercelDeployments(false);
+    }
+
+    function slideVercelTrack(direction) {
+      const track = document.getElementById('vercelSliderTrack');
+      if (!track) return;
+      const scrollStep = 374; // card width + gap
+      track.scrollBy({ left: direction * scrollStep, behavior: 'smooth' });
+      setTimeout(updateVercelSliderCounter, 300);
+    }
+
+    function updateVercelSliderCounter() {
+      try {
+        const track = document.getElementById('vercelSliderTrack');
+        const counter = document.getElementById('vercelSlideCounter');
+        if (!counter) return;
+
+        if (!track || vercelLayoutMode !== 'slide') {
+          const count = document.getElementById('vercelLivePillCount')?.textContent || '0';
+          counter.textContent = `${count} total`;
+          return;
+        }
+
+        const cards = track.querySelectorAll('.vercel-deploy-card, .vercel-app-card');
+        const total = cards ? cards.length : 0;
+        if (total === 0) {
+          counter.textContent = '0 of 0';
+          return;
+        }
+
+        const scrollLeft = track.scrollLeft || 0;
+        const cardWidth = 374;
+        const currentIndex = Math.min(total, Math.max(1, Math.round(scrollLeft / cardWidth) + 1));
+        counter.textContent = `${currentIndex} of ${total}`;
+      } catch (e) {
+        console.warn('updateVercelSliderCounter:', e);
+      }
     }
 
     function openVercelConnectModal() {
@@ -10398,7 +10747,7 @@
 
       // 3. Fetch Real-time Deployments
       try {
-        let dRes = await fetch('https://api.vercel.com/v6/deployments?limit=25', {
+        let dRes = await fetch('https://api.vercel.com/v6/deployments?limit=30', {
           headers: { 'Authorization': cleanToken }
         });
         if (!dRes.ok) {
@@ -10568,17 +10917,20 @@
       const realDeployments = (vercelData && Array.isArray(vercelData.deployments)) ? vercelData.deployments : [];
       const realProjects = (vercelData && Array.isArray(vercelData.projects)) ? vercelData.projects : [];
 
-      const totalCount = Math.max(realDeployments.length, realProjects.length, fallbackVercelApps.length);
-      if (livePillCount) livePillCount.textContent = totalCount;
-      if (totalLiveApps) totalLiveApps.textContent = totalCount;
-      if (vercelTabCount) vercelTabCount.textContent = totalCount;
-      if (countDeployments) countDeployments.textContent = realDeployments.length || fallbackVercelApps.length;
-      if (countProjects) countProjects.textContent = realProjects.length || fallbackVercelApps.length;
+      // Determine item count for tabs
+      const deployCount = realDeployments.length || fallbackVercelApps.length;
+      const projCount = realProjects.length || fallbackVercelApps.length;
+
+      if (livePillCount) livePillCount.textContent = Math.max(deployCount, projCount);
+      if (totalLiveApps) totalLiveApps.textContent = Math.max(deployCount, projCount);
+      if (vercelTabCount) vercelTabCount.textContent = Math.max(deployCount, projCount);
+      if (countDeployments) countDeployments.textContent = deployCount;
+      if (countProjects) countProjects.textContent = projCount;
 
       if (!grid) return;
 
       // EMPTY STATE
-      if (totalCount === 0) {
+      if (deployCount === 0 && projCount === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 28px; text-align: center; background: rgba(18, 18, 20, 0.7); border: 1px dashed #3f3f46; border-radius: 10px;">
             <span style="font-size: 28px; color: #ffffff; display: block; margin-bottom: 8px;">▲</span>
@@ -10599,23 +10951,28 @@
         return;
       }
 
-      // TAB 1: REAL-TIME DEPLOYMENTS
+      let cardsHtml = '';
+
+      // TAB 1: REAL-TIME DEPLOYMENTS (EXACT LIKE VERCEL)
       if (vercelSubTab === 'deployments') {
         if (realDeployments.length > 0) {
-          grid.innerHTML = realDeployments.map(dep => {
+          cardsHtml = realDeployments.map(dep => {
+            const name = dep.name || 'Deployment';
+            const rawUrl = dep.url || '';
+            const liveUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://${rawUrl}` : '#');
+            const displayHost = rawUrl.replace(/^https?:\/\//i, '');
             const state = (dep.readyState || dep.state || 'READY').toUpperCase();
             const isReady = state === 'READY';
-            const isBuilding = state === 'BUILDING' || state === 'INITIALIZING';
+            const isBuilding = state === 'BUILDING' || state === 'INITIALIZING' || state === 'QUEUED';
             const stateClass = isReady ? 'ready' : (isBuilding ? 'building' : 'error');
-            const stateLabel = isReady ? 'Ready (Production)' : (isBuilding ? 'Building...' : 'Error');
+            const stateLabel = isReady ? 'Ready' : (isBuilding ? 'Building...' : 'Error');
+            const isProd = dep.target === 'production' || !dep.target;
+            const envLabel = isProd ? 'Production' : 'Preview';
 
-            const liveUrl = dep.url ? `https://${dep.url}` : '#';
-            const displayHost = dep.url || 'deployment.vercel.app';
-            const commitRef = (dep.meta && dep.meta.githubCommitRef) || 'main';
-            const commitMsg = (dep.meta && dep.meta.githubCommitMessage) || (dep.name + ' production deployment');
-            const author = (dep.creator && dep.creator.username) || (dep.meta && dep.meta.githubCommitAuthorName) || 'Developer';
-            
-            // Format time ago
+            const branch = (dep.meta && dep.meta.githubCommitRef) || 'main';
+            const commitMsg = (dep.meta && dep.meta.githubCommitMessage) || `${name} production deployment`;
+            const author = (dep.creator && dep.creator.username) || (dep.meta && dep.meta.githubCommitAuthorName) || (savedVercelUser || 'developer');
+
             let timeAgo = 'recently';
             if (dep.createdAt) {
               const diffMs = Date.now() - Number(dep.createdAt);
@@ -10631,94 +10988,108 @@
             return `
               <div class="vercel-deploy-card">
                 <div>
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
-                      <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(dep.name || 'Deployment')}</strong>
+                  <div class="vercel-deploy-top">
+                    <div class="vercel-deploy-title-group">
+                      <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
+                      <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
+                      <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> ${envLabel}</span>
                     </div>
                     <span class="vercel-status-pill ${stateClass}">${stateLabel}</span>
                   </div>
 
-                  <div class="vercel-commit-msg" title="${escapeHtml(commitMsg)}">
-                    <i class="fab fa-git-alt" style="color: #f97316; font-size: 11px;"></i>
-                    <strong style="color: #a1a1aa; font-family: monospace;">${escapeHtml(commitRef)}</strong>
-                    <span>${escapeHtml(commitMsg)}</span>
+                  <div class="vercel-url-row">
+                    <i class="fas fa-globe" style="font-size: 11px; color: #71717a;"></i>
+                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link" title="${escapeHtml(liveUrl)}">
+                      ${escapeHtml(displayHost || 'deployment.vercel.app')}
+                    </a>
                   </div>
 
-                  <div class="vercel-meta-row">
-                    <span><i class="far fa-user" style="font-size: 10px; margin-right: 3px;"></i> ${escapeHtml(author)}</span>
-                    <span><i class="far fa-clock" style="font-size: 10px; margin-right: 3px;"></i> ${timeAgo}</span>
-                    <span style="color: #38bdf8; font-family: monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;">
-                      ${escapeHtml(displayHost)}
-                    </span>
+                  <div class="vercel-commit-box">
+                    <div class="vercel-commit-header">
+                      <i class="fab fa-git-alt" style="color: #f97316; font-size: 11.5px;"></i>
+                      <span class="vercel-branch-pill">${escapeHtml(branch)}</span>
+                      <span>by ${escapeHtml(author)}</span>
+                    </div>
+                    <div class="vercel-commit-text" title="${escapeHtml(commitMsg)}">
+                      ${escapeHtml(commitMsg)}
+                    </div>
                   </div>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 6px;">
-                  <span class="dev-tab-pill vercel" style="font-size: 9.5px; padding: 2px 7px;">
-                    <i class="fas fa-bolt" style="font-size: 8px; color: #38bdf8;"></i> Edge Live
+                <div class="vercel-deploy-footer">
+                  <span class="vercel-deploy-age">
+                    <i class="far fa-clock" style="font-size: 10px;"></i> ${timeAgo}
                   </span>
-                  <div style="display: flex; gap: 6px;">
-                    <button type="button" class="btn-github-resync" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" style="padding: 4px 8px; font-size: 11px;" title="Copy Domain">
+                  <div class="vercel-action-btns">
+                    <button type="button" class="btn-vercel-copy" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" title="Copy URL">
                       <i class="far fa-copy"></i>
                     </button>
-                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
-                      Visit App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
+                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
+                      Visit <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
                     </a>
                   </div>
                 </div>
               </div>
             `;
           }).join('');
-          return;
-        }
+        } else {
+          // Fallback to portfolio apps
+          cardsHtml = fallbackVercelApps.map(app => {
+            const liveUrl = app.live_url || '#';
+            const displayHost = liveUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+            const repoUrl = app.github_url || app.repo_url || (activeGitHubUser ? `https://github.com/${activeGitHubUser.username}` : '#');
 
-        // Fallback to portfolio apps if token not connected
-        grid.innerHTML = fallbackVercelApps.map(app => {
-          const liveUrl = app.live_url || '#';
-          const displayHost = liveUrl.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
-          const repoUrl = app.github_url || app.repo_url || (activeGitHubUser ? `https://github.com/${activeGitHubUser.username}` : '#');
-
-          return `
-            <div class="vercel-app-card">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
-                    <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(app.title || app.name || 'Vercel Deployment')}</strong>
+            return `
+              <div class="vercel-deploy-card">
+                <div>
+                  <div class="vercel-deploy-top">
+                    <div class="vercel-deploy-title-group">
+                      <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
+                      <span class="vercel-deploy-appname">${escapeHtml(app.title || app.name || 'Deployment')}</span>
+                      <span class="vercel-env-badge"><span style="font-size: 8px;">◆</span> Production</span>
+                    </div>
+                    <span class="vercel-status-pill ready">Ready</span>
                   </div>
-                  <span class="vercel-status-beacon">Live</span>
-                </div>
-                <p style="font-size: 11.5px; color: #a1a1aa; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                  ${escapeHtml(app.description || 'Verified production web application deployed on Vercel Global Edge CDN.')}
-                </p>
-                <div style="font-family: monospace; font-size: 11px; color: #71717a; margin-bottom: 12px; word-break: break-all;">
-                  <i class="fas fa-link" style="font-size: 10px; margin-right: 4px;"></i> ${escapeHtml(displayHost)}
-                </div>
-              </div>
 
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 4px;">
-                <span class="dev-tab-pill vercel" style="font-size: 10px;">
-                  ${escapeHtml(app.category || 'Web & Fullstack')}
-                </span>
-                <div style="display: flex; gap: 6px;">
-                  ${repoUrl && repoUrl !== '#' ? `
-                    <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-github-resync" style="padding: 4px 8px; font-size: 11px;" title="View Source on GitHub">
-                      <i class="fab fa-github"></i>
+                  <div class="vercel-url-row">
+                    <i class="fas fa-globe" style="font-size: 11px; color: #71717a;"></i>
+                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link">
+                      ${escapeHtml(displayHost)}
                     </a>
-                  ` : ''}
-                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
-                    Launch App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
-                  </a>
+                  </div>
+
+                  <div class="vercel-commit-box">
+                    <div class="vercel-commit-header">
+                      <i class="fab fa-git-alt" style="color: #f97316; font-size: 11.5px;"></i>
+                      <span class="vercel-branch-pill">main</span>
+                      <span>Production</span>
+                    </div>
+                    <div class="vercel-commit-text">
+                      ${escapeHtml(app.description || 'Verified production web application deployed on Vercel Edge Network.')}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="vercel-deploy-footer">
+                  <span class="vercel-status-beacon" style="font-size: 11px;">Production Live</span>
+                  <div class="vercel-action-btns">
+                    ${repoUrl && repoUrl !== '#' ? `
+                      <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-copy" title="View Source on GitHub">
+                        <i class="fab fa-github"></i>
+                      </a>
+                    ` : ''}
+                    <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
+                      Visit <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          `;
-        }).join('');
-        return;
+            `;
+          }).join('');
+        }
       }
 
-      // TAB 2: VERCEL PROJECTS CONSOLE
+      // TAB 2: VERCEL PROJECTS (EXACT LIKE VERCEL)
       if (vercelSubTab === 'projects') {
         const projectsToRender = realProjects.length > 0 ? realProjects : fallbackVercelApps.map(p => ({
           name: p.name || p.title,
@@ -10727,37 +11098,82 @@
           repo: p.github_url
         }));
 
-        grid.innerHTML = projectsToRender.map(prj => {
-          const liveUrl = prj.url || (prj.targets && prj.targets.production && prj.targets.production.url ? `https://${prj.targets.production.url}` : (prj.latestDeployments && prj.latestDeployments[0] && prj.latestDeployments[0].url ? `https://${prj.latestDeployments[0].url}` : '#'));
-          const framework = prj.framework || 'Custom Web';
+        cardsHtml = projectsToRender.map(prj => {
+          const name = prj.name || 'Project';
+          const framework = prj.framework ? prj.framework.toUpperCase() : 'WEB';
+          const rawUrl = prj.url || (prj.targets && prj.targets.production && prj.targets.production.url ? `https://${prj.targets.production.url}` : (prj.latestDeployments && prj.latestDeployments[0] && prj.latestDeployments[0].url ? `https://${prj.latestDeployments[0].url}` : '#'));
+          const liveUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://${rawUrl}` : '#');
+          const displayHost = rawUrl.replace(/^https?:\/\//i, '');
           const repo = (prj.link && prj.link.repo) || prj.repo || '';
 
           return `
             <div class="vercel-deploy-card">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 14px; font-weight: 900; color: #ffffff;">▲</span>
-                    <strong style="color: #f4f4f5; font-size: 13.5px;">${escapeHtml(prj.name || 'Project')}</strong>
+                <div class="vercel-deploy-top">
+                  <div class="vercel-deploy-title-group">
+                    <span style="font-size: 13px; font-weight: 900; color: #ffffff;">▲</span>
+                    <span class="vercel-deploy-appname">${escapeHtml(name)}</span>
                   </div>
-                  <span class="dev-tab-pill vercel" style="font-size: 10px; padding: 2px 8px;">${escapeHtml(framework)}</span>
+                  <span class="dev-tab-pill vercel" style="font-size: 10px; padding: 2px 8px; text-transform: uppercase;">
+                    ${escapeHtml(framework)}
+                  </span>
                 </div>
 
-                <div style="font-size: 11.5px; color: #a1a1aa; margin: 8px 0;">
-                  ${repo ? `<div style="display:flex;align-items:center;gap:6px;font-family:monospace;color:#58a6ff;margin-bottom:6px;"><i class="fab fa-github"></i> ${escapeHtml(repo)}</div>` : ''}
-                  <div style="font-family:monospace;color:#71717a;word-break:break-all;"><i class="fas fa-globe" style="font-size:10px;margin-right:4px;"></i> ${escapeHtml(liveUrl.replace(/^https?:\/\//i, ''))}</div>
+                <div class="vercel-url-row">
+                  <i class="fas fa-link" style="font-size: 11px; color: #71717a;"></i>
+                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="vercel-url-link" title="${escapeHtml(liveUrl)}">
+                    ${escapeHtml(displayHost || 'No production domain')}
+                  </a>
                 </div>
+
+                ${repo ? `
+                  <div style="background: rgba(24, 24, 27, 0.7); border: 1px solid #27272a; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; font-family: ui-monospace, monospace; font-size: 11px; color: #58a6ff;">
+                    <i class="fab fa-github" style="font-size: 12px;"></i>
+                    <a href="https://github.com/${escapeHtml(repo)}" target="_blank" rel="noopener noreferrer" style="color: #58a6ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      ${escapeHtml(repo)}
+                    </a>
+                  </div>
+                ` : `
+                  <div style="background: rgba(24, 24, 27, 0.7); border: 1px solid #27272a; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; font-size: 11.5px; color: #71717a;">
+                    <i class="fas fa-satellite-dish" style="color: #34d399; margin-right: 5px;"></i> Production deployment active on Edge CDN
+                  </div>
+                `}
               </div>
 
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; padding-top: 10px; margin-top: 6px;">
-                <span class="vercel-status-beacon" style="font-size: 10.5px;">Production Domain</span>
-                <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-connect" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
-                  Open App <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 4px;"></i>
-                </a>
+              <div class="vercel-deploy-footer">
+                <span class="vercel-status-beacon" style="font-size: 11px;">
+                  Production Domain
+                </span>
+                <div class="vercel-action-btns">
+                  <button type="button" class="btn-vercel-copy" onclick="navigator.clipboard.writeText('${liveUrl}'); showToast('Domain copied to clipboard', 'success');" title="Copy URL">
+                    <i class="far fa-copy"></i>
+                  </button>
+                  <a href="${liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-vercel-visit">
+                    Open App <i class="fas fa-external-link-alt" style="font-size: 9px;"></i>
+                  </a>
+                </div>
               </div>
             </div>
           `;
         }).join('');
+      }
+
+      // RENDER IN SLIDER TRACK OR GRID
+      if (vercelLayoutMode === 'slide') {
+        grid.innerHTML = `
+          <div class="vercel-slider-wrapper">
+            <div class="vercel-slider-track" id="vercelSliderTrack" onscroll="updateVercelSliderCounter()">
+              ${cardsHtml}
+            </div>
+          </div>
+        `;
+        setTimeout(updateVercelSliderCounter, 100);
+      } else {
+        grid.innerHTML = `
+          <div class="vercel-apps-grid">
+            ${cardsHtml}
+          </div>
+        `;
       }
     }
 
