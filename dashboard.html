@@ -7907,6 +7907,103 @@
       max-height: 50vh !important;
     }
   }
+
+    /* ===== NATIVE CLEAN MOBILE ARCHITECTURE ===== */
+    .dashboard-header-logo {
+      height: 36px;
+      width: auto;
+      max-width: 170px;
+      object-fit: contain;
+    }
+    .header-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .header-icon-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .update-icon-btn {
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.35);
+      background: rgba(168, 85, 247, 0.12);
+    }
+    .chat-icon-btn {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .logout-icon-btn {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .mobile-section-switcher {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header-logo {
+        height: 26px !important;
+        max-width: 110px !important;
+      }
+
+      /* Mobile Section Switcher Pills */
+      .mobile-section-switcher {
+        display: flex !important;
+        gap: 6px !important;
+        margin-bottom: 12px !important;
+        padding: 4px !important;
+        background: rgba(15, 23, 42, 0.94) !important;
+        border: 1px solid rgba(51, 65, 85, 0.6) !important;
+        border-radius: 14px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: sticky !important;
+        top: calc(env(safe-area-inset-top, 0px) + 54px) !important;
+        z-index: 999 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+      }
+      .mob-sec-tab {
+        flex: 1 !important;
+        padding: 7px 10px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        border: none !important;
+        background: transparent !important;
+        color: #94a3b8 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+      }
+      .mob-sec-tab.active {
+        background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 10px rgba(124, 58, 237, 0.5) !important;
+      }
+
+      /* In mobile profile view, hide dev-ecosystem-suite by default */
+      .mobile-view-profile .dev-ecosystem-suite {
+        display: none !important;
+      }
+    }
+
 </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -7996,23 +8093,21 @@
   <div class="header">
     <div class="header-container">
       <div class="logo-section">
-        <button class="hamburger-menu" onclick="toggleSidebar()">
+        <button class="hamburger-menu" onclick="toggleSidebar()" aria-label="Open Menu">
           <i class="fas fa-bars"></i>
         </button>
-        <img src="images/logo1.webp" alt="Place Wise"
-          style="height: 100px; width: auto; max-width: 250px; object-fit: contain;" />
+        <img src="images/logo1.webp" alt="Place Wise" class="dashboard-header-logo" />
       </div>
       <div class="header-actions">
-        <button class="header-chat-btn" onclick="openPlaceAIUpdateModal()" title="App Updates & OTA Patches" style="background: rgba(124, 58, 237, 0.18); border-color: rgba(139, 92, 246, 0.4); color: #c084fc;">
-          <i class="fas fa-sparkles"></i> <span>Updates</span>
+        <button class="header-icon-btn update-icon-btn" onclick="openPlaceAIUpdateModal()" title="Check Updates">
+          <i class="fas fa-sparkles"></i>
         </button>
-        <button class="header-chat-btn" onclick="openCampusChatModal('all')" title="Community Chat & Direct Messaging">
-          <i class="fas fa-comments"></i> <span>Community Chat</span>
+        <button class="header-icon-btn chat-icon-btn" onclick="openCampusChatModal('all')" title="Community Chat & Direct Messaging">
+          <i class="fas fa-comments"></i>
           <span class="wp-header-unread-badge" id="headerChatUnreadBadge" style="display:none;">0</span>
         </button>
-        <button class="btn-logout" id="logoutBtn">
+        <button class="header-icon-btn logout-icon-btn" id="logoutBtn" title="Logout">
           <i class="fa fa-sign-out-alt"></i>
-          Logout
         </button>
       </div>
     </div>
@@ -8020,6 +8115,22 @@
 
   <!-- Main Container -->
   <div class="main-container">
+    <!-- Clean Mobile View Selector (Visible only on mobile screens) -->
+    <div class="mobile-section-switcher" id="mobileDashboardSectionSwitcher">
+      <button class="mob-sec-tab active" onclick="switchMobileDashboardView('profile', this)" id="mobSecBtn_profile">
+        <i class="fas fa-user-circle"></i> Profile
+      </button>
+      <button class="mob-sec-tab" onclick="switchMobileDashboardView('github', this)" id="mobSecBtn_github">
+        <i class="fab fa-github"></i> GitHub
+      </button>
+      <button class="mob-sec-tab" onclick="switchMobileDashboardView('vercel', this)" id="mobSecBtn_vercel">
+        <i class="fas fa-cloud"></i> Vercel
+      </button>
+      <button class="mob-sec-tab" onclick="switchMobileDashboardView('skills', this)" id="mobSecBtn_skills">
+        <i class="fas fa-award"></i> Skills
+      </button>
+    </div>
+
     <div class="dashboard-grid">
       <!-- Left Sidebar -->
       <div>
@@ -19440,5 +19551,65 @@ ${projStr}
   </nav>
 
   <script src="js/app-updater.js"></script>
+
+  <script>
+    window.switchMobileDashboardView = function(view, btnEl) {
+      document.querySelectorAll('.mob-sec-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const profileCol = document.querySelector('.dashboard-grid > div:first-child');
+      const rightCol = document.querySelector('.dashboard-grid > div:last-child');
+      const devSuite = document.querySelector('.dev-ecosystem-suite');
+      const workspaceTabsCard = document.getElementById('profileWorkspaceTabs')?.closest('.card');
+      const tabPanels = document.getElementById('profileTabPanels');
+
+      if (window.innerWidth <= 768) {
+        if (view === 'profile') {
+          if (profileCol) profileCol.style.display = 'block';
+          if (rightCol) rightCol.style.display = 'block';
+          if (devSuite) devSuite.style.display = 'none';
+          if (workspaceTabsCard) workspaceTabsCard.style.display = 'block';
+          if (tabPanels) tabPanels.style.display = 'block';
+          const summaryTab = document.querySelector('#profileWorkspaceTabs a[data-section="summary"]');
+          if (summaryTab) summaryTab.click();
+        } else if (view === 'github') {
+          if (profileCol) profileCol.style.display = 'none';
+          if (rightCol) rightCol.style.display = 'block';
+          if (devSuite) devSuite.style.display = 'block';
+          const gitTab = document.getElementById('tabBtnGithub');
+          if (gitTab) gitTab.click();
+          if (workspaceTabsCard) workspaceTabsCard.style.display = 'none';
+          if (tabPanels) tabPanels.style.display = 'none';
+        } else if (view === 'vercel') {
+          if (profileCol) profileCol.style.display = 'none';
+          if (rightCol) rightCol.style.display = 'block';
+          if (devSuite) devSuite.style.display = 'block';
+          const vercelTab = document.getElementById('tabBtnVercel');
+          if (vercelTab) vercelTab.click();
+          if (workspaceTabsCard) workspaceTabsCard.style.display = 'none';
+          if (tabPanels) tabPanels.style.display = 'none';
+        } else if (view === 'skills') {
+          if (profileCol) profileCol.style.display = 'none';
+          if (rightCol) rightCol.style.display = 'block';
+          if (devSuite) devSuite.style.display = 'none';
+          if (workspaceTabsCard) workspaceTabsCard.style.display = 'block';
+          if (tabPanels) tabPanels.style.display = 'block';
+          const skillsTab = document.querySelector('#profileWorkspaceTabs a[data-section="skills"]');
+          if (skillsTab) skillsTab.click();
+        }
+      }
+    };
+
+    // Auto-initialize mobile clean view on load
+    window.addEventListener('DOMContentLoaded', function() {
+      if (window.innerWidth <= 768) {
+        setTimeout(function() {
+          const defaultBtn = document.getElementById('mobSecBtn_profile');
+          if (defaultBtn) switchMobileDashboardView('profile', defaultBtn);
+        }, 300);
+      }
+    });
+  </script>
+
 </body>
 

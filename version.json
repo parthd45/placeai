@@ -1,14 +1,15 @@
 {
-  "version": "2.2.1",
-  "buildTimestamp": 1727275000000,
+  "version": "2.2.2",
+  "buildTimestamp": 1727276000000,
   "releaseDate": "2026-09-25",
-  "name": "PlaceAI Mobile v2.2.1 (Streamlined Dashboard & OTA)",
+  "name": "PlaceAI Mobile v2.2.2 (Clean Mobile Architecture & Silent Updates)",
   "changelog": [
-    "Clean, decluttered modern mobile dashboard layout",
-    "Compact profile header with instant tab access",
-    "WhatsApp-style single-pane Community & Peer Chat with Back button",
-    "Full-screen touch-friendly campus messaging dialogs",
-    "Over-The-Air (OTA) automatic update system with home page modal"
+    "Clean, decluttered mobile dashboard with 1-tap view switcher (Profile, GitHub, Vercel, Skills)",
+    "Compact mobile header with PlaceAI logo and modern quick action icons",
+    "Dedicated high-contrast Sign In / Login button on homepage header and hero",
+    "Removed recurring homepage popup - non-intrusive OTA update notifications only",
+    "WhatsApp-style Community & Peer Chat with native Back navigation",
+    "Optimized WebRTC Voice and Video call stability"
   ],
   "apkUrl": "https://github.com/parthd45/placeai/raw/main/PlaceAI.apk",
   "directDownloadUrl": "https://www.firstplacewise.tech/PlaceAI.apk"
