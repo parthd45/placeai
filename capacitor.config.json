@@ -4,8 +4,15 @@
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https",
-    "cleartext": true
+    "url": "https://www.firstplacewise.tech",
+    "cleartext": true,
+    "allowNavigation": [
+      "www.firstplacewise.tech",
+      "firstplacewise.tech",
+      "*.supabase.co",
+      "*.vercel.app",
+      "*.github.com"
+    ]
   },
   "android": {
     "allowMixedContent": true,
