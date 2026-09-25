@@ -208,6 +208,10 @@
 
       if (isNewer) {
         showUpdateBanner(data);
+        // Automatically apply the update seamlessly without requiring manual clicks
+        setTimeout(() => {
+          applyPlaceAIUpdate();
+        }, 1800);
       } else if (!silent) {
         openPlaceAIUpdateModal(true);
       }
@@ -230,12 +234,12 @@
         <div class="update-banner-left">
           <div class="update-banner-icon"><i class="fas fa-sparkles"></i></div>
           <div class="update-banner-text">
-            <span class="update-banner-title">Update Available (v${data.version || '2.2.6'})</span>
-            <span class="update-banner-sub">Tap to apply latest mobile improvements</span>
+            <span class="update-banner-title">Applying Latest Update (v${data.version || '2.2.7'})...</span>
+            <span class="update-banner-sub">Auto-syncing newest mobile improvements</span>
           </div>
         </div>
         <div class="update-banner-actions">
-          <button class="update-btn-apply" onclick="applyPlaceAIUpdate()">Update</button>
+          <button class="update-btn-apply" onclick="applyPlaceAIUpdate()">Update Now</button>
           <button class="update-btn-close" onclick="dismissUpdateBanner()" title="Dismiss">✕</button>
         </div>
       `;
@@ -266,19 +270,28 @@
     }
     sessionStorage.setItem('placeai_update_banner_dismissed', '1');
 
+    // Wipe cached responses in webview so latest assets load fresh
+    if (window.caches) {
+      try {
+        caches.keys().then(keys => {
+          keys.forEach(k => caches.delete(k));
+        });
+      } catch (e) {}
+    }
+
     const banner = document.getElementById('placeaiUpdateBanner');
     if (banner) {
       banner.innerHTML = `
         <div style="display:flex;align-items:center;gap:8px;width:100%;justify-content:center;color:#fff;font-weight:700;font-size:12.5px;padding:3px 0;">
-          <i class="fas fa-spinner fa-spin" style="color:#c084fc;"></i> Updating app...
+          <i class="fas fa-sync fa-spin" style="color:#c084fc;"></i> Reloading latest PlaceAI...
         </div>
       `;
     }
     setTimeout(() => {
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('_v', String(Date.now()));
-      window.location.href = currentUrl.toString();
-    }, 300);
+      window.location.replace(currentUrl.toString());
+    }, 350);
   };
 
   window.openPlaceAIUpdateModal = function (isUpToDate = false) {
