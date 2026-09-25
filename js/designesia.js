@@ -7,7 +7,8 @@
   //$('.scrollbar-v,#selector,#buy-now,#back-to-top,.float-text').hide();
 
   var rtl_mode = "off"; // on - for enable RTL, off - for deactive RTL
-  var preloader = "on"; // on - for enable preloader, off - for disable preloader
+  var preloader = "off"; // on - for enable preloader, off - for disable preloader
+  try { jQuery("#de-loader").hide(); } catch(e){}
   var header_autoshow = "off"; // on - for enable fixed header, off - for disable fixed header
   var topbar = "on"; // on - for enable fixed header, off - for disable fixed header
 

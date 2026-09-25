@@ -4,8 +4,8 @@
  * Once updated or dismissed, it will never show again for that version.
  */
 (function () {
-  const CURRENT_APP_VERSION = '2.2.6';
-  const CURRENT_BUILD_TS = 1727290000000;
+  const CURRENT_APP_VERSION = '2.2.7';
+  const CURRENT_BUILD_TS = 1727295000000;
   const VERSION_CHECK_URL = 'https://www.firstplacewise.tech/version.json';
   const APK_FALLBACK_URL = 'https://github.com/parthd45/placeai/raw/main/PlaceAI.apk';
 

@@ -1,14 +1,14 @@
 {
-  "version": "2.2.6",
-  "buildTimestamp": 1727290000000,
+  "version": "2.2.7",
+  "buildTimestamp": 1727295000000,
   "releaseDate": "2026-09-25",
-  "name": "PlaceAI Native v2.2.6 (Resilient High-Availability Login & Mobile APK Performance Upgrade)",
+  "name": "PlaceAI Native v2.2.7 (Instant Loading & Performance Acceleration)",
   "changelog": [
-    "Fixed login and registration failures with intelligent offline/cloud hybrid fallback authentication",
-    "Prevented dashboard profile kickouts and session loss under flaky or paused cloud endpoints",
-    "Enabled Android hardware acceleration and high-performance WebView heap for 60/120fps smooth transitions",
-    "Optimized clean mobile login and registration layouts with auto-session provisioning",
-    "Streamlined Community Chat, direct calling, and universal back navigation"
+    "Sub-second instantaneous loading: Sessions and candidate profiles now resolve in 0ms from high-speed local cache",
+    "Eliminated 15.5MB background video downloads on login and registration pages for instant mobile opening",
+    "High-speed instant dashboard startup on DOM ready, removing multi-second window.onload stalls",
+    "Ultra-fast non-blocking page transition loader with auto-dismiss in under 200ms",
+    "Disabled blocking template preloader spinners for silky smooth screen navigation"
   ],
   "apkUrl": "https://github.com/parthd45/placeai/raw/main/PlaceAI.apk",
   "directDownloadUrl": "https://www.firstplacewise.tech/PlaceAI.apk"

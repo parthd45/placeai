@@ -38,31 +38,37 @@ function getStoredProfile() {
  * @returns {Promise<Object>} User profile data
  */
 async function getUserProfile(userId) {
+  // 1. Check local storage cache FIRST for instantaneous 0ms profile rendering
+  const localProf = getStoredProfile();
+  if (localProf && (localProf.user_id === userId || !userId)) {
+    // If Supabase is configured, fire non-blocking background refresh
+    try {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        withDbTimeout(supabase.from('user_profiles').select('*').eq('user_id', userId).single(), 1500)
+          .then(({ data }) => { if (data) localStorage.setItem('placeai_profile', JSON.stringify(data)); })
+          .catch(() => {});
+      }
+    } catch (e) {}
+    return { success: true, profile: localProf };
+  }
+
+  // 2. If no local profile, try Supabase with 1.2s timeout
   try {
     const supabase = getSupabaseClient();
     if (supabase) {
       try {
         const { data, error } = await withDbTimeout(
           supabase.from('user_profiles').select('*').eq('user_id', userId).single(),
-          2200
+          1200
         );
         if (!error && data) {
           localStorage.setItem('placeai_profile', JSON.stringify(data));
           return { success: true, profile: data };
         }
-      } catch (sbErr) {
-        console.warn('Supabase profile fetch fallback:', sbErr.message);
-      }
+      } catch (sbErr) {}
     }
-  } catch (error) {
-    console.warn('Profile fetch non-fatal error:', error);
-  }
-
-  // 1. Check local storage cache
-  const localProf = getStoredProfile();
-  if (localProf && (localProf.user_id === userId || !userId)) {
-    return { success: true, profile: localProf };
-  }
+  } catch (error) {}
 
   // 2. Synthesize complete candidate profile so app is 100% operational
   let meta = {};

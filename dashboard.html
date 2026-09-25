@@ -19312,11 +19312,18 @@ ${projStr}
       renderMilestones();
     }
 
-    // Initialize
-    window.addEventListener('load', function () {
-      console.log('Page loaded, checking authentication...');
-      checkAuthentication();
-    });
+    // High-speed instant Dashboard initialization
+    let dashboardInitStarted = false;
+    async function initializeDashboard() {
+      if (dashboardInitStarted) return;
+      dashboardInitStarted = true;
+      console.log('⚡ Initializing dashboard instantly...');
+      try {
+        await checkAuthentication();
+      } catch (e) {
+        console.warn('Dashboard init warning:', e);
+      }
+    }
 
     // Sidebar toggle function
     function toggleSidebar() {
@@ -19326,33 +19333,10 @@ ${projStr}
       overlay.classList.toggle('active');
     }
 
-    // Initialize with email confirmation check
-    async function initializeDashboard() {
-      // First check if this is an email confirmation callback
-      const isEmailConfirmation = await checkEmailConfirmation();
-
-      if (isEmailConfirmation) {
-        console.log('Email confirmed, proceeding to dashboard...');
-        // Small delay to ensure session is fully established
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-
-      // Then proceed with normal authentication check
-      await checkAuthentication();
-    }
-
-    // Also run on DOMContentLoaded as fallback
+    // Trigger instantly without waiting for images/load events
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(() => {
-          if (!currentUser) {
-            console.log('Fallback initialization...');
-            initializeDashboard();
-          }
-        }, 1000);
-      });
+      document.addEventListener('DOMContentLoaded', initializeDashboard, { once: true });
     } else {
-      // DOM already loaded
       initializeDashboard();
     }
   

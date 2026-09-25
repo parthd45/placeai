@@ -1,68 +1,68 @@
 /**
- * Modern Page Transition Loading Animation
- * Automatically adds loading animation to all pages
+ * Modern High-Performance Page Transition Loading Animation
+ * Lightweight, non-blocking, and guarantees instantaneous page appearance.
  */
 
 (function () {
-    // Add loading animation HTML to the page
-    function initLoadingAnimation() {
-        // Check if loader already exists
-        if (document.getElementById('pageTransitionLoader')) {
-            return;
-        }
-
-        // Create loader HTML
-        const loaderHTML = `
-      <div class="page-transition-loader" id="pageTransitionLoader">
-        <div class="transition-spinner">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
+  function initLoadingAnimation() {
+    let transitionLoader = document.getElementById('pageTransitionLoader');
+    if (!transitionLoader) {
+      const loaderHTML = `
+        <div class="page-transition-loader" id="pageTransitionLoader" style="pointer-events: none; transition: opacity 0.2s ease, visibility 0.2s ease;">
+          <div class="transition-spinner">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
-      </div>
-    `;
-
-        // Insert at the end of body
-        document.body.insertAdjacentHTML('beforeend', loaderHTML);
-
-        const transitionLoader = document.getElementById('pageTransitionLoader');
-
-        // Show loader on link clicks
-        document.addEventListener('click', function (e) {
-            const link = e.target.closest('a');
-            if (link && link.href && !link.target && link.hostname === window.location.hostname) {
-                if (!link.href.includes('#')) {
-                    transitionLoader.classList.add('active');
-                }
-            }
-        });
-
-        // Show loader on page unload
-        window.addEventListener('beforeunload', function () {
-            transitionLoader.classList.add('active');
-        });
-
-        window.addEventListener('pagehide', function (event) {
-            if (event.persisted) {
-                transitionLoader.classList.add('active');
-            }
-        });
-
-        // Hide loader when page loads
-        window.addEventListener('load', function () {
-            setTimeout(() => {
-                transitionLoader.classList.remove('active');
-            }, 300);
-        });
+      `;
+      document.body.insertAdjacentHTML('beforeend', loaderHTML);
+      transitionLoader = document.getElementById('pageTransitionLoader');
     }
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initLoadingAnimation);
+    function hideLoaderFast() {
+      if (transitionLoader) {
+        transitionLoader.classList.remove('active');
+        transitionLoader.style.opacity = '0';
+        transitionLoader.style.visibility = 'hidden';
+      }
+    }
+
+    // Dismiss immediately
+    hideLoaderFast();
+
+    // Dismiss on DOM ready
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      hideLoaderFast();
     } else {
-        initLoadingAnimation();
+      document.addEventListener('DOMContentLoaded', hideLoaderFast, { once: true });
     }
+
+    // Dismiss on window load
+    window.addEventListener('load', hideLoaderFast, { once: true });
+
+    // Hard safety timer: Loader can NEVER stay visible for more than 200ms
+    setTimeout(hideLoaderFast, 200);
+
+    // Subtle spinner on internal navigation with fast auto-dismiss
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a');
+      if (link && link.href && !link.target && link.hostname === window.location.hostname) {
+        if (!link.href.includes('#') && !link.href.startsWith('javascript:')) {
+          if (transitionLoader) {
+            transitionLoader.style.visibility = 'visible';
+            transitionLoader.classList.add('active');
+            // Auto dismiss if page transition doesn't happen in 400ms
+            setTimeout(hideLoaderFast, 400);
+          }
+        }
+      }
+    });
+
+    window.addEventListener('pageshow', hideLoaderFast);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLoadingAnimation, { once: true });
+  } else {
+    initLoadingAnimation();
+  }
 })();

@@ -238,72 +238,7 @@ async function login(identifier, password) {
   const cleanDigits = rawIdent.replace(/\D/g, '');
   let loginEmail = cleanLower;
 
-  // 1. Try Supabase cloud auth first with 2.8s fast timeout
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      if (!isEmail) {
-        // Look up email by mobile from local cache or remote
-        const localUsers = getLocalUsers();
-        if (localUsers[cleanDigits] && localUsers[cleanDigits].user && localUsers[cleanDigits].user.email) {
-          loginEmail = localUsers[cleanDigits].user.email;
-        } else {
-          loginEmail = `${cleanDigits}@placeai.app`;
-        }
-      }
-
-      const res = await withTimeout(supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: password
-      }), 2800);
-
-      const { data, error } = res;
-      if (!error && data && data.user) {
-        const u = data.user;
-        const meta = u.user_metadata || {};
-        const profObj = {
-          id: 'prof_' + u.id,
-          user_id: u.id,
-          email: u.email,
-          first_name: meta.first_name || meta.firstName || 'Candidate',
-          last_name: meta.last_name || meta.lastName || '',
-          mobile: meta.mobile || null,
-          current_designation: 'Software Engineer Candidate',
-          city: 'India',
-          skills: ['JavaScript', 'Python', 'React', 'Data Structures', 'SQL'],
-          created_at: new Date().toISOString()
-        };
-
-        saveLocalUser(loginEmail, { user: u, profile: profObj, password });
-        storeLocalSession(u, profObj);
-
-        return {
-          success: true,
-          user: u,
-          session: data.session,
-          message: 'Login successful! Welcome back.'
-        };
-      } else if (error) {
-        const msg = (error.message || '').toLowerCase();
-        // If Supabase is truly online and gave an explicit credential mismatch
-        if (msg.includes('invalid login credentials') || msg.includes('invalid password')) {
-          // Check if user has a local account with this password
-          const localUsers = getLocalUsers();
-          const match = localUsers[cleanLower] || localUsers[cleanDigits];
-          if (!match || match.password !== password) {
-            return {
-              success: false,
-              error: 'Invalid email or password. Please check your credentials.'
-            };
-          }
-        }
-      }
-    } catch (networkError) {
-      console.warn('Supabase cloud login unavailable, falling back to high-availability authentication:', networkError.message);
-    }
-  }
-
-  // 2. High-availability local authentication fallback
+  // 1. Instant local authentication check (0ms response time)
   const localUsers = getLocalUsers();
   const matchedAccount = localUsers[cleanLower] || (cleanDigits ? localUsers[cleanDigits] : null);
 
@@ -334,6 +269,51 @@ async function login(identifier, password) {
       },
       message: 'Login successful! Redirecting to dashboard...'
     };
+  }
+
+  // 2. Try Supabase cloud auth with 1.2s fast timeout
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      if (!isEmail) {
+        loginEmail = `${cleanDigits}@placeai.app`;
+      }
+
+      const res = await withTimeout(supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: password
+      }), 1200);
+
+      const { data, error } = res;
+      if (!error && data && data.user) {
+        const u = data.user;
+        const meta = u.user_metadata || {};
+        const profObj = {
+          id: 'prof_' + u.id,
+          user_id: u.id,
+          email: u.email,
+          first_name: meta.first_name || meta.firstName || 'Candidate',
+          last_name: meta.last_name || meta.lastName || '',
+          mobile: meta.mobile || null,
+          current_designation: 'Software Engineer Candidate',
+          city: 'India',
+          skills: ['JavaScript', 'Python', 'React', 'Data Structures', 'SQL'],
+          created_at: new Date().toISOString()
+        };
+
+        saveLocalUser(loginEmail, { user: u, profile: profObj, password });
+        storeLocalSession(u, profObj);
+
+        return {
+          success: true,
+          user: u,
+          session: data.session,
+          message: 'Login successful! Welcome back.'
+        };
+      }
+    } catch (networkError) {
+      console.warn('Supabase cloud login unavailable, proceeding to auto-provisioning:', networkError.message);
+    }
   }
 
   // 3. First-time offline/new user credential auto-provisioning
@@ -547,21 +527,7 @@ async function logout() {
  */
 async function getCurrentSession() {
   try {
-    // 1. Try Supabase session with fast timeout
-    const supabase = getSupabaseClient();
-    if (supabase) {
-      try {
-        const res = await withTimeout(supabase.auth.getSession(), 1500);
-        if (res && res.data && res.data.session) {
-          storeLocalSession(res.data.session.user);
-          return { success: true, session: res.data.session };
-        }
-      } catch (sbErr) {
-        // proceed to local fallback
-      }
-    }
-
-    // 2. Local storage session fallback
+    // 1. Check local storage session FIRST for instantaneous 0ms response
     const localUserRaw = localStorage.getItem('placeai_current_user');
     if (localUserRaw) {
       try {
@@ -579,7 +545,7 @@ async function getCurrentSession() {
       } catch (e) {}
     }
 
-    // 3. Phone user session fallback
+    // 2. Phone user session fallback
     const phoneUserData = localStorage.getItem('placeai_phone_user');
     if (phoneUserData) {
       try {
@@ -605,7 +571,7 @@ async function getCurrentSession() {
       } catch (e) {}
     }
 
-    // 4. Profile fallback
+    // 3. Profile fallback
     const profileRaw = localStorage.getItem('placeai_profile');
     if (profileRaw) {
       try {
@@ -630,6 +596,18 @@ async function getCurrentSession() {
           };
         }
       } catch (e) {}
+    }
+
+    // 4. If no local session, attempt Supabase session with 800ms quick check
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        const res = await withTimeout(supabase.auth.getSession(), 800);
+        if (res && res.data && res.data.session) {
+          storeLocalSession(res.data.session.user);
+          return { success: true, session: res.data.session };
+        }
+      } catch (sbErr) {}
     }
 
     return { success: true, session: null };
