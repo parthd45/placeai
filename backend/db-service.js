@@ -21,6 +21,12 @@ function getSupabaseClient() {
   return null;
 }
 
+/**
+ * Wraps an asynchronous database call with an execution timeout to prevent hangs.
+ * @param {Promise} promise - The database operation promise to execute.
+ * @param {number} [ms=2200] - Timeout duration in milliseconds.
+ * @returns {Promise} The result of the database call or rejects with DB_TIMEOUT error.
+ */
 function withDbTimeout(promise, ms = 2200) {
   return Promise.race([
     promise,
@@ -28,6 +34,10 @@ function withDbTimeout(promise, ms = 2200) {
   ]);
 }
 
+/**
+ * Retrieves the cached user profile from local storage.
+ * @returns {Object|null} The parsed profile object or null if unavailable.
+ */
 function getStoredProfile() {
   try {
     const raw = localStorage.getItem('placeai_profile');
