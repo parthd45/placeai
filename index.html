@@ -185,7 +185,77 @@
     }
   }
 
-  
+  /* Clean, modern card enhancements across all sections */
+  .box {
+      background: rgba(17, 24, 39, 0.75) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 16px !important;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      backdrop-filter: blur(12px) !important;
+    }
+    .box:hover {
+      transform: translateY(-4px) !important;
+      border-color: rgba(139, 92, 246, 0.4) !important;
+      box-shadow: 0 14px 34px rgba(124, 58, 237, 0.15) !important;
+    }
+    .hover .bg-dark-2 {
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      transition: all 0.3s ease !important;
+    }
+    .hover:hover .bg-dark-2 {
+      border-color: rgba(139, 92, 246, 0.4) !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4) !important;
+    }
+    .faq-item {
+      background: rgba(17, 24, 39, 0.65) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 14px !important;
+      margin-bottom: 12px !important;
+      transition: all 0.25s ease !important;
+      backdrop-filter: blur(10px) !important;
+    }
+    .faq-item:hover, .faq-item.active {
+      border-color: rgba(139, 92, 246, 0.4) !important;
+      background: rgba(22, 30, 49, 0.85) !important;
+    }
+    .faq-question {
+      padding: 16px 20px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+    .faq-question h5 {
+      font-size: 15.5px !important;
+      font-weight: 600 !important;
+      color: #f1f5f9 !important;
+    }
+    .faq-icon {
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #a855f7 !important;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out;
+      padding: 0 20px;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .faq-item.active .faq-answer {
+      padding-bottom: 18px;
+    }
+    #section-contact {
+      background: linear-gradient(135deg, rgba(88, 28, 135, 0.95) 0%, rgba(30, 27, 75, 0.95) 100%) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+      background: #080c17 !important;
+    }
   </style>
 </head>
 
@@ -666,7 +736,57 @@
           </div>
 
           <div class="col-lg-6">
-            <img src="" class="w-100" alt="" />
+            <div class="feature-preview-panel wow scaleIn" style="background: linear-gradient(145deg, rgba(20, 26, 48, 0.9), rgba(11, 16, 32, 0.95)); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 20px; padding: 28px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 58, 237, 0.15); backdrop-filter: blur(16px); position: relative; overflow: hidden;">
+              <div style="position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+              
+              <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></div>
+                  <div style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></div>
+                  <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></div>
+                  <span style="font-size: 13px; font-weight: 600; color: #94a3b8; margin-left: 8px;">PlaceAI Placement Intelligence</span>
+                </div>
+                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; padding: 4px 10px; border-radius: 12px;">Active v2.2</span>
+              </div>
+
+              <!-- Metric Card 1 -->
+              <div class="p-3 mb-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span style="font-size: 13px; color: #cbd5e1; font-weight: 600;"><i class="fas fa-file-check me-2" style="color: #38bdf8;"></i> ATS Keyword Compatibility</span>
+                  <span style="font-size: 14px; font-weight: 800; color: #38bdf8;">94%</span>
+                </div>
+                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px;">
+                  <div class="progress-bar" style="width: 94%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 3px;"></div>
+                </div>
+              </div>
+
+              <!-- Metric Card 2 -->
+              <div class="p-3 mb-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span style="font-size: 13px; color: #cbd5e1; font-weight: 600;"><i class="fas fa-code me-2" style="color: #a855f7;"></i> DSA Test Cases Solved</span>
+                  <span style="font-size: 14px; font-weight: 800; color: #c084fc;">48 / 50</span>
+                </div>
+                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px;">
+                  <div class="progress-bar" style="width: 96%; background: linear-gradient(90deg, #a855f7, #ec4899); border-radius: 3px;"></div>
+                </div>
+              </div>
+
+              <!-- Metric Card 3 -->
+              <div class="p-3 mb-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span style="font-size: 13px; color: #cbd5e1; font-weight: 600;"><i class="fas fa-robot me-2" style="color: #34d399;"></i> AI Mock Interview Readiness</span>
+                  <span style="font-size: 14px; font-weight: 800; color: #34d399;">High (Offer Ready)</span>
+                </div>
+                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px;">
+                  <div class="progress-bar" style="width: 88%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 3px;"></div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between pt-2">
+                <span style="font-size: 12px; color: #64748b;"><i class="fas fa-check-circle me-1" style="color: #10b981;"></i> End-to-end placement readiness</span>
+                <a href="login.html" style="font-size: 12px; font-weight: 700; color: #a855f7; text-decoration: none;">Try Live Demo &rarr;</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1223,13 +1343,14 @@
       window.location.href = 'dashboard.html?_ota=' + Date.now();
     }
 
-    // Auto-show popup on Home Page after 1.5s if not already dismissed in this session
+    // Auto-show popup only on native APK or when update is pending
     window.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        if (!sessionStorage.getItem('placeai_home_update_dismissed')) {
+      const isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+      if (isNativeApp && !sessionStorage.getItem('placeai_home_update_dismissed')) {
+        setTimeout(function() {
           showHomeUpdateModal();
-        }
-      }, 1200);
+        }, 1500);
+      }
     });
   </script>
 
