@@ -32,17 +32,24 @@
     }
   };
 
-  // Initialize Supabase client with persistent storage
-  window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      storage: persistentStorage,
-      storageKey: 'supabase.auth.token', // Consistent key for session storage
-      autoRefreshToken: true,
-      persistSession: true, // Persist in localStorage
-      detectSessionInUrl: true, // Important for OAuth callbacks
-      flowType: 'pkce' // Use PKCE flow for better security
+  // Initialize Supabase client with persistent storage safely
+  try {
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          storage: persistentStorage,
+          storageKey: 'supabase.auth.token', // Consistent key for session storage
+          autoRefreshToken: true,
+          persistSession: true, // Persist in localStorage
+          detectSessionInUrl: true, // Important for OAuth callbacks
+          flowType: 'pkce' // Use PKCE flow for better security
+        }
+      });
+      console.log('✅ Supabase configured with persistent storage (auto-login enabled)');
+    } else {
+      console.warn('Supabase SDK not loaded yet; will be created on demand');
     }
-  });
-
-  console.log('✅ Supabase configured with persistent storage (auto-login enabled)');
+  } catch (err) {
+    console.warn('Supabase init non-fatal warning:', err.message);
+  }
 })();

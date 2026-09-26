@@ -82,9 +82,9 @@
     }
 
     #section-hero {
-      min-height: 90vh !important;
-      padding-top: calc(env(safe-area-inset-top, 0px) + 90px) !important;
-      padding-bottom: 40px !important;
+      min-height: auto !important;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 76px) !important;
+      padding-bottom: 50px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -135,6 +135,53 @@
 
     #section-hero .abs.bottom-0 {
       display: none !important; /* Hide cluttered desktop banner bar on mobile */
+    }
+
+    /* Mobile Menu Drawer */
+    header.menu-open {
+      height: 100vh !important;
+      background: rgba(10, 15, 29, 0.98) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      overflow-y: auto !important;
+    }
+    header.menu-open .header-col-mid {
+      display: block !important;
+      width: 100% !important;
+      margin-top: 18px !important;
+    }
+    header.menu-open #mainmenu {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      padding: 16px 0 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      float: none !important;
+      margin: 0 !important;
+    }
+    header.menu-open #mainmenu li {
+      display: block !important;
+      width: 100% !important;
+      float: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    header.menu-open #mainmenu li a {
+      display: flex !important;
+      align-items: center !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      color: #e2e8f0 !important;
+      padding: 10px 14px !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, 0.03) !important;
+      transition: all 0.2s ease !important;
+    }
+    header.menu-open #mainmenu li a:hover,
+    header.menu-open #mainmenu li a.active {
+      background: rgba(124, 58, 237, 0.25) !important;
+      color: #c084fc !important;
+      padding-left: 18px !important;
     }
   }
 
@@ -1170,6 +1217,26 @@
     });
   </script>
 
+  <script>
+    // Robust mobile menu drawer toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuBtn = document.getElementById('menu-btn');
+      const header = document.querySelector('header');
+      if (menuBtn && header) {
+        menuBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          header.classList.toggle('menu-open');
+          menuBtn.classList.toggle('menu-open');
+        });
+        document.querySelectorAll('#mainmenu a').forEach(function(link) {
+          link.addEventListener('click', function() {
+            header.classList.remove('menu-open');
+            menuBtn.classList.remove('menu-open');
+          });
+        });
+      }
+    });
+  </script>
   <script src="js/mobile-nav.js"></script>
 </body>
 

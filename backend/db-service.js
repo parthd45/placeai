@@ -10,13 +10,17 @@
  * @returns {Object} Supabase client
  */
 function getSupabaseClient() {
-  return window.supabaseClient || window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-  );
+  try {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (window.supabase && typeof window.supabase.createClient === 'function' && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+      return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+  } catch (e) {
+    console.warn('Supabase client unavailable in db-service:', e);
+  }
+  return null;
 }
 
-/**
 function withDbTimeout(promise, ms = 2200) {
   return Promise.race([
     promise,
@@ -673,6 +677,7 @@ if (typeof window !== 'undefined') {
   window.getUserProfile = getUserProfile;
   window.getUserProfileByMobile = getUserProfileByMobile;
   window.DBService = {
+    getSupabaseClient,
     getUserProfile,
     getUserProfileByMobile,
     createUserProfile,
