@@ -8283,95 +8283,142 @@
 
   <!-- Main Container -->
   <div class="main-container">
-    <!-- Native Mobile 8-Card Quick Feature Hub (Visible on mobile) -->
-    <div class="mobile-feature-hub" id="mobileFeatureHub">
-      <a href="code-practice.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-code">
-          <i class="fas fa-code"></i>
+    <!-- Candidate Welcome & Preparation Status Hero -->
+    <div class="dashboard-hero-banner">
+      <div class="hero-banner-content">
+        <div class="hero-banner-pill">
+          <span class="pulse-dot"></span>
+          <span>AI Placement Engine Active</span>
         </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Code Practice</span>
-          <span class="hub-card-sub">Problems & Compiler</span>
+        <h1 class="hero-banner-title">Welcome back, <span id="heroBannerName" class="gradient-text">Candidate</span>! 🚀</h1>
+        <p class="hero-banner-subtitle">
+          Your personal AI career workspace. Solve curated DSA problems, optimize your ATS resume score, and simulate real technical interviews.
+        </p>
+      </div>
+      <div class="hero-banner-stats">
+        <div class="hero-stat-pill" title="Current ATS Resume Quality Score">
+          <i class="fas fa-file-shield" style="color: #c084fc;"></i>
+          <div>
+            <span class="hero-stat-num" id="heroStatScore">88%</span>
+            <span class="hero-stat-label">ATS Score</span>
+          </div>
         </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
+        <div class="hero-stat-pill" title="Verified Technical Skills on Profile">
+          <i class="fas fa-layer-group" style="color: #38bdf8;"></i>
+          <div>
+            <span class="hero-stat-num" id="heroStatSkills">5</span>
+            <span class="hero-stat-label">Core Skills</span>
+          </div>
+        </div>
+        <div class="hero-stat-pill" title="Placement Readiness Status">
+          <i class="fas fa-circle-check" style="color: #34d399;"></i>
+          <div>
+            <span class="hero-stat-num" style="color: #34d399; font-size: 13.5px;">Ready</span>
+            <span class="hero-stat-label">Interview Status</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <a href="resume-analyzer.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-resume">
-          <i class="fas fa-file-invoice"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Resume ATS</span>
-          <span class="hub-card-sub">Score & Keywords</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
-
-      <a href="mock-interview.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-interview">
-          <i class="fas fa-microphone-alt"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">AI Interview</span>
-          <span class="hub-card-sub">Voice & STAR Prep</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
-
-      <div class="feature-hub-card" onclick="openCampusChatModal('all')" style="cursor: pointer;">
-        <div class="hub-card-icon hub-icon-chat">
-          <i class="fas fa-comments"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Campus Chat</span>
-          <span class="hub-card-sub">Feed, DM & Calls</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
+    <!-- AI Placement Action Command Hub (Fast, Easy, High-Conversion Navigation) -->
+    <div class="action-command-hub" id="actionCommandHub">
+      <div class="action-hub-header">
+        <h2 class="action-hub-title">
+          <i class="fas fa-wand-magic-sparkles" style="color: #a855f7;"></i>
+          <span>Placement Tools & Practice</span>
+        </h2>
+        <span style="font-size: 11.5px; color: #94a3b8;">1-Click Instant Launch</span>
       </div>
 
-      <a href="career-recommendations.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-career">
-          <i class="fas fa-compass"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Career Paths</span>
-          <span class="hub-card-sub">AI Job Roadmap</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
+      <div class="action-hub-grid">
+        <!-- 1. Code Practice -->
+        <a href="code-practice.html" class="action-hub-card card-code">
+          <div class="action-card-top">
+            <div class="action-card-icon">
+              <i class="fas fa-code"></i>
+            </div>
+            <span class="action-card-badge">300+ Problems</span>
+          </div>
+          <div class="action-card-body">
+            <h3>Code Practice</h3>
+            <p>DSA challenges, interactive in-browser compiler & testcases.</p>
+          </div>
+          <div class="action-card-footer">
+            <span>Launch Compiler</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
 
-      <a href="skill-analysis.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-skill">
-          <i class="fas fa-chart-line"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Skill Analysis</span>
-          <span class="hub-card-sub">Readiness Score</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
+        <!-- 2. Resume ATS Analyzer -->
+        <a href="resume-analyzer.html" class="action-hub-card card-resume">
+          <div class="action-card-top">
+            <div class="action-card-icon">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <span class="action-card-badge">ATS Score</span>
+          </div>
+          <div class="action-card-body">
+            <h3>Resume ATS</h3>
+            <p>Instant scoring, keyword gap detection & PDF fix suggestions.</p>
+          </div>
+          <div class="action-card-footer">
+            <span>Analyze Resume</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
 
-      <a href="learning-paths.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-learning">
-          <i class="fas fa-graduation-cap"></i>
-        </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Learning Paths</span>
-          <span class="hub-card-sub">Curated Modules</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
+        <!-- 3. AI Mock Interview -->
+        <a href="mock-interview.html" class="action-hub-card card-interview">
+          <div class="action-card-top">
+            <div class="action-card-icon">
+              <i class="fas fa-microphone-alt"></i>
+            </div>
+            <span class="action-card-badge">Voice AI</span>
+          </div>
+          <div class="action-card-body">
+            <h3>AI Mock Interview</h3>
+            <p>Real-time speech & technical questions with STAR feedback.</p>
+          </div>
+          <div class="action-card-footer">
+            <span>Start Simulation</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
 
-      <a href="job-matching.html" class="feature-hub-card">
-        <div class="hub-card-icon hub-icon-job">
-          <i class="fas fa-briefcase"></i>
+        <!-- 4. Campus Chat & Community -->
+        <div class="action-hub-card card-community" onclick="openCampusChatModal('all')">
+          <div class="action-card-top">
+            <div class="action-card-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <span class="action-card-badge">Live Campus</span>
+          </div>
+          <div class="action-card-body">
+            <h3>Campus Network</h3>
+            <p>Connect with verified peers, study groups & 24/7 AI mentor.</p>
+          </div>
+          <div class="action-card-footer">
+            <span>Open Community</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
         </div>
-        <div class="hub-card-text">
-          <span class="hub-card-title">Job Matches</span>
-          <span class="hub-card-sub">Campus Openings</span>
-        </div>
-        <i class="fas fa-chevron-right hub-card-arrow"></i>
-      </a>
+      </div>
+
+      <!-- Secondary Tools Ribbon -->
+      <div class="secondary-tools-ribbon">
+        <a href="career-recommendations.html" class="secondary-tool-pill">
+          <i class="fas fa-compass" style="color: #38bdf8;"></i> Career Roadmap
+        </a>
+        <a href="skill-analysis.html" class="secondary-tool-pill">
+          <i class="fas fa-chart-line" style="color: #34d399;"></i> Skill Gap Analysis
+        </a>
+        <a href="learning-paths.html" class="secondary-tool-pill">
+          <i class="fas fa-graduation-cap" style="color: #c084fc;"></i> Curated Modules
+        </a>
+        <a href="job-matching.html" class="secondary-tool-pill">
+          <i class="fas fa-briefcase" style="color: #fbbf24;"></i> Campus Openings
+        </a>
+      </div>
     </div>
 
     <!-- Clean Mobile View Selector (Visible only on mobile screens) -->
@@ -16129,6 +16176,12 @@
         const fullName = `${firstName} ${lastName}`.trim() || 'User';
         const rawMobile = userProfile.mobile || meta.mobile || meta.phone || '';
 
+        // Update welcome hero banner
+        const bannerNameEl = document.getElementById('heroBannerName');
+        if (bannerNameEl) bannerNameEl.textContent = firstName || 'Candidate';
+        const bannerSkillsEl = document.getElementById('heroStatSkills');
+        if (bannerSkillsEl && userProfile.skills) bannerSkillsEl.textContent = userProfile.skills.length;
+
         // Auto-sync to database if database had blank values
         if ((!userProfile.first_name && (meta.first_name || meta.firstName)) || (!userProfile.mobile && (meta.mobile || meta.phone))) {
           userProfile.first_name = firstName;
@@ -19918,11 +19971,11 @@ ${projStr}
       const devSuite = document.querySelector('.dev-ecosystem-suite');
       const workspaceTabsCard = document.getElementById('profileWorkspaceTabs')?.closest('.card');
       const tabPanels = document.getElementById('profileTabPanels');
-      const featureHub = document.getElementById('mobileFeatureHub');
+      const featureHub = document.getElementById('actionCommandHub') || document.getElementById('mobileFeatureHub');
 
       if (window.innerWidth <= 768) {
         if (featureHub) {
-          featureHub.style.display = (view === 'profile') ? 'grid' : 'none';
+          featureHub.style.display = (view === 'profile') ? 'block' : 'none';
         }
 
         if (view === 'profile') {

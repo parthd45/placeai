@@ -842,3 +842,432 @@ html, body {
     -webkit-text-fill-color: transparent !important;
   }
 }
+
+/* ===================================================
+   12. PREMIUM AI PLACEMENT ACTION HUB & DASHBOARD HERO
+   =================================================== */
+
+/* Hero Banner */
+.dashboard-hero-banner {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 20px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dashboard-hero-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-banner-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.hero-banner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #c084fc;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+  animation: pulseBeacon 2s infinite;
+}
+
+@keyframes pulseBeacon {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 4px #34d399); }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.hero-banner-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.hero-banner-title .gradient-text {
+  background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-banner-subtitle {
+  font-size: 13.5px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 680px;
+}
+
+.hero-banner-stats {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-stat-pill {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 110px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.hero-stat-pill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.hero-stat-pill i {
+  font-size: 20px;
+}
+
+.hero-stat-num {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  display: block;
+  line-height: 1.2;
+}
+
+.hero-stat-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* AI Action Command Hub */
+.action-command-hub {
+  margin-bottom: 22px;
+}
+
+.action-hub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.action-hub-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.action-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.action-hub-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 18px 16px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.action-hub-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0.8;
+  transition: height 0.25s ease, opacity 0.25s ease;
+}
+
+.action-hub-card.card-code::before {
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+}
+
+.action-hub-card.card-resume::before {
+  background: linear-gradient(90deg, #a855f7, #6366f1);
+}
+
+.action-hub-card.card-interview::before {
+  background: linear-gradient(90deg, #34d399, #059669);
+}
+
+.action-hub-card.card-community::before {
+  background: linear-gradient(90deg, #fbbf24, #ea580c);
+}
+
+.action-hub-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 20px rgba(124, 58, 237, 0.2);
+}
+
+.action-hub-card:hover::before {
+  height: 4px;
+  opacity: 1;
+}
+
+.action-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.action-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.card-code .action-card-icon {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+.card-resume .action-card-icon {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+}
+
+.card-interview .action-card-icon {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.card-community .action-card-icon {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.action-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.card-code .action-card-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.card-resume .action-card-badge {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.card-interview .action-card-badge {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.card-community .action-card-badge {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.action-card-body h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.action-card-body p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.action-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.action-card-footer i {
+  transition: transform 0.2s ease;
+}
+
+.action-hub-card:hover .action-card-footer i {
+  transform: translateX(3px);
+  color: #38bdf8;
+}
+
+/* Secondary Quick Tools Ribbon */
+.secondary-tools-ribbon {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.secondary-tool-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.secondary-tool-pill:hover {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Responsive tweaks for Action Hub */
+@media (max-width: 1024px) {
+  .action-hub-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-hero-banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 16px 14px !important;
+    margin-bottom: 12px !important;
+    border-radius: 16px !important;
+  }
+  .hero-banner-title {
+    font-size: 18px !important;
+  }
+  .hero-banner-subtitle {
+    font-size: 12px !important;
+  }
+  .hero-banner-stats {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    margin-top: 10px !important;
+  }
+  .hero-stat-pill {
+    flex: 1 !important;
+    padding: 6px 10px !important;
+    min-width: auto !important;
+  }
+  .hero-stat-num {
+    font-size: 14px !important;
+  }
+  .hero-stat-label {
+    font-size: 9.5px !important;
+  }
+  .action-hub-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .action-hub-card {
+    padding: 12px 10px !important;
+    border-radius: 14px !important;
+  }
+  .action-card-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 16px !important;
+  }
+  .action-card-body h3 {
+    font-size: 13px !important;
+  }
+  .action-card-body p {
+    font-size: 10.5px !important;
+    margin-bottom: 6px !important;
+  }
+  .action-card-footer {
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-hub-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
