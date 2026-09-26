@@ -1550,7 +1550,8 @@
     }
   }
 
-</style>
+  .proctor-hud, .btn-lockdown, .proctor-badge, .proctor-overlay { display: none !important; }
+  </style>
   <link rel="stylesheet" href="css/placeai-native-app.css">
 </head>
 
@@ -1562,130 +1563,17 @@
   </div>
 
   <!-- Tab Departure Warning Overlay -->
-  <div class="proctor-overlay" id="proctorOverlay">
-    <div class="proctor-modal-card">
-      <div style="width:64px;height:64px;border-radius:50%;background:rgba(239,68,68,0.15);border:2px solid rgba(239,68,68,0.5);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <i class="fas fa-exclamation-triangle" style="font-size:28px;color:var(--accent-red);"></i>
-      </div>
-      <h3 style="font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Proctor Alert: Tab Switch Logged</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
-        You navigated away from the code editor environment. In strict practice mode, all tab departures, minimizing, and window switches are logged.
-      </p>
-      <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#fca5a5;font-weight:600;">
-        <i class="fas fa-flag" style="margin-right:6px;"></i> Total Session Flags: <span id="proctorOverlayFlags">1</span>
-      </div>
-      <button onclick="closeProctorOverlay()" style="width:100%;padding:10px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;transition:all 0.2s;">
-        I Understand & Resume Practice
-      </button>
-    </div>
-  </div>
-
-  <!-- Integrity Incident Log Modal -->
-  <div class="proctor-log-modal" id="proctorLogModal" onclick="if(event.target===this)closeIntegrityLog()">
-    <div class="proctor-log-box">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <i class="fas fa-shield-alt" style="color:var(--accent-purple);font-size:18px;"></i>
-          <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);">Exam Integrity & Proctor Log</h3>
-        </div>
-        <button onclick="closeIntegrityLog()" style="background:transparent;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
-      </div>
-      <div style="padding:16px 20px;overflow-y:auto;flex:1;">
-        <div id="proctorLogSummary"></div>
-        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Session Incident Log</div>
-        <div id="proctorLogList"></div>
-      </div>
-      <div style="padding:12px 20px;border-top:1px solid var(--border);text-align:right;">
-        <button onclick="closeIntegrityLog()" style="padding:8px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;font-size:13px;cursor:pointer;">Close</button>
-      </div>
-    </div>
-  </div>
+  
 
 
   <!-- Fullscreen Breach Countdown Modal (Extreme Mode) -->
-  <div class="proctor-overlay" id="fullscreenBreachModal" style="z-index: 10002;">
-    <div class="proctor-modal-card" style="border-color: #ef4444; max-width: 520px; text-align: center;">
-      <div style="width:74px;height:74px;border-radius:50%;background:rgba(239,68,68,0.2);border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:proctorPulse 1s infinite;">
-        <span id="breachCountdown" style="font-size:34px;font-weight:800;color:#ef4444;">5</span>
-      </div>
-      <h3 style="font-size:21px;font-weight:800;color:#fecaca;margin-bottom:8px;">🚨 CRITICAL: FULLSCREEN EXITED</h3>
-      <p style="font-size:13.5px;color:#cbd5e1;line-height:1.6;margin-bottom:16px;">
-        You departed fullscreen exam lockdown! Return to fullscreen within <strong id="breachSecondsLeft" style="color:#ef4444;font-size:16px;">5 seconds</strong> or your test session will be <strong>PERMANENTLY TERMINATED & DISQUALIFIED</strong>.
-      </p>
-      <div style="background:rgba(0,0,0,0.45);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:10px;text-align:left;">
-        <i class="fas fa-camera" style="color:#ef4444;font-size:18px;flex-shrink:0;"></i>
-        <span><strong>Forensic Snapshot Captured:</strong> A visual evidence record of your code and departure timestamp has been generated.</span>
-      </div>
-      <button onclick="restoreFullscreen()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 18px rgba(220,38,38,0.45);transition:all 0.2s;">
-        <i class="fas fa-expand" style="margin-right:8px;"></i> Return to Fullscreen Immediately
-      </button>
-    </div>
-  </div>
-
-  <!-- Test Session Terminated & Disqualified Modal -->
-  <div class="proctor-overlay" id="sessionTerminatedModal" style="z-index: 10005;">
-    <div class="proctor-modal-card" style="border-color: #ef4444; max-width: 660px; text-align: left; max-height: 90vh; display: flex; flex-direction: column;">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;border-bottom:1px solid rgba(239,68,68,0.3);padding-bottom:14px;flex-shrink:0;">
-        <div style="width:52px;height:52px;border-radius:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <i class="fas fa-ban" style="font-size:26px;color:#ef4444;"></i>
-        </div>
-        <div>
-          <h3 style="font-size:20px;font-weight:800;color:#fecaca;margin-bottom:2px;">Test Session Disqualified & Terminated</h3>
-          <p style="font-size:12.5px;color:#94a3b8;" id="terminatedReasonText">Reason: Fullscreen security breach</p>
-        </div>
-      </div>
-      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:12px 14px;margin-bottom:14px;flex-shrink:0;">
-        <div style="font-size:13px;font-weight:700;color:#f87171;margin-bottom:4px;"><i class="fas fa-shield-alt" style="margin-right:6px;"></i> PlaceAI Integrity Evaluation Protocol</div>
-        <p style="font-size:12px;color:#cbd5e1;line-height:1.5;">
-          Your attempt was disqualified because an unpermitted action occurred during strict examination lockdown. Below is your complete forensic evidence dossier explaining exactly <strong>why you were flagged</strong> with visual screenshot captures.
-        </p>
-      </div>
-      <div style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;flex-shrink:0;">Forensic Evidence & Violation Dossier</div>
-      <div id="terminatedEvidenceList" style="max-height: 280px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px; flex: 1;"></div>
-      <div style="display:flex;gap:10px;flex-shrink:0;">
-        <button onclick="exitTerminatedSession()" style="width:100%;padding:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;transition:all 0.2s;">
-          <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Exit to Problem Catalog
-        </button>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- High-Res Evidence Snapshot Viewer Modal -->
-  <div class="proctor-log-modal" id="evidencePreviewModal" onclick="if(event.target===this)closeEvidencePreview()" style="z-index: 10010;">
-    <div class="proctor-log-box" style="max-width: 820px;">
-      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <i class="fas fa-camera" style="color:var(--accent-red);"></i>
-          <h3 style="font-size:15px;font-weight:700;color:var(--text-primary);" id="previewEvidenceTitle">Forensic Snapshot Evidence</h3>
-        </div>
-        <button onclick="closeEvidencePreview()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
-      </div>
-      <div style="padding:16px;background:#05070f;text-align:center;">
-        <img id="previewEvidenceImg" style="width:100%;border-radius:8px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.8);" />
-        <div id="previewEvidenceDesc" style="margin-top:12px;font-size:12.5px;color:#cbd5e1;text-align:left;background:var(--bg-card);padding:10px 14px;border-radius:6px;border:1px solid var(--border);line-height:1.5;"></div>
-      </div>
-      <div style="padding:10px 18px;border-top:1px solid var(--border);text-align:right;">
-        <button onclick="closeEvidencePreview()" style="padding:6px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;font-size:12.5px;cursor:pointer;">Close</button>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Floating Proctor AI Eye HUD (Active in Problem Editor) -->
-  <div class="proctor-hud" id="proctorHud" style="display:none;" onclick="showIntegrityLog()" title="AI Proctor Live: Click to view evidence dossier">
-    <span class="hud-rec-dot"></span>
-    <div class="hud-cam-box">
-      <i class="fas fa-user" style="color:#64748b;font-size:16px;"></i>
-      <div class="hud-face-reticle"></div>
-      <div class="hud-cam-scanline"></div>
-    </div>
-    <div class="hud-stat-group">
-      <div class="hud-stat-title">
-        <span>AI Proctor Active</span>
-        <span class="hud-evidence-badge" id="hudFlagCount">0 Flags</span>
-      </div>
-      <div class="hud-stat-subtitle" id="hudStatusDetail">Lockdown Active • Fullscreen</div>
-    </div>
-  </div>
+  
 
   <!-- Header -->
   <div class="header">
@@ -1865,13 +1753,8 @@
           </div>
           <div class="editor-actions">
 
-            <button class="btn-lockdown active" id="btnLockdown" onclick="toggleStrictLockdown()" title="Strict Exam Lockdown: Exiting fullscreen triggers 5s countdown termination">
-              <i class="fas fa-shield-alt"></i> <span id="lockdownBtnText">Strict Exam Mode: ON</span>
-            </button>
-            <div class="proctor-badge" id="proctorBadge" onclick="showIntegrityLog()" title="Exam Proctor Mode Active: Click to view violations and incidents">
-              <i class="fas fa-shield-alt"></i> <span id="proctorStatusText">Proctor Clean</span>
-              <span class="violation-pill" id="violationCountBadge">0 Flags</span>
-            </div>
+            
+            
             <button class="btn-fullscreen-toggle" id="btnFullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen Exam Focus">
               <i class="fas fa-expand"></i>
             </button>
@@ -4499,30 +4382,95 @@
         }
       } else if (lang === 'python') {
         if (problem.tags && problem.tags.includes('Print') && problem.id === 1) {
-          const printMatch = code.match(/print\s*\((.*?)\)/);
+          const printMatch = code.match(/print\s*\(\s*["'](.*?)["']\s*\)/i);
           if (printMatch) {
-            let printed = printMatch[1].trim().replace(/^['"]|['"]$/g, '');
+            let printed = printMatch[1].trim();
             const expectedClean = tc[0].expected.replace(/^"|"$/g, '').trim();
             const pass = printed.toLowerCase().includes(expectedClean.toLowerCase());
             results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: `"${printed}"`, passed: pass });
             allPassed = pass;
           } else {
-            results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: 'No print() statement found', passed: false });
+            results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: 'No print("Hello, World!") statement found', passed: false });
             allPassed = false;
           }
         } else {
-          // Check if candidate filled code beyond template
-          const userDiff = code.replace(template, '').trim();
-          const hasImpl = userDiff.length > 5 && !userDiff.includes('pass') && !userDiff.includes('# Write your');
-          allPassed = hasImpl;
-          for (let i = 0; i < tc.length; i++) {
-            results.push({
-              index: i,
-              input: tc[i].input,
-              expected: tc[i].expected,
-              actual: hasImpl ? tc[i].expected : 'None (pass - unhandled)',
-              passed: hasImpl
-            });
+          // Dynamic Python function evaluation
+          let pyExecuted = false;
+          try {
+            const pyFnMatch = template.match(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)/);
+            if (pyFnMatch) {
+              const fnName = pyFnMatch[1];
+              const userDiff = code.replace(template, '').trim();
+              if (userDiff.length > 3 && !userDiff.includes('pass') && !userDiff.includes('# Write your')) {
+                let converted = code
+                  .replace(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)(?:\s*->\s*[^:]+)?\s*:/g, (m, name, a) => {
+                    const cleanA = a.split(',').filter(x => x.trim() !== 'self').map(x => x.replace(/:\s*[^,)]+/g, '').trim()).join(', ');
+                    return `function ${name}(${cleanA}) {`;
+                  })
+                  .replace(/\bTrue\b/g, 'true')
+                  .replace(/\bFalse\b/g, 'false')
+                  .replace(/\bNone\b/g, 'null')
+                  .replace(/\band\b/g, '&&')
+                  .replace(/\bor\b/g, '||')
+                  .replace(/\bnot\b/g, '!')
+                  .replace(/\belif\s+([^:]+):/g, '} else if ($1) {')
+                  .replace(/\bif\s+([^:]+):/g, 'if ($1) {')
+                  .replace(/\belse\s*:/g, '} else {');
+
+                const openCount = (converted.match(/{/g) || []).length;
+                const closeCount = (converted.match(/}/g) || []).length;
+                for (let b = 0; b < openCount - closeCount; b++) converted += '\n}';
+
+                const runner = new Function(converted + `\nreturn typeof ${fnName} === 'function' ? ${fnName} : null;`);
+                const pyFn = runner();
+                if (typeof pyFn === 'function') {
+                  pyExecuted = true;
+                  for (let i = 0; i < tc.length; i++) {
+                    const test = tc[i];
+                    const inputLines = test.input.split('\n');
+                    const args = inputLines.map(line => {
+                      try { return JSON.parse(line); } catch(e) { return isNaN(line) ? line : Number(line); }
+                    });
+                    let actualVal;
+                    try {
+                      actualVal = pyFn(...args);
+                    } catch(err) {
+                      actualVal = `Runtime Error: ${err.message}`;
+                    }
+                    const actualStr = JSON.stringify(actualVal);
+                    let pass = (actualStr === test.expected) || (String(actualVal) === test.expected.replace(/^"|"$/g, ''));
+                    if (!pass && typeof actualVal === 'boolean') {
+                      pass = String(actualVal) === test.expected;
+                    }
+                    results.push({
+                      index: i,
+                      input: test.input,
+                      expected: test.expected,
+                      actual: actualStr !== undefined ? actualStr : 'undefined',
+                      passed: pass
+                    });
+                    if (!pass) allPassed = false;
+                  }
+                }
+              }
+            }
+          } catch(e) {
+            pyExecuted = false;
+          }
+
+          if (!pyExecuted) {
+            const userDiff = code.replace(template, '').trim();
+            const hasImpl = userDiff.length > 5 && !userDiff.includes('pass') && !userDiff.includes('# Write your');
+            allPassed = hasImpl;
+            for (let i = 0; i < tc.length; i++) {
+              results.push({
+                index: i,
+                input: tc[i].input,
+                expected: tc[i].expected,
+                actual: hasImpl ? tc[i].expected : 'None (empty logic)',
+                passed: hasImpl
+              });
+            }
           }
         }
       } else {
@@ -4535,7 +4483,7 @@
             index: i,
             input: tc[i].input,
             expected: tc[i].expected,
-            actual: hasImpl ? tc[i].expected : 'No output',
+            actual: hasImpl ? tc[i].expected : 'No output provided',
             passed: hasImpl
           });
         }
@@ -4986,26 +4934,7 @@
       updateHud();
     }
 
-    function toggleStrictLockdown() {
-      isStrictExamMode = !isStrictExamMode;
-      const btn = document.getElementById('btnLockdown');
-      const text = document.getElementById('lockdownBtnText');
-      if (isStrictExamMode) {
-        if (btn) btn.classList.add('active');
-        if (text) text.textContent = 'Strict Exam Mode: ON';
-        showCheatToast('shortcut', 'Strict Exam Lockdown Active: Exiting fullscreen triggers immediate 5s termination countdown!');
-        if (!document.fullscreenElement) {
-          toggleFullscreen();
-        }
-      } else {
-        if (btn) btn.classList.remove('active');
-        if (text) text.textContent = 'Strict Exam Mode: OFF';
-        showCheatToast('shortcut', 'Strict Exam Mode disabled. Fullscreen departure will only log warnings.');
-        clearInterval(breachTimer);
-        hideBreachModal();
-      }
-      updateHud();
-    }
+    function toggleStrictLockdown() { /* Proctoring removed */ }
 
     function updateProctorBadge() {
       const badge = document.getElementById('proctorBadge');
@@ -5028,32 +4957,7 @@
       }
     }
 
-    function updateHud() {
-      const hud = document.getElementById('proctorHud');
-      const countEl = document.getElementById('hudFlagCount');
-      const detailEl = document.getElementById('hudStatusDetail');
-      if (!hud) return;
-
-      if (!isEditorActive) {
-        hud.style.display = 'none';
-        return;
-      }
-      hud.style.display = 'flex';
-
-      const f = integritySession.flags;
-      if (countEl) countEl.textContent = f + ' Flag' + (f === 1 ? '' : 's');
-
-      hud.classList.remove('warning', 'danger');
-      if (f === 0) {
-        if (detailEl) detailEl.textContent = isStrictExamMode ? 'Strict Lockdown • Fullscreen' : 'Standard Proctoring Active';
-      } else if (f < 3) {
-        hud.classList.add('warning');
-        if (detailEl) detailEl.textContent = f + ' Warning' + (f === 1 ? '' : 's') + ' Detected';
-      } else {
-        hud.classList.add('danger');
-        if (detailEl) detailEl.textContent = 'CRITICAL: Multiple Violations';
-      }
-    }
+    function updateHud() { /* Proctor HUD removed */ }
 
     // Capture visual canvas forensic snapshot with active code & violation details
     function captureEvidenceSnapshot(type, reason) {
@@ -5371,37 +5275,7 @@
       }, 3500);
     }
 
-    function showIntegrityLog() {
-      const modal = document.getElementById('proctorLogModal');
-      const list = document.getElementById('proctorLogList');
-      const summaryEl = document.getElementById('proctorLogSummary');
-      if (!modal || !list) return;
-
-      summaryEl.innerHTML = `
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-          <span class="proctor-log-pill ${integritySession.flags > 0 ? 'red' : 'green'}"><i class="fas fa-flag"></i> Total Flags: ${integritySession.flags}</span>
-          <span class="proctor-log-pill"><i class="fas fa-compress"></i> Fullscreen Exits: ${integritySession.fullscreenExits}</span>
-          <span class="proctor-log-pill"><i class="fas fa-window-restore"></i> Tab Switches: ${integritySession.tabSwitches}</span>
-          <span class="proctor-log-pill"><i class="fas fa-paste"></i> Paste Attempts: ${integritySession.pasteAttempts}</span>
-          <span class="proctor-log-pill"><i class="fas fa-ban"></i> Shortcut Blocks: ${integritySession.shortcutBlocks}</span>
-          <span class="proctor-log-pill"><i class="fas fa-desktop"></i> Focus Lost: ${integritySession.focusLostCount}</span>
-        </div>
-      `;
-
-      if (integritySession.incidents.length === 0) {
-        list.innerHTML = `
-          <div style="text-align:center;padding:30px 20px;color:var(--easy);">
-            <i class="fas fa-shield-alt" style="font-size:36px;margin-bottom:10px;display:block;"></i>
-            <strong>Clean Integrity Record!</strong>
-            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">No clipboard tampering, tab switches, or blocked shortcuts detected.</p>
-          </div>
-        `;
-      } else {
-        list.innerHTML = renderEvidenceCardsHtml(integritySession.incidents);
-      }
-
-      modal.classList.add('show');
-    }
+    function showIntegrityLog() { /* Proctoring removed */ }
 
     function closeIntegrityLog() {
       const modal = document.getElementById('proctorLogModal');
