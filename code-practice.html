@@ -284,6 +284,7 @@
 
     .diff-btn:hover { color: var(--text-primary); }
     .diff-btn.active { background: var(--bg-elevated); color: var(--text-primary); }
+    .diff-btn[data-diff="Basic"].active { background: rgba(56,189,248,0.15); color: #38bdf8; }
     .diff-btn[data-diff="Easy"].active { background: rgba(34,197,94,0.15); color: var(--easy); }
     .diff-btn[data-diff="Medium"].active { background: rgba(245,158,11,0.15); color: var(--medium); }
     .diff-btn[data-diff="Hard"].active { background: rgba(239,68,68,0.15); color: var(--hard); }
@@ -365,6 +366,7 @@
       display: inline-block;
     }
 
+    .diff-badge.basic { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
     .diff-badge.easy { background: rgba(34,197,94,0.12); color: var(--easy); }
     .diff-badge.medium { background: rgba(245,158,11,0.12); color: var(--medium); }
     .diff-badge.hard { background: rgba(239,68,68,0.12); color: var(--hard); }
@@ -1686,6 +1688,20 @@
           <div class="stat-ring">
             <svg viewBox="0 0 40 40">
               <circle class="ring-bg" cx="20" cy="20" r="18" />
+              <circle class="ring-fill" cx="20" cy="20" r="18" stroke="#38bdf8"
+                style="stroke-dashoffset: 113.097;" id="ringBasic" />
+            </svg>
+            <span class="ring-value" style="color:#38bdf8;" id="solvedBasic">0</span>
+          </div>
+          <div class="stat-info">
+            <h4 style="color:#38bdf8;" id="statBasic">0</h4>
+            <p>Fundamentals</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ring">
+            <svg viewBox="0 0 40 40">
+              <circle class="ring-bg" cx="20" cy="20" r="18" />
               <circle class="ring-fill" cx="20" cy="20" r="18" stroke="var(--easy)"
                 style="stroke-dashoffset: 113.097;" id="ringEasy" />
             </svg>
@@ -1734,6 +1750,7 @@
         </div>
         <div class="diff-filters">
           <button class="diff-btn active" data-diff="All" onclick="setDifficulty('All', this)">All</button>
+          <button class="diff-btn" data-diff="Basic" onclick="setDifficulty('Basic', this)"><i class="fas fa-seedling" style="margin-right:4px;color:#38bdf8;"></i>Fundamentals</button>
           <button class="diff-btn" data-diff="Easy" onclick="setDifficulty('Easy', this)">Easy</button>
           <button class="diff-btn" data-diff="Medium" onclick="setDifficulty('Medium', this)">Medium</button>
           <button class="diff-btn" data-diff="Hard" onclick="setDifficulty('Hard', this)">Hard</button>
@@ -1886,549 +1903,2025 @@
     // PROBLEM DATA (30 classic problems)
     // ============================================
     const PROBLEMS = [
+  {
+    "id": 1,
+    "title": "Print \"Hello, World!\"",
+    "difficulty": "Basic",
+    "acceptance": 98.4,
+    "tags": [
+      "Basics",
+      "Print",
+      "Fundamentals"
+    ],
+    "desc": "Welcome to programming! In this very first exercise, your task is to print the classic greeting <code>\"Hello, World!\"</code> to standard output.<br><br>Printing output is the foundation of computer programming and debugging.",
+    "examples": [
       {
-        id: 1, title: "Two Sum", difficulty: "Easy", acceptance: 49.2, tags: ["Array", "Hash Table"],
-        desc: "Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers</em> such that they add up to <code>target</code>.\n\nYou may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.",
-        examples: [
-          { input: "nums = [2,7,11,15], target = 9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]." },
-          { input: "nums = [3,2,4], target = 6", output: "[1,2]" },
-          { input: "nums = [3,3], target = 6", output: "[0,1]" }
-        ],
-        constraints: ["2 <= nums.length <= 10<sup>4</sup>", "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>", "-10<sup>9</sup> <= target <= 10<sup>9</sup>", "Only one valid answer exists."],
-        hints: ["Try using a hash map to store the values you've seen.", "For each number, check if target - num exists in the map."],
-        testCases: [
-          { input: "[2,7,11,15]\n9", expected: "[0,1]" },
-          { input: "[3,2,4]\n6", expected: "[1,2]" },
-          { input: "[3,3]\n6", expected: "[0,1]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};",
-          python: "class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        ",
-          java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};",
-          c: "int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}"
-        }
-      },
-      {
-        id: 2, title: "Palindrome Number", difficulty: "Easy", acceptance: 53.1, tags: ["Math"],
-        desc: "Given an integer <code>x</code>, return <code>true</code> if <code>x</code> is a palindrome, and <code>false</code> otherwise.\n\nAn integer is a <strong>palindrome</strong> when it reads the same forward and backward.",
-        examples: [
-          { input: "x = 121", output: "true", explanation: "121 reads as 121 from left to right and from right to left." },
-          { input: "x = -121", output: "false", explanation: "From left to right, it reads -121. From right to left it becomes 121-." },
-          { input: "x = 10", output: "false" }
-        ],
-        constraints: ["-2<sup>31</sup> <= x <= 2<sup>31</sup> - 1"],
-        hints: ["Negative numbers are never palindromes.", "Try reversing only half of the number."],
-        testCases: [
-          { input: "121", expected: "true" },
-          { input: "-121", expected: "false" },
-          { input: "10", expected: "false" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number} x\n * @return {boolean}\n */\nvar isPalindrome = function(x) {\n    \n};",
-          python: "class Solution:\n    def isPalindrome(self, x: int) -> bool:\n        ",
-          java: "class Solution {\n    public boolean isPalindrome(int x) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        \n    }\n};",
-          c: "bool isPalindrome(int x) {\n    \n}"
-        }
-      },
-      {
-        id: 3, title: "Roman to Integer", difficulty: "Easy", acceptance: 58.3, tags: ["Hash Table", "Math", "String"],
-        desc: "Roman numerals are represented by seven different symbols: <code>I, V, X, L, C, D, M</code>.\n\nGiven a roman numeral, convert it to an integer.",
-        examples: [
-          { input: 's = "III"', output: "3" },
-          { input: 's = "LVIII"', output: "58" },
-          { input: 's = "MCMXCIV"', output: "1994" }
-        ],
-        constraints: ["1 <= s.length <= 15", "s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M')"],
-        hints: ["Process the string from right to left.", "If a smaller value appears before a larger value, subtract it."],
-        testCases: [
-          { input: '"III"', expected: "3" },
-          { input: '"LVIII"', expected: "58" },
-          { input: '"MCMXCIV"', expected: "1994" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} s\n * @return {number}\n */\nvar romanToInt = function(s) {\n    \n};",
-          python: "class Solution:\n    def romanToInt(self, s: str) -> int:\n        ",
-          java: "class Solution {\n    public int romanToInt(String s) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int romanToInt(string s) {\n        \n    }\n};",
-          c: "int romanToInt(char* s) {\n    \n}"
-        }
-      },
-      {
-        id: 4, title: "Valid Parentheses", difficulty: "Easy", acceptance: 40.7, tags: ["String", "Stack"],
-        desc: "Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
-        examples: [
-          { input: 's = "()"', output: "true" },
-          { input: 's = "()[]{}"', output: "true" },
-          { input: 's = "(]"', output: "false" }
-        ],
-        constraints: ["1 <= s.length <= 10<sup>4</sup>", "s consists of parentheses only '()[]{}'"],
-        hints: ["Use a stack to keep track of opening brackets.", "When you encounter a closing bracket, check if the top of the stack matches."],
-        testCases: [
-          { input: '"()"', expected: "true" },
-          { input: '"()[]{}"', expected: "true" },
-          { input: '"(]"', expected: "false" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    \n};",
-          python: "class Solution:\n    def isValid(self, s: str) -> bool:\n        ",
-          java: "class Solution {\n    public boolean isValid(String s) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};",
-          c: "bool isValid(char* s) {\n    \n}"
-        }
-      },
-      {
-        id: 5, title: "Merge Two Sorted Lists", difficulty: "Easy", acceptance: 61.8, tags: ["Linked List", "Recursion"],
-        desc: "You are given the heads of two sorted linked lists <code>list1</code> and <code>list2</code>.\n\nMerge the two lists into one <strong>sorted</strong> list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.",
-        examples: [
-          { input: "list1 = [1,2,4], list2 = [1,3,4]", output: "[1,1,2,3,4,4]" },
-          { input: "list1 = [], list2 = []", output: "[]" },
-          { input: "list1 = [], list2 = [0]", output: "[0]" }
-        ],
-        constraints: ["The number of nodes in both lists is in the range [0, 50]", "-100 <= Node.val <= 100"],
-        hints: ["Use a dummy node to simplify the merge.", "Compare the heads of both lists and advance the pointer."],
-        testCases: [
-          { input: "[1,2,4]\n[1,3,4]", expected: "[1,1,2,3,4,4]" },
-          { input: "[]\n[]", expected: "[]" },
-          { input: "[]\n[0]", expected: "[0]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {ListNode} list1\n * @param {ListNode} list2\n * @return {ListNode}\n */\nvar mergeTwoLists = function(list1, list2) {\n    \n};",
-          python: "class Solution:\n    def mergeTwoLists(self, list1, list2):\n        ",
-          java: "class Solution {\n    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {\n        \n    }\n};",
-          c: "struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2) {\n    \n}"
-        }
-      },
-      {
-        id: 6, title: "Best Time to Buy and Sell Stock", difficulty: "Easy", acceptance: 54.2, tags: ["Array", "DP"],
-        desc: "You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i<sup>th</sup></code> day.\n\nYou want to maximize your profit by choosing a <strong>single day</strong> to buy and a <strong>different day in the future</strong> to sell.\n\nReturn the maximum profit. If no profit is possible, return <code>0</code>.",
-        examples: [
-          { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5." },
-          { input: "prices = [7,6,4,3,1]", output: "0" }
-        ],
-        constraints: ["1 <= prices.length <= 10<sup>5</sup>", "0 <= prices[i] <= 10<sup>4</sup>"],
-        hints: ["Track the minimum price seen so far.", "At each step, calculate profit if you sold today."],
-        testCases: [
-          { input: "[7,1,5,3,6,4]", expected: "5" },
-          { input: "[7,6,4,3,1]", expected: "0" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} prices\n * @return {number}\n */\nvar maxProfit = function(prices) {\n    \n};",
-          python: "class Solution:\n    def maxProfit(self, prices: list[int]) -> int:\n        ",
-          java: "class Solution {\n    public int maxProfit(int[] prices) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        \n    }\n};",
-          c: "int maxProfit(int* prices, int pricesSize) {\n    \n}"
-        }
-      },
-      {
-        id: 7, title: "Valid Anagram", difficulty: "Easy", acceptance: 62.5, tags: ["Hash Table", "String", "Sorting"],
-        desc: "Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if <code>t</code> is an anagram of <code>s</code>, and <code>false</code> otherwise.",
-        examples: [
-          { input: 's = "anagram", t = "nagaram"', output: "true" },
-          { input: 's = "rat", t = "car"', output: "false" }
-        ],
-        constraints: ["1 <= s.length, t.length <= 5 * 10<sup>4</sup>", "s and t consist of lowercase English letters"],
-        hints: ["Count character frequencies.", "Two strings are anagrams if they have the same character counts."],
-        testCases: [
-          { input: '"anagram"\n"nagaram"', expected: "true" },
-          { input: '"rat"\n"car"', expected: "false" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nvar isAnagram = function(s, t) {\n    \n};",
-          python: "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        ",
-          java: "class Solution {\n    public boolean isAnagram(String s, String t) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    bool isAnagram(string s, string t) {\n        \n    }\n};",
-          c: "bool isAnagram(char* s, char* t) {\n    \n}"
-        }
-      },
-      {
-        id: 8, title: "Contains Duplicate", difficulty: "Easy", acceptance: 61.0, tags: ["Array", "Hash Table", "Sorting"],
-        desc: "Given an integer array <code>nums</code>, return <code>true</code> if any value appears <strong>at least twice</strong>, and return <code>false</code> if every element is distinct.",
-        examples: [
-          { input: "nums = [1,2,3,1]", output: "true" },
-          { input: "nums = [1,2,3,4]", output: "false" }
-        ],
-        constraints: ["1 <= nums.length <= 10<sup>5</sup>", "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>"],
-        hints: ["Use a Set to track seen values."],
-        testCases: [
-          { input: "[1,2,3,1]", expected: "true" },
-          { input: "[1,2,3,4]", expected: "false" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar containsDuplicate = function(nums) {\n    \n};",
-          python: "class Solution:\n    def containsDuplicate(self, nums: list[int]) -> bool:\n        ",
-          java: "class Solution {\n    public boolean containsDuplicate(int[] nums) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        \n    }\n};",
-          c: "bool containsDuplicate(int* nums, int numsSize) {\n    \n}"
-        }
-      },
-      {
-        id: 9, title: "Maximum Subarray", difficulty: "Medium", acceptance: 50.1, tags: ["Array", "DP", "Divide and Conquer"],
-        desc: "Given an integer array <code>nums</code>, find the subarray with the largest sum, and return its sum.\n\nA <strong>subarray</strong> is a contiguous non-empty sequence of elements within an array.",
-        examples: [
-          { input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
-          { input: "nums = [1]", output: "1" },
-          { input: "nums = [5,4,-1,7,8]", output: "23" }
-        ],
-        constraints: ["1 <= nums.length <= 10<sup>5</sup>", "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"],
-        hints: ["Use Kadane's Algorithm.", "Keep track of the current sum and the maximum sum seen so far."],
-        testCases: [
-          { input: "[-2,1,-3,4,-1,2,1,-5,4]", expected: "6" },
-          { input: "[1]", expected: "1" },
-          { input: "[5,4,-1,7,8]", expected: "23" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSubArray = function(nums) {\n    \n};",
-          python: "class Solution:\n    def maxSubArray(self, nums: list[int]) -> int:\n        ",
-          java: "class Solution {\n    public int maxSubArray(int[] nums) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int maxSubArray(vector<int>& nums) {\n        \n    }\n};",
-          c: "int maxSubArray(int* nums, int numsSize) {\n    \n}"
-        }
-      },
-      {
-        id: 10, title: "Longest Substring Without Repeating Characters", difficulty: "Medium", acceptance: 33.8, tags: ["Hash Table", "String", "Sliding Window"],
-        desc: "Given a string <code>s</code>, find the length of the <strong>longest substring</strong> without repeating characters.",
-        examples: [
-          { input: 's = "abcabcbb"', output: "3", explanation: 'The answer is "abc", with the length of 3.' },
-          { input: 's = "bbbbb"', output: "1" },
-          { input: 's = "pwwkew"', output: "3" }
-        ],
-        constraints: ["0 <= s.length <= 5 * 10<sup>4</sup>", "s consists of English letters, digits, symbols and spaces"],
-        hints: ["Use a sliding window approach.", "Use a set or map to track characters in the current window."],
-        testCases: [
-          { input: '"abcabcbb"', expected: "3" },
-          { input: '"bbbbb"', expected: "1" },
-          { input: '"pwwkew"', expected: "3" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} s\n * @return {number}\n */\nvar lengthOfLongestSubstring = function(s) {\n    \n};",
-          python: "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        ",
-          java: "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        \n    }\n};",
-          c: "int lengthOfLongestSubstring(char* s) {\n    \n}"
-        }
-      },
-      {
-        id: 11, title: "Container With Most Water", difficulty: "Medium", acceptance: 54.3, tags: ["Array", "Two Pointers", "Greedy"],
-        desc: "You are given an integer array <code>height</code> of length <code>n</code>. Find two lines that together with the x-axis form a container that holds the most water.\n\nReturn the maximum amount of water a container can store.",
-        examples: [
-          { input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" },
-          { input: "height = [1,1]", output: "1" }
-        ],
-        constraints: ["n == height.length", "2 <= n <= 10<sup>5</sup>", "0 <= height[i] <= 10<sup>4</sup>"],
-        hints: ["Use two pointers, one at each end.", "Move the pointer with the shorter height inward."],
-        testCases: [
-          { input: "[1,8,6,2,5,4,8,3,7]", expected: "49" },
-          { input: "[1,1]", expected: "1" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} height\n * @return {number}\n */\nvar maxArea = function(height) {\n    \n};",
-          python: "class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        ",
-          java: "class Solution {\n    public int maxArea(int[] height) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int maxArea(vector<int>& height) {\n        \n    }\n};",
-          c: "int maxArea(int* height, int heightSize) {\n    \n}"
-        }
-      },
-      {
-        id: 12, title: "3Sum", difficulty: "Medium", acceptance: 32.5, tags: ["Array", "Two Pointers", "Sorting"],
-        desc: "Given an integer array nums, return all the triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j</code>, <code>i != k</code>, and <code>j != k</code>, and <code>nums[i] + nums[j] + nums[k] == 0</code>.\n\nThe solution set must not contain duplicate triplets.",
-        examples: [
-          { input: "nums = [-1,0,1,2,-1,-4]", output: "[[-1,-1,2],[-1,0,1]]" },
-          { input: "nums = [0,1,1]", output: "[]" },
-          { input: "nums = [0,0,0]", output: "[[0,0,0]]" }
-        ],
-        constraints: ["3 <= nums.length <= 3000", "-10<sup>5</sup> <= nums[i] <= 10<sup>5</sup>"],
-        hints: ["Sort the array first.", "Fix one element and use two pointers for the remaining two."],
-        testCases: [
-          { input: "[-1,0,1,2,-1,-4]", expected: "[[-1,-1,2],[-1,0,1]]" },
-          { input: "[0,0,0]", expected: "[[0,0,0]]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @return {number[][]}\n */\nvar threeSum = function(nums) {\n    \n};",
-          python: "class Solution:\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        ",
-          java: "class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        \n    }\n};",
-          c: "int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
-        }
-      },
-      {
-        id: 13, title: "Group Anagrams", difficulty: "Medium", acceptance: 66.3, tags: ["Array", "Hash Table", "String", "Sorting"],
-        desc: "Given an array of strings <code>strs</code>, group the anagrams together. You can return the answer in <strong>any order</strong>.",
-        examples: [
-          { input: 'strs = ["eat","tea","tan","ate","nat","bat"]', output: '[["bat"],["nat","tan"],["ate","eat","tea"]]' },
-          { input: 'strs = [""]', output: '[[""]]' }
-        ],
-        constraints: ["1 <= strs.length <= 10<sup>4</sup>", "0 <= strs[i].length <= 100", "strs[i] consists of lowercase English letters"],
-        hints: ["Use sorted version of each string as a key.", "Group strings with the same key together."],
-        testCases: [
-          { input: '["eat","tea","tan","ate","nat","bat"]', expected: '[["eat","tea","ate"],["tan","nat"],["bat"]]' }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string[]} strs\n * @return {string[][]}\n */\nvar groupAnagrams = function(strs) {\n    \n};",
-          python: "class Solution:\n    def groupAnagrams(self, strs: list[str]) -> list[list[str]]:\n        ",
-          java: "class Solution {\n    public List<List<String>> groupAnagrams(String[] strs) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<vector<string>> groupAnagrams(vector<string>& strs) {\n        \n    }\n};",
-          c: "char*** groupAnagrams(char** strs, int strsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
-        }
-      },
-      {
-        id: 14, title: "Climbing Stairs", difficulty: "Easy", acceptance: 51.7, tags: ["Math", "DP", "Memoization"],
-        desc: "You are climbing a staircase. It takes <code>n</code> steps to reach the top.\n\nEach time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?",
-        examples: [
-          { input: "n = 2", output: "2", explanation: "1. 1 step + 1 step\n2. 2 steps" },
-          { input: "n = 3", output: "3" }
-        ],
-        constraints: ["1 <= n <= 45"],
-        hints: ["This is the Fibonacci sequence!", "f(n) = f(n-1) + f(n-2)"],
-        testCases: [
-          { input: "2", expected: "2" },
-          { input: "3", expected: "3" },
-          { input: "5", expected: "8" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number} n\n * @return {number}\n */\nvar climbStairs = function(n) {\n    \n};",
-          python: "class Solution:\n    def climbStairs(self, n: int) -> int:\n        ",
-          java: "class Solution {\n    public int climbStairs(int n) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int climbStairs(int n) {\n        \n    }\n};",
-          c: "int climbStairs(int n) {\n    \n}"
-        }
-      },
-      {
-        id: 15, title: "Binary Search", difficulty: "Easy", acceptance: 55.2, tags: ["Array", "Binary Search"],
-        desc: "Given an array of integers <code>nums</code> which is sorted in ascending order, and an integer <code>target</code>, write a function to search <code>target</code> in <code>nums</code>. If <code>target</code> exists, return its index. Otherwise, return <code>-1</code>.",
-        examples: [
-          { input: "nums = [-1,0,3,5,9,12], target = 9", output: "4" },
-          { input: "nums = [-1,0,3,5,9,12], target = 2", output: "-1" }
-        ],
-        constraints: ["1 <= nums.length <= 10<sup>4</sup>", "All integers in nums are unique", "nums is sorted in ascending order"],
-        hints: ["Compare the target with the middle element.", "Narrow the search range by half each iteration."],
-        testCases: [
-          { input: "[-1,0,3,5,9,12]\n9", expected: "4" },
-          { input: "[-1,0,3,5,9,12]\n2", expected: "-1" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
-          python: "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
-          java: "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
-          c: "int search(int* nums, int numsSize, int target) {\n    \n}"
-        }
-      },
-      {
-        id: 16, title: "Reverse Linked List", difficulty: "Easy", acceptance: 73.2, tags: ["Linked List", "Recursion"],
-        desc: "Given the <code>head</code> of a singly linked list, reverse the list, and return the reversed list.",
-        examples: [
-          { input: "head = [1,2,3,4,5]", output: "[5,4,3,2,1]" },
-          { input: "head = [1,2]", output: "[2,1]" }
-        ],
-        constraints: ["The number of nodes in the list is in the range [0, 5000]"],
-        hints: ["Use three pointers: prev, current, next.", "Or solve it recursively."],
-        testCases: [
-          { input: "[1,2,3,4,5]", expected: "[5,4,3,2,1]" },
-          { input: "[1,2]", expected: "[2,1]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nvar reverseList = function(head) {\n    \n};",
-          python: "class Solution:\n    def reverseList(self, head):\n        ",
-          java: "class Solution {\n    public ListNode reverseList(ListNode head) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    ListNode* reverseList(ListNode* head) {\n        \n    }\n};",
-          c: "struct ListNode* reverseList(struct ListNode* head) {\n    \n}"
-        }
-      },
-      {
-        id: 17, title: "Product of Array Except Self", difficulty: "Medium", acceptance: 64.6, tags: ["Array", "Prefix Sum"],
-        desc: "Given an integer array <code>nums</code>, return an array <code>answer</code> such that <code>answer[i]</code> is equal to the product of all the elements of <code>nums</code> except <code>nums[i]</code>.\n\nYou must write an algorithm that runs in <code>O(n)</code> time and without using the division operation.",
-        examples: [
-          { input: "nums = [1,2,3,4]", output: "[24,12,8,6]" },
-          { input: "nums = [-1,1,0,-3,3]", output: "[0,0,9,0,0]" }
-        ],
-        constraints: ["2 <= nums.length <= 10<sup>5</sup>", "-30 <= nums[i] <= 30"],
-        hints: ["Use prefix and suffix products.", "First pass: compute prefix products. Second pass: compute suffix products."],
-        testCases: [
-          { input: "[1,2,3,4]", expected: "[24,12,8,6]" },
-          { input: "[-1,1,0,-3,3]", expected: "[0,0,9,0,0]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar productExceptSelf = function(nums) {\n    \n};",
-          python: "class Solution:\n    def productExceptSelf(self, nums: list[int]) -> list[int]:\n        ",
-          java: "class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        \n    }\n};",
-          c: "int* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}"
-        }
-      },
-      {
-        id: 18, title: "Longest Palindromic Substring", difficulty: "Medium", acceptance: 32.4, tags: ["String", "DP"],
-        desc: "Given a string <code>s</code>, return the longest palindromic substring in <code>s</code>.",
-        examples: [
-          { input: 's = "babad"', output: '"bab"', explanation: '"aba" is also a valid answer.' },
-          { input: 's = "cbbd"', output: '"bb"' }
-        ],
-        constraints: ["1 <= s.length <= 1000", "s consist of only digits and English letters"],
-        hints: ["Expand around center for each character.", "Consider both odd and even length palindromes."],
-        testCases: [
-          { input: '"babad"', expected: '"bab"' },
-          { input: '"cbbd"', expected: '"bb"' }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} s\n * @return {string}\n */\nvar longestPalindrome = function(s) {\n    \n};",
-          python: "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        ",
-          java: "class Solution {\n    public String longestPalindrome(String s) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    string longestPalindrome(string s) {\n        \n    }\n};",
-          c: "char* longestPalindrome(char* s) {\n    \n}"
-        }
-      },
-      {
-        id: 19, title: "Coin Change", difficulty: "Medium", acceptance: 41.8, tags: ["Array", "DP", "BFS"],
-        desc: "You are given an integer array <code>coins</code> representing coins of different denominations and an integer <code>amount</code> representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount cannot be made up, return <code>-1</code>.",
-        examples: [
-          { input: "coins = [1,5,10], amount = 12", output: "3", explanation: "12 = 10 + 1 + 1" },
-          { input: "coins = [2], amount = 3", output: "-1" },
-          { input: "coins = [1], amount = 0", output: "0" }
-        ],
-        constraints: ["1 <= coins.length <= 12", "1 <= coins[i] <= 2<sup>31</sup> - 1", "0 <= amount <= 10<sup>4</sup>"],
-        hints: ["Use dynamic programming.", "dp[i] = min coins needed to make amount i."],
-        testCases: [
-          { input: "[1,5,10]\n12", expected: "3" },
-          { input: "[2]\n3", expected: "-1" },
-          { input: "[1]\n0", expected: "0" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} coins\n * @param {number} amount\n * @return {number}\n */\nvar coinChange = function(coins, amount) {\n    \n};",
-          python: "class Solution:\n    def coinChange(self, coins: list[int], amount: int) -> int:\n        ",
-          java: "class Solution {\n    public int coinChange(int[] coins, int amount) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        \n    }\n};",
-          c: "int coinChange(int* coins, int coinsSize, int amount) {\n    \n}"
-        }
-      },
-      {
-        id: 20, title: "Merge Intervals", difficulty: "Medium", acceptance: 46.1, tags: ["Array", "Sorting"],
-        desc: "Given an array of <code>intervals</code> where <code>intervals[i] = [start_i, end_i]</code>, merge all overlapping intervals and return an array of the non-overlapping intervals.",
-        examples: [
-          { input: "intervals = [[1,3],[2,6],[8,10],[15,18]]", output: "[[1,6],[8,10],[15,18]]" },
-          { input: "intervals = [[1,4],[4,5]]", output: "[[1,5]]" }
-        ],
-        constraints: ["1 <= intervals.length <= 10<sup>4</sup>", "intervals[i].length == 2"],
-        hints: ["Sort by start time.", "Merge if current interval overlaps with previous."],
-        testCases: [
-          { input: "[[1,3],[2,6],[8,10],[15,18]]", expected: "[[1,6],[8,10],[15,18]]" },
-          { input: "[[1,4],[4,5]]", expected: "[[1,5]]" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[][]} intervals\n * @return {number[][]}\n */\nvar merge = function(intervals) {\n    \n};",
-          python: "class Solution:\n    def merge(self, intervals: list[list[int]]) -> list[list[int]]:\n        ",
-          java: "class Solution {\n    public int[][] merge(int[][] intervals) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        \n    }\n};",
-          c: "int** merge(int** intervals, int intervalsSize, int* intervalsColSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
-        }
-      },
-      {
-        id: 21, title: "Trapping Rain Water", difficulty: "Hard", acceptance: 59.3, tags: ["Array", "Two Pointers", "Stack", "DP"],
-        desc: "Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is <code>1</code>, compute how much water it can trap after raining.",
-        examples: [
-          { input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" },
-          { input: "height = [4,2,0,3,2,5]", output: "9" }
-        ],
-        constraints: ["n == height.length", "1 <= n <= 2 * 10<sup>4</sup>", "0 <= height[i] <= 10<sup>5</sup>"],
-        hints: ["Use two pointers from both ends.", "Water at each position = min(maxLeft, maxRight) - height[i]."],
-        testCases: [
-          { input: "[0,1,0,2,1,0,1,3,2,1,2,1]", expected: "6" },
-          { input: "[4,2,0,3,2,5]", expected: "9" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} height\n * @return {number}\n */\nvar trap = function(height) {\n    \n};",
-          python: "class Solution:\n    def trap(self, height: list[int]) -> int:\n        ",
-          java: "class Solution {\n    public int trap(int[] height) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int trap(vector<int>& height) {\n        \n    }\n};",
-          c: "int trap(int* height, int heightSize) {\n    \n}"
-        }
-      },
-      {
-        id: 22, title: "Median of Two Sorted Arrays", difficulty: "Hard", acceptance: 36.1, tags: ["Array", "Binary Search", "Divide and Conquer"],
-        desc: "Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the <strong>median</strong> of the two sorted arrays.\n\nThe overall run time complexity should be <code>O(log (m+n))</code>.",
-        examples: [
-          { input: "nums1 = [1,3], nums2 = [2]", output: "2.0" },
-          { input: "nums1 = [1,2], nums2 = [3,4]", output: "2.5" }
-        ],
-        constraints: ["nums1.length == m", "nums2.length == n", "0 <= m <= 1000", "0 <= n <= 1000"],
-        hints: ["Use binary search on the shorter array.", "Partition both arrays such that left half <= right half."],
-        testCases: [
-          { input: "[1,3]\n[2]", expected: "2.0" },
-          { input: "[1,2]\n[3,4]", expected: "2.5" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar findMedianSortedArrays = function(nums1, nums2) {\n    \n};",
-          python: "class Solution:\n    def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:\n        ",
-          java: "class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        \n    }\n};",
-          c: "double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size) {\n    \n}"
-        }
-      },
-      {
-        id: 23, title: "FizzBuzz", difficulty: "Easy", acceptance: 69.5, tags: ["Math", "String"],
-        desc: "Given an integer <code>n</code>, return a string array <code>answer</code> (1-indexed) where:\n\n- <code>answer[i] == \"FizzBuzz\"</code> if <code>i</code> is divisible by 3 and 5.\n- <code>answer[i] == \"Fizz\"</code> if <code>i</code> is divisible by 3.\n- <code>answer[i] == \"Buzz\"</code> if <code>i</code> is divisible by 5.\n- <code>answer[i] == i</code> (as a string) if none of the above.",
-        examples: [
-          { input: "n = 3", output: '["1","2","Fizz"]' },
-          { input: "n = 5", output: '["1","2","Fizz","4","Buzz"]' }
-        ],
-        constraints: ["1 <= n <= 10<sup>4</sup>"],
-        hints: ["Check divisibility by 15 first, then by 3, then by 5."],
-        testCases: [
-          { input: "3", expected: '["1","2","Fizz"]' },
-          { input: "5", expected: '["1","2","Fizz","4","Buzz"]' }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number} n\n * @return {string[]}\n */\nvar fizzBuzz = function(n) {\n    \n};",
-          python: "class Solution:\n    def fizzBuzz(self, n: int) -> list[str]:\n        ",
-          java: "class Solution {\n    public List<String> fizzBuzz(int n) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        \n    }\n};",
-          c: "char** fizzBuzz(int n, int* returnSize) {\n    \n}"
-        }
-      },
-      {
-        id: 24, title: "Search in Rotated Sorted Array", difficulty: "Medium", acceptance: 38.9, tags: ["Array", "Binary Search"],
-        desc: "Given a rotated sorted array <code>nums</code> and an integer <code>target</code>, return the index of <code>target</code> if it is in <code>nums</code>, or <code>-1</code> if it is not.\n\nYou must write an algorithm with <code>O(log n)</code> runtime complexity.",
-        examples: [
-          { input: "nums = [4,5,6,7,0,1,2], target = 0", output: "4" },
-          { input: "nums = [4,5,6,7,0,1,2], target = 3", output: "-1" }
-        ],
-        constraints: ["1 <= nums.length <= 5000", "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"],
-        hints: ["Modified binary search.", "Determine which half is sorted, then check if target is in that half."],
-        testCases: [
-          { input: "[4,5,6,7,0,1,2]\n0", expected: "4" },
-          { input: "[4,5,6,7,0,1,2]\n3", expected: "-1" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
-          python: "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
-          java: "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
-          c: "int search(int* nums, int numsSize, int target) {\n    \n}"
-        }
-      },
-      {
-        id: 25, title: "Longest Common Subsequence", difficulty: "Medium", acceptance: 58.8, tags: ["String", "DP"],
-        desc: "Given two strings <code>text1</code> and <code>text2</code>, return the length of their <strong>longest common subsequence</strong>. If there is no common subsequence, return <code>0</code>.",
-        examples: [
-          { input: 'text1 = "abcde", text2 = "ace"', output: "3", explanation: 'The longest common subsequence is "ace".' },
-          { input: 'text1 = "abc", text2 = "def"', output: "0" }
-        ],
-        constraints: ["1 <= text1.length, text2.length <= 1000"],
-        hints: ["Classic DP problem.", "dp[i][j] = LCS of text1[0..i-1] and text2[0..j-1]"],
-        testCases: [
-          { input: '"abcde"\n"ace"', expected: "3" },
-          { input: '"abc"\n"def"', expected: "0" }
-        ],
-        templates: {
-          javascript: "/**\n * @param {string} text1\n * @param {string} text2\n * @return {number}\n */\nvar longestCommonSubsequence = function(text1, text2) {\n    \n};",
-          python: "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        ",
-          java: "class Solution {\n    public int longestCommonSubsequence(String text1, String text2) {\n        \n    }\n}",
-          cpp: "class Solution {\npublic:\n    int longestCommonSubsequence(string text1, string text2) {\n        \n    }\n};",
-          c: "int longestCommonSubsequence(char* text1, char* text2) {\n    \n}"
-        }
+        "input": "No input",
+        "output": "\"Hello, World!\"",
+        "explanation": "The program prints \"Hello, World!\" to the console."
       }
-    ];
+    ],
+    "constraints": [
+      "Output must match exact casing and punctuation: Hello, World!"
+    ],
+    "hints": [
+      "In JavaScript: console.log(\"Hello, World!\");",
+      "In Python: print(\"Hello, World!\")",
+      "In Java: System.out.println(\"Hello, World!\");",
+      "In C++: cout << \"Hello, World!\" << endl;",
+      "In C: printf(\"Hello, World!\\n\");"
+    ],
+    "testCases": [
+      {
+        "input": "\"\"",
+        "expected": "\"Hello, World!\""
+      }
+    ],
+    "templates": {
+      "javascript": "// Step 1: Print Hello, World! to the console\nconsole.log(\"Hello, World!\");\n",
+      "python": "# Step 1: Print Hello, World! to the console\nprint(\"Hello, World!\")\n",
+      "java": "public class Solution {\n    public static void main(String[] args) {\n        // Step 1: Print Hello, World!\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Step 1: Print Hello, World!\n    cout << \"Hello, World!\" << endl;\n    return 0;\n}\n",
+      "c": "#include <stdio.h>\n\nint main() {\n    // Step 1: Print Hello, World!\n    printf(\"Hello, World!\\n\");\n    return 0;\n}\n"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Variables & Basic Arithmetic",
+    "difficulty": "Basic",
+    "acceptance": 96.2,
+    "tags": [
+      "Basics",
+      "Print",
+      "Variables",
+      "Math"
+    ],
+    "desc": "Learn how to store values in variables and calculate their sum, difference, product, and quotient.<br><br>Given two numbers <code>a</code> and <code>b</code>, return an array of 4 values: <code>[sum, difference, product, quotient]</code>.",
+    "examples": [
+      {
+        "input": "a = 20, b = 5",
+        "output": "[25, 15, 100, 4]",
+        "explanation": "20+5=25, 20-5=15, 20*5=100, 20/5=4"
+      },
+      {
+        "input": "a = 10, b = 2",
+        "output": "[12, 8, 20, 5]"
+      }
+    ],
+    "constraints": [
+      "b != 0",
+      "1 <= a, b <= 1000"
+    ],
+    "hints": [
+      "Use +, -, *, and / operators.",
+      "Store each result in a variable before returning or printing."
+    ],
+    "testCases": [
+      {
+        "input": "20\n5",
+        "expected": "[25, 15, 100, 4]"
+      },
+      {
+        "input": "10\n2",
+        "expected": "[12, 8, 20, 5]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} a\n * @param {number} b\n * @return {number[]}\n */\nfunction basicArithmetic(a, b) {\n    let sum = a + b;\n    let diff = a - b;\n    let prod = a * b;\n    let div = Math.floor(a / b);\n    console.log(\"Sum:\", sum, \"Diff:\", diff);\n    return [sum, diff, prod, div];\n}",
+      "python": "def basic_arithmetic(a: int, b: int) -> list[int]:\n    total = a + b\n    diff = a - b\n    prod = a * b\n    div = a // b\n    print(f\"Sum: {total}, Diff: {diff}\")\n    return [total, diff, prod, div]",
+      "java": "class Solution {\n    public int[] basicArithmetic(int a, int b) {\n        return new int[]{ a + b, a - b, a * b, a / b };\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<int> basicArithmetic(int a, int b) {\n        return { a + b, a - b, a * b, a / b };\n    }\n};",
+      "c": "int* basicArithmetic(int a, int b, int* returnSize) {\n    // return array of 4 values\n}"
+    }
+  },
+  {
+    "id": 3,
+    "title": "Personalized Greeting",
+    "difficulty": "Basic",
+    "acceptance": 97.1,
+    "tags": [
+      "Basics",
+      "Print",
+      "String"
+    ],
+    "desc": "Given a person's name as a string <code>name</code>, return a personalized greeting string: <code>\"Hello, <name>! Welcome to PlaceAI.\"</code>.",
+    "examples": [
+      {
+        "input": "name = \"Alice\"",
+        "output": "\"Hello, Alice! Welcome to PlaceAI.\"",
+        "explanation": "String concatenation or template literal produces greeting."
+      },
+      {
+        "input": "name = \"Bob\"",
+        "output": "\"Hello, Bob! Welcome to PlaceAI.\""
+      }
+    ],
+    "constraints": [
+      "1 <= name.length <= 50"
+    ],
+    "hints": [
+      "In JS, use template literals: `Hello, ${name}! Welcome to PlaceAI.`",
+      "In Python: f'Hello, {name}! Welcome to PlaceAI.'"
+    ],
+    "testCases": [
+      {
+        "input": "\"Alice\"",
+        "expected": "\"Hello, Alice! Welcome to PlaceAI.\""
+      },
+      {
+        "input": "\"Bob\"",
+        "expected": "\"Hello, Bob! Welcome to PlaceAI.\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} name\n * @return {string}\n */\nfunction greetUser(name) {\n    return `Hello, ${name}! Welcome to PlaceAI.`;\n}",
+      "python": "def greet_user(name: str) -> str:\n    return f\"Hello, {name}! Welcome to PlaceAI.\"",
+      "java": "class Solution {\n    public String greetUser(String name) {\n        return \"Hello, \" + name + \"! Welcome to PlaceAI.\";\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string greetUser(string name) {\n        return \"Hello, \" + name + \"! Welcome to PlaceAI.\";\n    }\n};",
+      "c": "char* greetUser(char* name) {\n    \n}"
+    }
+  },
+  {
+    "id": 4,
+    "title": "Check Even or Odd",
+    "difficulty": "Basic",
+    "acceptance": 95.8,
+    "tags": [
+      "If-Else",
+      "Conditions",
+      "Fundamentals"
+    ],
+    "desc": "Given an integer <code>n</code>, use an <code>if-else</code> statement to determine if the number is even or odd.<br><br>Return <code>\"Even\"</code> if the number is divisible by 2 (remainder is 0), or <code>\"Odd\"</code> otherwise.",
+    "examples": [
+      {
+        "input": "n = 4",
+        "output": "\"Even\"",
+        "explanation": "4 % 2 == 0, so it is Even."
+      },
+      {
+        "input": "n = 7",
+        "output": "\"Odd\"",
+        "explanation": "7 % 2 != 0, so it is Odd."
+      }
+    ],
+    "constraints": [
+      "-10^6 <= n <= 10^6"
+    ],
+    "hints": [
+      "Use the modulo operator % to get the remainder when dividing by 2.",
+      "if (n % 2 === 0) return 'Even'; else return 'Odd';"
+    ],
+    "testCases": [
+      {
+        "input": "4",
+        "expected": "\"Even\""
+      },
+      {
+        "input": "7",
+        "expected": "\"Odd\""
+      },
+      {
+        "input": "0",
+        "expected": "\"Even\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {string}\n */\nfunction checkEvenOdd(n) {\n    if (n % 2 === 0) {\n        return \"Even\";\n    } else {\n        return \"Odd\";\n    }\n}",
+      "python": "def check_even_odd(n: int) -> str:\n    if n % 2 == 0:\n        return \"Even\"\n    else:\n        return \"Odd\"",
+      "java": "class Solution {\n    public String checkEvenOdd(int n) {\n        return (n % 2 == 0) ? \"Even\" : \"Odd\";\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string checkEvenOdd(int n) {\n        return (n % 2 == 0) ? \"Even\" : \"Odd\";\n    }\n};",
+      "c": "char* checkEvenOdd(int n) {\n    return (n % 2 == 0) ? \"Even\" : \"Odd\";\n}"
+    }
+  },
+  {
+    "id": 5,
+    "title": "Check Positive, Negative or Zero",
+    "difficulty": "Basic",
+    "acceptance": 94.6,
+    "tags": [
+      "If-Else",
+      "Conditions"
+    ],
+    "desc": "Using an <code>if-else if-else</code> ladder, check whether an integer <code>n</code> is positive, negative, or zero.<br><br>Return <code>\"Positive\"</code> if <code>n > 0</code>, <code>\"Negative\"</code> if <code>n < 0</code>, or <code>\"Zero\"</code> if <code>n == 0</code>.",
+    "examples": [
+      {
+        "input": "n = 15",
+        "output": "\"Positive\""
+      },
+      {
+        "input": "n = -8",
+        "output": "\"Negative\""
+      },
+      {
+        "input": "n = 0",
+        "output": "\"Zero\""
+      }
+    ],
+    "constraints": [
+      "-10^9 <= n <= 10^9"
+    ],
+    "hints": [
+      "First test if n > 0, then else if n < 0, else return 'Zero'."
+    ],
+    "testCases": [
+      {
+        "input": "15",
+        "expected": "\"Positive\""
+      },
+      {
+        "input": "-8",
+        "expected": "\"Negative\""
+      },
+      {
+        "input": "0",
+        "expected": "\"Zero\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {string}\n */\nfunction checkSign(n) {\n    if (n > 0) {\n        return \"Positive\";\n    } else if (n < 0) {\n        return \"Negative\";\n    } else {\n        return \"Zero\";\n    }\n}",
+      "python": "def check_sign(n: int) -> str:\n    if n > 0:\n        return \"Positive\"\n    elif n < 0:\n        return \"Negative\"\n    else:\n        return \"Zero\"",
+      "java": "class Solution {\n    public String checkSign(int n) {\n        if (n > 0) return \"Positive\";\n        if (n < 0) return \"Negative\";\n        return \"Zero\";\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string checkSign(int n) {\n        if (n > 0) return \"Positive\";\n        if (n < 0) return \"Negative\";\n        return \"Zero\";\n    }\n};",
+      "c": "char* checkSign(int n) {\n    if (n > 0) return \"Positive\";\n    if (n < 0) return \"Negative\";\n    return \"Zero\";\n}"
+    }
+  },
+  {
+    "id": 6,
+    "title": "Voting Age Eligibility",
+    "difficulty": "Basic",
+    "acceptance": 96,
+    "tags": [
+      "If-Else",
+      "Conditions"
+    ],
+    "desc": "In most democracies, a citizen is legally eligible to vote if their age is 18 or older.<br><br>Given an integer <code>age</code>, return <code>true</code> if eligible to vote (<code>age >= 18</code>), or <code>false</code> otherwise.",
+    "examples": [
+      {
+        "input": "age = 20",
+        "output": "true",
+        "explanation": "20 >= 18, so eligible."
+      },
+      {
+        "input": "age = 16",
+        "output": "false",
+        "explanation": "16 < 18, so not eligible."
+      }
+    ],
+    "constraints": [
+      "0 <= age <= 150"
+    ],
+    "hints": [
+      "Use a simple comparison: age >= 18"
+    ],
+    "testCases": [
+      {
+        "input": "20",
+        "expected": "true"
+      },
+      {
+        "input": "16",
+        "expected": "false"
+      },
+      {
+        "input": "18",
+        "expected": "true"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} age\n * @return {boolean}\n */\nfunction isEligibleToVote(age) {\n    if (age >= 18) {\n        return true;\n    } else {\n        return false;\n    }\n}",
+      "python": "def is_eligible_to_vote(age: int) -> bool:\n    return age >= 18",
+      "java": "class Solution {\n    public boolean isEligibleToVote(int age) {\n        return age >= 18;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool isEligibleToVote(int age) {\n        return age >= 18;\n    }\n};",
+      "c": "bool isEligibleToVote(int age) {\n    return age >= 18;\n}"
+    }
+  },
+  {
+    "id": 7,
+    "title": "Find Maximum of Two Numbers",
+    "difficulty": "Basic",
+    "acceptance": 95.1,
+    "tags": [
+      "If-Else",
+      "Conditions",
+      "Logic"
+    ],
+    "desc": "Given two numbers <code>a</code> and <code>b</code>, write an <code>if-else</code> statement to find and return the larger value.<br><br>If both numbers are equal, return either.",
+    "examples": [
+      {
+        "input": "a = 10, b = 25",
+        "output": "25",
+        "explanation": "25 is greater than 10."
+      },
+      {
+        "input": "a = 40, b = 12",
+        "output": "40"
+      }
+    ],
+    "constraints": [
+      "-10^9 <= a, b <= 10^9"
+    ],
+    "hints": [
+      "if (a > b) return a; else return b;"
+    ],
+    "testCases": [
+      {
+        "input": "10\n25",
+        "expected": "25"
+      },
+      {
+        "input": "40\n12",
+        "expected": "40"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nfunction maxOfTwo(a, b) {\n    if (a > b) {\n        return a;\n    } else {\n        return b;\n    }\n}",
+      "python": "def max_of_two(a: int, b: int) -> int:\n    if a > b:\n        return a\n    else:\n        return b",
+      "java": "class Solution {\n    public int maxOfTwo(int a, int b) {\n        return (a > b) ? a : b;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int maxOfTwo(int a, int b) {\n        return (a > b) ? a : b;\n    }\n};",
+      "c": "int maxOfTwo(int a, int b) {\n    return (a > b) ? a : b;\n}"
+    }
+  },
+  {
+    "id": 8,
+    "title": "Student Grade Calculator",
+    "difficulty": "Basic",
+    "acceptance": 93.7,
+    "tags": [
+      "If-Else",
+      "Conditions"
+    ],
+    "desc": "Given an integer <code>marks</code> (0 to 100), return the corresponding grade based on the grading scale:<br><ul><li><code>marks >= 90</code>: <code>\"Grade A\"</code></li><li><code>marks >= 75</code>: <code>\"Grade B\"</code></li><li><code>marks >= 50</code>: <code>\"Grade C\"</code></li><li><code>marks < 50</code>: <code>\"Fail\"</code></li></ul>",
+    "examples": [
+      {
+        "input": "marks = 85",
+        "output": "\"Grade B\""
+      },
+      {
+        "input": "marks = 95",
+        "output": "\"Grade A\""
+      },
+      {
+        "input": "marks = 42",
+        "output": "\"Fail\""
+      }
+    ],
+    "constraints": [
+      "0 <= marks <= 100"
+    ],
+    "hints": [
+      "Start from the top boundary (marks >= 90) and work down."
+    ],
+    "testCases": [
+      {
+        "input": "85",
+        "expected": "\"Grade B\""
+      },
+      {
+        "input": "95",
+        "expected": "\"Grade A\""
+      },
+      {
+        "input": "42",
+        "expected": "\"Fail\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} marks\n * @return {string}\n */\nfunction calculateGrade(marks) {\n    if (marks >= 90) {\n        return \"Grade A\";\n    } else if (marks >= 75) {\n        return \"Grade B\";\n    } else if (marks >= 50) {\n        return \"Grade C\";\n    } else {\n        return \"Fail\";\n    }\n}",
+      "python": "def calculate_grade(marks: int) -> str:\n    if marks >= 90:\n        return \"Grade A\"\n    elif marks >= 75:\n        return \"Grade B\"\n    elif marks >= 50:\n        return \"Grade C\"\n    else:\n        return \"Fail\"",
+      "java": "class Solution {\n    public String calculateGrade(int marks) {\n        if (marks >= 90) return \"Grade A\";\n        if (marks >= 75) return \"Grade B\";\n        if (marks >= 50) return \"Grade C\";\n        return \"Fail\";\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string calculateGrade(int marks) {\n        if (marks >= 90) return \"Grade A\";\n        if (marks >= 75) return \"Grade B\";\n        if (marks >= 50) return \"Grade C\";\n        return \"Fail\";\n    }\n};",
+      "c": "char* calculateGrade(int marks) {\n    if (marks >= 90) return \"Grade A\";\n    if (marks >= 75) return \"Grade B\";\n    if (marks >= 50) return \"Grade C\";\n    return \"Fail\";\n}"
+    }
+  },
+  {
+    "id": 9,
+    "title": "Print Numbers 1 to N",
+    "difficulty": "Basic",
+    "acceptance": 94.9,
+    "tags": [
+      "Loops",
+      "For-Loop",
+      "Fundamentals"
+    ],
+    "desc": "Loops allow code to repeat multiple times without writing repetitive lines.<br><br>Using a <code>for</code> loop, generate and return an array containing all integers from <code>1</code> up to <code>n</code> in increasing order.",
+    "examples": [
+      {
+        "input": "n = 5",
+        "output": "[1, 2, 3, 4, 5]",
+        "explanation": "The loop runs for i = 1 to 5."
+      },
+      {
+        "input": "n = 3",
+        "output": "[1, 2, 3]"
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 1000"
+    ],
+    "hints": [
+      "Initialize an empty list/array.",
+      "Use for (let i = 1; i <= n; i++) and push i to the list."
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expected": "[1, 2, 3, 4, 5]"
+      },
+      {
+        "input": "3",
+        "expected": "[1, 2, 3]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number[]}\n */\nfunction print1ToN(n) {\n    let result = [];\n    for (let i = 1; i <= n; i++) {\n        result.push(i);\n    }\n    return result;\n}",
+      "python": "def print_1_to_n(n: int) -> list[int]:\n    result = []\n    for i in range(1, n + 1):\n        result.append(i)\n    return result",
+      "java": "class Solution {\n    public int[] print1ToN(int n) {\n        int[] res = new int[n];\n        for (int i = 0; i < n; i++) res[i] = i + 1;\n        return res;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<int> print1ToN(int n) {\n        vector<int> res;\n        for (int i = 1; i <= n; i++) res.push_back(i);\n        return res;\n    }\n};",
+      "c": "int* print1ToN(int n, int* returnSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 10,
+    "title": "Sum of Numbers from 1 to N",
+    "difficulty": "Basic",
+    "acceptance": 95,
+    "tags": [
+      "Loops",
+      "Math",
+      "Fundamentals"
+    ],
+    "desc": "Given an integer <code>n</code>, write a loop to calculate the sum of all natural numbers from 1 to <code>n</code> (i.e. <code>1 + 2 + 3 + ... + n</code>).",
+    "examples": [
+      {
+        "input": "n = 5",
+        "output": "15",
+        "explanation": "1 + 2 + 3 + 4 + 5 = 15."
+      },
+      {
+        "input": "n = 10",
+        "output": "55"
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 10^5"
+    ],
+    "hints": [
+      "Keep a running total variable initialized to 0.",
+      "In a loop, add each number i to total."
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expected": "15"
+      },
+      {
+        "input": "10",
+        "expected": "55"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction sum1ToN(n) {\n    let total = 0;\n    for (let i = 1; i <= n; i++) {\n        total += i;\n    }\n    return total;\n}",
+      "python": "def sum_1_to_n(n: int) -> int:\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total",
+      "java": "class Solution {\n    public int sum1ToN(int n) {\n        int total = 0;\n        for (int i = 1; i <= n; i++) total += i;\n        return total;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int sum1ToN(int n) {\n        int total = 0;\n        for (int i = 1; i <= n; i++) total += i;\n        return total;\n    }\n};",
+      "c": "int sum1ToN(int n) {\n    int total = 0;\n    for (int i = 1; i <= n; i++) total += i;\n    return total;\n}"
+    }
+  },
+  {
+    "id": 11,
+    "title": "Multiplication Table",
+    "difficulty": "Basic",
+    "acceptance": 94.2,
+    "tags": [
+      "Loops",
+      "Math"
+    ],
+    "desc": "Given an integer <code>n</code>, use a loop to generate an array of the first 10 multiples of <code>n</code>: <code>[n*1, n*2, ..., n*10]</code>.",
+    "examples": [
+      {
+        "input": "n = 5",
+        "output": "[5, 10, 15, 20, 25, 30, 35, 40, 45, 50]"
+      },
+      {
+        "input": "n = 3",
+        "output": "[3, 6, 9, 12, 15, 18, 21, 24, 27, 30]"
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 100"
+    ],
+    "hints": [
+      "Run a loop from i = 1 to 10 and multiply n * i."
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expected": "[5, 10, 15, 20, 25, 30, 35, 40, 45, 50]"
+      },
+      {
+        "input": "3",
+        "expected": "[3, 6, 9, 12, 15, 18, 21, 24, 27, 30]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number[]}\n */\nfunction multiplicationTable(n) {\n    let table = [];\n    for (let i = 1; i <= 10; i++) {\n        table.push(n * i);\n    }\n    return table;\n}",
+      "python": "def multiplication_table(n: int) -> list[int]:\n    return [n * i for i in range(1, 11)]",
+      "java": "class Solution {\n    public int[] multiplicationTable(int n) {\n        int[] table = new int[10];\n        for (int i = 1; i <= 10; i++) table[i - 1] = n * i;\n        return table;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<int> multiplicationTable(int n) {\n        vector<int> table;\n        for (int i = 1; i <= 10; i++) table.push_back(n * i);\n        return table;\n    }\n};",
+      "c": "int* multiplicationTable(int n, int* returnSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 12,
+    "title": "Write a Function: Add Two Numbers",
+    "difficulty": "Basic",
+    "acceptance": 97.5,
+    "tags": [
+      "Functions",
+      "Fundamentals"
+    ],
+    "desc": "Functions allow programmers to package reusable blocks of code.<br><br>Write a function <code>add(a, b)</code> that takes two integer arguments and returns their sum.",
+    "examples": [
+      {
+        "input": "a = 3, b = 7",
+        "output": "10",
+        "explanation": "3 + 7 = 10"
+      },
+      {
+        "input": "a = -4, b = 9",
+        "output": "5"
+      }
+    ],
+    "constraints": [
+      "-10^9 <= a, b <= 10^9"
+    ],
+    "hints": [
+      "Simply return a + b;"
+    ],
+    "testCases": [
+      {
+        "input": "3\n7",
+        "expected": "10"
+      },
+      {
+        "input": "-4\n9",
+        "expected": "5"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nfunction add(a, b) {\n    return a + b;\n}",
+      "python": "def add(a: int, b: int) -> int:\n    return a + b",
+      "java": "class Solution {\n    public int add(int a, int b) {\n        return a + b;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int add(int a, int b) {\n        return a + b;\n    }\n};",
+      "c": "int add(int a, int b) {\n    return a + b;\n}"
+    }
+  },
+  {
+    "id": 13,
+    "title": "Write a Function: Square of a Number",
+    "difficulty": "Basic",
+    "acceptance": 96.8,
+    "tags": [
+      "Functions",
+      "Math"
+    ],
+    "desc": "Write a function <code>square(n)</code> that takes an integer <code>n</code> and returns the square of the number (i.e. <code>n * n</code>).",
+    "examples": [
+      {
+        "input": "n = 6",
+        "output": "36",
+        "explanation": "6 * 6 = 36."
+      },
+      {
+        "input": "n = -5",
+        "output": "25",
+        "explanation": "(-5) * (-5) = 25."
+      }
+    ],
+    "constraints": [
+      "-10^4 <= n <= 10^4"
+    ],
+    "hints": [
+      "Multiply the number by itself: n * n"
+    ],
+    "testCases": [
+      {
+        "input": "6",
+        "expected": "36"
+      },
+      {
+        "input": "-5",
+        "expected": "25"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction square(n) {\n    return n * n;\n}",
+      "python": "def square(n: int) -> int:\n    return n * n",
+      "java": "class Solution {\n    public int square(int n) {\n        return n * n;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int square(int n) {\n        return n * n;\n    }\n};",
+      "c": "int square(int n) {\n    return n * n;\n}"
+    }
+  },
+  {
+    "id": 14,
+    "title": "Write a Function: Factorial",
+    "difficulty": "Basic",
+    "acceptance": 92.4,
+    "tags": [
+      "Functions",
+      "Loops",
+      "Math"
+    ],
+    "desc": "Write a function <code>factorial(n)</code> that computes the factorial of a non-negative integer <code>n</code>.<br><br>The factorial of <code>n</code> is <code>n * (n - 1) * ... * 1</code>. Note: <code>0! = 1</code>.",
+    "examples": [
+      {
+        "input": "n = 5",
+        "output": "120",
+        "explanation": "5 * 4 * 3 * 2 * 1 = 120."
+      },
+      {
+        "input": "n = 0",
+        "output": "1",
+        "explanation": "0! is defined as 1."
+      }
+    ],
+    "constraints": [
+      "0 <= n <= 12"
+    ],
+    "hints": [
+      "Handle n === 0 as a special case returning 1.",
+      "Otherwise loop from 1 to n multiplying a result."
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expected": "120"
+      },
+      {
+        "input": "0",
+        "expected": "1"
+      },
+      {
+        "input": "3",
+        "expected": "6"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction factorial(n) {\n    if (n === 0) return 1;\n    let ans = 1;\n    for (let i = 1; i <= n; i++) ans *= i;\n    return ans;\n}",
+      "python": "def factorial(n: int) -> int:\n    if n == 0:\n        return 1\n    ans = 1\n    for i in range(1, n + 1):\n        ans *= i\n    return ans",
+      "java": "class Solution {\n    public int factorial(int n) {\n        if (n == 0) return 1;\n        int ans = 1;\n        for (int i = 1; i <= n; i++) ans *= i;\n        return ans;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int factorial(int n) {\n        if (n == 0) return 1;\n        int ans = 1;\n        for (int i = 1; i <= n; i++) ans *= i;\n        return ans;\n    }\n};",
+      "c": "int factorial(int n) {\n    if (n == 0) return 1;\n    int ans = 1;\n    for (int i = 1; i <= n; i++) ans *= i;\n    return ans;\n}"
+    }
+  },
+  {
+    "id": 15,
+    "title": "Write a Function: Check Prime Number",
+    "difficulty": "Basic",
+    "acceptance": 91.2,
+    "tags": [
+      "Functions",
+      "Math",
+      "Logic"
+    ],
+    "desc": "A prime number is an integer greater than 1 that cannot be formed by multiplying two smaller natural numbers.<br><br>Write a function <code>isPrime(n)</code> that returns <code>true</code> if <code>n</code> is a prime number, or <code>false</code> otherwise.",
+    "examples": [
+      {
+        "input": "n = 7",
+        "output": "true",
+        "explanation": "7 has only two factors: 1 and 7."
+      },
+      {
+        "input": "n = 12",
+        "output": "false",
+        "explanation": "12 is divisible by 2, 3, 4, 6."
+      },
+      {
+        "input": "n = 1",
+        "output": "false",
+        "explanation": "1 is not prime."
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 10^5"
+    ],
+    "hints": [
+      "If n <= 1, return false.",
+      "Loop from i = 2 up to sqrt(n). If n % i == 0, return false. Else return true."
+    ],
+    "testCases": [
+      {
+        "input": "7",
+        "expected": "true"
+      },
+      {
+        "input": "12",
+        "expected": "false"
+      },
+      {
+        "input": "1",
+        "expected": "false"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {boolean}\n */\nfunction isPrime(n) {\n    if (n <= 1) return false;\n    for (let i = 2; i * i <= n; i++) {\n        if (n % i === 0) return false;\n    }\n    return true;\n}",
+      "python": "def is_prime(n: int) -> bool:\n    if n <= 1:\n        return False\n    i = 2\n    while i * i <= n:\n        if n % i == 0:\n            return False\n        i += 1\n    return True",
+      "java": "class Solution {\n    public boolean isPrime(int n) {\n        if (n <= 1) return false;\n        for (int i = 2; i * i <= n; i++) {\n            if (n % i == 0) return false;\n        }\n        return true;\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool isPrime(int n) {\n        if (n <= 1) return false;\n        for (int i = 2; i * i <= n; i++) {\n            if (n % i == 0) return false;\n        }\n        return true;\n    }\n};",
+      "c": "bool isPrime(int n) {\n    if (n <= 1) return false;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) return false;\n    }\n    return true;\n}"
+    }
+  },
+  {
+    "id": 16,
+    "title": "Write a Function: Reverse a String",
+    "difficulty": "Basic",
+    "acceptance": 93.5,
+    "tags": [
+      "Functions",
+      "String",
+      "Fundamentals"
+    ],
+    "desc": "Write a function <code>reverseString(s)</code> that takes a string <code>s</code> and returns the reversed string.",
+    "examples": [
+      {
+        "input": "s = \"hello\"",
+        "output": "\"olleh\"",
+        "explanation": "Letters are reversed from right to left."
+      },
+      {
+        "input": "s = \"PlaceAI\"",
+        "output": "\"IAecalP\""
+      }
+    ],
+    "constraints": [
+      "1 <= s.length <= 10^4"
+    ],
+    "hints": [
+      "In JS: s.split('').reverse().join('') or a backward loop.",
+      "In Python: s[::-1]"
+    ],
+    "testCases": [
+      {
+        "input": "\"hello\"",
+        "expected": "\"olleh\""
+      },
+      {
+        "input": "\"PlaceAI\"",
+        "expected": "\"IAecalP\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction reverseString(s) {\n    return s.split(\"\").reverse().join(\"\");\n}",
+      "python": "def reverse_string(s: str) -> str:\n    return s[::-1]",
+      "java": "class Solution {\n    public String reverseString(String s) {\n        return new StringBuilder(s).reverse().toString();\n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string reverseString(string s) {\n        reverse(s.begin(), s.end());\n        return s;\n    }\n};",
+      "c": "char* reverseString(char* s) {\n    \n}"
+    }
+  },
+  {
+    "id": 17,
+    "title": "Two Sum",
+    "difficulty": "Easy",
+    "acceptance": 49.2,
+    "tags": [
+      "Array",
+      "Hash Table"
+    ],
+    "desc": "Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers</em> such that they add up to <code>target</code>.\n\nYou may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.",
+    "examples": [
+      {
+        "input": "nums = [2,7,11,15], target = 9",
+        "output": "[0,1]",
+        "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+      },
+      {
+        "input": "nums = [3,2,4], target = 6",
+        "output": "[1,2]"
+      },
+      {
+        "input": "nums = [3,3], target = 6",
+        "output": "[0,1]"
+      }
+    ],
+    "constraints": [
+      "2 <= nums.length <= 10<sup>4</sup>",
+      "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>",
+      "-10<sup>9</sup> <= target <= 10<sup>9</sup>",
+      "Only one valid answer exists."
+    ],
+    "hints": [
+      "Try using a hash map to store the values you've seen.",
+      "For each number, check if target - num exists in the map."
+    ],
+    "testCases": [
+      {
+        "input": "[2,7,11,15]\n9",
+        "expected": "[0,1]"
+      },
+      {
+        "input": "[3,2,4]\n6",
+        "expected": "[1,2]"
+      },
+      {
+        "input": "[3,3]\n6",
+        "expected": "[0,1]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};",
+      "python": "class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        ",
+      "java": "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};",
+      "c": "int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 18,
+    "title": "Palindrome Number",
+    "difficulty": "Easy",
+    "acceptance": 53.1,
+    "tags": [
+      "Math"
+    ],
+    "desc": "Given an integer <code>x</code>, return <code>true</code> if <code>x</code> is a palindrome, and <code>false</code> otherwise.\n\nAn integer is a <strong>palindrome</strong> when it reads the same forward and backward.",
+    "examples": [
+      {
+        "input": "x = 121",
+        "output": "true",
+        "explanation": "121 reads as 121 from left to right and from right to left."
+      },
+      {
+        "input": "x = -121",
+        "output": "false",
+        "explanation": "From left to right, it reads -121. From right to left it becomes 121-."
+      },
+      {
+        "input": "x = 10",
+        "output": "false"
+      }
+    ],
+    "constraints": [
+      "-2<sup>31</sup> <= x <= 2<sup>31</sup> - 1"
+    ],
+    "hints": [
+      "Negative numbers are never palindromes.",
+      "Try reversing only half of the number."
+    ],
+    "testCases": [
+      {
+        "input": "121",
+        "expected": "true"
+      },
+      {
+        "input": "-121",
+        "expected": "false"
+      },
+      {
+        "input": "10",
+        "expected": "false"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} x\n * @return {boolean}\n */\nvar isPalindrome = function(x) {\n    \n};",
+      "python": "class Solution:\n    def isPalindrome(self, x: int) -> bool:\n        ",
+      "java": "class Solution {\n    public boolean isPalindrome(int x) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        \n    }\n};",
+      "c": "bool isPalindrome(int x) {\n    \n}"
+    }
+  },
+  {
+    "id": 19,
+    "title": "Roman to Integer",
+    "difficulty": "Easy",
+    "acceptance": 58.3,
+    "tags": [
+      "Hash Table",
+      "Math",
+      "String"
+    ],
+    "desc": "Roman numerals are represented by seven different symbols: <code>I, V, X, L, C, D, M</code>.\n\nGiven a roman numeral, convert it to an integer.",
+    "examples": [
+      {
+        "input": "s = \"III\"",
+        "output": "3"
+      },
+      {
+        "input": "s = \"LVIII\"",
+        "output": "58"
+      },
+      {
+        "input": "s = \"MCMXCIV\"",
+        "output": "1994"
+      }
+    ],
+    "constraints": [
+      "1 <= s.length <= 15",
+      "s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M')"
+    ],
+    "hints": [
+      "Process the string from right to left.",
+      "If a smaller value appears before a larger value, subtract it."
+    ],
+    "testCases": [
+      {
+        "input": "\"III\"",
+        "expected": "3"
+      },
+      {
+        "input": "\"LVIII\"",
+        "expected": "58"
+      },
+      {
+        "input": "\"MCMXCIV\"",
+        "expected": "1994"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nvar romanToInt = function(s) {\n    \n};",
+      "python": "class Solution:\n    def romanToInt(self, s: str) -> int:\n        ",
+      "java": "class Solution {\n    public int romanToInt(String s) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int romanToInt(string s) {\n        \n    }\n};",
+      "c": "int romanToInt(char* s) {\n    \n}"
+    }
+  },
+  {
+    "id": 20,
+    "title": "Valid Parentheses",
+    "difficulty": "Easy",
+    "acceptance": 40.7,
+    "tags": [
+      "String",
+      "Stack"
+    ],
+    "desc": "Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
+    "examples": [
+      {
+        "input": "s = \"()\"",
+        "output": "true"
+      },
+      {
+        "input": "s = \"()[]{}\"",
+        "output": "true"
+      },
+      {
+        "input": "s = \"(]\"",
+        "output": "false"
+      }
+    ],
+    "constraints": [
+      "1 <= s.length <= 10<sup>4</sup>",
+      "s consists of parentheses only '()[]{}'"
+    ],
+    "hints": [
+      "Use a stack to keep track of opening brackets.",
+      "When you encounter a closing bracket, check if the top of the stack matches."
+    ],
+    "testCases": [
+      {
+        "input": "\"()\"",
+        "expected": "true"
+      },
+      {
+        "input": "\"()[]{}\"",
+        "expected": "true"
+      },
+      {
+        "input": "\"(]\"",
+        "expected": "false"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    \n};",
+      "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        ",
+      "java": "class Solution {\n    public boolean isValid(String s) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};",
+      "c": "bool isValid(char* s) {\n    \n}"
+    }
+  },
+  {
+    "id": 21,
+    "title": "Merge Two Sorted Lists",
+    "difficulty": "Easy",
+    "acceptance": 61.8,
+    "tags": [
+      "Linked List",
+      "Recursion"
+    ],
+    "desc": "You are given the heads of two sorted linked lists <code>list1</code> and <code>list2</code>.\n\nMerge the two lists into one <strong>sorted</strong> list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.",
+    "examples": [
+      {
+        "input": "list1 = [1,2,4], list2 = [1,3,4]",
+        "output": "[1,1,2,3,4,4]"
+      },
+      {
+        "input": "list1 = [], list2 = []",
+        "output": "[]"
+      },
+      {
+        "input": "list1 = [], list2 = [0]",
+        "output": "[0]"
+      }
+    ],
+    "constraints": [
+      "The number of nodes in both lists is in the range [0, 50]",
+      "-100 <= Node.val <= 100"
+    ],
+    "hints": [
+      "Use a dummy node to simplify the merge.",
+      "Compare the heads of both lists and advance the pointer."
+    ],
+    "testCases": [
+      {
+        "input": "[1,2,4]\n[1,3,4]",
+        "expected": "[1,1,2,3,4,4]"
+      },
+      {
+        "input": "[]\n[]",
+        "expected": "[]"
+      },
+      {
+        "input": "[]\n[0]",
+        "expected": "[0]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {ListNode} list1\n * @param {ListNode} list2\n * @return {ListNode}\n */\nvar mergeTwoLists = function(list1, list2) {\n    \n};",
+      "python": "class Solution:\n    def mergeTwoLists(self, list1, list2):\n        ",
+      "java": "class Solution {\n    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {\n        \n    }\n};",
+      "c": "struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2) {\n    \n}"
+    }
+  },
+  {
+    "id": 22,
+    "title": "Best Time to Buy and Sell Stock",
+    "difficulty": "Easy",
+    "acceptance": 54.2,
+    "tags": [
+      "Array",
+      "DP"
+    ],
+    "desc": "You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i<sup>th</sup></code> day.\n\nYou want to maximize your profit by choosing a <strong>single day</strong> to buy and a <strong>different day in the future</strong> to sell.\n\nReturn the maximum profit. If no profit is possible, return <code>0</code>.",
+    "examples": [
+      {
+        "input": "prices = [7,1,5,3,6,4]",
+        "output": "5",
+        "explanation": "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5."
+      },
+      {
+        "input": "prices = [7,6,4,3,1]",
+        "output": "0"
+      }
+    ],
+    "constraints": [
+      "1 <= prices.length <= 10<sup>5</sup>",
+      "0 <= prices[i] <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Track the minimum price seen so far.",
+      "At each step, calculate profit if you sold today."
+    ],
+    "testCases": [
+      {
+        "input": "[7,1,5,3,6,4]",
+        "expected": "5"
+      },
+      {
+        "input": "[7,6,4,3,1]",
+        "expected": "0"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} prices\n * @return {number}\n */\nvar maxProfit = function(prices) {\n    \n};",
+      "python": "class Solution:\n    def maxProfit(self, prices: list[int]) -> int:\n        ",
+      "java": "class Solution {\n    public int maxProfit(int[] prices) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        \n    }\n};",
+      "c": "int maxProfit(int* prices, int pricesSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 23,
+    "title": "Valid Anagram",
+    "difficulty": "Easy",
+    "acceptance": 62.5,
+    "tags": [
+      "Hash Table",
+      "String",
+      "Sorting"
+    ],
+    "desc": "Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if <code>t</code> is an anagram of <code>s</code>, and <code>false</code> otherwise.",
+    "examples": [
+      {
+        "input": "s = \"anagram\", t = \"nagaram\"",
+        "output": "true"
+      },
+      {
+        "input": "s = \"rat\", t = \"car\"",
+        "output": "false"
+      }
+    ],
+    "constraints": [
+      "1 <= s.length, t.length <= 5 * 10<sup>4</sup>",
+      "s and t consist of lowercase English letters"
+    ],
+    "hints": [
+      "Count character frequencies.",
+      "Two strings are anagrams if they have the same character counts."
+    ],
+    "testCases": [
+      {
+        "input": "\"anagram\"\n\"nagaram\"",
+        "expected": "true"
+      },
+      {
+        "input": "\"rat\"\n\"car\"",
+        "expected": "false"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nvar isAnagram = function(s, t) {\n    \n};",
+      "python": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        ",
+      "java": "class Solution {\n    public boolean isAnagram(String s, String t) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool isAnagram(string s, string t) {\n        \n    }\n};",
+      "c": "bool isAnagram(char* s, char* t) {\n    \n}"
+    }
+  },
+  {
+    "id": 24,
+    "title": "Contains Duplicate",
+    "difficulty": "Easy",
+    "acceptance": 61,
+    "tags": [
+      "Array",
+      "Hash Table",
+      "Sorting"
+    ],
+    "desc": "Given an integer array <code>nums</code>, return <code>true</code> if any value appears <strong>at least twice</strong>, and return <code>false</code> if every element is distinct.",
+    "examples": [
+      {
+        "input": "nums = [1,2,3,1]",
+        "output": "true"
+      },
+      {
+        "input": "nums = [1,2,3,4]",
+        "output": "false"
+      }
+    ],
+    "constraints": [
+      "1 <= nums.length <= 10<sup>5</sup>",
+      "-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>"
+    ],
+    "hints": [
+      "Use a Set to track seen values."
+    ],
+    "testCases": [
+      {
+        "input": "[1,2,3,1]",
+        "expected": "true"
+      },
+      {
+        "input": "[1,2,3,4]",
+        "expected": "false"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar containsDuplicate = function(nums) {\n    \n};",
+      "python": "class Solution:\n    def containsDuplicate(self, nums: list[int]) -> bool:\n        ",
+      "java": "class Solution {\n    public boolean containsDuplicate(int[] nums) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        \n    }\n};",
+      "c": "bool containsDuplicate(int* nums, int numsSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 25,
+    "title": "Maximum Subarray",
+    "difficulty": "Medium",
+    "acceptance": 50.1,
+    "tags": [
+      "Array",
+      "DP",
+      "Divide and Conquer"
+    ],
+    "desc": "Given an integer array <code>nums</code>, find the subarray with the largest sum, and return its sum.\n\nA <strong>subarray</strong> is a contiguous non-empty sequence of elements within an array.",
+    "examples": [
+      {
+        "input": "nums = [-2,1,-3,4,-1,2,1,-5,4]",
+        "output": "6",
+        "explanation": "The subarray [4,-1,2,1] has the largest sum 6."
+      },
+      {
+        "input": "nums = [1]",
+        "output": "1"
+      },
+      {
+        "input": "nums = [5,4,-1,7,8]",
+        "output": "23"
+      }
+    ],
+    "constraints": [
+      "1 <= nums.length <= 10<sup>5</sup>",
+      "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Use Kadane's Algorithm.",
+      "Keep track of the current sum and the maximum sum seen so far."
+    ],
+    "testCases": [
+      {
+        "input": "[-2,1,-3,4,-1,2,1,-5,4]",
+        "expected": "6"
+      },
+      {
+        "input": "[1]",
+        "expected": "1"
+      },
+      {
+        "input": "[5,4,-1,7,8]",
+        "expected": "23"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSubArray = function(nums) {\n    \n};",
+      "python": "class Solution:\n    def maxSubArray(self, nums: list[int]) -> int:\n        ",
+      "java": "class Solution {\n    public int maxSubArray(int[] nums) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int maxSubArray(vector<int>& nums) {\n        \n    }\n};",
+      "c": "int maxSubArray(int* nums, int numsSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 26,
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "Medium",
+    "acceptance": 33.8,
+    "tags": [
+      "Hash Table",
+      "String",
+      "Sliding Window"
+    ],
+    "desc": "Given a string <code>s</code>, find the length of the <strong>longest substring</strong> without repeating characters.",
+    "examples": [
+      {
+        "input": "s = \"abcabcbb\"",
+        "output": "3",
+        "explanation": "The answer is \"abc\", with the length of 3."
+      },
+      {
+        "input": "s = \"bbbbb\"",
+        "output": "1"
+      },
+      {
+        "input": "s = \"pwwkew\"",
+        "output": "3"
+      }
+    ],
+    "constraints": [
+      "0 <= s.length <= 5 * 10<sup>4</sup>",
+      "s consists of English letters, digits, symbols and spaces"
+    ],
+    "hints": [
+      "Use a sliding window approach.",
+      "Use a set or map to track characters in the current window."
+    ],
+    "testCases": [
+      {
+        "input": "\"abcabcbb\"",
+        "expected": "3"
+      },
+      {
+        "input": "\"bbbbb\"",
+        "expected": "1"
+      },
+      {
+        "input": "\"pwwkew\"",
+        "expected": "3"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nvar lengthOfLongestSubstring = function(s) {\n    \n};",
+      "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        ",
+      "java": "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        \n    }\n};",
+      "c": "int lengthOfLongestSubstring(char* s) {\n    \n}"
+    }
+  },
+  {
+    "id": 27,
+    "title": "Container With Most Water",
+    "difficulty": "Medium",
+    "acceptance": 54.3,
+    "tags": [
+      "Array",
+      "Two Pointers",
+      "Greedy"
+    ],
+    "desc": "You are given an integer array <code>height</code> of length <code>n</code>. Find two lines that together with the x-axis form a container that holds the most water.\n\nReturn the maximum amount of water a container can store.",
+    "examples": [
+      {
+        "input": "height = [1,8,6,2,5,4,8,3,7]",
+        "output": "49"
+      },
+      {
+        "input": "height = [1,1]",
+        "output": "1"
+      }
+    ],
+    "constraints": [
+      "n == height.length",
+      "2 <= n <= 10<sup>5</sup>",
+      "0 <= height[i] <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Use two pointers, one at each end.",
+      "Move the pointer with the shorter height inward."
+    ],
+    "testCases": [
+      {
+        "input": "[1,8,6,2,5,4,8,3,7]",
+        "expected": "49"
+      },
+      {
+        "input": "[1,1]",
+        "expected": "1"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} height\n * @return {number}\n */\nvar maxArea = function(height) {\n    \n};",
+      "python": "class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        ",
+      "java": "class Solution {\n    public int maxArea(int[] height) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int maxArea(vector<int>& height) {\n        \n    }\n};",
+      "c": "int maxArea(int* height, int heightSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 28,
+    "title": "3Sum",
+    "difficulty": "Medium",
+    "acceptance": 32.5,
+    "tags": [
+      "Array",
+      "Two Pointers",
+      "Sorting"
+    ],
+    "desc": "Given an integer array nums, return all the triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j</code>, <code>i != k</code>, and <code>j != k</code>, and <code>nums[i] + nums[j] + nums[k] == 0</code>.\n\nThe solution set must not contain duplicate triplets.",
+    "examples": [
+      {
+        "input": "nums = [-1,0,1,2,-1,-4]",
+        "output": "[[-1,-1,2],[-1,0,1]]"
+      },
+      {
+        "input": "nums = [0,1,1]",
+        "output": "[]"
+      },
+      {
+        "input": "nums = [0,0,0]",
+        "output": "[[0,0,0]]"
+      }
+    ],
+    "constraints": [
+      "3 <= nums.length <= 3000",
+      "-10<sup>5</sup> <= nums[i] <= 10<sup>5</sup>"
+    ],
+    "hints": [
+      "Sort the array first.",
+      "Fix one element and use two pointers for the remaining two."
+    ],
+    "testCases": [
+      {
+        "input": "[-1,0,1,2,-1,-4]",
+        "expected": "[[-1,-1,2],[-1,0,1]]"
+      },
+      {
+        "input": "[0,0,0]",
+        "expected": "[[0,0,0]]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number[][]}\n */\nvar threeSum = function(nums) {\n    \n};",
+      "python": "class Solution:\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        ",
+      "java": "class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        \n    }\n};",
+      "c": "int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+    }
+  },
+  {
+    "id": 29,
+    "title": "Group Anagrams",
+    "difficulty": "Medium",
+    "acceptance": 66.3,
+    "tags": [
+      "Array",
+      "Hash Table",
+      "String",
+      "Sorting"
+    ],
+    "desc": "Given an array of strings <code>strs</code>, group the anagrams together. You can return the answer in <strong>any order</strong>.",
+    "examples": [
+      {
+        "input": "strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]",
+        "output": "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]"
+      },
+      {
+        "input": "strs = [\"\"]",
+        "output": "[[\"\"]]"
+      }
+    ],
+    "constraints": [
+      "1 <= strs.length <= 10<sup>4</sup>",
+      "0 <= strs[i].length <= 100",
+      "strs[i] consists of lowercase English letters"
+    ],
+    "hints": [
+      "Use sorted version of each string as a key.",
+      "Group strings with the same key together."
+    ],
+    "testCases": [
+      {
+        "input": "[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]",
+        "expected": "[[\"eat\",\"tea\",\"ate\"],[\"tan\",\"nat\"],[\"bat\"]]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string[]} strs\n * @return {string[][]}\n */\nvar groupAnagrams = function(strs) {\n    \n};",
+      "python": "class Solution:\n    def groupAnagrams(self, strs: list[str]) -> list[list[str]]:\n        ",
+      "java": "class Solution {\n    public List<List<String>> groupAnagrams(String[] strs) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<vector<string>> groupAnagrams(vector<string>& strs) {\n        \n    }\n};",
+      "c": "char*** groupAnagrams(char** strs, int strsSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+    }
+  },
+  {
+    "id": 30,
+    "title": "Climbing Stairs",
+    "difficulty": "Easy",
+    "acceptance": 51.7,
+    "tags": [
+      "Math",
+      "DP",
+      "Memoization"
+    ],
+    "desc": "You are climbing a staircase. It takes <code>n</code> steps to reach the top.\n\nEach time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?",
+    "examples": [
+      {
+        "input": "n = 2",
+        "output": "2",
+        "explanation": "1. 1 step + 1 step\n2. 2 steps"
+      },
+      {
+        "input": "n = 3",
+        "output": "3"
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 45"
+    ],
+    "hints": [
+      "This is the Fibonacci sequence!",
+      "f(n) = f(n-1) + f(n-2)"
+    ],
+    "testCases": [
+      {
+        "input": "2",
+        "expected": "2"
+      },
+      {
+        "input": "3",
+        "expected": "3"
+      },
+      {
+        "input": "5",
+        "expected": "8"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nvar climbStairs = function(n) {\n    \n};",
+      "python": "class Solution:\n    def climbStairs(self, n: int) -> int:\n        ",
+      "java": "class Solution {\n    public int climbStairs(int n) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int climbStairs(int n) {\n        \n    }\n};",
+      "c": "int climbStairs(int n) {\n    \n}"
+    }
+  },
+  {
+    "id": 31,
+    "title": "Binary Search",
+    "difficulty": "Easy",
+    "acceptance": 55.2,
+    "tags": [
+      "Array",
+      "Binary Search"
+    ],
+    "desc": "Given an array of integers <code>nums</code> which is sorted in ascending order, and an integer <code>target</code>, write a function to search <code>target</code> in <code>nums</code>. If <code>target</code> exists, return its index. Otherwise, return <code>-1</code>.",
+    "examples": [
+      {
+        "input": "nums = [-1,0,3,5,9,12], target = 9",
+        "output": "4"
+      },
+      {
+        "input": "nums = [-1,0,3,5,9,12], target = 2",
+        "output": "-1"
+      }
+    ],
+    "constraints": [
+      "1 <= nums.length <= 10<sup>4</sup>",
+      "All integers in nums are unique",
+      "nums is sorted in ascending order"
+    ],
+    "hints": [
+      "Compare the target with the middle element.",
+      "Narrow the search range by half each iteration."
+    ],
+    "testCases": [
+      {
+        "input": "[-1,0,3,5,9,12]\n9",
+        "expected": "4"
+      },
+      {
+        "input": "[-1,0,3,5,9,12]\n2",
+        "expected": "-1"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
+      "python": "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
+      "java": "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
+      "c": "int search(int* nums, int numsSize, int target) {\n    \n}"
+    }
+  },
+  {
+    "id": 32,
+    "title": "Reverse Linked List",
+    "difficulty": "Easy",
+    "acceptance": 73.2,
+    "tags": [
+      "Linked List",
+      "Recursion"
+    ],
+    "desc": "Given the <code>head</code> of a singly linked list, reverse the list, and return the reversed list.",
+    "examples": [
+      {
+        "input": "head = [1,2,3,4,5]",
+        "output": "[5,4,3,2,1]"
+      },
+      {
+        "input": "head = [1,2]",
+        "output": "[2,1]"
+      }
+    ],
+    "constraints": [
+      "The number of nodes in the list is in the range [0, 5000]"
+    ],
+    "hints": [
+      "Use three pointers: prev, current, next.",
+      "Or solve it recursively."
+    ],
+    "testCases": [
+      {
+        "input": "[1,2,3,4,5]",
+        "expected": "[5,4,3,2,1]"
+      },
+      {
+        "input": "[1,2]",
+        "expected": "[2,1]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nvar reverseList = function(head) {\n    \n};",
+      "python": "class Solution:\n    def reverseList(self, head):\n        ",
+      "java": "class Solution {\n    public ListNode reverseList(ListNode head) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    ListNode* reverseList(ListNode* head) {\n        \n    }\n};",
+      "c": "struct ListNode* reverseList(struct ListNode* head) {\n    \n}"
+    }
+  },
+  {
+    "id": 33,
+    "title": "Product of Array Except Self",
+    "difficulty": "Medium",
+    "acceptance": 64.6,
+    "tags": [
+      "Array",
+      "Prefix Sum"
+    ],
+    "desc": "Given an integer array <code>nums</code>, return an array <code>answer</code> such that <code>answer[i]</code> is equal to the product of all the elements of <code>nums</code> except <code>nums[i]</code>.\n\nYou must write an algorithm that runs in <code>O(n)</code> time and without using the division operation.",
+    "examples": [
+      {
+        "input": "nums = [1,2,3,4]",
+        "output": "[24,12,8,6]"
+      },
+      {
+        "input": "nums = [-1,1,0,-3,3]",
+        "output": "[0,0,9,0,0]"
+      }
+    ],
+    "constraints": [
+      "2 <= nums.length <= 10<sup>5</sup>",
+      "-30 <= nums[i] <= 30"
+    ],
+    "hints": [
+      "Use prefix and suffix products.",
+      "First pass: compute prefix products. Second pass: compute suffix products."
+    ],
+    "testCases": [
+      {
+        "input": "[1,2,3,4]",
+        "expected": "[24,12,8,6]"
+      },
+      {
+        "input": "[-1,1,0,-3,3]",
+        "expected": "[0,0,9,0,0]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar productExceptSelf = function(nums) {\n    \n};",
+      "python": "class Solution:\n    def productExceptSelf(self, nums: list[int]) -> list[int]:\n        ",
+      "java": "class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        \n    }\n};",
+      "c": "int* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 34,
+    "title": "Longest Palindromic Substring",
+    "difficulty": "Medium",
+    "acceptance": 32.4,
+    "tags": [
+      "String",
+      "DP"
+    ],
+    "desc": "Given a string <code>s</code>, return the longest palindromic substring in <code>s</code>.",
+    "examples": [
+      {
+        "input": "s = \"babad\"",
+        "output": "\"bab\"",
+        "explanation": "\"aba\" is also a valid answer."
+      },
+      {
+        "input": "s = \"cbbd\"",
+        "output": "\"bb\""
+      }
+    ],
+    "constraints": [
+      "1 <= s.length <= 1000",
+      "s consist of only digits and English letters"
+    ],
+    "hints": [
+      "Expand around center for each character.",
+      "Consider both odd and even length palindromes."
+    ],
+    "testCases": [
+      {
+        "input": "\"babad\"",
+        "expected": "\"bab\""
+      },
+      {
+        "input": "\"cbbd\"",
+        "expected": "\"bb\""
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nvar longestPalindrome = function(s) {\n    \n};",
+      "python": "class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        ",
+      "java": "class Solution {\n    public String longestPalindrome(String s) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    string longestPalindrome(string s) {\n        \n    }\n};",
+      "c": "char* longestPalindrome(char* s) {\n    \n}"
+    }
+  },
+  {
+    "id": 35,
+    "title": "Coin Change",
+    "difficulty": "Medium",
+    "acceptance": 41.8,
+    "tags": [
+      "Array",
+      "DP",
+      "BFS"
+    ],
+    "desc": "You are given an integer array <code>coins</code> representing coins of different denominations and an integer <code>amount</code> representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount cannot be made up, return <code>-1</code>.",
+    "examples": [
+      {
+        "input": "coins = [1,5,10], amount = 12",
+        "output": "3",
+        "explanation": "12 = 10 + 1 + 1"
+      },
+      {
+        "input": "coins = [2], amount = 3",
+        "output": "-1"
+      },
+      {
+        "input": "coins = [1], amount = 0",
+        "output": "0"
+      }
+    ],
+    "constraints": [
+      "1 <= coins.length <= 12",
+      "1 <= coins[i] <= 2<sup>31</sup> - 1",
+      "0 <= amount <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Use dynamic programming.",
+      "dp[i] = min coins needed to make amount i."
+    ],
+    "testCases": [
+      {
+        "input": "[1,5,10]\n12",
+        "expected": "3"
+      },
+      {
+        "input": "[2]\n3",
+        "expected": "-1"
+      },
+      {
+        "input": "[1]\n0",
+        "expected": "0"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} coins\n * @param {number} amount\n * @return {number}\n */\nvar coinChange = function(coins, amount) {\n    \n};",
+      "python": "class Solution:\n    def coinChange(self, coins: list[int], amount: int) -> int:\n        ",
+      "java": "class Solution {\n    public int coinChange(int[] coins, int amount) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        \n    }\n};",
+      "c": "int coinChange(int* coins, int coinsSize, int amount) {\n    \n}"
+    }
+  },
+  {
+    "id": 36,
+    "title": "Merge Intervals",
+    "difficulty": "Medium",
+    "acceptance": 46.1,
+    "tags": [
+      "Array",
+      "Sorting"
+    ],
+    "desc": "Given an array of <code>intervals</code> where <code>intervals[i] = [start_i, end_i]</code>, merge all overlapping intervals and return an array of the non-overlapping intervals.",
+    "examples": [
+      {
+        "input": "intervals = [[1,3],[2,6],[8,10],[15,18]]",
+        "output": "[[1,6],[8,10],[15,18]]"
+      },
+      {
+        "input": "intervals = [[1,4],[4,5]]",
+        "output": "[[1,5]]"
+      }
+    ],
+    "constraints": [
+      "1 <= intervals.length <= 10<sup>4</sup>",
+      "intervals[i].length == 2"
+    ],
+    "hints": [
+      "Sort by start time.",
+      "Merge if current interval overlaps with previous."
+    ],
+    "testCases": [
+      {
+        "input": "[[1,3],[2,6],[8,10],[15,18]]",
+        "expected": "[[1,6],[8,10],[15,18]]"
+      },
+      {
+        "input": "[[1,4],[4,5]]",
+        "expected": "[[1,5]]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[][]} intervals\n * @return {number[][]}\n */\nvar merge = function(intervals) {\n    \n};",
+      "python": "class Solution:\n    def merge(self, intervals: list[list[int]]) -> list[list[int]]:\n        ",
+      "java": "class Solution {\n    public int[][] merge(int[][] intervals) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        \n    }\n};",
+      "c": "int** merge(int** intervals, int intervalsSize, int* intervalsColSize, int* returnSize, int** returnColumnSizes) {\n    \n}"
+    }
+  },
+  {
+    "id": 37,
+    "title": "Trapping Rain Water",
+    "difficulty": "Hard",
+    "acceptance": 59.3,
+    "tags": [
+      "Array",
+      "Two Pointers",
+      "Stack",
+      "DP"
+    ],
+    "desc": "Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is <code>1</code>, compute how much water it can trap after raining.",
+    "examples": [
+      {
+        "input": "height = [0,1,0,2,1,0,1,3,2,1,2,1]",
+        "output": "6"
+      },
+      {
+        "input": "height = [4,2,0,3,2,5]",
+        "output": "9"
+      }
+    ],
+    "constraints": [
+      "n == height.length",
+      "1 <= n <= 2 * 10<sup>4</sup>",
+      "0 <= height[i] <= 10<sup>5</sup>"
+    ],
+    "hints": [
+      "Use two pointers from both ends.",
+      "Water at each position = min(maxLeft, maxRight) - height[i]."
+    ],
+    "testCases": [
+      {
+        "input": "[0,1,0,2,1,0,1,3,2,1,2,1]",
+        "expected": "6"
+      },
+      {
+        "input": "[4,2,0,3,2,5]",
+        "expected": "9"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} height\n * @return {number}\n */\nvar trap = function(height) {\n    \n};",
+      "python": "class Solution:\n    def trap(self, height: list[int]) -> int:\n        ",
+      "java": "class Solution {\n    public int trap(int[] height) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int trap(vector<int>& height) {\n        \n    }\n};",
+      "c": "int trap(int* height, int heightSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 38,
+    "title": "Median of Two Sorted Arrays",
+    "difficulty": "Hard",
+    "acceptance": 36.1,
+    "tags": [
+      "Array",
+      "Binary Search",
+      "Divide and Conquer"
+    ],
+    "desc": "Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the <strong>median</strong> of the two sorted arrays.\n\nThe overall run time complexity should be <code>O(log (m+n))</code>.",
+    "examples": [
+      {
+        "input": "nums1 = [1,3], nums2 = [2]",
+        "output": "2.0"
+      },
+      {
+        "input": "nums1 = [1,2], nums2 = [3,4]",
+        "output": "2.5"
+      }
+    ],
+    "constraints": [
+      "nums1.length == m",
+      "nums2.length == n",
+      "0 <= m <= 1000",
+      "0 <= n <= 1000"
+    ],
+    "hints": [
+      "Use binary search on the shorter array.",
+      "Partition both arrays such that left half <= right half."
+    ],
+    "testCases": [
+      {
+        "input": "[1,3]\n[2]",
+        "expected": "2.0"
+      },
+      {
+        "input": "[1,2]\n[3,4]",
+        "expected": "2.5"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar findMedianSortedArrays = function(nums1, nums2) {\n    \n};",
+      "python": "class Solution:\n    def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:\n        ",
+      "java": "class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        \n    }\n};",
+      "c": "double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size) {\n    \n}"
+    }
+  },
+  {
+    "id": 39,
+    "title": "FizzBuzz",
+    "difficulty": "Easy",
+    "acceptance": 69.5,
+    "tags": [
+      "Math",
+      "String"
+    ],
+    "desc": "Given an integer <code>n</code>, return a string array <code>answer</code> (1-indexed) where:\n\n- <code>answer[i] == \"FizzBuzz\"</code> if <code>i</code> is divisible by 3 and 5.\n- <code>answer[i] == \"Fizz\"</code> if <code>i</code> is divisible by 3.\n- <code>answer[i] == \"Buzz\"</code> if <code>i</code> is divisible by 5.\n- <code>answer[i] == i</code> (as a string) if none of the above.",
+    "examples": [
+      {
+        "input": "n = 3",
+        "output": "[\"1\",\"2\",\"Fizz\"]"
+      },
+      {
+        "input": "n = 5",
+        "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
+      }
+    ],
+    "constraints": [
+      "1 <= n <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Check divisibility by 15 first, then by 3, then by 5."
+    ],
+    "testCases": [
+      {
+        "input": "3",
+        "expected": "[\"1\",\"2\",\"Fizz\"]"
+      },
+      {
+        "input": "5",
+        "expected": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar fizzBuzz = function(n) {\n    \n};",
+      "python": "class Solution:\n    def fizzBuzz(self, n: int) -> list[str]:\n        ",
+      "java": "class Solution {\n    public List<String> fizzBuzz(int n) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        \n    }\n};",
+      "c": "char** fizzBuzz(int n, int* returnSize) {\n    \n}"
+    }
+  },
+  {
+    "id": 40,
+    "title": "Search in Rotated Sorted Array",
+    "difficulty": "Medium",
+    "acceptance": 38.9,
+    "tags": [
+      "Array",
+      "Binary Search"
+    ],
+    "desc": "Given a rotated sorted array <code>nums</code> and an integer <code>target</code>, return the index of <code>target</code> if it is in <code>nums</code>, or <code>-1</code> if it is not.\n\nYou must write an algorithm with <code>O(log n)</code> runtime complexity.",
+    "examples": [
+      {
+        "input": "nums = [4,5,6,7,0,1,2], target = 0",
+        "output": "4"
+      },
+      {
+        "input": "nums = [4,5,6,7,0,1,2], target = 3",
+        "output": "-1"
+      }
+    ],
+    "constraints": [
+      "1 <= nums.length <= 5000",
+      "-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>"
+    ],
+    "hints": [
+      "Modified binary search.",
+      "Determine which half is sorted, then check if target is in that half."
+    ],
+    "testCases": [
+      {
+        "input": "[4,5,6,7,0,1,2]\n0",
+        "expected": "4"
+      },
+      {
+        "input": "[4,5,6,7,0,1,2]\n3",
+        "expected": "-1"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};",
+      "python": "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        ",
+      "java": "class Solution {\n    public int search(int[] nums, int target) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        \n    }\n};",
+      "c": "int search(int* nums, int numsSize, int target) {\n    \n}"
+    }
+  },
+  {
+    "id": 41,
+    "title": "Longest Common Subsequence",
+    "difficulty": "Medium",
+    "acceptance": 58.8,
+    "tags": [
+      "String",
+      "DP"
+    ],
+    "desc": "Given two strings <code>text1</code> and <code>text2</code>, return the length of their <strong>longest common subsequence</strong>. If there is no common subsequence, return <code>0</code>.",
+    "examples": [
+      {
+        "input": "text1 = \"abcde\", text2 = \"ace\"",
+        "output": "3",
+        "explanation": "The longest common subsequence is \"ace\"."
+      },
+      {
+        "input": "text1 = \"abc\", text2 = \"def\"",
+        "output": "0"
+      }
+    ],
+    "constraints": [
+      "1 <= text1.length, text2.length <= 1000"
+    ],
+    "hints": [
+      "Classic DP problem.",
+      "dp[i][j] = LCS of text1[0..i-1] and text2[0..j-1]"
+    ],
+    "testCases": [
+      {
+        "input": "\"abcde\"\n\"ace\"",
+        "expected": "3"
+      },
+      {
+        "input": "\"abc\"\n\"def\"",
+        "expected": "0"
+      }
+    ],
+    "templates": {
+      "javascript": "/**\n * @param {string} text1\n * @param {string} text2\n * @return {number}\n */\nvar longestCommonSubsequence = function(text1, text2) {\n    \n};",
+      "python": "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        ",
+      "java": "class Solution {\n    public int longestCommonSubsequence(String text1, String text2) {\n        \n    }\n}",
+      "cpp": "class Solution {\npublic:\n    int longestCommonSubsequence(string text1, string text2) {\n        \n    }\n};",
+      "c": "int longestCommonSubsequence(char* text1, char* text2) {\n    \n}"
+    }
+  }
+];
 
     // ============================================
     // STATE
@@ -2565,14 +4058,22 @@
     function updateStats() {
       const total = PROBLEMS.length;
       const solved = Object.values(solvedProblems).filter(s => s === 'solved').length;
+      const basicTotal = PROBLEMS.filter(p => p.difficulty === 'Basic').length;
       const easyTotal = PROBLEMS.filter(p => p.difficulty === 'Easy').length;
       const medTotal = PROBLEMS.filter(p => p.difficulty === 'Medium').length;
       const hardTotal = PROBLEMS.filter(p => p.difficulty === 'Hard').length;
+      const basicSolved = PROBLEMS.filter(p => p.difficulty === 'Basic' && solvedProblems[p.id] === 'solved').length;
       const easySolved = PROBLEMS.filter(p => p.difficulty === 'Easy' && solvedProblems[p.id] === 'solved').length;
       const medSolved = PROBLEMS.filter(p => p.difficulty === 'Medium' && solvedProblems[p.id] === 'solved').length;
       const hardSolved = PROBLEMS.filter(p => p.difficulty === 'Hard' && solvedProblems[p.id] === 'solved').length;
 
       document.getElementById('statSolved').innerHTML = `${solved}<span style="font-size:14px;color:var(--text-muted);font-weight:400;"> / <span id="statTotal">${total}</span></span>`;
+      const statBasicEl = document.getElementById('statBasic');
+      if (statBasicEl) statBasicEl.textContent = basicSolved;
+      const solvedBasicEl = document.getElementById('solvedBasic');
+      if (solvedBasicEl) solvedBasicEl.textContent = basicSolved;
+      const ringBasicEl = document.getElementById('ringBasic');
+      if (ringBasicEl && basicTotal > 0) ringBasicEl.style.strokeDashoffset = 113.097 * (1 - basicSolved / basicTotal);
       document.getElementById('statEasy').textContent = easySolved;
       document.getElementById('statMedium').textContent = medSolved;
       document.getElementById('statHard').textContent = hardSolved;
@@ -2754,6 +4255,28 @@
             consoleEl.innerHTML = logs.length > 0
               ? logs.map(l => `<span class="log-line">${l}</span>`).join('\n')
               : '<span class="success-line">✓ Code executed successfully (no output)</span>';
+          } else if (currentLang === 'python') {
+            const printMatches = code.match(/print\s*\((.*?)\)/g);
+            if (printMatches) {
+              const outputs = [];
+              for (const m of printMatches) {
+                const inner = m.replace(/^print\s*\(\s*|\s*\)$/g, '').trim();
+                try {
+                  if ((inner.startsWith('"') && inner.endsWith('"')) || (inner.startsWith("'") && inner.endsWith("'"))) {
+                    outputs.push(inner.slice(1, -1));
+                  } else if (inner.startsWith('f"') || inner.startsWith("f'")) {
+                    outputs.push(inner.slice(2, -1));
+                  } else {
+                    outputs.push(eval(inner));
+                  }
+                } catch(e) {
+                  outputs.push(inner);
+                }
+              }
+              consoleEl.innerHTML = outputs.map(o => `<span class="log-line">${o}</span>`).join('\n') + '\n<span class="success-line">✓ Python executed successfully</span>';
+            } else {
+              consoleEl.innerHTML = `<span class="log-line">⚡ Python code compiled successfully.</span>\n<span class="log-line">Use "Submit" to test against all test cases.</span>`;
+            }
           } else {
             consoleEl.innerHTML = `<span class="log-line">⚡ ${currentLang} code compiled successfully.</span>\n<span class="log-line">Use "Submit" to test against all test cases.</span>`;
           }
@@ -2776,7 +4299,10 @@
         const tc = currentProblem.testCases;
         // Simulate: randomly accept or show wrong answer based on code length
         const code = document.getElementById('codeEditor').value;
-        const hasImplementation = code.replace(currentProblem.templates[currentLang] || '', '').trim().length > 10;
+        const isBasic = currentProblem.difficulty === 'Basic';
+        const hasImplementation = isBasic
+          ? code.trim().length > 15
+          : code.replace(currentProblem.templates[currentLang] || '', '').trim().length > 8;
         const accepted = hasImplementation;
 
         if (accepted) {
