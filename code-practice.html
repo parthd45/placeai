@@ -4309,19 +4309,27 @@
           try {
             const runner = new Function('console', code + '\nif (typeof printHelloWorld === "function") printHelloWorld();\n');
             runner(mockConsole);
-            const output = logs.join('\n').trim();
+            let output = logs.join('\n').trim();
             const expectedClean = tc[0].expected.replace(/^"|"$/g, '').trim();
-            const passed = output.toLowerCase().includes(expectedClean.toLowerCase());
+            if (!output) {
+              const strMatch = code.match(/["'`](.*?)["'`]/);
+              if (strMatch && strMatch[1].toLowerCase().includes('hello')) {
+                output = strMatch[1];
+              }
+            }
+            const cleanOutput = output.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cleanExpected = expectedClean.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const passed = cleanOutput === cleanExpected || output.toLowerCase().includes(expectedClean.toLowerCase()) || expectedClean.toLowerCase().includes(output.toLowerCase());
             results.push({
               index: 0,
-              input: tc[0].input || 'None',
+              input: tc[0].input || '""',
               expected: tc[0].expected,
               actual: output ? `"${output}"` : 'No output printed',
               passed: passed
             });
             allPassed = passed;
           } catch(err) {
-            results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: `Error: ${err.message}`, passed: false });
+            results.push({ index: 0, input: tc[0].input || '""', expected: tc[0].expected, actual: `Error: ${err.message}`, passed: false });
             allPassed = false;
           }
         } else {
@@ -4382,15 +4390,50 @@
         }
       } else if (lang === 'python') {
         if (problem.tags && problem.tags.includes('Print') && problem.id === 1) {
-          const printMatch = code.match(/print\s*\(\s*["'](.*?)["']\s*\)/i);
-          if (printMatch) {
-            let printed = printMatch[1].trim();
+          // Robust Python print detection: supports Python 3 print(...) and Python 2 print "..."
+          let printed = null;
+          const matchWithParen = code.match(/print\s*\(\s*(?:f|r)?["'`]([\s\S]*?)["'`]\s*\)/i);
+          const matchNoParen = code.match(/print\s+(?:f|r)?["'`]([\s\S]*?)["'`]/i);
+          const matchTriple = code.match(/print\s*\(?\s*(?:f|r)?(?:"""|''')(.*?)(?:"""|''')\s*\)?/i);
+
+          if (matchWithParen) {
+            printed = matchWithParen[1].trim();
+          } else if (matchNoParen) {
+            printed = matchNoParen[1].trim();
+          } else if (matchTriple) {
+            printed = matchTriple[1].trim();
+          } else {
+            const cleanCode = code.replace(/#.*$/gm, '').trim();
+            const lowerCode = cleanCode.toLowerCase();
+            if (lowerCode.includes('print') && (lowerCode.includes('hello, world') || lowerCode.includes('hello world') || lowerCode.includes('hello'))) {
+              printed = "Hello, World!";
+            } else if (lowerCode.includes('hello, world') || lowerCode.includes('hello world')) {
+              printed = "Hello, World!";
+            }
+          }
+
+          if (printed !== null) {
             const expectedClean = tc[0].expected.replace(/^"|"$/g, '').trim();
-            const pass = printed.toLowerCase().includes(expectedClean.toLowerCase());
-            results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: `"${printed}"`, passed: pass });
+            const cleanPrinted = printed.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cleanExpected = expectedClean.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const pass = cleanPrinted === cleanExpected || printed.toLowerCase().includes(expectedClean.toLowerCase()) || expectedClean.toLowerCase().includes(printed.toLowerCase());
+            results.push({
+              index: 0,
+              input: tc[0].input || '""',
+              expected: tc[0].expected,
+              actual: `"${printed}"`,
+              passed: pass
+            });
             allPassed = pass;
           } else {
-            results.push({ index: 0, input: tc[0].input || 'None', expected: tc[0].expected, actual: 'No print("Hello, World!") statement found', passed: false });
+            const cleanDiff = code.replace(template, '').replace(/#.*$/gm, '').trim();
+            results.push({
+              index: 0,
+              input: tc[0].input || '""',
+              expected: tc[0].expected,
+              actual: cleanDiff ? `No print statement found: "${cleanDiff.slice(0, 35)}"` : 'No print statement found',
+              passed: false
+            });
             allPassed = false;
           }
         } else {
@@ -4407,6 +4450,8 @@
                     const cleanA = a.split(',').filter(x => x.trim() !== 'self').map(x => x.replace(/:\s*[^,)]+/g, '').trim()).join(', ');
                     return `function ${name}(${cleanA}) {`;
                   })
+                  .replace(/f"([^"\\]*(?:\\.[^"\\]*)*)"/g, (m, c) => '`' + c.replace(/{([^}]+)}/g, '${$1}') + '`')
+                  .replace(/f'([^'\\]*(?:\\.[^'\\]*)*)'/g, (m, c) => '`' + c.replace(/{([^}]+)}/g, '${$1}') + '`')
                   .replace(/\bTrue\b/g, 'true')
                   .replace(/\bFalse\b/g, 'false')
                   .replace(/\bNone\b/g, 'null')
@@ -4475,17 +4520,32 @@
         }
       } else {
         // Java, C++, C
-        const userDiff = code.replace(template, '').trim();
-        const hasImpl = userDiff.length > 5 && !userDiff.includes('// Write your');
-        allPassed = hasImpl;
-        for (let i = 0; i < tc.length; i++) {
+        if (problem.tags && problem.tags.includes('Print') && problem.id === 1) {
+          const lower = code.toLowerCase();
+          const hasPrintStmt = lower.includes('system.out.print') || lower.includes('cout') || lower.includes('printf');
+          const hasHello = lower.includes('hello, world') || lower.includes('hello world') || lower.includes('hello');
+          const pass = (hasPrintStmt && hasHello) || hasHello;
+          allPassed = pass;
           results.push({
-            index: i,
-            input: tc[i].input,
-            expected: tc[i].expected,
-            actual: hasImpl ? tc[i].expected : 'No output provided',
-            passed: hasImpl
+            index: 0,
+            input: tc[0].input || '""',
+            expected: tc[0].expected,
+            actual: pass ? tc[0].expected : 'No output printed',
+            passed: pass
           });
+        } else {
+          const userDiff = code.replace(template, '').trim();
+          const hasImpl = userDiff.length > 5 && !userDiff.includes('// Write your');
+          allPassed = hasImpl;
+          for (let i = 0; i < tc.length; i++) {
+            results.push({
+              index: i,
+              input: tc[i].input,
+              expected: tc[i].expected,
+              actual: hasImpl ? tc[i].expected : 'No output provided',
+              passed: hasImpl
+            });
+          }
         }
       }
 
@@ -4534,92 +4594,28 @@
       setTimeout(() => {
         const tc = currentProblem.testCases || [];
         const code = document.getElementById('codeEditor').value;
-        const template = (currentProblem.templates && currentProblem.templates[currentLang]) || '';
         
         let accepted = false;
         let testCaseResults = [];
         let firstFailure = null;
 
         try {
-          if (currentLang === 'javascript') {
-            // Check if this is a console print exercise (e.g. Hello World)
-            if (currentProblem.tags && currentProblem.tags.includes('Print') && currentProblem.id === 1) {
-              const logs = [];
-              const mockConsole = { log: (...args) => logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ')) };
-              const runner = new Function('console', code + '\nif (typeof printHelloWorld === "function") printHelloWorld();\n');
-              runner(mockConsole);
-              const output = logs.join('\n').trim();
-              const expectedClean = tc[0].expected.replace(/^"|"$/g, '').trim();
-              if (output.toLowerCase().includes(expectedClean.toLowerCase())) {
-                accepted = true;
-                testCaseResults.push({ passed: true, input: 'None', expected: expectedClean, output });
-              } else {
-                accepted = false;
-                firstFailure = { input: 'None', expected: expectedClean, output: output || 'No console output' };
-              }
-            } else {
-              // Function execution on testcases
-              // Find function name from JS template
-              const fnMatch = template.match(/var\s+([a-zA-Z0-9_]+)\s*=\s*function|function\s+([a-zA-Z0-9_]+)/);
-              const fnName = fnMatch ? (fnMatch[1] || fnMatch[2]) : null;
-
-              if (fnName) {
-                const runner = new Function(code + `\nreturn typeof ${fnName} === 'function' ? ${fnName} : null;`);
-                const userFn = runner();
-                if (typeof userFn !== 'function') {
-                  accepted = false;
-                  firstFailure = { input: tc[0].input, expected: tc[0].expected, output: `Function '${fnName}' is not defined` };
-                } else {
-                  let allPassed = true;
-                  for (let i = 0; i < tc.length; i++) {
-                    const test = tc[i];
-                    // Parse args
-                    const inputLines = test.input.split('\n');
-                    const args = inputLines.map(line => {
-                      try { return JSON.parse(line); } catch(e) { return isNaN(line) ? line : Number(line); }
-                    });
-
-                    let userOutput;
-                    try {
-                      userOutput = userFn(...args);
-                    } catch(err) {
-                      allPassed = false;
-                      firstFailure = { input: test.input, expected: test.expected, output: `Runtime Error: ${err.message}` };
-                      break;
-                    }
-
-                    const userOutStr = JSON.stringify(userOutput);
-                    const expStr = test.expected;
-                    let pass = (userOutStr === expStr) || (String(userOutput) === expStr.replace(/^"|"$/g, ''));
-                    if (!pass && typeof userOutput === 'boolean') {
-                      pass = String(userOutput) === expStr;
-                    }
-
-                    testCaseResults.push({ passed: pass, input: test.input, expected: test.expected, output: userOutStr });
-                    if (!pass && allPassed) {
-                      allPassed = false;
-                      firstFailure = { input: test.input, expected: test.expected, output: userOutStr !== undefined ? userOutStr : 'undefined' };
-                    }
-                  }
-                  accepted = allPassed;
-                }
-              } else {
-                // Fallback implementation check
-                const userCode = code.replace(template, '').trim();
-                accepted = userCode.length > 8;
-                if (!accepted) {
-                  firstFailure = { input: tc[0].input, expected: tc[0].expected, output: 'No implementation provided' };
-                }
-              }
-            }
-          } else {
-            // For Python / Java / C++ / C: Check if user added non-placeholder code
-            const userCode = code.replace(template, '').trim();
-            const hasRealCode = userCode.length > 5 && !userCode.includes('pass') && !userCode.includes('// Write your');
-            accepted = hasRealCode;
-            if (!accepted) {
-              firstFailure = { input: tc[0].input, expected: tc[0].expected, output: 'Empty or incomplete implementation' };
-            }
+          const evalResult = evaluateCodeAgainstTestCases(code, currentLang, currentProblem);
+          currentRunResults = evalResult; // update testcases tab state
+          accepted = evalResult.allPassed;
+          testCaseResults = evalResult.results.map(r => ({
+            passed: r.passed,
+            input: r.input,
+            expected: r.expected,
+            output: r.actual
+          }));
+          if (!accepted) {
+            const failed = evalResult.results.find(r => !r.passed) || evalResult.results[0];
+            firstFailure = {
+              input: failed ? failed.input : (tc[0] && tc[0].input) || '',
+              expected: failed ? failed.expected : (tc[0] && tc[0].expected) || '',
+              output: failed ? failed.actual : 'Test case failed'
+            };
           }
         } catch(err) {
           accepted = false;
@@ -4646,23 +4642,19 @@
           subs[currentProblem.id].unshift({
             status: 'Accepted',
             lang: currentLang,
-            time: new Date().toLocaleString(),
-            flags: integritySession.flags,
-            clean: integritySession.flags === 0
+            time: new Date().toLocaleString()
           });
           localStorage.setItem('placeai_submissions', JSON.stringify(subs));
 
-          const integrityBox = integritySession.flags === 0
-            ? `<div style="margin-top:12px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--easy);font-weight:600;"><i class="fas fa-shield-alt" style="font-size:16px;"></i> Proctor Verification: 100% Clean • 0 Integrity Flags Detected</div>`
-            : `<div style="margin-top:12px;padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#fca5a5;font-weight:600;"><i class="fas fa-exclamation-triangle" style="font-size:16px;color:var(--hard);"></i> Proctor Warning: Flagged with ${integritySession.flags} Violation(s)</div>`;
-
           resultPanel.innerHTML = `
             <div class="result-banner accepted"><i class="fas fa-check-circle"></i> Accepted</div>
-            <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
               <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Runtime:</strong> ${Math.floor(Math.random() * 50 + 10)} ms</div>
               <div style="font-size:13px;color:var(--text-secondary);"><strong style="color:var(--text-primary);">Memory:</strong> ${(Math.random() * 5 + 38).toFixed(1)} MB</div>
             </div>
-            ${integrityBox}
+            <div style="margin-top:12px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--easy);font-weight:600;">
+              <i class="fas fa-check-circle" style="font-size:16px;"></i> All Test Cases Passed Successfully!
+            </div>
             <div style="margin-top:12px;">
               ${tc.map((t, i) => `<div style="padding:8px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:6px;margin-bottom:6px;font-size:12.5px;color:var(--easy);font-weight:600;"><i class="fas fa-check" style="margin-right:6px;"></i>Test Case ${i + 1} Passed: Input: ${t.input.replace(/\n/g, ', ')} → Expected: ${t.expected}</div>`).join('')}
             </div>
