@@ -883,7 +883,7 @@
     }
 
     /**
-     * Get existing file SHA if present on GitHub repo (with cache-busting)
+     * Get existing file SHA if present on GitHub repo (with cache-busting query param)
      */
     async getFileSha(token, owner, repo, path, branch = 'main', forceFresh = false) {
       try {
@@ -893,10 +893,7 @@
         const res = await fetch(url, {
           headers: {
             'Authorization': `token ${cleanToken}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'User-Agent': 'PlaceAI-Platform',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
+            'Accept': 'application/vnd.github.v3+json'
           }
         });
         if (res.ok) {
@@ -905,6 +902,7 @@
         }
         return { exists: false, sha: null };
       } catch (e) {
+        console.warn('getFileSha error:', e.message);
         return { exists: false, sha: null };
       }
     }
@@ -949,14 +947,13 @@
         headers: {
           'Authorization': `token ${cleanToken}`,
           'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'PlaceAI-Platform'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
 
-      // Handle 409 Conflict (SHA changed or out-of-date on update): re-fetch fresh SHA and retry
-      if (res.status === 409) {
+      // Handle 409 Conflict (SHA out-of-date) OR 422 ("sha" wasn't supplied): re-fetch fresh SHA and retry
+      if (res.status === 409 || res.status === 422) {
         const fresh = await this.getFileSha(token, owner, repo, cleanPath, branch, true);
         if (fresh.exists && fresh.sha) {
           payload.sha = fresh.sha;
@@ -965,8 +962,7 @@
             headers: {
               'Authorization': `token ${cleanToken}`,
               'Accept': 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json',
-              'User-Agent': 'PlaceAI-Platform'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
           });
@@ -985,7 +981,7 @@
         commitUrl: data.commit ? data.commit.html_url : `https://github.com/${owner}/${repo}/commits/${branch}`,
         fileUrl: data.content ? data.content.html_url : `https://github.com/${owner}/${repo}/blob/${branch}/${cleanPath}`,
         repoUrl: `https://github.com/${owner}/${repo}`,
-        isUpdate: !!(existing.exists)
+        isUpdate: !!(existing.exists || payload.sha)
       };
     }
   }
