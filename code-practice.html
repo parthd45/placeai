@@ -637,6 +637,8 @@
       line-height: 1.6;
       tab-size: 4;
       outline: none;
+      filter: none !important;
+      -webkit-filter: none !important;
     }
 
     /* Bottom Panel */
@@ -5060,6 +5062,49 @@
         return;
       }
 
+      // ============================================
+      // REQUIREMENT: ONLY PUSH IF ALL TEST CASES PASS!
+      // ============================================
+      if (currentProblem && currentProblem.testCases && currentProblem.testCases.length > 0) {
+        let evalResult = null;
+        try {
+          evalResult = evaluateCodeAgainstTestCases(code, currentLang, currentProblem);
+        } catch(evalErr) {
+          console.warn('Evaluation error before push:', evalErr);
+        }
+
+        const tc = currentProblem.testCases;
+        const totalCount = tc.length;
+        const passedCount = evalResult && Array.isArray(evalResult.results) 
+          ? evalResult.results.filter(r => r.passed).length 
+          : 0;
+
+        if (!evalResult || !evalResult.allPassed) {
+          showToast(
+            '⚠️ <b>Cannot Push:</b> All test cases must pass before pushing to GitHub! (' + passedCount + '/' + totalCount + ' passed)',
+            'warning',
+            6000
+          );
+
+          // Update test cases run results and switch to Test Cases tab to show student what failed
+          currentRunResults = evalResult || { allPassed: false, results: [] };
+          renderTestCases();
+          const tabBtn = document.querySelectorAll('.bottom-tab')[0];
+          if (tabBtn) showBottomTab('testcases', tabBtn);
+
+          // Scroll test cases tab into view smoothly
+          const testPanel = document.getElementById('testcasesPanel');
+          if (testPanel) {
+            testPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          return;
+        }
+
+        // All test cases passed! Mark problem as solved if not already
+        solvedProblems[currentProblem.id] = 'solved';
+        localStorage.setItem('placeai_solved', JSON.stringify(solvedProblems));
+      }
+
       const owner = user.login;
       const repoName = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
       const branch = localStorage.getItem('placeai_github_branch') || 'main';
@@ -5170,6 +5215,40 @@
       if (!code || !code.trim()) {
         showToast('No code to push.', 'warning');
         return;
+      }
+
+      // ============================================
+      // REQUIREMENT: ONLY PUSH IF ALL TEST CASES PASS!
+      // ============================================
+      if (currentProblem && currentProblem.testCases && currentProblem.testCases.length > 0) {
+        let evalResult = null;
+        try {
+          evalResult = evaluateCodeAgainstTestCases(code, currentLang, currentProblem);
+        } catch(evalErr) {
+          console.warn('Evaluation error before modal push:', evalErr);
+        }
+
+        const totalCount = currentProblem.testCases.length;
+        const passedCount = evalResult && Array.isArray(evalResult.results)
+          ? evalResult.results.filter(r => r.passed).length
+          : 0;
+
+        if (!evalResult || !evalResult.allPassed) {
+          showToast(
+            '⚠️ <b>Cannot Push:</b> All test cases must pass first! (' + passedCount + '/' + totalCount + ' passed)',
+            'warning',
+            6000
+          );
+          const statusBanner = document.getElementById('ghStatusBanner');
+          if (statusBanner) {
+            statusBanner.style.display = 'block';
+            statusBanner.style.background = 'rgba(239, 68, 68, 0.12)';
+            statusBanner.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            statusBanner.style.color = '#ef4444';
+            statusBanner.innerHTML = '<i class="fas fa-times-circle" style="margin-right:8px;"></i> Cannot push: All test cases must pass first (' + passedCount + '/' + totalCount + ' passed). Please test your solution first.';
+          }
+          return;
+        }
       }
 
       const repoSelect = document.getElementById('ghRepoSelect');
@@ -5434,6 +5513,11 @@
       if (!currentProblem) return;
 
       resetIntegritySession();
+      const edEl = document.getElementById('codeEditor');
+      if (edEl) {
+        edEl.disabled = false;
+        edEl.style.filter = 'none';
+      }
       showView('editor');
       updateHud();
       if (isStrictExamMode && !document.fullscreenElement) { toggleFullscreen(); }
@@ -6235,7 +6319,7 @@
     // ============================================
     // PROCTORING & EXAM INTEGRITY ENGINE
     // ============================================
-    let isStrictExamMode = true; // Extreme security enabled by default
+    let isStrictExamMode = false; // Normal practice mode by default (no unwanted lockups or blurs)
     let breachTimer = null;
     let breachSecondsLeft = 5;
     let isSessionTerminated = false;
@@ -6520,11 +6604,11 @@
       clearInterval(breachTimer);
       hideBreachModal();
 
-      // Disable and freeze editor
+      // Ensure editor remains fully visible and sharp
       const codeEditor = document.getElementById('codeEditor');
       if (codeEditor) {
-        codeEditor.disabled = true;
-        codeEditor.style.filter = 'blur(1.5px) grayscale(80%)';
+        codeEditor.disabled = false;
+        codeEditor.style.filter = 'none';
       }
 
       // Record disqualified submission
@@ -6668,34 +6752,38 @@
     }
 
     // ============================================
-    // CLIPBOARD & SHORTCUT RESTRICTIONS
+    // CLIPBOARD & SHORTCUT RESTRICTIONS (Only active in strict exam mode)
     // ============================================
     const codeEditorEl = document.getElementById('codeEditor');
 
-    // Prevent direct copy/cut/paste on editor
+    // Prevent direct copy/cut/paste on editor only during strict exam mode
     codeEditorEl.addEventListener('copy', (e) => {
+      if (!isStrictExamMode) return;
       e.preventDefault();
       triggerViolation('paste', 'Copying code from editor is restricted in Exam Mode!', 'warning');
     });
 
     codeEditorEl.addEventListener('cut', (e) => {
+      if (!isStrictExamMode) return;
       e.preventDefault();
       triggerViolation('paste', 'Cutting code from editor is restricted in Exam Mode!', 'warning');
     });
 
     codeEditorEl.addEventListener('paste', (e) => {
+      if (!isStrictExamMode) return;
       e.preventDefault();
       triggerViolation('paste', 'Direct paste from clipboard is strictly blocked! Type code directly.', 'danger');
     });
 
     codeEditorEl.addEventListener('contextmenu', (e) => {
+      if (!isStrictExamMode) return;
       e.preventDefault();
       triggerViolation('shortcut', 'Right-click context menu is restricted in editor!', 'warning');
     });
 
-    // Global shortcut interceptions in Editor View
+    // Global shortcut interceptions in Editor View (Only in strict exam mode)
     window.addEventListener('keydown', (e) => {
-      if (!isEditorActive || isSessionTerminated) return;
+      if (!isEditorActive || isSessionTerminated || !isStrictExamMode) return;
 
       const isCmdOrCtrl = e.ctrlKey || e.metaKey;
 
@@ -6736,9 +6824,9 @@
       }
     }, true);
 
-    // Tab visibility & departure monitor
+    // Tab visibility & departure monitor (Only in strict exam mode)
     document.addEventListener('visibilitychange', () => {
-      if (!isEditorActive || isSessionTerminated) return;
+      if (!isEditorActive || isSessionTerminated || !isStrictExamMode) return;
       if (document.hidden) {
         triggerViolation('tab_switch', 'Tab departure detected! Navigated away from practice exam.', 'danger');
         const overlay = document.getElementById('proctorOverlay');
@@ -6748,13 +6836,13 @@
       }
     });
 
-    // Window focus loss detection (blur)
+    // Window focus loss detection (blur) - Only in strict exam mode
     window.addEventListener('blur', () => {
-      if (!isEditorActive || document.hidden || isSessionTerminated) return;
+      if (!isEditorActive || document.hidden || isSessionTerminated || !isStrictExamMode) return;
       triggerViolation('focus_lost', 'Window focus lost! Interacting with external application.', 'warning');
     });
 
-    // Fullscreen state listener
+    // Fullscreen state listener (Only in strict exam mode)
     document.addEventListener('fullscreenchange', () => {
       const btn = document.getElementById('btnFullscreen');
       if (document.fullscreenElement) {
@@ -6762,17 +6850,17 @@
         hideBreachModal();
       } else {
         if (btn) btn.classList.remove('active');
-        if (isEditorActive && !isSessionTerminated) {
+        if (isEditorActive && !isSessionTerminated && isStrictExamMode) {
           triggerViolation('fullscreen_exit', 'Exited fullscreen exam mode!', 'danger');
         }
       }
     });
 
-    // Screen resize / layout change monitor
+    // Screen resize / layout change monitor (Only in strict exam mode)
     let lastWinW = window.innerWidth;
     let lastWinH = window.innerHeight;
     window.addEventListener('resize', () => {
-      if (!isEditorActive || isSessionTerminated) return;
+      if (!isEditorActive || isSessionTerminated || !isStrictExamMode) return;
       const dW = Math.abs(window.innerWidth - lastWinW);
       const dH = Math.abs(window.innerHeight - lastWinH);
       if (dW > 180 || dH > 180) {
