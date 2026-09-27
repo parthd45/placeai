@@ -4542,8 +4542,15 @@
       const pushBtn = document.getElementById('btnPushToGitHub');
       if (pushBtn) {
         if (isConnected && ghConnectedUser && ghConnectedUser.login) {
-          pushBtn.title = 'Push solution directly to @' + ghConnectedUser.login + '/code-practice on GitHub';
-          pushBtn.innerHTML = '<i class="fab fa-github" style="color:#22c55e;"></i> Push to @' + ghConnectedUser.login + '<span id="ghPushDot" class="gh-sync-dot" style="display:inline-block;" title="Connected & Auto-Sync Ready"></span>';
+          const pushedMap = JSON.parse(localStorage.getItem('placeai_pushed_problems') || '{}');
+          const isAlreadyPushed = currentProblem && !!pushedMap[currentProblem.id];
+          if (isAlreadyPushed) {
+            pushBtn.title = 'Code already pushed to GitHub. Click to commit and push updated solution to @' + ghConnectedUser.login + '/code-practice';
+            pushBtn.innerHTML = '<i class="fas fa-sync-alt" style="color:#38bdf8;"></i> Commit & Push Update<span id="ghPushDot" class="gh-sync-dot" style="display:inline-block;" title="Connected & Auto-Sync Ready"></span>';
+          } else {
+            pushBtn.title = 'Push solution directly to @' + ghConnectedUser.login + '/code-practice on GitHub';
+            pushBtn.innerHTML = '<i class="fab fa-github" style="color:#22c55e;"></i> Push to @' + ghConnectedUser.login + '<span id="ghPushDot" class="gh-sync-dot" style="display:inline-block;" title="Connected & Auto-Sync Ready"></span>';
+          }
         } else {
           pushBtn.title = 'Connect GitHub once to enable 1-click push';
           pushBtn.innerHTML = '<i class="fab fa-github"></i> Push to GitHub<span id="ghPushDot" class="gh-sync-dot" style="display:none;" title="Connected & Auto-Sync Ready"></span>';
@@ -4692,7 +4699,11 @@
       const probTitle = currentProblem ? currentProblem.title : 'Solution';
       const probSlug = probTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const filePath = 'solutions/' + probId + '-' + probSlug + '/solution' + langInfo.ext;
-      const commitMsg = 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
+      const pushedMap = JSON.parse(localStorage.getItem('placeai_pushed_problems') || '{}');
+      const isAlreadyPushed = currentProblem && !!pushedMap[currentProblem.id];
+      const commitMsg = isAlreadyPushed
+        ? 'refactor(dsa): update ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI'
+        : 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
 
       const pathInput = document.getElementById('ghFilePathInput');
       if (pathInput) pathInput.value = filePath;
@@ -5116,22 +5127,26 @@
       const folderPath = 'solutions/' + probId + '-' + probSlug;
       const filePath = folderPath + '/solution' + langInfo.ext;
       const readmePath = folderPath + '/README.md';
-      const commitMsg = 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
+      const pushedMap = JSON.parse(localStorage.getItem('placeai_pushed_problems') || '{}');
+      const isAlreadyPushed = currentProblem && !!pushedMap[currentProblem.id];
+      const commitMsg = isAlreadyPushed
+        ? 'refactor(dsa): update ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI'
+        : 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
 
       const pushBtns = document.querySelectorAll('.btn-github-push');
       pushBtns.forEach(btn => {
         btn.disabled = true;
         btn.dataset.prevHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Pushing...';
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ' + (isAlreadyPushed ? 'Committing Update...' : 'Pushing...');
       });
 
-      showToast('🚀 Committing <b>' + probTitle + '</b> directly to <b>' + owner + '/' + repoName + '</b>...', 'info', 3000);
+      showToast((isAlreadyPushed ? '🔄 Committing update for <b>' : '🚀 Committing <b>') + probTitle + '</b> directly to <b>' + owner + '/' + repoName + '</b>...', 'info', 3000);
 
       try {
         // Step 1: Commit README Documentation
         if (currentProblem) {
           const readmeContent = generateProblemReadmeContent(currentProblem, currentLang, code);
-          const readmeMsg = 'docs(dsa): add documentation for ' + currentProblem.id + '. ' + currentProblem.title;
+          const readmeMsg = (isAlreadyPushed ? 'docs(dsa): update documentation for ' : 'docs(dsa): add documentation for ') + currentProblem.id + '. ' + currentProblem.title;
           try {
             await window.GitHubService.commitAndPushFile(token, owner, repoName, readmePath, readmeContent, readmeMsg, branch);
           } catch (rErr) {
@@ -5139,27 +5154,41 @@
           }
         }
 
-        // Step 2: Commit Solution Code
+        // Step 2: Commit Solution Code (auto-fetches fresh SHA and retries on conflict if already exists)
         const pushResult = await window.GitHubService.commitAndPushFile(token, owner, repoName, filePath, code, commitMsg, branch);
+
+        // Record in pushed problems map
+        if (currentProblem) {
+          pushedMap[currentProblem.id] = {
+            title: probTitle,
+            pushed_at: new Date().toISOString(),
+            commitSha: pushResult.commitSha,
+            commitUrl: pushResult.commitUrl,
+            filePath: filePath,
+            language: currentLang
+          };
+          localStorage.setItem('placeai_pushed_problems', JSON.stringify(pushedMap));
+        }
 
         // Step 3: Record Authentic Activity for Today
         if (window.ActivityTracker) {
-          window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + probTitle + ' to ' + repoName);
+          window.ActivityTracker.recordActivity('github_push', 1, (pushResult.isUpdate ? 'Updated ' : 'Pushed ') + probTitle + ' to ' + repoName);
         }
         recordStudentGitHubPushActivity(probTitle, currentLang, pushResult.commitSha, pushResult.commitUrl);
 
-        // Step 4: Success Button Animation
+        // Step 4: Success Button Animation & transition to updated state
         pushBtns.forEach(btn => {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> Pushed!';
+          btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> ' + (pushResult.isUpdate ? 'Updated & Pushed!' : 'Pushed!');
           setTimeout(() => {
-            btn.innerHTML = btn.dataset.prevHtml || ('<i class="fab fa-github" style="color:#22c55e;"></i> Push to @' + owner);
+            updatePushButtonsConnectedState(true);
           }, 3000);
         });
 
         // Step 5: Rich Success Toast with Clickable Commit Link
+        const actionLabel = pushResult.isUpdate ? 'Updated & committed' : 'Pushed';
         showToast(
-          '✅ Pushed <b>' + probTitle + '</b> to <b>' + owner + '/' + repoName + '</b>! ' +
+          '✅ ' + actionLabel + ' <b>' + probTitle + '</b> to <b>' + owner + '/' + repoName + '</b>! ' +
           '<a href="' + pushResult.commitUrl + '" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;margin-left:8px;">View Commit <i class="fas fa-external-link-alt" style="font-size:11px;"></i></a>',
           'success',
           7000
@@ -5319,13 +5348,28 @@
         if (statusBanner) statusBanner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Committing solution to ' + filePath + '...';
         const pushResult = await window.GitHubService.commitAndPushFile(token, owner, repoName, filePath, code, commitMsg, branch);
 
+        // Record in pushed problems map
+        if (currentProblem) {
+          const pMap = JSON.parse(localStorage.getItem('placeai_pushed_problems') || '{}');
+          pMap[currentProblem.id] = {
+            title: currentProblem.title,
+            pushed_at: new Date().toISOString(),
+            commitSha: pushResult.commitSha,
+            commitUrl: pushResult.commitUrl,
+            filePath: filePath,
+            language: currentLang
+          };
+          localStorage.setItem('placeai_pushed_problems', JSON.stringify(pMap));
+        }
+
         // Step 4: Record authentic activity point for today
         if (window.ActivityTracker) {
-          window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + (currentProblem ? currentProblem.title : 'Solution') + ' to GitHub');
+          window.ActivityTracker.recordActivity('github_push', 1, (pushResult.isUpdate ? 'Updated ' : 'Pushed ') + (currentProblem ? currentProblem.title : 'Solution') + ' to GitHub');
         }
         recordStudentGitHubPushActivity(currentProblem ? currentProblem.title : 'Solution', currentLang, pushResult.commitSha, pushResult.commitUrl);
 
         localStorage.setItem('placeai_github_default_repo', repoName);
+        updatePushButtonsConnectedState(true);
 
         // Step 5: Render Success UI
         const formArea = document.getElementById('ghCommitFormArea');
@@ -5347,7 +5391,7 @@
           document.getElementById('ghResultBtnOpen').href = pushResult.commitUrl;
         }
 
-        showToast('🚀 Solution pushed to GitHub successfully!', 'success');
+        showToast(pushResult.isUpdate ? '🚀 Solution updated and committed to GitHub successfully!' : '🚀 Solution pushed to GitHub successfully!', 'success');
 
       } catch (err) {
         console.error('executeGitHubPush error:', err);
@@ -5522,6 +5566,7 @@
       updateHud();
       if (isStrictExamMode && !document.fullscreenElement) { toggleFullscreen(); }
       renderProblemDesc();
+      updatePushButtonsConnectedState(!!ghConnectedUser);
       loadCode();
       renderTestCases();
       startTimer();

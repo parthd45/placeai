@@ -883,16 +883,20 @@
     }
 
     /**
-     * Get existing file SHA if present on GitHub repo
+     * Get existing file SHA if present on GitHub repo (with cache-busting)
      */
-    async getFileSha(token, owner, repo, path, branch = 'main') {
+    async getFileSha(token, owner, repo, path, branch = 'main', forceFresh = false) {
       try {
         const cleanToken = token.trim();
-        const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}?ref=${encodeURIComponent(branch)}`, {
+        const cleanPath = String(path).trim().replace(/^\/+/, '');
+        const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}?ref=${encodeURIComponent(branch)}${forceFresh ? `&_t=${Date.now()}` : ''}`;
+        const res = await fetch(url, {
           headers: {
             'Authorization': `token ${cleanToken}`,
             'Accept': 'application/vnd.github.v3+json',
-            'User-Agent': 'PlaceAI-Platform'
+            'User-Agent': 'PlaceAI-Platform',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
           }
         });
         if (res.ok) {
@@ -906,15 +910,17 @@
     }
 
     /**
-     * Commit and Push a file directly to GitHub
+     * Commit and Push a file directly to GitHub (handles new commits and updates to already pushed files)
      */
     async commitAndPushFile(token, owner, repo, path, content, commitMessage, branch = 'main') {
       const cleanToken = token.trim();
       if (!cleanToken) throw new Error('GitHub token is required to commit.');
       if (!owner || !repo || !path) throw new Error('Repository owner, name, and file path are required.');
 
-      // Check if file already exists to get SHA
-      const existing = await this.getFileSha(token, owner, repo, path, branch);
+      const cleanPath = String(path).trim().replace(/^\/+/, '');
+
+      // Check if file already exists to get current SHA
+      let existing = await this.getFileSha(token, owner, repo, cleanPath, branch, true);
 
       // Encode UTF-8 to Base64 safely
       let base64Content = '';
@@ -924,8 +930,12 @@
         base64Content = btoa(content);
       }
 
+      const defaultMsg = existing.exists
+        ? `refactor(dsa): update ${cleanPath} via PlaceAI`
+        : `feat(dsa): add ${cleanPath} solution via PlaceAI`;
+
       const payload = {
-        message: commitMessage || `feat(dsa): add ${path} solution via PlaceAI`,
+        message: commitMessage || defaultMsg,
         content: base64Content,
         branch: branch
       };
@@ -934,7 +944,7 @@
         payload.sha = existing.sha;
       }
 
-      const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}`, {
+      let res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}`, {
         method: 'PUT',
         headers: {
           'Authorization': `token ${cleanToken}`,
@@ -945,8 +955,26 @@
         body: JSON.stringify(payload)
       });
 
+      // Handle 409 Conflict (SHA changed or out-of-date on update): re-fetch fresh SHA and retry
+      if (res.status === 409) {
+        const fresh = await this.getFileSha(token, owner, repo, cleanPath, branch, true);
+        if (fresh.exists && fresh.sha) {
+          payload.sha = fresh.sha;
+          res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${cleanPath}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${cleanToken}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+              'User-Agent': 'PlaceAI-Platform'
+            },
+            body: JSON.stringify(payload)
+          });
+        }
+      }
+
       if (!res.ok) {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         throw new Error(err.message || `Failed to commit file to GitHub (${res.status})`);
       }
 
@@ -955,9 +983,9 @@
         success: true,
         commitSha: data.commit ? data.commit.sha : '',
         commitUrl: data.commit ? data.commit.html_url : `https://github.com/${owner}/${repo}/commits/${branch}`,
-        fileUrl: data.content ? data.content.html_url : `https://github.com/${owner}/${repo}/blob/${branch}/${path}`,
+        fileUrl: data.content ? data.content.html_url : `https://github.com/${owner}/${repo}/blob/${branch}/${cleanPath}`,
         repoUrl: `https://github.com/${owner}/${repo}`,
-        isUpdate: existing.exists
+        isUpdate: !!(existing.exists)
       };
     }
   }
