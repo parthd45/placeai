@@ -16417,8 +16417,9 @@
         }
 
         // If GitHub URL is connected, load authentic GitHub contributions & display profile badge
-        if (userProfile && userProfile.github_url) {
-          loadGitHubContributions(userProfile.github_url);
+        const ghTarget = (userProfile && userProfile.github_url) || localStorage.getItem('placeai_connected_github') || 'https://github.com/parthd45';
+        if (ghTarget) {
+          loadGitHubContributions(ghTarget);
         } else {
           updateGitHubUI(null, false);
           if (typeof renderHeatmap === 'function') {

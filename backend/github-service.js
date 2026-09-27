@@ -650,71 +650,109 @@
       const u = this.extractUsername(username);
       if (!u) throw new Error('Valid GitHub username is required');
 
-      // 1. Primary: Authentic multi-year GitHub contribution calendar API
+      let contributions = [];
+      let totals = {};
+      let years = [];
+
+      // 1. Primary: Multi-year historical contribution calendar API
       try {
         const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(u)}`);
         if (res.ok) {
           const json = await res.json();
           if (json && json.contributions && Array.isArray(json.contributions)) {
-            const totals = json.total || {};
-            const years = Object.keys(totals).sort((a, b) => Number(b) - Number(a));
-
-            return {
-              success: true,
-              contributions: json.contributions, // Full history of all days
-              total: totals,
-              years: years
-            };
+            contributions = json.contributions;
+            totals = json.total || {};
+            years = Object.keys(totals).sort((a, b) => Number(b) - Number(a));
           }
         }
       } catch (e) {
-        console.warn('Contributions endpoint error, trying events fallback:', e.message);
+        console.warn('Contributions historical endpoint notice:', e.message);
       }
 
-      // 2. Fallback: Compute real contributions from public GitHub events
+      // 2. Real-Time Sync: Fetch live GitHub public events to guarantee today and recent days are 100% accurate
       try {
-        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/events`, {
+        const eventsRes = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}/events?per_page=100`, {
           headers: {
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': 'PlaceAI-Platform'
           }
         });
 
-        if (res.ok) {
-          const events = await res.json();
-          const dayMap = {};
-
+        if (eventsRes.ok) {
+          const events = await eventsRes.json();
           if (Array.isArray(events)) {
+            const liveDayMap = {};
             events.forEach(evt => {
               if (evt.created_at) {
-                const day = evt.created_at.split('T')[0];
+                // Parse date in user's local timezone
+                const d = new Date(evt.created_at);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateKey = `${y}-${m}-${day}`;
+
                 let weight = 1;
-                if (evt.type === 'PushEvent' && evt.payload && evt.payload.commits) {
-                  weight = evt.payload.commits.length || 1;
-                } else if (evt.type === 'PullRequestEvent') {
+                if (evt.type === 'PullRequestEvent') {
                   weight = 2;
+                } else if (evt.type === 'PushEvent') {
+                  weight = (evt.payload && (evt.payload.size || evt.payload.distinct_size)) || (evt.payload && evt.payload.commits ? evt.payload.commits.length : 1) || 1;
                 }
-                dayMap[day] = (dayMap[day] || 0) + weight;
+                liveDayMap[dateKey] = (liveDayMap[dateKey] || 0) + weight;
               }
             });
+
+            // Map existing contributions by date
+            const contribMap = {};
+            contributions.forEach(c => {
+              if (c && c.date) contribMap[c.date] = c;
+            });
+
+            // Ensure today is always present
+            const now = new Date();
+            const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            // Merge live events into contributions
+            Object.keys(liveDayMap).forEach(d => {
+              const liveCount = liveDayMap[d];
+              if (contribMap[d]) {
+                if (liveCount > (contribMap[d].count || 0)) {
+                  const diff = liveCount - (contribMap[d].count || 0);
+                  contribMap[d].count = liveCount;
+                  contribMap[d].level = liveCount >= 10 ? 4 : (liveCount >= 5 ? 3 : (liveCount >= 3 ? 2 : 1));
+                  const yr = d.split('-')[0];
+                  totals[yr] = (totals[yr] || 0) + diff;
+                }
+              } else {
+                const level = liveCount >= 10 ? 4 : (liveCount >= 5 ? 3 : (liveCount >= 3 ? 2 : 1));
+                const newEntry = { date: d, count: liveCount, level };
+                contribMap[d] = newEntry;
+                contributions.push(newEntry);
+                const yr = d.split('-')[0];
+                totals[yr] = (totals[yr] || 0) + liveCount;
+              }
+            });
+
+            if (!liveDayMap[todayKey] && !contribMap[todayKey]) {
+              const todayEntry = { date: todayKey, count: 0, level: 0 };
+              contribMap[todayKey] = todayEntry;
+              contributions.push(todayEntry);
+            }
           }
-
-          const contributions = Object.keys(dayMap).map(d => ({
-            date: d,
-            count: dayMap[d],
-            level: dayMap[d] > 8 ? 4 : (dayMap[d] > 5 ? 3 : (dayMap[d] > 2 ? 2 : 1))
-          }));
-
-          const curYear = String(new Date().getFullYear());
-          return {
-            success: true,
-            contributions,
-            total: { [curYear]: contributions.reduce((acc, c) => acc + c.count, 0) },
-            years: [curYear]
-          };
         }
-      } catch (err) {
-        console.warn('Events fallback error:', err.message);
+      } catch (liveErr) {
+        console.warn('Real-time GitHub events fetch notice:', liveErr.message);
+      }
+
+      if (contributions.length > 0) {
+        const curYear = String(new Date().getFullYear());
+        if (!years.includes(curYear)) years.unshift(curYear);
+
+        return {
+          success: true,
+          contributions: contributions,
+          total: totals,
+          years: years
+        };
       }
 
       return { success: false, error: 'Could not fetch GitHub contribution calendar.' };

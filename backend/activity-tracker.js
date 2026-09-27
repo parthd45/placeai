@@ -126,12 +126,13 @@
       });
       const todayLoggedPoints = todayLogs.reduce((sum, l) => sum + (Number(l.points) || 1), 0);
 
+      // Preserve higher contributions already recorded for today (e.g. from GitHub live commits)
+      const currentToday = map[today] || 0;
       if (todayLoggedPoints > 0) {
-        map[today] = todayLoggedPoints;
+        map[today] = Math.max(currentToday, todayLoggedPoints);
       } else {
-        // Daily active session check-in = 1 contribution point
-        // This also sanitizes any legacy inflated/fake values (e.g. 95) back to an authentic 1
-        map[today] = 1;
+        // Daily active session check-in = minimum 1 contribution point
+        map[today] = Math.max(currentToday, 1);
       }
 
       this.saveStoredMap(map);
