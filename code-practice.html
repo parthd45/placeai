@@ -4419,6 +4419,119 @@
       }
     }
 
+    function recordStudentGitHubConnection(user, repoName) {
+      try {
+        const studentUser = JSON.parse(localStorage.getItem('placeai_current_user') || localStorage.getItem('currentUser') || '{}');
+        const studentProfile = JSON.parse(localStorage.getItem('placeai_profile') || '{}');
+        const email = studentUser.email || studentProfile.email || (user.login + '@student.placewise.edu');
+        const name = studentProfile.name || (studentProfile.first_name ? (studentProfile.first_name + ' ' + (studentProfile.last_name || '')).trim() : '') || studentUser.name || user.name || user.login;
+
+        const registry = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+        const existing = registry[user.login] || registry[email] || {};
+
+        const connectionData = {
+          user_id: studentUser.id || studentProfile.user_id || ('usr_' + user.login),
+          name: name,
+          email: email,
+          college: studentProfile.college_name || 'Engineering Candidate',
+          course: studentProfile.course || 'Computer Science & Engineering',
+          github_username: user.login,
+          github_name: user.name || user.login,
+          github_url: user.html_url || ('https://github.com/' + user.login),
+          avatar_url: user.avatar_url || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+          bio: user.bio || 'PlaceAI Coding Practice Student',
+          public_repos: user.public_repos || 0,
+          followers: user.followers || 0,
+          repo_name: repoName || 'code-practice',
+          repo_url: 'https://github.com/' + user.login + '/' + (repoName || 'code-practice'),
+          branch: 'main',
+          status: 'Connected',
+          joined_at: existing.joined_at || new Date().toISOString(),
+          last_push_at: existing.last_push_at || new Date().toISOString(),
+          pushes_count: existing.pushes_count || 0,
+          recent_activity: existing.recent_activity || []
+        };
+
+        registry[user.login] = connectionData;
+        registry[email] = connectionData;
+        localStorage.setItem('placeai_student_github_connections', JSON.stringify(registry));
+
+        // Also update in placeai_registered_users
+        const regUsers = JSON.parse(localStorage.getItem('placeai_registered_users') || '{}');
+        if (regUsers[email]) {
+          regUsers[email].github_username = user.login;
+          regUsers[email].github_url = user.html_url;
+          regUsers[email].github_repo = repoName || 'code-practice';
+          localStorage.setItem('placeai_registered_users', JSON.stringify(regUsers));
+        }
+
+        // Also update in Supabase user_profiles if connected
+        if (window.supabaseClient && (studentUser.id || studentProfile.user_id)) {
+          const uid = studentUser.id || studentProfile.user_id;
+          window.supabaseClient
+            .from('user_profiles')
+            .update({
+              github_url: user.html_url,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', uid)
+            .then(() => {})
+            .catch(() => {});
+        }
+      } catch (e) {
+        console.warn('recordStudentGitHubConnection error:', e);
+      }
+    }
+
+    function recordStudentGitHubPushActivity(problemTitle, lang, commitSha, commitUrl) {
+      try {
+        const userStr = localStorage.getItem('placeai_github_user');
+        if (!userStr) return;
+        const user = JSON.parse(userStr);
+        const repoName = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+
+        const registry = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+        const studentUser = JSON.parse(localStorage.getItem('placeai_current_user') || '{}');
+        const email = studentUser.email || (user.login + '@student.placewise.edu');
+
+        const key = registry[user.login] ? user.login : email;
+        const student = registry[key] || {
+          user_id: 'usr_' + user.login,
+          name: user.name || user.login,
+          email: email,
+          github_username: user.login,
+          github_url: user.html_url || ('https://github.com/' + user.login),
+          avatar_url: user.avatar_url,
+          repo_name: repoName,
+          repo_url: 'https://github.com/' + user.login + '/' + repoName,
+          branch: 'main',
+          pushes_count: 0,
+          recent_activity: []
+        };
+
+        student.pushes_count = (student.pushes_count || 0) + 1;
+        student.last_push_at = new Date().toISOString();
+        student.last_problem_title = problemTitle;
+        student.status = 'Active';
+
+        if (!Array.isArray(student.recent_activity)) student.recent_activity = [];
+        student.recent_activity.unshift({
+          problemTitle: problemTitle,
+          language: lang,
+          commitSha: commitSha,
+          commitUrl: commitUrl,
+          timestamp: new Date().toISOString()
+        });
+        if (student.recent_activity.length > 25) student.recent_activity.pop();
+
+        registry[user.login] = student;
+        registry[email] = student;
+        localStorage.setItem('placeai_student_github_connections', JSON.stringify(registry));
+      } catch (e) {
+        console.warn('recordStudentGitHubPushActivity error:', e);
+      }
+    }
+
     function openGitHubPushModal(isSettings = false) {
       const modal = document.getElementById('githubPushModal');
       if (!modal) return;
@@ -4585,6 +4698,7 @@
 
         localStorage.setItem('placeai_github_default_repo', targetRepo);
         localStorage.setItem('placeai_github_joined', 'true');
+        recordStudentGitHubConnection(res.user, targetRepo);
 
         renderConnectedGitHubUser(res.user);
         updatePushButtonsConnectedState(true);
@@ -4604,6 +4718,14 @@
 
     function disconnectGitHubToken() {
       if (confirm('Disconnect GitHub account from PlaceAI Code Practice?')) {
+        try {
+          const registry = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+          if (ghConnectedUser && registry[ghConnectedUser.login]) {
+            registry[ghConnectedUser.login].status = 'Disconnected';
+            localStorage.setItem('placeai_student_github_connections', JSON.stringify(registry));
+          }
+        } catch(e) {}
+
         localStorage.removeItem('placeai_github_pat');
         localStorage.removeItem('placeai_github_user');
         localStorage.removeItem('placeai_github_joined');
@@ -4765,6 +4887,7 @@
         if (window.ActivityTracker) {
           window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + probTitle + ' to ' + repoName);
         }
+        recordStudentGitHubPushActivity(probTitle, currentLang, pushResult.commitSha, pushResult.commitUrl);
 
         // Step 4: Success Button Animation
         pushBtns.forEach(btn => {
@@ -4884,6 +5007,7 @@
         if (window.ActivityTracker) {
           window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + (currentProblem ? currentProblem.title : 'Solution') + ' to GitHub');
         }
+        recordStudentGitHubPushActivity(currentProblem ? currentProblem.title : 'Solution', currentLang, pushResult.commitSha, pushResult.commitUrl);
 
         localStorage.setItem('placeai_github_default_repo', repoName);
 
