@@ -800,6 +800,166 @@
         return { success: false, error: err.message };
       }
     }
+
+    /**
+     * Authenticate and validate a GitHub Personal Access Token (PAT)
+     * @param {string} token 
+     * @returns {Promise<Object>} user data
+     */
+    async validateToken(token) {
+      if (!token || !token.trim()) throw new Error('GitHub token is required');
+      const cleanToken = token.trim();
+      const res = await fetch('https://api.github.com/user', {
+        headers: {
+          'Authorization': `token ${cleanToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'PlaceAI-Platform'
+        }
+      });
+      if (!res.ok) {
+        if (res.status === 401) throw new Error('Invalid or expired GitHub Personal Access Token. Please verify token permissions.');
+        throw new Error(`GitHub verification failed (HTTP ${res.status})`);
+      }
+      const user = await res.json();
+      return {
+        success: true,
+        user: {
+          login: user.login,
+          name: user.name || user.login,
+          avatar_url: user.avatar_url,
+          html_url: user.html_url
+        }
+      };
+    }
+
+    /**
+     * Fetch user's repositories for selection
+     */
+    async getUserRepositories(token) {
+      const cleanToken = token.trim();
+      const res = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100&affiliation=owner,collaborator', {
+        headers: {
+          'Authorization': `token ${cleanToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'PlaceAI-Platform'
+        }
+      });
+      if (!res.ok) throw new Error('Could not fetch user repositories.');
+      const repos = await res.json();
+      return Array.isArray(repos) ? repos.map(r => ({
+        name: r.name,
+        full_name: r.full_name,
+        default_branch: r.default_branch || 'main',
+        private: r.private,
+        html_url: r.html_url
+      })) : [];
+    }
+
+    /**
+     * Create a new GitHub repository for DSA solutions
+     */
+    async createRepository(token, repoName = 'PlaceAI-DSA-Solutions', description = 'My verified Data Structures & Algorithms solutions and code practice - powered by PlaceAI') {
+      const cleanToken = token.trim();
+      const res = await fetch('https://api.github.com/user/repos', {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${cleanToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'PlaceAI-Platform'
+        },
+        body: JSON.stringify({
+          name: repoName,
+          description: description,
+          private: false,
+          auto_init: true
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to create repository on GitHub');
+      }
+      return await res.json();
+    }
+
+    /**
+     * Get existing file SHA if present on GitHub repo
+     */
+    async getFileSha(token, owner, repo, path, branch = 'main') {
+      try {
+        const cleanToken = token.trim();
+        const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}?ref=${encodeURIComponent(branch)}`, {
+          headers: {
+            'Authorization': `token ${cleanToken}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'PlaceAI-Platform'
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return { exists: true, sha: data.sha };
+        }
+        return { exists: false, sha: null };
+      } catch (e) {
+        return { exists: false, sha: null };
+      }
+    }
+
+    /**
+     * Commit and Push a file directly to GitHub
+     */
+    async commitAndPushFile(token, owner, repo, path, content, commitMessage, branch = 'main') {
+      const cleanToken = token.trim();
+      if (!cleanToken) throw new Error('GitHub token is required to commit.');
+      if (!owner || !repo || !path) throw new Error('Repository owner, name, and file path are required.');
+
+      // Check if file already exists to get SHA
+      const existing = await this.getFileSha(token, owner, repo, path, branch);
+
+      // Encode UTF-8 to Base64 safely
+      let base64Content = '';
+      try {
+        base64Content = btoa(unescape(encodeURIComponent(content)));
+      } catch (b64Err) {
+        base64Content = btoa(content);
+      }
+
+      const payload = {
+        message: commitMessage || `feat(dsa): add ${path} solution via PlaceAI`,
+        content: base64Content,
+        branch: branch
+      };
+
+      if (existing.exists && existing.sha) {
+        payload.sha = existing.sha;
+      }
+
+      const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${cleanToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'PlaceAI-Platform'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || `Failed to commit file to GitHub (${res.status})`);
+      }
+
+      const data = await res.json();
+      return {
+        success: true,
+        commitSha: data.commit ? data.commit.sha : '',
+        commitUrl: data.commit ? data.commit.html_url : `https://github.com/${owner}/${repo}/commits/${branch}`,
+        fileUrl: data.content ? data.content.html_url : `https://github.com/${owner}/${repo}/blob/${branch}/${path}`,
+        repoUrl: `https://github.com/${owner}/${repo}`,
+        isUpdate: existing.exists
+      };
+    }
   }
 
   // Export to window
