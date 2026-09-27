@@ -1588,6 +1588,42 @@
       transform: translateY(0);
     }
 
+    .btn-github-gear {
+      background: transparent;
+      border: none;
+      border-left: 1px solid #30363d;
+      color: #8b949e;
+      padding: 7px 11px;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .btn-github-gear:hover {
+      color: #58a6ff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .gh-sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+      margin-left: 3px;
+      animation: ghDotPulse 2s infinite;
+    }
+    @keyframes ghDotPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+    @keyframes toastSlideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
     /* Modal Overlay & Card */
     .gh-modal-overlay {
       position: fixed;
@@ -1987,9 +2023,15 @@
             <button class="btn-reset" onclick="resetCode()"><i class="fas fa-undo"></i> Reset</button>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
-            <button class="btn-github-push" id="btnPushToGitHub" onclick="openGitHubPushModal()" title="Commit & Push this solution directly to your GitHub repository">
-              <i class="fab fa-github"></i> Push to GitHub
-            </button>
+            <div style="display:inline-flex;align-items:center;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden;box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+              <button class="btn-github-push" id="btnPushToGitHub" onclick="handleDirectGitHubPush()" title="Push each solution directly to your code-practice repository on GitHub" style="border:none;border-radius:0;box-shadow:none;">
+                <i class="fab fa-github"></i> Push to GitHub
+                <span id="ghPushDot" class="gh-sync-dot" style="display:none;" title="Connected & Auto-Sync Ready"></span>
+              </button>
+              <button type="button" class="btn-github-gear" onclick="openGitHubPushModal(true)" title="GitHub Settings & Options">
+                <i class="fas fa-cog"></i>
+              </button>
+            </div>
             <button class="btn-run" onclick="runCode()"><i class="fas fa-play"></i> Run Code</button>
             <button class="btn-submit" onclick="submitCode()"><i class="fas fa-cloud-upload-alt"></i> Submit</button>
           </div>
@@ -2038,8 +2080,8 @@
             <i class="fab fa-github"></i>
           </div>
           <div>
-            <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0;">Commit & Push Solution to GitHub</h3>
-            <p style="font-size:12px;color:#94a3b8;margin:2px 0 0 0;">Push your verified code and problem documentation directly to your repository</p>
+            <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0;">GitHub 1-Time Join & Direct Sync</h3>
+            <p style="font-size:12px;color:#94a3b8;margin:2px 0 0 0;">Join once. Solutions will push directly to your <code style="color:#38bdf8;">code-practice</code> repo on 1-click.</p>
           </div>
         </div>
         <button type="button" class="gh-modal-close" onclick="closeGitHubPushModal()">&times;</button>
@@ -2059,7 +2101,7 @@
             <div style="display:flex;gap:8px;">
               <input type="password" id="ghPatInput" class="gh-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="flex:1;">
               <button type="button" class="gh-btn-primary" onclick="connectGitHubToken()" style="white-space:nowrap;">
-                <i class="fas fa-plug"></i> Connect
+                <i class="fas fa-plug"></i> Join & Setup Repo
               </button>
             </div>
             <p style="font-size:11px;color:#64748b;margin:8px 0 0 0;">
@@ -2074,9 +2116,9 @@
               <div>
                 <div style="font-weight:700;color:#fff;font-size:13.5px;display:flex;align-items:center;gap:6px;">
                   <span id="ghUserLogin">@username</span>
-                  <span style="background:rgba(16,185,129,0.2);color:#34d399;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;"><i class="fas fa-check-circle"></i> Connected</span>
+                  <span style="background:rgba(16,185,129,0.2);color:#34d399;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;"><i class="fas fa-check-circle"></i> Joined</span>
                 </div>
-                <div id="ghUserName" style="font-size:11.5px;color:#94a3b8;">User Name</div>
+                <div style="font-size:11.5px;color:#94a3b8;"><span id="ghUserName">User Name</span> • Syncing to <span id="ghConnectedRepoName" style="color:#38bdf8;font-weight:600;">code-practice</span></div>
               </div>
             </div>
             <button type="button" onclick="disconnectGitHubToken()" class="gh-btn-subtle" title="Disconnect / Change Token">
@@ -2096,7 +2138,8 @@
                 </button>
               </div>
               <select id="ghRepoSelect" class="gh-input" onchange="handleRepoSelectChange()">
-                <option value="create_new">+ Auto-create 'PlaceAI-DSA-Solutions'</option>
+                <option value="code-practice" selected>code-practice (Default Practice Repo)</option>
+                <option value="create_new">+ Auto-create / Select Other Repo</option>
               </select>
             </div>
             <div>
@@ -2106,10 +2149,10 @@
           </div>
 
           <!-- Custom new repo input if create_new selected -->
-          <div id="ghCustomRepoDiv" style="margin-bottom:12px;">
+          <div id="ghCustomRepoDiv" style="display:none;margin-bottom:12px;">
             <label class="gh-label">Repository Name</label>
-            <input type="text" id="ghNewRepoName" class="gh-input" value="PlaceAI-DSA-Solutions" placeholder="PlaceAI-DSA-Solutions">
-            <span style="font-size:11px;color:#64748b;">Repository will be initialized automatically on GitHub if it does not already exist.</span>
+            <input type="text" id="ghNewRepoName" class="gh-input" value="code-practice" placeholder="code-practice">
+            <span style="font-size:11px;color:#64748b;">Repository will be created automatically on GitHub if it does not already exist.</span>
           </div>
 
           <!-- File Path in Repo -->
@@ -4306,6 +4349,51 @@
     }
 
     // ============================================
+    // UNIVERSAL TOAST NOTIFICATION SYSTEM
+    // ============================================
+    function showToast(message, type = 'info', duration = 4000) {
+      let container = document.getElementById('placeai-toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'placeai-toast-container';
+        container.style.cssText = 'position:fixed;top:24px;right:24px;z-index:999999;display:flex;flex-direction:column;gap:10px;max-width:440px;pointer-events:none;';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = 'placeai-toast';
+      toast.style.cssText = 'pointer-events:auto;background:#0d1117;border-radius:10px;padding:12px 16px;color:#e6edf3;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.08);display:flex;align-items:flex-start;gap:10px;animation:toastSlideIn 0.25s cubic-bezier(0.16,1,0.3,1);transition:all 0.25s ease;line-height:1.45;';
+
+      let iconHtml = '<i class="fas fa-info-circle" style="color:#38bdf8;font-size:16px;margin-top:2px;"></i>';
+      let borderLeft = '4px solid #38bdf8';
+
+      if (type === 'success') {
+        iconHtml = '<i class="fas fa-check-circle" style="color:#10b981;font-size:16px;margin-top:2px;"></i>';
+        borderLeft = '4px solid #10b981';
+      } else if (type === 'warning') {
+        iconHtml = '<i class="fas fa-exclamation-triangle" style="color:#f59e0b;font-size:16px;margin-top:2px;"></i>';
+        borderLeft = '4px solid #f59e0b';
+      } else if (type === 'error') {
+        iconHtml = '<i class="fas fa-times-circle" style="color:#ef4444;font-size:16px;margin-top:2px;"></i>';
+        borderLeft = '4px solid #ef4444';
+      }
+
+      toast.style.borderLeft = borderLeft;
+      toast.innerHTML = iconHtml +
+        '<div style="flex:1;word-break:break-word;">' + message + '</div>' +
+        '<button type="button" style="background:none;border:none;color:#8b949e;cursor:pointer;padding:0 0 0 6px;font-size:15px;line-height:1;" onclick="this.parentElement.remove()">&times;</button>';
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        setTimeout(() => toast.remove(), 250);
+      }, duration);
+    }
+    window.showToast = showToast;
+
+    // ============================================
     // GITHUB DIRECT COMMIT & PUSH SYSTEM
     // ============================================
     const GH_LANG_CONFIG = {
@@ -4318,26 +4406,38 @@
 
     let ghConnectedUser = null;
 
-    function openGitHubPushModal() {
+    function updatePushButtonsConnectedState(isConnected) {
+      const dot = document.getElementById('ghPushDot');
+      if (dot) dot.style.display = isConnected ? 'inline-block' : 'none';
+      const pushBtn = document.getElementById('btnPushToGitHub');
+      if (pushBtn) {
+        if (isConnected) {
+          pushBtn.title = 'Push solution directly to your code-practice repository on GitHub';
+        } else {
+          pushBtn.title = 'Connect GitHub once to enable 1-click push';
+        }
+      }
+    }
+
+    function openGitHubPushModal(isSettings = false) {
       const modal = document.getElementById('githubPushModal');
       if (!modal) return;
 
       const code = document.getElementById('codeEditor') ? document.getElementById('codeEditor').value : '';
-      if (!code || !code.trim()) {
-        showToast('Please write some code in the editor before pushing to GitHub.', 'warning');
-        return;
-      }
 
       // Reset views
-      document.getElementById('ghSuccessScreen').style.display = 'none';
-      document.getElementById('ghCommitFormArea').style.display = 'block';
-      document.getElementById('ghModalFooter').style.display = 'flex';
+      const successScreen = document.getElementById('ghSuccessScreen');
+      if (successScreen) successScreen.style.display = 'none';
+      const formArea = document.getElementById('ghCommitFormArea');
+      if (formArea) formArea.style.display = 'block';
+      const footer = document.getElementById('ghModalFooter');
+      if (footer) footer.style.display = 'flex';
       const statusBanner = document.getElementById('ghStatusBanner');
       if (statusBanner) statusBanner.style.display = 'none';
 
       // Update Code Preview
       const preview = document.getElementById('ghCodePreview');
-      if (preview) preview.textContent = code;
+      if (preview) preview.textContent = code || '// Write code in the editor to see preview';
       const langTag = document.getElementById('ghCodeLangTag');
       if (langTag) langTag.textContent = (currentLang || 'javascript').toUpperCase();
 
@@ -4346,8 +4446,8 @@
       const probId = currentProblem ? String(currentProblem.id).padStart(2, '0') : '01';
       const probTitle = currentProblem ? currentProblem.title : 'Solution';
       const probSlug = probTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const filePath = `solutions/${probId}-${probSlug}/solution${langInfo.ext}`;
-      const commitMsg = `feat(dsa): solve ${currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem'} in ${langInfo.name} - PlaceAI`;
+      const filePath = 'solutions/' + probId + '-' + probSlug + '/solution' + langInfo.ext;
+      const commitMsg = 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
 
       const pathInput = document.getElementById('ghFilePathInput');
       if (pathInput) pathInput.value = filePath;
@@ -4375,10 +4475,15 @@
       const token = localStorage.getItem('placeai_github_pat');
       const tokenArea = document.getElementById('ghTokenInputArea');
       const userArea = document.getElementById('ghConnectedUserArea');
+      const defaultRepo = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+
+      const repoNameEl = document.getElementById('ghConnectedRepoName');
+      if (repoNameEl) repoNameEl.textContent = defaultRepo;
 
       if (!token) {
         if (tokenArea) tokenArea.style.display = 'block';
         if (userArea) userArea.style.display = 'none';
+        updatePushButtonsConnectedState(false);
         return;
       }
 
@@ -4388,6 +4493,7 @@
         try {
           ghConnectedUser = JSON.parse(cachedUser);
           renderConnectedGitHubUser(ghConnectedUser);
+          updatePushButtonsConnectedState(true);
           loadUserReposDropdown(token);
           return;
         } catch(e) {}
@@ -4401,6 +4507,7 @@
             ghConnectedUser = res.user;
             localStorage.setItem('placeai_github_user', JSON.stringify(res.user));
             renderConnectedGitHubUser(res.user);
+            updatePushButtonsConnectedState(true);
             loadUserReposDropdown(token);
           }
         }
@@ -4408,18 +4515,26 @@
         console.warn('GitHub token validation error:', err.message);
         if (tokenArea) tokenArea.style.display = 'block';
         if (userArea) userArea.style.display = 'none';
+        updatePushButtonsConnectedState(false);
       }
     }
 
     function renderConnectedGitHubUser(user) {
       const tokenArea = document.getElementById('ghTokenInputArea');
       const userArea = document.getElementById('ghConnectedUserArea');
+      const defaultRepo = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+
       if (tokenArea) tokenArea.style.display = 'none';
       if (userArea) {
         userArea.style.display = 'flex';
-        document.getElementById('ghUserAvatar').src = user.avatar_url || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
-        document.getElementById('ghUserLogin').textContent = '@' + user.login;
-        document.getElementById('ghUserName').textContent = user.name || user.login;
+        const avatar = document.getElementById('ghUserAvatar');
+        if (avatar) avatar.src = user.avatar_url || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
+        const loginEl = document.getElementById('ghUserLogin');
+        if (loginEl) loginEl.textContent = '@' + user.login;
+        const nameEl = document.getElementById('ghUserName');
+        if (nameEl) nameEl.textContent = user.name || user.login;
+        const repoEl = document.getElementById('ghConnectedRepoName');
+        if (repoEl) repoEl.textContent = defaultRepo;
       }
     }
 
@@ -4431,22 +4546,59 @@
         return;
       }
 
-      showToast('Connecting to GitHub API...', 'info');
+      showToast('Connecting to GitHub & initializing your "code-practice" repository...', 'info');
 
       try {
         if (!window.GitHubService) throw new Error('GitHub service not initialized');
         const res = await window.GitHubService.validateToken(token);
-        if (res && res.success && res.user) {
-          ghConnectedUser = res.user;
-          localStorage.setItem('placeai_github_pat', token);
-          localStorage.setItem('placeai_github_user', JSON.stringify(res.user));
-          localStorage.setItem('placeai_connected_github', res.user.login);
-          renderConnectedGitHubUser(res.user);
-          await loadUserReposDropdown(token);
-          showToast(`✅ Connected as @${res.user.login}!`, 'success');
+        if (!res || !res.success || !res.user) {
+          throw new Error((res && res.error) || 'Invalid GitHub token. Please verify token repo permissions.');
         }
+
+        ghConnectedUser = res.user;
+        localStorage.setItem('placeai_github_pat', token);
+        localStorage.setItem('placeai_github_user', JSON.stringify(res.user));
+        localStorage.setItem('placeai_connected_github', res.user.login);
+
+        // Auto-create or verify "code-practice" repository
+        let targetRepo = 'code-practice';
+        try {
+          const userRepos = await window.GitHubService.getUserRepositories(token);
+          const found = userRepos.find(r => r.name.toLowerCase() === 'code-practice');
+          if (found) {
+            targetRepo = found.name;
+          } else {
+            try {
+              await window.GitHubService.createRepository(
+                token,
+                'code-practice',
+                'My verified Data Structures & Algorithms solutions and code practice - PlaceAI'
+              );
+              await new Promise(r => setTimeout(r, 1200));
+            } catch (crErr) {
+              console.warn('Repository auto-create note:', crErr.message);
+            }
+          }
+        } catch (rErr) {
+          console.warn('Repo check warning:', rErr.message);
+        }
+
+        localStorage.setItem('placeai_github_default_repo', targetRepo);
+        localStorage.setItem('placeai_github_joined', 'true');
+
+        renderConnectedGitHubUser(res.user);
+        updatePushButtonsConnectedState(true);
+        await loadUserReposDropdown(token);
+
+        showToast('🎉 Joined as @' + res.user.login + '! Ready to 1-click push solutions directly to <b>' + targetRepo + '</b>.', 'success', 5000);
+
+        setTimeout(() => {
+          closeGitHubPushModal();
+        }, 1200);
+
       } catch (err) {
-        alert('GitHub Connection Error: ' + err.message);
+        console.error('connectGitHubToken error:', err);
+        showToast('GitHub Connection Error: ' + err.message, 'error', 6000);
       }
     }
 
@@ -4454,10 +4606,16 @@
       if (confirm('Disconnect GitHub account from PlaceAI Code Practice?')) {
         localStorage.removeItem('placeai_github_pat');
         localStorage.removeItem('placeai_github_user');
+        localStorage.removeItem('placeai_github_joined');
         ghConnectedUser = null;
-        document.getElementById('ghTokenInputArea').style.display = 'block';
-        document.getElementById('ghConnectedUserArea').style.display = 'none';
-        document.getElementById('ghPatInput').value = '';
+        const tokenArea = document.getElementById('ghTokenInputArea');
+        if (tokenArea) tokenArea.style.display = 'block';
+        const userArea = document.getElementById('ghConnectedUserArea');
+        if (userArea) userArea.style.display = 'none';
+        const patInput = document.getElementById('ghPatInput');
+        if (patInput) patInput.value = '';
+        updatePushButtonsConnectedState(false);
+        showToast('GitHub account disconnected.', 'info');
       }
     }
 
@@ -4467,18 +4625,15 @@
 
       try {
         const repos = await window.GitHubService.getUserRepositories(token);
-        let html = '<option value="create_new">+ Auto-create "PlaceAI-DSA-Solutions"</option>';
+        const defaultRepo = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+        let html = '<option value="' + defaultRepo + '" selected>' + defaultRepo + ' (PlaceAI Practice Repo)</option>';
+        html += '<option value="create_new">+ Auto-create / Custom Repo</option>';
         repos.forEach(r => {
-          html += `<option value="${r.name}" data-branch="${r.default_branch}">${r.full_name} (${r.private ? 'Private' : 'Public'})</option>`;
+          if (r.name.toLowerCase() !== defaultRepo.toLowerCase()) {
+            html += '<option value="' + r.name + '" data-branch="' + (r.default_branch || 'main') + '">' + r.full_name + ' (' + (r.private ? 'Private' : 'Public') + ')</option>';
+          }
         });
         select.innerHTML = html;
-
-        // Auto select if user previously used a repo
-        const lastRepo = localStorage.getItem('placeai_github_last_repo');
-        if (lastRepo && Array.from(select.options).some(o => o.value === lastRepo)) {
-          select.value = lastRepo;
-        }
-
         handleRepoSelectChange();
       } catch (err) {
         console.warn('Could not load repos list:', err.message);
@@ -4535,11 +4690,119 @@
         '*Solved & committed with [PlaceAI Code Practice](https://www.firstplacewise.tech/code-practice.html) by @' + (ghConnectedUser ? ghConnectedUser.login : 'developer') + '*\n';
     }
 
+    // ============================================
+    // DIRECT 1-CLICK PUSH TO GITHUB
+    // ============================================
+    async function handleDirectGitHubPush() {
+      const token = localStorage.getItem('placeai_github_pat');
+      const userStr = localStorage.getItem('placeai_github_user');
+
+      // If not joined, prompt one-time join
+      if (!token || !userStr) {
+        showToast('Please join GitHub once to enable automatic 1-click push.', 'info');
+        openGitHubPushModal(false);
+        return;
+      }
+
+      let user = null;
+      try {
+        user = JSON.parse(userStr);
+      } catch(e) {
+        user = { login: localStorage.getItem('placeai_connected_github') || '' };
+      }
+
+      if (!user || !user.login) {
+        showToast('Please join GitHub once to enable automatic 1-click push.', 'info');
+        openGitHubPushModal(false);
+        return;
+      }
+
+      const codeEl = document.getElementById('codeEditor');
+      const code = codeEl ? codeEl.value : '';
+      if (!code || !code.trim()) {
+        showToast('Please write some code in the editor before pushing to GitHub.', 'warning');
+        return;
+      }
+
+      const owner = user.login;
+      const repoName = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+      const branch = localStorage.getItem('placeai_github_branch') || 'main';
+
+      const langInfo = GH_LANG_CONFIG[currentLang] || { ext: '.js', name: 'JavaScript' };
+      const probId = currentProblem ? String(currentProblem.id).padStart(2, '0') : '01';
+      const probTitle = currentProblem ? currentProblem.title : 'Solution';
+      const probSlug = probTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const folderPath = 'solutions/' + probId + '-' + probSlug;
+      const filePath = folderPath + '/solution' + langInfo.ext;
+      const readmePath = folderPath + '/README.md';
+      const commitMsg = 'feat(dsa): solve ' + (currentProblem ? currentProblem.id + '. ' + currentProblem.title : 'Problem') + ' in ' + langInfo.name + ' - PlaceAI';
+
+      const pushBtns = document.querySelectorAll('.btn-github-push');
+      pushBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.dataset.prevHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Pushing...';
+      });
+
+      showToast('🚀 Committing <b>' + probTitle + '</b> directly to <b>' + owner + '/' + repoName + '</b>...', 'info', 3000);
+
+      try {
+        // Step 1: Commit README Documentation
+        if (currentProblem) {
+          const readmeContent = generateProblemReadmeContent(currentProblem, currentLang, code);
+          const readmeMsg = 'docs(dsa): add documentation for ' + currentProblem.id + '. ' + currentProblem.title;
+          try {
+            await window.GitHubService.commitAndPushFile(token, owner, repoName, readmePath, readmeContent, readmeMsg, branch);
+          } catch (rErr) {
+            console.warn('README commit warning:', rErr.message);
+          }
+        }
+
+        // Step 2: Commit Solution Code
+        const pushResult = await window.GitHubService.commitAndPushFile(token, owner, repoName, filePath, code, commitMsg, branch);
+
+        // Step 3: Record Authentic Activity for Today
+        if (window.ActivityTracker) {
+          window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + probTitle + ' to ' + repoName);
+        }
+
+        // Step 4: Success Button Animation
+        pushBtns.forEach(btn => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> Pushed!';
+          setTimeout(() => {
+            btn.innerHTML = btn.dataset.prevHtml || '<i class="fab fa-github"></i> Push to GitHub';
+          }, 3000);
+        });
+
+        // Step 5: Rich Success Toast with Clickable Commit Link
+        showToast(
+          '✅ Pushed <b>' + probTitle + '</b> to <b>' + owner + '/' + repoName + '</b>! ' +
+          '<a href="' + pushResult.commitUrl + '" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:600;margin-left:8px;">View Commit <i class="fas fa-external-link-alt" style="font-size:11px;"></i></a>',
+          'success',
+          7000
+        );
+
+      } catch (err) {
+        console.error('Direct GitHub Push Error:', err);
+        pushBtns.forEach(btn => {
+          btn.disabled = false;
+          btn.innerHTML = btn.dataset.prevHtml || '<i class="fab fa-github"></i> Push to GitHub';
+        });
+
+        showToast('GitHub Push Error: ' + err.message, 'error', 6000);
+        if (err.message.includes('404') || err.message.includes('Not Found')) {
+          openGitHubPushModal(true);
+        }
+      }
+    }
+
     async function executeGitHubPush() {
       const token = localStorage.getItem('placeai_github_pat');
       if (!token || !ghConnectedUser) {
         showToast('Please connect your GitHub token first.', 'warning');
-        document.getElementById('ghTokenInputArea').scrollIntoView({ behavior: 'smooth' });
+        const tokenArea = document.getElementById('ghTokenInputArea');
+        if (tokenArea) tokenArea.scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
@@ -4550,14 +4813,14 @@
       }
 
       const repoSelect = document.getElementById('ghRepoSelect');
-      let repoName = repoSelect ? repoSelect.value : 'PlaceAI-DSA-Solutions';
+      let repoName = repoSelect ? repoSelect.value : 'code-practice';
       if (repoName === 'create_new') {
         const customNameEl = document.getElementById('ghNewRepoName');
-        repoName = customNameEl && customNameEl.value.trim() ? customNameEl.value.trim() : 'PlaceAI-DSA-Solutions';
+        repoName = customNameEl && customNameEl.value.trim() ? customNameEl.value.trim() : 'code-practice';
       }
 
       const branch = (document.getElementById('ghBranchInput')?.value || 'main').trim();
-      const filePath = (document.getElementById('ghFilePathInput')?.value || 'solution.py').trim();
+      const filePath = (document.getElementById('ghFilePathInput')?.value || 'solutions/solution.py').trim();
       const commitMsg = (document.getElementById('ghCommitMsgInput')?.value || 'feat(dsa): add solution via PlaceAI').trim();
       const includeReadme = document.getElementById('ghIncludeReadme')?.checked;
 
@@ -4580,19 +4843,17 @@
       try {
         const owner = ghConnectedUser.login;
 
-        // Step 1: Ensure repository exists (create if create_new)
+        // Step 1: Ensure repository exists
         if (repoSelect && repoSelect.value === 'create_new') {
-          if (statusBanner) statusBanner.innerHTML = `<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Checking repository ${owner}/${repoName}...`;
+          if (statusBanner) statusBanner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Checking repository ' + owner + '/' + repoName + '...';
           try {
-            // Test if repo exists
-            const testRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
-              headers: { 'Authorization': `token ${token}`, 'User-Agent': 'PlaceAI-Platform' }
+            const testRes = await fetch('https://api.github.com/repos/' + owner + '/' + repoName, {
+              headers: { 'Authorization': 'token ' + token, 'User-Agent': 'PlaceAI-Platform' }
             });
             if (testRes.status === 404) {
-              if (statusBanner) statusBanner.innerHTML = `<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Creating new repository ${owner}/${repoName}...`;
-              await window.GitHubService.createRepository(token, repoName, 'My verified Data Structures & Algorithms solutions - powered by PlaceAI');
-              // Wait 1.5 seconds for GitHub to initialize branch
-              await new Promise(r => setTimeout(r, 1500));
+              if (statusBanner) statusBanner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Creating new repository ' + owner + '/' + repoName + '...';
+              await window.GitHubService.createRepository(token, repoName, 'My verified Data Structures & Algorithms solutions - PlaceAI');
+              await new Promise(r => setTimeout(r, 1200));
             }
           } catch(e) {
             console.warn('Repository check/create:', e.message);
@@ -4602,12 +4863,12 @@
         // Step 2: Push README if requested
         if (includeReadme && currentProblem) {
           const dirParts = filePath.split('/');
-          dirParts.pop(); // remove file name
+          dirParts.pop();
           const readmePath = (dirParts.length > 0 ? dirParts.join('/') + '/' : '') + 'README.md';
           const readmeContent = generateProblemReadmeContent(currentProblem, currentLang, code);
-          const readmeMsg = `docs(dsa): add documentation for ${currentProblem.id}. ${currentProblem.title}`;
+          const readmeMsg = 'docs(dsa): add documentation for ' + currentProblem.id + '. ' + currentProblem.title;
 
-          if (statusBanner) statusBanner.innerHTML = `<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Committing documentation ${readmePath}...`;
+          if (statusBanner) statusBanner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Committing documentation ' + readmePath + '...';
           try {
             await window.GitHubService.commitAndPushFile(token, owner, repoName, readmePath, readmeContent, readmeMsg, branch);
           } catch (rErr) {
@@ -4616,20 +4877,21 @@
         }
 
         // Step 3: Commit and Push Solution Code
-        if (statusBanner) statusBanner.innerHTML = `<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Committing solution to ${filePath}...`;
+        if (statusBanner) statusBanner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right:8px;"></i> Committing solution to ' + filePath + '...';
         const pushResult = await window.GitHubService.commitAndPushFile(token, owner, repoName, filePath, code, commitMsg, branch);
 
         // Step 4: Record authentic activity point for today
         if (window.ActivityTracker) {
-          window.ActivityTracker.recordActivity('github_push', 1, `Pushed ${currentProblem ? currentProblem.title : 'Solution'} to GitHub`);
+          window.ActivityTracker.recordActivity('github_push', 1, 'Pushed ' + (currentProblem ? currentProblem.title : 'Solution') + ' to GitHub');
         }
 
-        // Save last used repo
-        localStorage.setItem('placeai_github_last_repo', repoName);
+        localStorage.setItem('placeai_github_default_repo', repoName);
 
         // Step 5: Render Success UI
-        document.getElementById('ghCommitFormArea').style.display = 'none';
-        document.getElementById('ghModalFooter').style.display = 'none';
+        const formArea = document.getElementById('ghCommitFormArea');
+        if (formArea) formArea.style.display = 'none';
+        const footer = document.getElementById('ghModalFooter');
+        if (footer) footer.style.display = 'none';
         if (statusBanner) statusBanner.style.display = 'none';
 
         const successScreen = document.getElementById('ghSuccessScreen');
@@ -4640,7 +4902,7 @@
           document.getElementById('ghResultCommitLink').href = pushResult.commitUrl;
           document.getElementById('ghResultPath').textContent = filePath;
           document.getElementById('ghResultFileLink').href = pushResult.fileUrl;
-          document.getElementById('ghResultRepo').textContent = `${owner}/${repoName}`;
+          document.getElementById('ghResultRepo').textContent = owner + '/' + repoName;
           document.getElementById('ghResultRepoLink').href = pushResult.repoUrl;
           document.getElementById('ghResultBtnOpen').href = pushResult.commitUrl;
         }
@@ -4653,9 +4915,9 @@
           statusBanner.style.background = 'rgba(239, 68, 68, 0.12)';
           statusBanner.style.border = '1px solid rgba(239, 68, 68, 0.3)';
           statusBanner.style.color = '#fca5a5';
-          statusBanner.innerHTML = `<i class="fas fa-exclamation-circle" style="margin-right:8px;"></i> Error: ${err.message}`;
+          statusBanner.innerHTML = '<i class="fas fa-exclamation-circle" style="margin-right:8px;"></i> Error: ' + err.message;
         }
-        alert('GitHub Commit Failed: ' + err.message);
+        showToast('GitHub Commit Failed: ' + err.message, 'error', 6000);
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -4665,6 +4927,7 @@
     }
 
     // Global bindings so buttons can call these anytime
+    window.showToast = showToast;
     window.openGitHubPushModal = openGitHubPushModal;
     window.closeGitHubPushModal = closeGitHubPushModal;
     window.handleGitHubModalBackdropClick = handleGitHubModalBackdropClick;
@@ -4673,6 +4936,14 @@
     window.handleRepoSelectChange = handleRepoSelectChange;
     window.refreshUserRepos = refreshUserRepos;
     window.executeGitHubPush = executeGitHubPush;
+    window.handleDirectGitHubPush = handleDirectGitHubPush;
+
+    // Initialize GitHub state on load
+    setTimeout(() => {
+      try {
+        initGitHubConnectionUI();
+      } catch(e) {}
+    }, 200);
 
     // ============================================
     // PROBLEM LIST
@@ -5398,7 +5669,7 @@
                   <div style="color:var(--text-secondary);font-size:11.5px;">Push your verified solution directly to your personal GitHub repository</div>
                 </div>
               </div>
-              <button type="button" class="btn-github-push" onclick="openGitHubPushModal()" style="padding:6px 14px;font-size:12.5px;">
+              <button type="button" class="btn-github-push" onclick="handleDirectGitHubPush()" style="padding:6px 14px;font-size:12.5px;">
                 <i class="fab fa-github"></i> Push Solution to GitHub
               </button>
             </div>
