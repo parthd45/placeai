@@ -2116,7 +2116,7 @@
               <div>
                 <div style="font-weight:700;color:#fff;font-size:13.5px;display:flex;align-items:center;gap:6px;">
                   <span id="ghUserLogin">@username</span>
-                  <span style="background:rgba(16,185,129,0.2);color:#34d399;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;"><i class="fas fa-check-circle"></i> Joined</span>
+                  <span id="ghUserBadge" style="background:rgba(16,185,129,0.2);color:#34d399;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;"><i class="fas fa-check-circle"></i> Joined</span>
                 </div>
                 <div style="font-size:11.5px;color:#94a3b8;"><span id="ghUserName">User Name</span> • Syncing to <span id="ghConnectedRepoName" style="color:#38bdf8;font-weight:600;">code-practice</span></div>
               </div>
@@ -4406,15 +4406,145 @@
 
     let ghConnectedUser = null;
 
+    function cleanGitHubHandle(input) {
+      if (!input) return '';
+      let str = String(input).trim();
+      str = str.replace(/^https?:\/\//i, '');
+      str = str.replace(/^www\./i, '');
+      str = str.replace(/^github\.com\//i, '');
+      str = str.split('/')[0].split('?')[0].split('#')[0].replace(/^@/, '').trim();
+      const m = str.match(/([a-zA-Z0-9_\-\.]+)/);
+      return m ? m[1] : '';
+    }
+
+    function detectProfileConnectedGitHub() {
+      // 1. Direct connection keys
+      const directUsername = localStorage.getItem('placeai_connected_github');
+      if (directUsername && directUsername.trim() && directUsername !== 'null' && directUsername !== 'undefined') {
+        const clean = cleanGitHubHandle(directUsername);
+        if (clean) {
+          const cached = localStorage.getItem('placeai_github_user');
+          let parsed = {};
+          try { parsed = JSON.parse(cached || '{}'); } catch(e) {}
+          return {
+            login: clean,
+            name: parsed.name || clean,
+            avatar_url: parsed.avatar_url || ('https://avatars.githubusercontent.com/' + clean),
+            html_url: parsed.html_url || ('https://github.com/' + clean),
+            source: 'placeai_connected_github'
+          };
+        }
+      }
+
+      const cachedUserStr = localStorage.getItem('placeai_github_user');
+      if (cachedUserStr) {
+        try {
+          const u = JSON.parse(cachedUserStr);
+          const clean = cleanGitHubHandle(u.login || u.username);
+          if (clean) {
+            return {
+              login: clean,
+              name: u.name || clean,
+              avatar_url: u.avatar_url || ('https://avatars.githubusercontent.com/' + clean),
+              html_url: u.html_url || ('https://github.com/' + clean),
+              source: 'placeai_github_user'
+            };
+          }
+        } catch(e) {}
+      }
+
+      // 2. Check placeai_profile (standard student profile storage)
+      try {
+        const prof = JSON.parse(localStorage.getItem('placeai_profile') || '{}');
+        const ghUrl = prof.github_url || prof.github || prof.github_username;
+        if (ghUrl) {
+          const clean = cleanGitHubHandle(ghUrl);
+          if (clean) {
+            return {
+              login: clean,
+              name: ((prof.first_name || '') + ' ' + (prof.last_name || '')).trim() || prof.name || clean,
+              avatar_url: prof.profile_image_url || ('https://avatars.githubusercontent.com/' + clean),
+              html_url: 'https://github.com/' + clean,
+              source: 'placeai_profile'
+            };
+          }
+        }
+      } catch(e) {}
+
+      // 3. Check placeai_current_user / currentUser metadata
+      try {
+        const cu = JSON.parse(localStorage.getItem('placeai_current_user') || localStorage.getItem('currentUser') || '{}');
+        const meta = cu.user_metadata || cu.raw_user_meta_data || {};
+        const ghUrl = meta.github_url || meta.github || meta.user_name || meta.preferred_username;
+        if (ghUrl) {
+          const clean = cleanGitHubHandle(ghUrl);
+          if (clean) {
+            return {
+              login: clean,
+              name: meta.full_name || meta.name || clean,
+              avatar_url: meta.avatar_url || ('https://avatars.githubusercontent.com/' + clean),
+              html_url: 'https://github.com/' + clean,
+              source: 'current_user'
+            };
+          }
+        }
+      } catch(e) {}
+
+      // 4. Check placeai_profile_* user email keys
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('placeai_profile_')) {
+            const item = JSON.parse(localStorage.getItem(k) || '{}');
+            if (item.github_url || item.github) {
+              const clean = cleanGitHubHandle(item.github_url || item.github);
+              if (clean) {
+                return {
+                  login: clean,
+                  name: item.first_name ? `${item.first_name} ${item.last_name || ''}`.trim() : clean,
+                  avatar_url: item.profile_image_url || ('https://avatars.githubusercontent.com/' + clean),
+                  html_url: 'https://github.com/' + clean,
+                  source: 'placeai_profile_keyed'
+                };
+              }
+            }
+          }
+        }
+      } catch(e) {}
+
+      // 5. Check student registry
+      try {
+        const registry = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+        const studentUser = JSON.parse(localStorage.getItem('placeai_current_user') || localStorage.getItem('currentUser') || '{}');
+        const email = studentUser.email;
+        if (email) {
+          const match = Object.values(registry).find(r => r.email && r.email.toLowerCase() === email.toLowerCase());
+          if (match && match.github_username) {
+            return {
+              login: match.github_username,
+              name: match.student_name || match.github_username,
+              avatar_url: match.avatar_url || ('https://avatars.githubusercontent.com/' + match.github_username),
+              html_url: match.profile_url || ('https://github.com/' + match.github_username),
+              source: 'student_registry'
+            };
+          }
+        }
+      } catch(e) {}
+
+      return null;
+    }
+
     function updatePushButtonsConnectedState(isConnected) {
       const dot = document.getElementById('ghPushDot');
       if (dot) dot.style.display = isConnected ? 'inline-block' : 'none';
       const pushBtn = document.getElementById('btnPushToGitHub');
       if (pushBtn) {
-        if (isConnected) {
-          pushBtn.title = 'Push solution directly to your code-practice repository on GitHub';
+        if (isConnected && ghConnectedUser && ghConnectedUser.login) {
+          pushBtn.title = 'Push solution directly to @' + ghConnectedUser.login + '/code-practice on GitHub';
+          pushBtn.innerHTML = '<i class="fab fa-github" style="color:#22c55e;"></i> Push to @' + ghConnectedUser.login + '<span id="ghPushDot" class="gh-sync-dot" style="display:inline-block;" title="Connected & Auto-Sync Ready"></span>';
         } else {
           pushBtn.title = 'Connect GitHub once to enable 1-click push';
+          pushBtn.innerHTML = '<i class="fab fa-github"></i> Push to GitHub<span id="ghPushDot" class="gh-sync-dot" style="display:none;" title="Connected & Auto-Sync Ready"></span>';
         }
       }
     }
@@ -4585,14 +4715,45 @@
     }
 
     async function initGitHubConnectionUI() {
-      const token = localStorage.getItem('placeai_github_pat');
-      const tokenArea = document.getElementById('ghTokenInputArea');
-      const userArea = document.getElementById('ghConnectedUserArea');
       const defaultRepo = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
-
       const repoNameEl = document.getElementById('ghConnectedRepoName');
       if (repoNameEl) repoNameEl.textContent = defaultRepo;
 
+      const token = localStorage.getItem('placeai_github_pat');
+      const tokenArea = document.getElementById('ghTokenInputArea');
+      const userArea = document.getElementById('ghConnectedUserArea');
+
+      // Check if user already connected their profile to GitHub anywhere in PlaceAI
+      const detected = detectProfileConnectedGitHub();
+      if (detected && detected.login) {
+        const ghUser = {
+          login: detected.login,
+          name: detected.name || detected.login,
+          avatar_url: detected.avatar_url || ('https://avatars.githubusercontent.com/' + detected.login),
+          html_url: detected.html_url || ('https://github.com/' + detected.login),
+          source: detected.source || 'profile'
+        };
+
+        ghConnectedUser = ghUser;
+        localStorage.setItem('placeai_connected_github', ghUser.login);
+        localStorage.setItem('placeai_github_user', JSON.stringify(ghUser));
+        localStorage.setItem('placeai_github_default_repo', defaultRepo);
+        localStorage.setItem('placeai_github_joined', 'true');
+
+        // Automatically register connection for admin tracking
+        recordStudentGitHubConnection(ghUser, defaultRepo);
+
+        // Display user as connected - NO REJOIN NEEDED!
+        renderConnectedGitHubUser(ghUser, true);
+        updatePushButtonsConnectedState(true);
+
+        if (token) {
+          loadUserReposDropdown(token);
+        }
+        return;
+      }
+
+      // If no profile connection and no token
       if (!token) {
         if (tokenArea) tokenArea.style.display = 'block';
         if (userArea) userArea.style.display = 'none';
@@ -4600,26 +4761,25 @@
         return;
       }
 
-      // If token exists, show user or validate
+      // Token exists: validate or restore
       const cachedUser = localStorage.getItem('placeai_github_user');
       if (cachedUser) {
         try {
           ghConnectedUser = JSON.parse(cachedUser);
-          renderConnectedGitHubUser(ghConnectedUser);
+          renderConnectedGitHubUser(ghConnectedUser, false);
           updatePushButtonsConnectedState(true);
           loadUserReposDropdown(token);
           return;
         } catch(e) {}
       }
 
-      // Validate token live
       try {
         if (window.GitHubService) {
           const res = await window.GitHubService.validateToken(token);
           if (res && res.success && res.user) {
             ghConnectedUser = res.user;
             localStorage.setItem('placeai_github_user', JSON.stringify(res.user));
-            renderConnectedGitHubUser(res.user);
+            renderConnectedGitHubUser(res.user, false);
             updatePushButtonsConnectedState(true);
             loadUserReposDropdown(token);
           }
@@ -4632,22 +4792,57 @@
       }
     }
 
-    function renderConnectedGitHubUser(user) {
+    function renderConnectedGitHubUser(user, isFromProfile = false) {
       const tokenArea = document.getElementById('ghTokenInputArea');
       const userArea = document.getElementById('ghConnectedUserArea');
       const defaultRepo = localStorage.getItem('placeai_github_default_repo') || 'code-practice';
+      const token = localStorage.getItem('placeai_github_pat');
 
-      if (tokenArea) tokenArea.style.display = 'none';
       if (userArea) {
         userArea.style.display = 'flex';
         const avatar = document.getElementById('ghUserAvatar');
-        if (avatar) avatar.src = user.avatar_url || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
+        if (avatar) avatar.src = user.avatar_url || ('https://avatars.githubusercontent.com/' + user.login);
         const loginEl = document.getElementById('ghUserLogin');
         if (loginEl) loginEl.textContent = '@' + user.login;
         const nameEl = document.getElementById('ghUserName');
         if (nameEl) nameEl.textContent = user.name || user.login;
         const repoEl = document.getElementById('ghConnectedRepoName');
         if (repoEl) repoEl.textContent = defaultRepo;
+
+        const badgeEl = document.getElementById('ghUserBadge');
+        if (badgeEl) {
+          badgeEl.innerHTML = '<i class="fas fa-check-circle"></i> ' + (isFromProfile || user.source === 'profile' ? 'Linked from Profile' : 'Joined');
+        }
+      }
+
+      // If token exists, token input area is hidden
+      if (token && token.trim()) {
+        if (tokenArea) tokenArea.style.display = 'none';
+      } else {
+        // Token is not provided yet, but user IS already recognized from their profile!
+        // Show streamlined 1-step token grant for @username without forcing them to rejoin
+        if (tokenArea) {
+          tokenArea.style.display = 'block';
+          tokenArea.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <label style="font-weight:600;font-size:13px;color:#e2e8f0;">
+                <i class="fas fa-key" style="color:#fbbf24;margin-right:6px;"></i>Enable Direct Commits to @${user.login}/code-practice
+              </label>
+              <a href="https://github.com/settings/tokens/new?scopes=repo&description=PlaceAI%20Code%20Practice%20Sync%20for%20${user.login}" target="_blank" style="color:#38bdf8;font-size:12px;text-decoration:none;font-weight:600;">
+                <i class="fas fa-external-link-alt" style="margin-right:4px;"></i>Generate Token (repo scope)
+              </a>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <input type="password" id="ghPatInput" class="gh-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx (Personal Access Token)" style="flex:1;">
+              <button type="button" class="gh-btn-primary" onclick="connectGitHubToken()" style="white-space:nowrap;">
+                <i class="fas fa-check-circle"></i> Save Token & Push
+              </button>
+            </div>
+            <p style="font-size:11px;color:#94a3b8;margin:8px 0 0 0;">
+              <i class="fas fa-info-circle" style="color:#38bdf8;margin-right:4px;"></i>Your profile is connected as <b>@${user.login}</b>. Enter your GitHub Personal Access Token once so PlaceAI can commit directly to your <code>code-practice</code> repository.
+            </p>
+          `;
+        }
       }
     }
 
@@ -4700,7 +4895,7 @@
         localStorage.setItem('placeai_github_joined', 'true');
         recordStudentGitHubConnection(res.user, targetRepo);
 
-        renderConnectedGitHubUser(res.user);
+        renderConnectedGitHubUser(res.user, false);
         updatePushButtonsConnectedState(true);
         await loadUserReposDropdown(token);
 
@@ -4816,26 +5011,45 @@
     // DIRECT 1-CLICK PUSH TO GITHUB
     // ============================================
     async function handleDirectGitHubPush() {
-      const token = localStorage.getItem('placeai_github_pat');
-      const userStr = localStorage.getItem('placeai_github_user');
+      // 1. Resolve ghConnectedUser from in-memory or profile storage
+      if (!ghConnectedUser) {
+        const detected = detectProfileConnectedGitHub();
+        if (detected && detected.login) {
+          ghConnectedUser = {
+            login: detected.login,
+            name: detected.name || detected.login,
+            avatar_url: detected.avatar_url || ('https://avatars.githubusercontent.com/' + detected.login),
+            html_url: detected.html_url || ('https://github.com/' + detected.login),
+            source: detected.source || 'profile'
+          };
+          localStorage.setItem('placeai_connected_github', ghConnectedUser.login);
+          localStorage.setItem('placeai_github_user', JSON.stringify(ghConnectedUser));
+          localStorage.setItem('placeai_github_default_repo', localStorage.getItem('placeai_github_default_repo') || 'code-practice');
+          localStorage.setItem('placeai_github_joined', 'true');
+          recordStudentGitHubConnection(ghConnectedUser, 'code-practice');
+          renderConnectedGitHubUser(ghConnectedUser, true);
+          updatePushButtonsConnectedState(true);
+        }
+      }
 
-      // If not joined, prompt one-time join
-      if (!token || !userStr) {
-        showToast('Please join GitHub once to enable automatic 1-click push.', 'info');
+      // If user is truly not connected to GitHub at all (no profile connection, no storage)
+      if (!ghConnectedUser || !ghConnectedUser.login) {
+        showToast('Please connect your GitHub account in your Profile or Code Practice to push.', 'info');
         openGitHubPushModal(false);
         return;
       }
 
-      let user = null;
-      try {
-        user = JSON.parse(userStr);
-      } catch(e) {
-        user = { login: localStorage.getItem('placeai_connected_github') || '' };
-      }
+      const token = localStorage.getItem('placeai_github_pat');
+      const user = ghConnectedUser;
 
-      if (!user || !user.login) {
-        showToast('Please join GitHub once to enable automatic 1-click push.', 'info');
-        openGitHubPushModal(false);
+      // If token is missing, open modal for 1-step token authorization for @username
+      if (!token) {
+        showToast('Profile @' + user.login + ' is connected! Please enter your GitHub token once to authorize commits.', 'info', 5000);
+        openGitHubPushModal(true);
+        const patInput = document.getElementById('ghPatInput');
+        if (patInput) {
+          setTimeout(() => patInput.focus(), 300);
+        }
         return;
       }
 
@@ -4894,7 +5108,7 @@
           btn.disabled = false;
           btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> Pushed!';
           setTimeout(() => {
-            btn.innerHTML = btn.dataset.prevHtml || '<i class="fab fa-github"></i> Push to GitHub';
+            btn.innerHTML = btn.dataset.prevHtml || ('<i class="fab fa-github" style="color:#22c55e;"></i> Push to @' + owner);
           }, 3000);
         });
 
@@ -4914,7 +5128,7 @@
         });
 
         showToast('GitHub Push Error: ' + err.message, 'error', 6000);
-        if (err.message.includes('404') || err.message.includes('Not Found')) {
+        if (err.message.includes('404') || err.message.includes('Not Found') || err.message.includes('token') || err.message.includes('Bad credentials')) {
           openGitHubPushModal(true);
         }
       }
@@ -4922,10 +5136,33 @@
 
     async function executeGitHubPush() {
       const token = localStorage.getItem('placeai_github_pat');
-      if (!token || !ghConnectedUser) {
-        showToast('Please connect your GitHub token first.', 'warning');
+      if (!ghConnectedUser) {
+        const detected = detectProfileConnectedGitHub();
+        if (detected && detected.login) {
+          ghConnectedUser = {
+            login: detected.login,
+            name: detected.name || detected.login,
+            avatar_url: detected.avatar_url || ('https://avatars.githubusercontent.com/' + detected.login),
+            html_url: detected.html_url || ('https://github.com/' + detected.login),
+            source: detected.source || 'profile'
+          };
+        }
+      }
+
+      if (!ghConnectedUser) {
+        showToast('Please connect your GitHub account in your Profile first.', 'warning');
+        return;
+      }
+
+      if (!token) {
+        showToast('Please enter your GitHub token once to authorize commits for @' + ghConnectedUser.login, 'warning');
         const tokenArea = document.getElementById('ghTokenInputArea');
-        if (tokenArea) tokenArea.scrollIntoView({ behavior: 'smooth' });
+        if (tokenArea) {
+          tokenArea.style.display = 'block';
+          tokenArea.scrollIntoView({ behavior: 'smooth' });
+          const patInput = document.getElementById('ghPatInput');
+          if (patInput) patInput.focus();
+        }
         return;
       }
 

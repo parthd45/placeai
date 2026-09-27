@@ -15396,8 +15396,39 @@
         await loadUserProfile();
         initRealtimeCampusNetwork();
 
-        // 5. Update UI state
+        // 5. Update UI state & Cross-App Sync (Code Practice, Admin Tracker)
         activeGitHubUser = extracted;
+        localStorage.setItem('placeai_connected_github', username);
+        const ghUserData = {
+          login: username,
+          name: extracted.name || ((extracted.first_name || '') + ' ' + (extracted.last_name || '')).trim() || username,
+          avatar_url: extracted.profile_image_url || extracted.avatar_url || `https://avatars.githubusercontent.com/${username}`,
+          html_url: `https://github.com/${username}`,
+          source: 'profile'
+        };
+        localStorage.setItem('placeai_github_user', JSON.stringify(ghUserData));
+        localStorage.setItem('placeai_github_default_repo', 'code-practice');
+        localStorage.setItem('placeai_github_joined', 'true');
+
+        // Central Student Registry update for admin visibility
+        try {
+          const reg = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+          reg[username] = {
+            github_username: username,
+            student_name: ghUserData.name,
+            email: (currentUser && currentUser.email) || (userProfile && userProfile.email) || `${username}@student.placeai.app`,
+            avatar_url: ghUserData.avatar_url,
+            profile_url: ghUserData.html_url,
+            connected_at: new Date().toISOString(),
+            status: 'Connected',
+            target_repo: 'code-practice',
+            total_pushes: (reg[username] && reg[username].total_pushes) || 0,
+            last_push_at: (reg[username] && reg[username].last_push_at) || null,
+            pushes: (reg[username] && reg[username].pushes) || []
+          };
+          localStorage.setItem('placeai_student_github_connections', JSON.stringify(reg));
+        } catch(e) {}
+
         updateGitHubUI(extracted, true);
         renderHeatmap();
 
@@ -15480,6 +15511,19 @@
           window.ActivityTracker.clearLegacyFakeData();
           window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
         }
+
+        // Clear cross-app sync keys
+        const prevGh = localStorage.getItem('placeai_connected_github');
+        localStorage.removeItem('placeai_connected_github');
+        localStorage.removeItem('placeai_github_user');
+        localStorage.removeItem('placeai_github_joined');
+        try {
+          const reg = JSON.parse(localStorage.getItem('placeai_student_github_connections') || '{}');
+          if (prevGh && reg[prevGh]) {
+            reg[prevGh].status = 'Disconnected';
+            localStorage.setItem('placeai_student_github_connections', JSON.stringify(reg));
+          }
+        } catch(e) {}
 
         updateGitHubUI(null, false);
         renderHeatmap();
