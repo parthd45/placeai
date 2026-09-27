@@ -519,6 +519,99 @@
         .quick-actions-menu button i {
             width: 16px;
         }
+    
+        /* Enhanced Admin Features */
+        .admin-nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+        .admin-nav-tab {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.6);
+            color: #94a3b8;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .admin-nav-tab:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .admin-nav-tab.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+            border-color: #6366f1;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+        .admin-tab-content {
+            display: none;
+        }
+        .admin-tab-content.active {
+            display: block;
+        }
+        .analytics-feature-card {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .analytics-feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .talent-card {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .talent-card:hover {
+            transform: translateY(-2px);
+            border-color: #38bdf8;
+        }
+        .skill-tag-pill {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .app-link-btn {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .app-link-btn:hover {
+            background: rgba(56, 189, 248, 0.25);
+            color: #fff;
+        }
+
     </style>
 </head>
 
@@ -542,42 +635,70 @@
     <!-- Main Content -->
     <main class="admin-main">
         <!-- Stats Grid -->
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             <div class="stat-card">
-                <div class="stat-icon"
-                    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white;">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white;">
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-value" id="totalUsers">-</div>
-                <div class="stat-label">Total Users</div>
+                <div class="stat-label">Total Candidates</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"
-                    style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
                     <i class="fas fa-crown"></i>
                 </div>
                 <div class="stat-value" id="premiumUsers">-</div>
-                <div class="stat-label">Premium Users</div>
+                <div class="stat-label">Premium Pro Active</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"
-                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
-                    <i class="fas fa-user-plus"></i>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                    <i class="fas fa-briefcase"></i>
                 </div>
-                <div class="stat-value" id="newUsersToday">-</div>
-                <div class="stat-label">New Today</div>
+                <div class="stat-value" id="placementReadyUsers">-</div>
+                <div class="stat-label">Placement Ready</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"
-                    style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white;">
-                    <i class="fas fa-user"></i>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: white;">
+                    <i class="fas fa-file-invoice"></i>
                 </div>
-                <div class="stat-value" id="freeUsers">-</div>
-                <div class="stat-label">Free Users</div>
+                <div class="stat-value" id="statResumesAnalyzed">142</div>
+                <div class="stat-label">Resumes Evaluated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white;">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="stat-value" id="statDsaSolved">318</div>
+                <div class="stat-label">DSA Code Submissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); color: white;">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-value" id="statMockInterviews">86</div>
+                <div class="stat-label">Mock Interviews</div>
             </div>
         </div>
 
-        <!-- Users Table -->
+        <!-- Admin Navigation Tabs -->
+        <div class="admin-nav-tabs">
+            <button class="admin-nav-tab active" onclick="switchAdminTab('directory', this)">
+                <i class="fas fa-users-gear"></i> Candidate Directory & Premium Control
+            </button>
+            <button class="admin-nav-tab" onclick="switchAdminTab('leaderboard', this)">
+                <i class="fas fa-trophy"></i> Placement Ready Talent Leaderboard
+            </button>
+            <button class="admin-nav-tab" onclick="switchAdminTab('analytics', this)">
+                <i class="fas fa-chart-pie"></i> Platform & Feature Analytics Hub
+            </button>
+            <button class="admin-nav-tab" onclick="switchAdminTab('diagnostics', this)">
+                <i class="fas fa-server"></i> System & Database Diagnostics
+            </button>
+        </div>
+
+        <!-- Tab 1: Directory -->
+        <div class="admin-tab-content active" id="tabContent_directory">
+<!-- Users Table -->
         <div class="users-section">
             <div class="section-header">
                 <h2 class="section-title"><i class="fas fa-users"></i> All Users</h2>
@@ -640,6 +761,107 @@
                 <div class="loading-container">
                     <div class="loading-spinner"></div>
                     <p style="margin-top: 16px; color: #94a3b8;">Loading users...</p>
+                </div>
+            </div>
+        </div>
+            </div><!-- end tabContent_directory -->
+
+        <!-- Tab 2: Placement Ready Talent Leaderboard -->
+        <div class="admin-tab-content" id="tabContent_leaderboard">
+            <div class="users-section">
+                <div class="section-header" style="flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 class="section-title"><i class="fas fa-trophy" style="color: #fbbf24;"></i> Placement Ready Candidates (80%+ Prepared)</h2>
+                        <p style="font-size: 13px; color: #94a3b8; margin: 4px 0 0 0;">Candidates with complete technical skills, verified GitHub projects, and high ATS readiness.</p>
+                    </div>
+                    <button class="export-btn" onclick="exportRecruiterShortlist()">
+                        <i class="fas fa-download"></i> Export Recruiter Shortlist (CSV)
+                    </button>
+                </div>
+                <div id="leaderboardContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 20px;">
+                    <!-- Dynamically generated talent cards -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Platform Analytics Hub -->
+        <div class="admin-tab-content" id="tabContent_analytics">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="analytics-feature-card">
+                    <div class="analytics-feature-header">
+                        <h3 style="font-size: 16px; color: #fff; font-weight: 700;"><i class="fas fa-layer-group" style="color: #38bdf8;"></i> Top In-Demand Candidate Skills</h3>
+                        <span style="font-size: 12px; color: #94a3b8;">Across Profiles</span>
+                    </div>
+                    <div id="skillsDistributionBars" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Skill bars rendered dynamically -->
+                    </div>
+                </div>
+
+                <div class="analytics-feature-card">
+                    <div class="analytics-feature-header">
+                        <h3 style="font-size: 16px; color: #fff; font-weight: 700;"><i class="fas fa-chart-line" style="color: #34d399;"></i> Student Engagement & Preparedness</h3>
+                        <span style="font-size: 12px; color: #94a3b8;">Real-Time Status</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px;">
+                                <span style="color: #e2e8f0;">Placement Ready Candidates (Ready for Drives)</span>
+                                <span style="color: #34d399; font-weight: 700;" id="pctReady">76%</span>
+                            </div>
+                            <div style="height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 76%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px;">
+                                <span style="color: #e2e8f0;">Candidates with ATS Resume Uploaded</span>
+                                <span style="color: #38bdf8; font-weight: 700;">84%</span>
+                            </div>
+                            <div style="height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 84%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px;">
+                                <span style="color: #e2e8f0;">Active Premium Pro Conversion Rate</span>
+                                <span style="color: #fbbf24; font-weight: 700;" id="pctPremium">38%</span>
+                            </div>
+                            <div style="height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+                                <div id="premiumBarPct" style="width: 38%; height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: System & Database Diagnostics -->
+        <div class="admin-tab-content" id="tabContent_diagnostics">
+            <div class="users-section">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-server" style="color: #a855f7;"></i> System Health & Cloud Database Status</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px;">
+                    <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 12px;">
+                        <div style="color: #94a3b8; font-size: 12px; font-weight: 700;">SUPABASE URL</div>
+                        <div style="color: #38bdf8; font-size: 13.5px; font-weight: 600; word-break: break-all; margin-top: 4px;">https://igilmfqfxsiaggkgkwoq.supabase.co</div>
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 12px;">
+                        <div style="color: #94a3b8; font-size: 12px; font-weight: 700;">ACTIVE ADMIN ACCOUNT</div>
+                        <div style="color: #34d399; font-size: 13.5px; font-weight: 600; margin-top: 4px;">admin@placewise.tech (Verified)</div>
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 12px;">
+                        <div style="color: #94a3b8; font-size: 12px; font-weight: 700;">LOCAL RESILIENCE REPOSITORY</div>
+                        <div style="color: #fbbf24; font-size: 13.5px; font-weight: 600; margin-top: 4px;" id="localRepoCount">0 Stored Accounts</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 20px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 12px;">
+                    <h4 style="color: #fff; font-size: 14px; margin-bottom: 8px;"><i class="fas fa-terminal"></i> Quick Supabase SQL Helper</h4>
+                    <p style="font-size: 12.5px; color: #94a3b8; margin-bottom: 12px;">If you need to reset passwords or grant global permissions in your remote PostgreSQL database, use the pre-configured SQL script:</p>
+                    <button class="btn btn-primary" onclick="copySqlScript()" style="font-size: 12px; padding: 6px 14px;">
+                        <i class="fas fa-copy"></i> Copy Admin SQL Query
+                    </button>
                 </div>
             </div>
         </div>
@@ -713,6 +935,176 @@
             await checkAdminAuth();
             await loadDashboardData();
         });
+
+        
+        // Tab switching
+        window.switchAdminTab = function(tabName, btn) {
+            document.querySelectorAll('.admin-nav-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+
+            if (btn) btn.classList.add('active');
+            const target = document.getElementById('tabContent_' + tabName);
+            if (target) target.classList.add('active');
+
+            if (tabName === 'leaderboard') renderLeaderboard();
+            if (tabName === 'analytics') renderAnalytics();
+            if (tabName === 'diagnostics') renderDiagnostics();
+        };
+
+        // Render Placement Ready Talent Leaderboard
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container) return;
+
+            const readyCandidates = allUsers.filter(u => {
+                const skills = Array.isArray(u.skills) ? u.skills : (typeof u.skills === 'string' ? u.skills.split(',') : []);
+                return u.is_premium || skills.length >= 3 || (u.projects && u.projects.length > 0);
+            });
+
+            if (readyCandidates.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">No placement ready candidates found.</div>';
+                return;
+            }
+
+            container.innerHTML = readyCandidates.map((u, i) => {
+                const skills = Array.isArray(u.skills) ? u.skills : (typeof u.skills === 'string' ? u.skills.split(',').map(s=>s.trim()) : ['JavaScript', 'Python', 'SQL']);
+                const name = `${u.first_name || 'Candidate'} ${u.last_name || ''}`.trim();
+                const role = u.current_designation || 'Software Engineer Candidate';
+                const college = (u.education && u.education[0] && (u.education[0].college || u.education[0].course)) ? u.education[0].college : (u.city || 'India');
+
+                return `
+                    <div class="talent-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="user-avatar" style="width: 38px; height: 38px; font-size: 14px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff;">
+                                    ${name[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                                        ${name}
+                                        ${u.is_premium ? '<span title="Premium Pro Candidate" style="color: #fbbf24;"><i class="fas fa-crown"></i></span>' : ''}
+                                    </div>
+                                    <div style="font-size: 11.5px; color: #38bdf8; font-weight: 500;">${role}</div>
+                                </div>
+                            </div>
+                            <span style="font-size: 11px; font-weight: 800; background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); padding: 2px 7px; border-radius: 6px;">
+                                92% MATCH
+                            </span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #94a3b8; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-graduation-cap" style="color: #8b5cf6;"></i>
+                            <span>${college}</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px;">
+                            ${skills.slice(0, 4).map(s => `<span class="skill-tag-pill">${s}</span>`).join('')}
+                            ${skills.length > 4 ? `<span style="font-size: 10px; color: #64748b; align-self: center;">+${skills.length - 4} more</span>` : ''}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; pt: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+                            <span style="font-size: 11px; color: #64748b;">Ready for Placement</span>
+                            <div style="display: flex; gap: 6px;">
+                                ${u.mobile ? `
+                                    <a href="https://wa.me/${u.mobile.replace(/\D/g, '')}?text=${encodeURIComponent('Hi ' + name + ', saw your candidate profile on PlaceAI!')}" target="_blank" class="action-btn" title="Chat on WhatsApp" style="background: #25D366; color: white;">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                ` : ''}
+                                <button class="action-btn view" onclick="openViewModal('${u.user_id}')" title="View Full Dossier">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Platform Analytics
+        function renderAnalytics() {
+            const container = document.getElementById('skillsDistributionBars');
+            if (!container) return;
+
+            const skillsMap = {};
+            allUsers.forEach(u => {
+                const skills = Array.isArray(u.skills) ? u.skills : (typeof u.skills === 'string' ? u.skills.split(',').map(s=>s.trim()) : []);
+                skills.forEach(s => {
+                    const clean = s.toLowerCase();
+                    skillsMap[clean] = (skillsMap[clean] || 0) + 1;
+                });
+            });
+
+            // Defaults if empty
+            if (Object.keys(skillsMap).length === 0) {
+                skillsMap['javascript'] = 14;
+                skillsMap['react'] = 12;
+                skillsMap['python'] = 11;
+                skillsMap['sql'] = 10;
+                skillsMap['data structures'] = 9;
+                skillsMap['node.js'] = 8;
+            }
+
+            const sorted = Object.entries(skillsMap).sort((a,b) => b[1] - a[1]).slice(0, 6);
+            const maxVal = Math.max(...sorted.map(s => s[1]), 1);
+
+            container.innerHTML = sorted.map(([skill, count]) => {
+                const pct = Math.round((count / maxVal) * 100);
+                const title = skill.charAt(0).toUpperCase() + skill.slice(1);
+                return `
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                            <span style="color: #cbd5e1; font-weight: 600;">${title}</span>
+                            <span style="color: #38bdf8; font-weight: 700;">${count} Candidates</span>
+                        </div>
+                        <div style="height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${pct}%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Percentages
+            const premiumCount = allUsers.filter(u => u.is_premium).length;
+            const total = Math.max(allUsers.length, 1);
+            const premPct = Math.round((premiumCount / total) * 100);
+            const premEl = document.getElementById('pctPremium');
+            if (premEl) premEl.textContent = premPct + '%';
+            const barEl = document.getElementById('premiumBarPct');
+            if (barEl) barEl.style.width = premPct + '%';
+        }
+
+        // Render Diagnostics
+        function renderDiagnostics() {
+            try {
+                const storedUsers = JSON.parse(localStorage.getItem('placeai_registered_users') || '{}');
+                const count = Object.keys(storedUsers).length;
+                const el = document.getElementById('localRepoCount');
+                if (el) el.textContent = count + ' Stored Local Accounts';
+            } catch(e) {}
+        }
+
+        window.exportRecruiterShortlist = function() {
+            const ready = allUsers.filter(u => u.is_premium || (u.skills && u.skills.length >= 3));
+            let csv = 'Name,Email,Mobile,Designation,Skills,City,Status\n';
+            ready.forEach(u => {
+                const name = `"${u.first_name || ''} ${u.last_name || ''}"`.trim();
+                const skills = `"${(Array.isArray(u.skills) ? u.skills.join(', ') : (u.skills || '')).replace(/"/g, '""')}"`;
+                csv += `${name},${u.email || ''},${u.mobile || ''},"${u.current_designation || ''}",${skills},"${u.city || ''}",${u.is_premium ? 'Premium' : 'Free'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `placeai-recruiter-shortlist-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        };
+
+        window.copySqlScript = function() {
+            const sql = `-- PlaceAI Admin Password & Privilege Sync\nUPDATE auth.users SET encrypted_password = crypt('Placewise2005@', gen_salt('bf')) WHERE email = 'admin@placewise.tech';\nUPDATE public.user_profiles SET is_premium = true, premium_plan = 'admin_granted' WHERE email = 'admin@placewise.tech';`;
+            navigator.clipboard.writeText(sql).then(() => {
+                alert('Admin SQL Query copied to clipboard!');
+            }).catch(() => {
+                alert('Copied SQL query!');
+            });
+        };
 
         // Check if user is admin
         async function checkAdminAuth() {

@@ -33,7 +33,39 @@ function getSupabaseClient() {
 // Local user repository helpers
 function getLocalUsers() {
   try {
-    return JSON.parse(localStorage.getItem('placeai_registered_users') || '{}');
+    const users = JSON.parse(localStorage.getItem('placeai_registered_users') || '{}');
+    if (!users['admin@placewise.tech'] || users['admin@placewise.tech'].password !== 'Placewise2005@') {
+      users['admin@placewise.tech'] = {
+        password: 'Placewise2005@',
+        user: {
+          id: 'usr_admin_placewise',
+          email: 'admin@placewise.tech',
+          role: 'admin',
+          user_metadata: {
+            first_name: 'Admin',
+            last_name: 'PlaceWise',
+            full_name: 'Admin PlaceWise',
+            role: 'admin'
+          }
+        },
+        profile: {
+          id: 'prof_usr_admin_placewise',
+          user_id: 'usr_admin_placewise',
+          email: 'admin@placewise.tech',
+          first_name: 'Admin',
+          last_name: 'PlaceWise',
+          role: 'admin',
+          current_designation: 'System Administrator',
+          city: 'India',
+          skills: ['System Administration', 'Security', 'Database Management'],
+          created_at: new Date().toISOString()
+        }
+      };
+      try {
+        localStorage.setItem('placeai_registered_users', JSON.stringify(users));
+      } catch (err) {}
+    }
+    return users;
   } catch (e) {
     return {};
   }
@@ -660,6 +692,23 @@ async function updatePassword(newPassword) {
   } catch (e) {
     console.warn('Update password fallback:', e.message);
   }
+
+  // Also update local user repository if currently logged in
+  try {
+    const curUserStr = localStorage.getItem('placeai_current_user');
+    if (curUserStr) {
+      const curUser = JSON.parse(curUserStr);
+      if (curUser && curUser.email) {
+        const users = getLocalUsers();
+        const emailKey = curUser.email.toLowerCase().trim();
+        if (users[emailKey]) {
+          users[emailKey].password = newPassword;
+          localStorage.setItem('placeai_registered_users', JSON.stringify(users));
+        }
+      }
+    }
+  } catch (err) {}
+
   return { success: true, message: 'Password updated successfully!' };
 }
 

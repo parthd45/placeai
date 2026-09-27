@@ -55,12 +55,29 @@ async function getUserProfile(userId) {
   // 1. Check local storage cache FIRST for instantaneous 0ms profile rendering
   const localProf = getStoredProfile();
   if (localProf && (localProf.user_id === userId || !userId)) {
+    // Check if isPremium was separately set in localStorage
+    if (localStorage.getItem('isPremium') === 'true') {
+      localProf.is_premium = true;
+    }
     // If Supabase is configured, fire non-blocking background refresh
     try {
       const supabase = getSupabaseClient();
       if (supabase) {
         withDbTimeout(supabase.from('user_profiles').select('*').eq('user_id', userId).single(), 1500)
-          .then(({ data }) => { if (data) localStorage.setItem('placeai_profile', JSON.stringify(data)); })
+          .then(({ data }) => {
+            if (data) {
+              const prevPremium = localProf.is_premium;
+              if (data.is_premium) {
+                localStorage.setItem('isPremium', 'true');
+              } else if (data.is_premium === false) {
+                localStorage.removeItem('isPremium');
+              }
+              localStorage.setItem('placeai_profile', JSON.stringify(data));
+              if (typeof window !== 'undefined' && window.dispatchEvent) {
+                window.dispatchEvent(new CustomEvent('placeai_profile_updated', { detail: data }));
+              }
+            }
+          })
           .catch(() => {});
       }
     } catch (e) {}
@@ -77,6 +94,11 @@ async function getUserProfile(userId) {
           1200
         );
         if (!error && data) {
+          if (data.is_premium) {
+            localStorage.setItem('isPremium', 'true');
+          } else if (data.is_premium === false) {
+            localStorage.removeItem('isPremium');
+          }
           localStorage.setItem('placeai_profile', JSON.stringify(data));
           return { success: true, profile: data };
         }
