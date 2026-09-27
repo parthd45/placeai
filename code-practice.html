@@ -4290,7 +4290,21 @@
         document.getElementById('viewProblems').classList.add('active');
         document.getElementById('viewProblems').style.display = 'block';
         document.getElementById('navProblems').classList.add('active');
-        
+        renderProblems();
+      } else if (view === 'leaderboard') {
+        isEditorActive = false;
+        updateHud();
+        document.getElementById('viewLeaderboard').classList.add('active');
+        document.getElementById('viewLeaderboard').style.display = 'block';
+        document.getElementById('navLeaderboard').classList.add('active');
+        renderLeaderboard();
+      } else if (view === 'editor') {
+        isEditorActive = true;
+        document.getElementById('viewEditor').classList.add('active');
+        document.getElementById('viewEditor').style.display = 'flex';
+      }
+    }
+
     // ============================================
     // GITHUB DIRECT COMMIT & PUSH SYSTEM
     // ============================================
@@ -4650,21 +4664,15 @@
       }
     }
 
-    
-    renderProblems();
-      } else if (view === 'leaderboard') {
-        isEditorActive = false;
-        updateHud();
-        document.getElementById('viewLeaderboard').classList.add('active');
-        document.getElementById('viewLeaderboard').style.display = 'block';
-        document.getElementById('navLeaderboard').classList.add('active');
-        renderLeaderboard();
-      } else if (view === 'editor') {
-        isEditorActive = true;
-        document.getElementById('viewEditor').classList.add('active');
-        document.getElementById('viewEditor').style.display = 'flex';
-      }
-    }
+    // Global bindings so buttons can call these anytime
+    window.openGitHubPushModal = openGitHubPushModal;
+    window.closeGitHubPushModal = closeGitHubPushModal;
+    window.handleGitHubModalBackdropClick = handleGitHubModalBackdropClick;
+    window.connectGitHubToken = connectGitHubToken;
+    window.disconnectGitHubToken = disconnectGitHubToken;
+    window.handleRepoSelectChange = handleRepoSelectChange;
+    window.refreshUserRepos = refreshUserRepos;
+    window.executeGitHubPush = executeGitHubPush;
 
     // ============================================
     // PROBLEM LIST
