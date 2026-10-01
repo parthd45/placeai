@@ -596,6 +596,7 @@ export default function DashboardPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           progressPercentage={project?.progressPercentage || 0}
+          project={project}
         />
 
         {/* Content Workspace Area */}
@@ -651,6 +652,8 @@ export default function DashboardPage() {
                     onUpdateProject={handleUpdateProject}
                     user={user}
                     onLeaveSquad={handleLeaveSquad}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
                   />
                 ) : (
                   // STUDENT HAS NO SQUAD FOUND -> Show Team Discovery & Squad Formation Portal
