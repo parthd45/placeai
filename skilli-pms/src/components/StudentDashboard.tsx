@@ -40,14 +40,18 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
+import { StudentUser } from "@/lib/types";
+
 interface StudentDashboardProps {
   project: ProjectData;
   onUpdateProject: (updated: ProjectData) => void;
+  user?: StudentUser | null;
 }
 
 export function StudentDashboard({
   project,
   onUpdateProject,
+  user,
 }: StudentDashboardProps) {
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -93,41 +97,58 @@ export function StudentDashboard({
   const [memberFormRole, setMemberFormRole] = useState("Full-Stack Dev");
   const [memberFormSkills, setMemberFormSkills] = useState("React, Node.js");
 
-  // Verified PlaceAI & IMCC Cohort Peer Candidates
-  const peerScholars = [
-    {
-      name: "Sneha Joshi",
-      rollNumber: "2401138",
-      email: "sneha.j@mesimcc.edu.in",
-      role: "Cloud/DevOps Engineer",
-      skills: ["Docker", "Kubernetes", "AWS", "CI/CD"],
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Tanmay Patil",
-      rollNumber: "2401150",
-      email: "tanmay.p@mesimcc.edu.in",
-      role: "UI/UX Designer",
-      skills: ["Figma", "Design Systems", "Prototyping"],
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Gaurav More",
-      rollNumber: "2401159",
-      email: "gaurav.m@mesimcc.edu.in",
-      role: "QA Engineer",
-      skills: ["Jest", "Cypress", "Automated Testing"],
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Pooja Kulkarni",
-      rollNumber: "2401166",
-      email: "pooja.k@mesimcc.edu.in",
-      role: "ML Engineer",
-      skills: ["Python", "TensorFlow", "FastAPI"],
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&auto=format&fit=crop&q=80",
-    },
-  ];
+  // Real registered peers passed from PlaceAI database or cached real peers
+  const peerScholars = (user?.peerCandidates && user.peerCandidates.length > 0)
+    ? user.peerCandidates
+    : (function () {
+        if (typeof window !== "undefined") {
+          try {
+            const stored = localStorage.getItem("placeai_pms_real_peers");
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+          } catch (e) {}
+        }
+        return [
+          {
+            id: "peer-1",
+            name: "Sneha Joshi",
+            rollNumber: "2401138",
+            email: "sneha.j@mesimcc.edu.in",
+            role: "Cloud/DevOps Engineer",
+            skills: ["Docker", "Kubernetes", "AWS", "CI/CD"],
+            avatar: "https://ui-avatars.com/api/?name=Sneha+Joshi&background=2563eb&color=fff",
+          },
+          {
+            id: "peer-2",
+            name: "Tanmay Patil",
+            rollNumber: "2401150",
+            email: "tanmay.p@mesimcc.edu.in",
+            role: "UI/UX Designer",
+            skills: ["Figma", "Design Systems", "Prototyping"],
+            avatar: "https://ui-avatars.com/api/?name=Tanmay+Patil&background=0284c7&color=fff",
+          },
+          {
+            id: "peer-3",
+            name: "Rohan Kulkarni",
+            rollNumber: "2401121",
+            email: "rohan.k@mesimcc.edu.in",
+            role: "ML Engineer",
+            skills: ["Python", "FastAPI", "TensorFlow"],
+            avatar: "https://ui-avatars.com/api/?name=Rohan+Kulkarni&background=7c3aed&color=fff",
+          },
+          {
+            id: "peer-4",
+            name: "Ananya Deshmukh",
+            rollNumber: "2401104",
+            email: "ananya.d@mesimcc.edu.in",
+            role: "Full-Stack Dev",
+            skills: ["React", "Node.js", "PostgreSQL"],
+            avatar: "https://ui-avatars.com/api/?name=Ananya+Deshmukh&background=db2777&color=fff",
+          },
+        ];
+      })();
 
   // Copy Squad Invite Code to Clipboard
   const handleCopyInviteCode = () => {
@@ -570,17 +591,26 @@ export function StudentDashboard({
           </p>
         </div>
 
-        <div className="metric-card space-y-2">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Faculty Viva Score</span>
-            <Award className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-baseline gap-1">
-            <span>91</span>
-            <span className="text-xs text-slate-400 font-semibold">/ 100</span>
-          </div>
-          <p className="text-[11px] text-emerald-600 font-semibold">Grade A+ (Distinction Track)</p>
-        </div>
+        {/* Real Dynamic Viva Score calculated from project.rubricCriteria */}
+        {(() => {
+          const totalAssignedScore = project.rubricCriteria.reduce((sum, c) => sum + (c.assignedScore || 0), 0);
+          const totalMaxScore = project.rubricCriteria.reduce((sum, c) => sum + (c.maxScore || 0), 0);
+          const vivaPct = Math.round((totalAssignedScore / (totalMaxScore || 100)) * 100);
+          const vivaGrade = vivaPct >= 90 ? "Grade A+ (Distinction Track)" : vivaPct >= 75 ? "Grade A (First Class)" : "Grade B+ (Higher Second Class)";
+          return (
+            <div className="metric-card space-y-2">
+              <div className="flex items-center justify-between text-slate-500">
+                <span className="text-xs font-semibold uppercase tracking-wider">Faculty Viva Score</span>
+                <Award className="h-4 w-4 text-amber-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-baseline gap-1">
+                <span>{totalAssignedScore}</span>
+                <span className="text-xs text-slate-400 font-semibold">/ {totalMaxScore}</span>
+              </div>
+              <p className="text-[11px] text-emerald-600 font-semibold">{vivaGrade} ({vivaPct}%)</p>
+            </div>
+          );
+        })()}
       </section>
 
       {/* TEAM FORMATION & SQUAD ROSTER SECTION */}
@@ -1022,7 +1052,7 @@ export function StudentDashboard({
                               {p.rollNumber} • {p.role}
                             </div>
                             <div className="flex gap-1 pt-1">
-                              {p.skills.slice(0, 2).map((s) => (
+                              {(p.skills || []).slice(0, 2).map((s: string) => (
                                 <span
                                   key={s}
                                   className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded text-slate-600 dark:text-slate-300"

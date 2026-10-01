@@ -41,6 +41,8 @@ export interface StudentUser {
   skills: string[];
   githubUrl?: string;
   isPlaceAiAuth?: boolean;
+  peerCandidates?: TeamMember[];
+  projects?: any[];
 }
 
 export interface TeamMember {

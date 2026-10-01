@@ -241,21 +241,21 @@ export function Navbar({ currentRole, onRoleChange, activeView, user }: NavbarPr
               onClick={() => setShowUserDropdown(!showUserDropdown)}
               className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 p-1 pr-2 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
             >
-              <div className="h-7 w-7 rounded-full bg-[#2D7F62] text-white flex items-center justify-center text-xs font-bold shadow-sm">
-                {(user?.name || "Aarav Sharma")
+              <div className="h-7 w-7 rounded-full bg-[#1b7056] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                {(user?.name || "Parth Deshmukh")
                   .split(" ")
                   .filter(Boolean)
                   .map((n) => n[0])
                   .join("")
                   .slice(0, 2)
-                  .toUpperCase() || "AS"}
+                  .toUpperCase() || "PD"}
               </div>
               <div className="hidden xl:block text-left">
                 <div className="text-xs font-semibold leading-none text-slate-900 dark:text-white">
-                  {user?.name ? user.name.split(" ")[0] + (user.name.split(" ")[1] ? " " + user.name.split(" ")[1][0] + "." : "") : "Aarav S."}
+                  {user?.name ? user.name.split(" ")[0] + (user.name.split(" ")[1] ? " " + user.name.split(" ")[1][0] + "." : "") : "Parth D."}
                 </div>
                 <div className="text-[10px] text-slate-500 leading-none mt-0.5">
-                  {user?.rollNumber || "2401098"}
+                  {user?.rollNumber || "2401089"}
                 </div>
               </div>
               <ChevronDown className="h-3 w-3 text-slate-400" />
@@ -265,16 +265,16 @@ export function Navbar({ currentRole, onRoleChange, activeView, user }: NavbarPr
               <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50">
                 <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 space-y-1">
                   <div className="font-bold text-xs text-slate-900 dark:text-white flex items-center justify-between">
-                    <span>{user?.name || "Aarav Sharma"}</span>
+                    <span>{user?.name || "Parth Deshmukh"}</span>
                     {user?.isPlaceAiAuth && (
                       <span className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded border border-emerald-500/20">
                         SSO
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-500 truncate">{user?.email || "student.roll@mesimcc.edu.in"}</div>
+                  <div className="text-[11px] text-slate-500 truncate">{user?.email || "parth.deshmukh@mesimcc.edu.in"}</div>
                   <div className="inline-flex items-center gap-1 rounded bg-[#2D7F62]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#1b7056] dark:text-emerald-400">
-                    {user?.department ? (user.department.length > 25 ? user.department.slice(0, 25) + "..." : user.department) : "SY MCA"} • {user?.division || "Div A"}
+                    {user?.department ? (user.department.length > 25 ? user.department.slice(0, 25) + "..." : user.department) : "Department of Computer Applications (MCA)"} • {user?.division || "Div A"}
                   </div>
                 </div>
 

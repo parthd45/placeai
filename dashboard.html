@@ -21963,6 +21963,25 @@ ${projStr}
         const skills = (prof && prof.skills && prof.skills.length > 0) ? prof.skills : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'];
         const gh = (prof && prof.github_url) || localStorage.getItem('placeai_connected_github') || '';
 
+        const realPeers = (Array.isArray(realRegisteredUsers) ? realRegisteredUsers : []).slice(0, 12).map(u => ({
+          id: String(u.id || ('peer_' + Math.random())),
+          name: u.name || 'Verified Scholar',
+          rollNumber: u.rollNumber || ('2401' + Math.abs((u.email || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 900 + 100)),
+          email: u.email || 'student@mesimcc.edu.in',
+          role: u.role || 'Full-Stack Dev',
+          avatar: u.avatarImg || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'Student')}&background=1b7056&color=fff`,
+          skills: u.skills || ['React', 'JavaScript', 'SQL']
+        }));
+
+        const realProjects = (prof && Array.isArray(prof.projects) && prof.projects.length > 0) ? prof.projects : [
+          {
+            name: 'PlaceAI - Placement Intelligence & Technical Assessment Platform',
+            description: 'AI-driven candidate skill evaluation, proctored in-browser code execution, resume ATS analytics, and campus mentorship ecosystem.',
+            technologies: skills,
+            repositoryUrl: gh ? (gh.startsWith('http') ? gh : ('https://github.com/' + gh)) : 'https://github.com/parthd45/placeai'
+          }
+        ];
+
         const ssoPayload = {
           id: (usr && usr.id) || (prof && prof.user_id) || ('usr_' + Date.now()),
           name: fullName,
@@ -21973,12 +21992,15 @@ ${projStr}
           division: 'Division A',
           avatar: (prof && prof.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=1b7056&color=fff`,
           skills: skills,
-          githubUrl: gh ? (gh.startsWith('http') ? gh : ('https://github.com/' + gh)) : '',
+          githubUrl: gh ? (gh.startsWith('http') ? gh : ('https://github.com/' + gh)) : 'https://github.com/parthd45/placeai',
+          peerCandidates: realPeers,
+          projects: realProjects,
           isPlaceAiAuth: true,
           timestamp: Date.now()
         };
 
         localStorage.setItem('placeai_pms_authenticated_user', JSON.stringify(ssoPayload));
+        localStorage.setItem('placeai_pms_real_peers', JSON.stringify(realPeers));
         const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(ssoPayload)))));
         window.open(`/pms/dashboard?sso=placeai&token=${token}`, '_blank');
       } catch (e) {

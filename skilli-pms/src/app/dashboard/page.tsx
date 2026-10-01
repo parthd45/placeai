@@ -325,6 +325,7 @@ export default function DashboardPage() {
               <StudentDashboard
                 project={project}
                 onUpdateProject={handleUpdateProject}
+                user={user}
               />
             )}
 
