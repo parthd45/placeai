@@ -205,11 +205,17 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={handleUnifiedSSO}
+                onClick={() => {
+                  setIsLoading(true);
+                  setTimeout(() => {
+                    setIsLoading(false);
+                    router.push("/dashboard?sso=placeai");
+                  }, 400);
+                }}
                 className="w-full border border-emerald-600/30 hover:border-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-semibold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer shadow-2xs"
               >
                 <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Sign in with Skilli Unified Account</span>
+                <span>1-Click Sign in with PlaceAI Student Profile</span>
               </button>
 
               <div className="text-center pt-1 pb-1">

@@ -9053,7 +9053,7 @@
           <span class="sidebar-item-text">Resume Analyzer</span>
           <span class="sidebar-badge">AI</span>
         </div>
-        <div class="sidebar-item" onclick="window.open('/pms', '_blank');" title="Open Capstone PMS in a new tab">
+        <div class="sidebar-item" onclick="launchCapstonePMS();" title="Open Capstone PMS in a new tab with your student profile">
           <i class="fas fa-diagram-project" style="color: #10b981;"></i>
           <span class="sidebar-item-text">Capstone PMS</span>
           <span class="sidebar-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">NEW</span>
@@ -9248,9 +9248,9 @@
         <a href="job-matching.html" class="secondary-tool-pill">
           <i class="fas fa-briefcase" style="color: #fbbf24;"></i> Campus Openings
         </a>
-        <a href="/pms" target="_blank" rel="noopener noreferrer" class="secondary-tool-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399;" title="Open Capstone PMS in separate tab">
+        <button type="button" onclick="launchCapstonePMS();" class="secondary-tool-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; cursor: pointer;" title="Open Capstone PMS in separate tab with active student profile">
           <i class="fas fa-diagram-project" style="color: #34d399;"></i> Capstone PMS <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 3px; opacity: 0.8;"></i>
-        </a>
+        </button>
         <button type="button" onclick="openExploreStudentsModal()" class="secondary-tool-pill" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35); color: #c084fc; cursor: pointer;">
           <i class="fas fa-users-viewfinder" style="color: #c084fc;"></i> Discover Students
         </button>
@@ -21936,6 +21936,56 @@ ${projStr}
         }, 300);
       }
     });
+
+    // Launch Capstone PMS with Student SSO data transfer
+    window.launchCapstonePMS = function() {
+      try {
+        const prof = window.userProfile || (function() {
+          try { return JSON.parse(localStorage.getItem('placeai_profile') || 'null'); } catch(e){ return null; }
+        })();
+        const usr = window.currentUser || (function() {
+          try {
+            const raw = localStorage.getItem('placeai_current_user') || localStorage.getItem('placeai_phone_user');
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            return parsed.user || parsed;
+          } catch(e) { return null; }
+        })();
+
+        const meta = (usr && (usr.user_metadata || usr.raw_user_meta_data)) || {};
+        const fName = (prof && (prof.first_name || prof.name)) || meta.first_name || (usr && usr.email ? usr.email.split('@')[0] : 'Candidate');
+        const lName = (prof && prof.last_name) || meta.last_name || '';
+        const fullName = `${fName} ${lName}`.trim() || 'Candidate Scholar';
+        const email = (prof && prof.email) || (usr && usr.email) || 'student@mesimcc.edu.in';
+        const rollNo = (prof && (prof.roll_number || prof.student_id)) || (prof && prof.education && prof.education[0] && prof.education[0].roll_number) || ('2401' + Math.abs(email.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 900 + 100));
+        const dept = (prof && prof.education && prof.education[0] && prof.education[0].course) || 'Department of Computer Applications (MCA)';
+        const college = (prof && prof.education && prof.education[0] && prof.education[0].college) || 'MES IMCC College, Pune';
+        const skills = (prof && prof.skills && prof.skills.length > 0) ? prof.skills : ['React', 'TypeScript', 'Node.js', 'PostgreSQL'];
+        const gh = (prof && prof.github_url) || localStorage.getItem('placeai_connected_github') || '';
+
+        const ssoPayload = {
+          id: (usr && usr.id) || (prof && prof.user_id) || ('usr_' + Date.now()),
+          name: fullName,
+          email: email,
+          rollNumber: String(rollNo),
+          department: dept,
+          college: college,
+          division: 'Division A',
+          avatar: (prof && prof.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=1b7056&color=fff`,
+          skills: skills,
+          githubUrl: gh ? (gh.startsWith('http') ? gh : ('https://github.com/' + gh)) : '',
+          isPlaceAiAuth: true,
+          timestamp: Date.now()
+        };
+
+        localStorage.setItem('placeai_pms_authenticated_user', JSON.stringify(ssoPayload));
+        const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(ssoPayload)))));
+        window.open(`/pms/dashboard?sso=placeai&token=${token}`, '_blank');
+      } catch (e) {
+        console.warn('Error launching PMS:', e);
+        window.open('/pms/dashboard', '_blank');
+      }
+    };
   </script>
 
   <!-- Fixed Native Mobile Bottom Navigation Bar -->

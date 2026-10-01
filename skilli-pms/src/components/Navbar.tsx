@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { UserRole } from "@/lib/types";
+import { UserRole, StudentUser } from "@/lib/types";
 import {
   Bell,
   Search,
@@ -22,9 +22,10 @@ interface NavbarProps {
   currentRole: UserRole;
   onRoleChange: (role: UserRole) => void;
   activeView: string;
+  user?: StudentUser | null;
 }
 
-export function Navbar({ currentRole, onRoleChange, activeView }: NavbarProps) {
+export function Navbar({ currentRole, onRoleChange, activeView, user }: NavbarProps) {
   const [isDark, setIsDark] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -241,32 +242,56 @@ export function Navbar({ currentRole, onRoleChange, activeView }: NavbarProps) {
               className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 p-1 pr-2 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
             >
               <div className="h-7 w-7 rounded-full bg-[#2D7F62] text-white flex items-center justify-center text-xs font-bold shadow-sm">
-                AS
+                {(user?.name || "Aarav Sharma")
+                  .split(" ")
+                  .filter(Boolean)
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase() || "AS"}
               </div>
               <div className="hidden xl:block text-left">
-                <div className="text-xs font-semibold leading-none text-slate-900 dark:text-white">Aarav S.</div>
-                <div className="text-[10px] text-slate-500 leading-none mt-0.5">2401098</div>
+                <div className="text-xs font-semibold leading-none text-slate-900 dark:text-white">
+                  {user?.name ? user.name.split(" ")[0] + (user.name.split(" ")[1] ? " " + user.name.split(" ")[1][0] + "." : "") : "Aarav S."}
+                </div>
+                <div className="text-[10px] text-slate-500 leading-none mt-0.5">
+                  {user?.rollNumber || "2401098"}
+                </div>
               </div>
               <ChevronDown className="h-3 w-3 text-slate-400" />
             </button>
 
             {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50">
-                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                  <div className="font-bold text-xs text-slate-900 dark:text-white">Aarav Sharma</div>
-                  <div className="text-[11px] text-slate-500">student.roll@mesimcc.edu.in</div>
-                  <div className="mt-1 inline-flex items-center gap-1 rounded bg-[#2D7F62]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#1b7056] dark:text-emerald-400">
-                    SY MCA • Div A
+              <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 space-y-1">
+                  <div className="font-bold text-xs text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>{user?.name || "Aarav Sharma"}</span>
+                    {user?.isPlaceAiAuth && (
+                      <span className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        SSO
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-slate-500 truncate">{user?.email || "student.roll@mesimcc.edu.in"}</div>
+                  <div className="inline-flex items-center gap-1 rounded bg-[#2D7F62]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#1b7056] dark:text-emerald-400">
+                    {user?.department ? (user.department.length > 25 ? user.department.slice(0, 25) + "..." : user.department) : "SY MCA"} • {user?.division || "Div A"}
                   </div>
                 </div>
 
                 <div className="py-1">
+                  <a
+                    href="/dashboard.html"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 text-emerald-600" />
+                    <span>Return to PlaceAI Profile</span>
+                  </a>
                   <Link
                     href="/auth/login"
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                   >
                     <LogOut className="h-3.5 w-3.5" />
-                    Sign Out / Switch Session
+                    <span>Sign Out / Switch Session</span>
                   </Link>
                 </div>
               </div>

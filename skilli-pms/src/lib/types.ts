@@ -29,6 +29,20 @@ export type MilestoneStatus =
   | "IN_PROGRESS"
   | "PENDING";
 
+export interface StudentUser {
+  id: string;
+  name: string;
+  email: string;
+  rollNumber: string;
+  department: string;
+  college: string;
+  division: string;
+  avatar: string;
+  skills: string[];
+  githubUrl?: string;
+  isPlaceAiAuth?: boolean;
+}
+
 export interface TeamMember {
   id: string;
   name: string;
