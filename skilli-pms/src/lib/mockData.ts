@@ -31,6 +31,8 @@ export const initialProject: ProjectData = {
   repositoryUrl: "https://github.com/imcc-capstone/autonomous-orchestrator",
   figmaUrl: "https://figma.com/@imcc-design/system-architecture",
   miroUrl: "https://miro.com/app/board/capstone-milestone-architecture",
+  inviteCode: "IMCC-CAP-7942",
+  maxTeamSize: 4,
   teamMembers: [
     {
       id: "mem-1",

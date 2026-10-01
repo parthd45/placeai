@@ -46,10 +46,13 @@ export interface StudentUser {
 export interface TeamMember {
   id: string;
   name: string;
-  role: "Team Lead" | "Full-Stack Dev" | "ML Engineer" | "UI/UX Designer";
+  role: "Team Lead" | "Full-Stack Dev" | "ML Engineer" | "UI/UX Designer" | "Cloud/DevOps Engineer" | "QA Engineer" | string;
   rollNumber: string;
   email: string;
   avatar: string;
+  skills?: string[];
+  joinedAt?: string;
+  phone?: string;
 }
 
 export interface Mentor {
@@ -122,4 +125,6 @@ export interface ProjectData {
   milestones: Milestone[];
   tasks: Task[];
   rubricCriteria: RubricCriterion[];
+  inviteCode?: string;
+  maxTeamSize?: number;
 }

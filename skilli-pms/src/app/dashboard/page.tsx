@@ -24,6 +24,17 @@ export default function DashboardPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Restore saved project state from localStorage if present
+    try {
+      const savedProjRaw = localStorage.getItem("placeai_pms_project_data");
+      if (savedProjRaw) {
+        const savedProj = JSON.parse(savedProjRaw);
+        if (savedProj && savedProj.name && Array.isArray(savedProj.teamMembers)) {
+          setProject(savedProj);
+        }
+      }
+    } catch (e) {}
+
     let detectedUser: StudentUser | null = null;
     let isSsoFlow = false;
 
@@ -171,6 +182,15 @@ export default function DashboardPage() {
     }
   }, []);
 
+  const handleUpdateProject = (updated: ProjectData) => {
+    setProject(updated);
+    try {
+      localStorage.setItem("placeai_pms_project_data", JSON.stringify(updated));
+    } catch (e) {
+      console.warn("Failed to persist project to localStorage:", e);
+    }
+  };
+
   const handleRoleChange = (role: UserRole) => {
     setCurrentRole(role);
     if (role === "STUDENT") {
@@ -304,14 +324,14 @@ export default function DashboardPage() {
             {currentRole === "STUDENT" && (
               <StudentDashboard
                 project={project}
-                onUpdateProject={setProject}
+                onUpdateProject={handleUpdateProject}
               />
             )}
 
             {currentRole === "MENTOR" && (
               <MentorDashboard
                 project={project}
-                onUpdateProject={setProject}
+                onUpdateProject={handleUpdateProject}
               />
             )}
 
