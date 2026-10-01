@@ -12,29 +12,82 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import {
+  getCurrentSessionId,
+  fetchAllSessions,
+  detectBrowser,
+  detectOS,
+  detectDeviceType,
+  syncSessionsToCloudAndLocal,
+  UserSession,
+} from "@/lib/sessionManager";
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("student.roll@mesimcc.edu.in");
+  const [email, setEmail] = useState("parth.deshmukh@mesimcc.edu.in");
   const [password, setPassword] = useState("capstone2026");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      router.push("/dashboard");
-    }, 600);
+  const registerLoginSession = async (userEmail: string) => {
+    try {
+      const sessId = "sess_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 8);
+      localStorage.setItem("placeai_current_session_id", sessId);
+
+      const authUser = {
+        id: "std-parth",
+        name: "Parth Deshmukh",
+        email: userEmail,
+        rollNumber: "2401089",
+        division: "Div A",
+        batch: "2026-2028",
+        program: "MCA (Under SPPU)",
+        college: "MES IMCC College Pune",
+      };
+      localStorage.setItem("placeai_pms_authenticated_user", JSON.stringify(authUser));
+
+      const newSession: UserSession = {
+        id: sessId,
+        userEmail,
+        userName: "Parth Deshmukh",
+        deviceName: `${detectBrowser()} on ${detectOS()}`,
+        deviceType: detectDeviceType(),
+        browser: detectBrowser(),
+        os: detectOS(),
+        ipAddress: "103.151.43.22",
+        location: "Pune, Maharashtra, India",
+        createdAt: new Date().toISOString(),
+        lastActiveAt: new Date().toISOString(),
+        status: "active",
+        isCurrent: true,
+      };
+
+      const existing = await fetchAllSessions(userEmail);
+      const filtered = existing.filter((s) => s.id !== sessId);
+      await syncSessionsToCloudAndLocal([newSession, ...filtered]);
+    } catch (e) {
+      console.warn("Could not register session:", e);
+    }
   };
 
-  const handleUnifiedSSO = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
+    await registerLoginSession(email || "parth.deshmukh@mesimcc.edu.in");
     setTimeout(() => {
       setIsLoading(false);
       router.push("/dashboard");
-    }, 500);
+    }, 400);
+  };
+
+  const handleUnifiedSSO = async () => {
+    setIsLoading(true);
+    await registerLoginSession("parth.deshmukh@mesimcc.edu.in");
+    setTimeout(() => {
+      setIsLoading(false);
+      router.push("/dashboard");
+    }, 400);
   };
 
   return (

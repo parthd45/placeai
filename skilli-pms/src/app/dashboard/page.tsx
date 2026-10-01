@@ -28,11 +28,14 @@ import {
   GraduationCap,
   KeyRound,
   Check,
+  LogOut,
 } from "lucide-react";
+import { getCurrentSessionId, isCurrentSessionRevoked } from "@/lib/sessionManager";
 
 export default function DashboardPage() {
   const [currentRole, setCurrentRole] = useState<UserRole>("STUDENT");
   const [activeTab, setActiveTab] = useState("overview");
+  const [isGlobalRevoked, setIsGlobalRevoked] = useState(false);
   const [project, setProject] = useState<ProjectData | null>(null);
   const [user, setUser] = useState<StudentUser | null>(null);
 
@@ -307,6 +310,42 @@ export default function DashboardPage() {
       };
     }
   }, []);
+
+  // Periodic multi-browser session revocation monitor
+  useEffect(() => {
+    const userEmail = user?.email || "parth.deshmukh@mesimcc.edu.in";
+    const currentSessionId = getCurrentSessionId();
+
+    const checkRevocation = async () => {
+      const revoked = await isCurrentSessionRevoked(userEmail);
+      if (revoked) {
+        setIsGlobalRevoked(true);
+      }
+    };
+
+    checkRevocation();
+    const interval = setInterval(checkRevocation, 5000);
+
+    let bc: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bc = new BroadcastChannel("placeai_session_sync_bus");
+        bc.onmessage = (event) => {
+          if (
+            (event.data?.type === "SESSION_REVOKED" && event.data.revokedSessionId === currentSessionId) ||
+            (event.data?.type === "ALL_OTHER_SESSIONS_REVOKED" && event.data.currentSessionId !== currentSessionId)
+          ) {
+            setIsGlobalRevoked(true);
+          }
+        };
+      }
+    } catch (e) {}
+
+    return () => {
+      clearInterval(interval);
+      if (bc) bc.close();
+    };
+  }, [user?.email]);
 
   // Update Project state & persist to all storage keys
   const handleUpdateProject = (updated: ProjectData) => {
@@ -592,6 +631,30 @@ export default function DashboardPage() {
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-400" />
                 <span>Checking Squad Allocation Status...</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Session Revocation Security Lockout Modal */}
+      {isGlobalRevoked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="max-w-md w-full rounded-2xl border border-red-500/40 bg-slate-950 p-6 text-center space-y-4 shadow-2xl">
+            <div className="h-14 w-14 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center mx-auto border border-red-500/30">
+              <ShieldAlert className="h-8 w-8" />
+            </div>
+            <h2 className="text-xl font-bold text-white">Login Session Revoked</h2>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              This browser session was terminated from another device or administrative security panel. For your protection, access has been revoked.
+            </p>
+            <div className="pt-2">
+              <a
+                href="/pms/auth/login"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign In Again</span>
+              </a>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ProjectData, StudentUser } from "@/lib/types";
 import {
   FolderGit2,
@@ -39,7 +39,25 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  Smartphone,
+  Laptop,
+  Trash2,
+  ShieldAlert,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Check,
+  LogOut,
 } from "lucide-react";
+import {
+  UserSession,
+  fetchAllSessions,
+  revokeSession,
+  revokeAllOtherSessions,
+  getCurrentSessionId,
+  isCurrentSessionRevoked,
+  syncSessionsToCloudAndLocal,
+} from "@/lib/sessionManager";
 
 function FigmaIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -1048,78 +1066,500 @@ export function MiroView() {
    VIEW: Session & Login Management
    ============================================================================ */
 export function SessionsView({ user }: { user?: StudentUser | null }) {
+  const [sessions, setSessions] = useState<UserSession[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [isSelfRevoked, setIsSelfRevoked] = useState(false);
+
+  const userEmail = user?.email || "parth.deshmukh@mesimcc.edu.in";
+  const currentSessionId = typeof window !== "undefined" ? getCurrentSessionId() : "";
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3800);
+  };
+
+  const copyToClipboard = (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      showToast(`📋 Copied IP address (${text}) to clipboard!`);
+    }
+  };
+
+  const loadSessions = async (showIndicator = false) => {
+    if (showIndicator) setIsRefreshing(true);
+    try {
+      const data = await fetchAllSessions(userEmail);
+      setSessions(data);
+    } catch (e) {
+      console.warn("Could not load sessions:", e);
+    } finally {
+      setIsLoading(false);
+      if (showIndicator) {
+        setTimeout(() => setIsRefreshing(false), 300);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadSessions();
+
+    // Auto-sync polling every 5 seconds to detect sessions from other browsers and remote revocations
+    const interval = setInterval(async () => {
+      // Check if current browser session was revoked remotely
+      const revoked = await isCurrentSessionRevoked(userEmail);
+      if (revoked) {
+        setIsSelfRevoked(true);
+        return;
+      }
+      loadSessions();
+    }, 5000);
+
+    // Listen to inter-tab broadcast channel
+    let bc: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bc = new BroadcastChannel("placeai_session_sync_bus");
+        bc.onmessage = (event) => {
+          if (event.data?.type === "SESSIONS_UPDATED") {
+            setSessions(event.data.sessions);
+          } else if (event.data?.type === "SESSION_REVOKED") {
+            if (event.data.revokedSessionId === currentSessionId) {
+              setIsSelfRevoked(true);
+            } else {
+              loadSessions();
+            }
+          } else if (event.data?.type === "ALL_OTHER_SESSIONS_REVOKED") {
+            if (event.data.currentSessionId !== currentSessionId) {
+              setIsSelfRevoked(true);
+            } else {
+              loadSessions();
+            }
+          }
+        };
+      }
+    } catch (e) {}
+
+    return () => {
+      clearInterval(interval);
+      if (bc) bc.close();
+    };
+  }, [userEmail, currentSessionId]);
+
+  const handleRevokeSingle = async (sessId: string, deviceName: string) => {
+    setRevokingId(sessId);
+    try {
+      const res = await revokeSession(sessId, userEmail);
+      setSessions(res.updatedSessions);
+      showToast(`🔒 Session for "${deviceName}" has been revoked! That login is now terminated.`);
+    } catch (e) {
+      showToast("❌ Could not revoke session. Please try again.");
+    } finally {
+      setRevokingId(null);
+    }
+  };
+
+  const handleTerminateAllOthers = async () => {
+    setRevokingId("ALL_OTHERS");
+    try {
+      const res = await revokeAllOtherSessions(userEmail);
+      setSessions(res.updatedSessions);
+      showToast(`🛡️ Successfully terminated ${res.count} other active login session(s)!`);
+    } catch (e) {
+      showToast("❌ Could not terminate sessions. Please try again.");
+    } finally {
+      setRevokingId(null);
+    }
+  };
+
+  const handleAddSecondarySource = async () => {
+    const simId = "sess_src_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 6);
+    const newSession: UserSession = {
+      id: simId,
+      userEmail,
+      deviceName: "Mozilla Firefox on Ubuntu Linux (Secondary Workstation)",
+      deviceType: "desktop",
+      browser: "Mozilla Firefox 125",
+      os: "Ubuntu 24.04 LTS",
+      ipAddress: "49.36.128.45",
+      location: "Mumbai, Maharashtra, India",
+      createdAt: new Date().toISOString(),
+      lastActiveAt: new Date().toISOString(),
+      status: "active",
+      isCurrent: false,
+    };
+    const updated = [newSession, ...sessions];
+    setSessions(updated);
+    await syncSessionsToCloudAndLocal(updated);
+    showToast(`✅ Secondary login source registered! You can now test revoking it below.`);
+  };
+
+  const currentSession = sessions.find((s) => s.isCurrent) || sessions[0];
+  const otherSessions = sessions.filter((s) => s.id !== currentSession?.id);
+  const activeCount = sessions.filter((s) => s.status === "active").length;
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-150">
+    <div className="space-y-6 animate-in fade-in duration-150 relative">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 shadow-2xl border border-slate-700 text-xs font-semibold animate-in fade-in slide-in-from-bottom-5">
+          <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Self-Revoked Security Overlay (if another device revoked this browser) */}
+      {isSelfRevoked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="max-w-md w-full rounded-2xl border border-red-500/40 bg-slate-950 p-6 text-center space-y-4 shadow-2xl">
+            <div className="h-14 w-14 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center mx-auto border border-red-500/30">
+              <ShieldAlert className="h-8 w-8" />
+            </div>
+            <h2 className="text-xl font-bold text-white">Your Login Session Was Revoked</h2>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              This device session was terminated from another logged-in browser or administrative security panel. For your protection, this session has been locked.
+            </p>
+            <div className="pt-2">
+              <a
+                href="/pms/auth/login"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign In Again</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       <PageHeader
         icon={ShieldCheck}
         title="Session & Login Management"
         description="Monitor all devices logged into your PlaceAI PMS account, inspect IP geolocations, and revoke unauthorized sessions in real-time."
         action={
-          <div className="flex items-center gap-2">
-            <button className="rounded-lg border border-slate-700 bg-slate-800 text-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"><RefreshCw className="h-3.5 w-3.5" /> Refresh</button>
-            <button className="rounded-lg border border-slate-700 bg-slate-800 text-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer">✏️ Change Password</button>
-            <button className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 px-3 py-2 text-xs font-bold hover:bg-red-500/20 transition-colors cursor-pointer">➡️ Terminate Other Sessions</button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => loadSessions(true)}
+              disabled={isRefreshing}
+              className="rounded-lg border border-slate-700 bg-slate-800 text-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+              <span>{isRefreshing ? "Syncing..." : "Refresh"}</span>
+            </button>
+
+            <button
+              onClick={handleAddSecondarySource}
+              className="rounded-lg border border-slate-700 bg-slate-800 text-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"
+              title="Register a simulated secondary device to test cross-device revocation"
+            >
+              <Plus className="h-3.5 w-3.5 text-emerald-400" />
+              <span>+ Add Secondary Source</span>
+            </button>
+
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="rounded-lg border border-slate-700 bg-slate-800 text-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              ✏️ Change Password
+            </button>
+
+            <button
+              onClick={handleTerminateAllOthers}
+              disabled={revokingId === "ALL_OTHERS"}
+              className="rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 px-3 py-2 text-xs font-bold hover:bg-red-500/20 transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>{revokingId === "ALL_OTHERS" ? "Terminating..." : "Terminate Other Sessions"}</span>
+            </button>
           </div>
         }
       />
 
+      {/* Security Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard label="Active Devices" value={1} sublabel="Single Login" icon={Monitor} color="text-emerald-400" />
+        <StatCard
+          label="Active Devices"
+          value={isLoading ? "..." : `${activeCount} Active`}
+          sublabel="Multi-Device Cross-Sync Enabled"
+          icon={Monitor}
+          color="text-emerald-400"
+        />
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Security Status</span>
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-extrabold text-emerald-400">Protected</div>
-          <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400">2FA Ready</span>
-          <div className="text-[10px] text-slate-500">Email alerts active for new sign-ins from unrecognized IPs.</div>
+          <div className="flex items-center gap-2">
+            <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400">
+              Cloud Synced
+            </span>
+            <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/15 text-blue-400">
+              Revocation Guard
+            </span>
+          </div>
+          <div className="text-[10px] text-slate-500">
+            Real-time multi-browser session enforcement active for {userEmail}.
+          </div>
         </div>
-        <StatCard label="Primary Location" value="Maharashtra, India" sublabel="Detected from your active network connection." icon={Globe} />
+        <StatCard
+          label="Primary Location"
+          value={currentSession?.location || "Maharashtra, India"}
+          sublabel="Detected from active network telemetry"
+          icon={Globe}
+        />
       </div>
 
-      {/* Current Session */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Monitor className="h-5 w-5 text-emerald-400" />
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white">Google Chrome on Windows 10/11</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">📡 This Device (Current Session)</span>
+      {/* Section 1: This Device (Current Session) */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>Active Device (Current Browser)</span>
+        </h3>
+
+        {currentSession ? (
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-4 shadow-sm">
+            <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  {currentSession.deviceType === "mobile" ? (
+                    <Smartphone className="h-5 w-5" />
+                  ) : (
+                    <Monitor className="h-5 w-5" />
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-white">{currentSession.deviceName}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      This Device (Current Session)
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    Device Type: <span className="capitalize text-slate-200">{currentSession.deviceType}</span> • Browser: <span className="text-slate-200">{currentSession.browser}</span>
+                  </span>
+                </div>
               </div>
-              <span className="text-xs text-slate-400">Device Type: Desktop</span>
+
+              <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                <span className="font-mono text-emerald-400 font-bold">{currentSession.ipAddress}</span>
+                <button
+                  onClick={() => copyToClipboard(currentSession.ipAddress)}
+                  className="p-1 hover:text-white transition-colors cursor-pointer"
+                  title="Copy IP"
+                >
+                  <Copy className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-800/80">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <MapPin className="h-3 w-3" /> Approximate Location
+                </span>
+                <span className="text-xs font-bold text-white">{currentSession.location}</span>
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <Clock className="h-3 w-3" /> Current Status
+                </span>
+                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Active Right Now
+                </span>
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" /> Session Token
+                </span>
+                <span className="text-xs font-mono text-slate-300 truncate block">
+                  {currentSession.id}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <span className="font-mono">IP Address</span>
-            <Copy className="h-3 w-3 cursor-pointer hover:text-white" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-800">
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1"><MapPin className="h-3 w-3" /> Approximate Location</span>
-            <span className="text-xs font-bold text-white">Maharashtra, India</span>
-          </div>
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> Current Status</span>
-            <span className="text-xs font-bold text-emerald-400">✅ Active Right Now</span>
-          </div>
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Session Type</span>
-            <span className="text-xs font-bold text-white">Primary Authorized Session</span>
-          </div>
-        </div>
+        ) : (
+          <div className="p-4 text-xs text-slate-400">Detecting session...</div>
+        )}
       </div>
 
-      {/* Other Sessions */}
-      <div>
-        <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-          Other Logged-in Devices & History
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
-        </h3>
-        <p className="text-xs text-slate-500 italic">No other active sessions detected.</p>
+      {/* Section 2: Other Logged-in Devices & Multi-Source History */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <span>Other Logged-in Devices & Multi-Source History</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+              {otherSessions.length} Devices
+            </span>
+          </h3>
+
+          <span className="text-[11px] text-slate-500">
+            Sessions can be revoked from any device in real-time
+          </span>
+        </div>
+
+        {otherSessions.length > 0 ? (
+          <div className="space-y-3">
+            {otherSessions.map((s) => {
+              const isRevoked = s.status === "revoked";
+              const isBeingRevoked = revokingId === s.id;
+
+              return (
+                <div
+                  key={s.id}
+                  className={`rounded-xl border p-4 transition-all duration-200 ${
+                    isRevoked
+                      ? "border-red-950/40 bg-slate-900/30 opacity-60"
+                      : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+                          isRevoked
+                            ? "bg-red-500/10 text-red-400"
+                            : "bg-blue-500/10 text-blue-400"
+                        }`}
+                      >
+                        {s.deviceType === "mobile" ? (
+                          <Smartphone className="h-5 w-5" />
+                        ) : s.deviceType === "tablet" ? (
+                          <Smartphone className="h-5 w-5" />
+                        ) : (
+                          <Laptop className="h-5 w-5" />
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-bold text-white truncate">
+                            {s.deviceName}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                              isRevoked
+                                ? "bg-red-500/15 text-red-400 border border-red-500/20"
+                                : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
+                            }`}
+                          >
+                            {isRevoked ? "Revoked / Signed Out" : "Active Session"}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-slate-500" />
+                            {s.location}
+                          </span>
+                          <span>•</span>
+                          <span className="font-mono text-slate-300">{s.ipAddress}</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-slate-500" />
+                            Active {new Date(s.lastActiveAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <button
+                        onClick={() => copyToClipboard(s.ipAddress)}
+                        className="p-2 rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                        title="Copy IP Address"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
+
+                      {isRevoked ? (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 text-red-400 border border-red-900/40 text-xs font-semibold select-none">
+                          <XCircle className="h-3.5 w-3.5" />
+                          <span>Terminated</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleRevokeSingle(s.id, s.deviceName)}
+                          disabled={isBeingRevoked}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                          title="Immediately log out this device"
+                        >
+                          <Trash2 className={`h-3.5 w-3.5 ${isBeingRevoked ? "animate-spin" : ""}`} />
+                          <span>{isBeingRevoked ? "Revoking..." : "Revoke Session"}</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center space-y-2">
+            <Monitor className="h-6 w-6 text-slate-600 mx-auto" />
+            <h4 className="text-xs font-bold text-slate-400">No other active sessions detected</h4>
+            <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+              If you log in from another browser, laptop, or mobile phone, that login session will appear here in real-time. You can revoke any device session at any time.
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="max-w-md w-full rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Lock className="h-4 w-4 text-emerald-400" />
+                <span>Update Account Password</span>
+              </h3>
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="text-slate-400 hover:text-white text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-slate-400">
+              Updating your institutional PlaceAI password will immediately terminate all active sessions across all devices for security.
+            </p>
+            <div className="space-y-3 pt-2">
+              <input
+                type="password"
+                placeholder="Current Password"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+              <input
+                type="password"
+                placeholder="New Password (min 8 characters)"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-3">
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  showToast("🔒 Password successfully updated! Other sessions terminated.");
+                  handleTerminateAllOthers();
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#1b7056] hover:bg-[#155a45] text-white"
+              >
+                Save & Terminate Other Sessions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
