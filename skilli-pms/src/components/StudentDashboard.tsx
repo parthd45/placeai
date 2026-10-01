@@ -49,7 +49,26 @@ import {
   FileCode2,
   Database,
   Terminal,
+  LayoutGrid,
+  List,
+  Search,
+  CheckSquare,
 } from "lucide-react";
+import {
+  ProjectsView,
+  MentorshipView,
+  CalendarView,
+  DocumentsView,
+  ResearchView,
+  ResourcesView,
+  BlackbookView,
+  IntegrationsView,
+  ReposView,
+  FigmaView,
+  MiroView,
+  SessionsView,
+  PortfolioView,
+} from "./SkilliViews";
 
 interface StudentDashboardProps {
   project: ProjectData;
@@ -98,6 +117,9 @@ export function StudentDashboard({
   const [newTaskAssigneeId, setNewTaskAssigneeId] = useState(project.teamMembers[0]?.id || "mem-1");
   const [newTaskDueDate, setNewTaskDueDate] = useState("Oct 15");
   const [taskFilterLabel, setTaskFilterLabel] = useState("ALL");
+  const [taskViewMode, setTaskViewMode] = useState<"board" | "list">("board");
+  const [taskSearchQuery, setTaskSearchQuery] = useState("");
+  const [taskStatusFilter, setTaskStatusFilter] = useState("ALL");
 
   // Drag and drop state for Kanban Taskboard
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
@@ -508,52 +530,53 @@ export function StudentDashboard({
       )}
 
       {/* Top Interactive Workspace Tabs Ribbon */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold">
-        {[
-          { id: "overview", label: "Project Cockpit", icon: LayoutDashboard },
-          {
-            id: "milestones",
-            label: "Milestones & Submissions",
-            icon: CheckCircle2,
-            badge: `${project.milestones.filter((m) => m.status === "COMPLETED").length}/5 Done`,
-          },
-          {
-            id: "kanban",
-            label: "Taskboard (Kanban)",
-            icon: KanbanSquare,
-            badge: `${project.tasks.length} Tasks`,
-          },
-          {
-            id: "rubrics",
-            label: "Evaluation & Rubrics",
-            icon: Award,
-            badge: totalAssignedScore > 0 ? `${totalAssignedScore}/100` : "Pending",
-          },
-          {
-            id: "team",
-            label: "Team & Guides",
-            icon: Users,
-            badge: `${project.teamMembers.length}/4 Members`,
-          },
-          {
-            id: "docs",
-            label: "IEEE / Synopsis Docs",
-            icon: FileText,
-            badge: "Artifacts",
-          },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = currentTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => switchTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                isActive
-                  ? "bg-[#1b7056] text-white shadow-xs"
-                  : "bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800"
-              }`}
-            >
+      {["overview", "milestones", "kanban", "tasks", "rubrics", "team", "docs"].includes(currentTab) && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold">
+          {[
+            { id: "overview", label: "Project Cockpit", icon: LayoutDashboard },
+            {
+              id: "milestones",
+              label: "Milestones & Submissions",
+              icon: CheckCircle2,
+              badge: `${project.milestones.filter((m) => m.status === "COMPLETED").length}/5 Done`,
+            },
+            {
+              id: "kanban",
+              label: "Taskboard (Kanban)",
+              icon: KanbanSquare,
+              badge: `${project.tasks.length} Tasks`,
+            },
+            {
+              id: "rubrics",
+              label: "Evaluation & Rubrics",
+              icon: Award,
+              badge: totalAssignedScore > 0 ? `${totalAssignedScore}/100` : "Pending",
+            },
+            {
+              id: "team",
+              label: "Team & Guides",
+              icon: Users,
+              badge: `${project.teamMembers.length}/4 Members`,
+            },
+            {
+              id: "docs",
+              label: "IEEE / Synopsis Docs",
+              icon: FileText,
+              badge: "Artifacts",
+            },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = currentTab === tab.id || (tab.id === "kanban" && currentTab === "tasks") || (tab.id === "docs" && currentTab === "documents");
+            return (
+              <button
+                key={tab.id}
+                onClick={() => switchTab(tab.id)}
+                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                  isActive
+                    ? "bg-[#1b7056] text-white shadow-xs"
+                    : "bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800"
+                }`}
+              >
               <Icon className="h-3.5 w-3.5" />
               <span>{tab.label}</span>
               {tab.badge && (
@@ -571,6 +594,7 @@ export function StudentDashboard({
           );
         })}
       </div>
+      )}
 
       {/* ========================================================================= */}
       {/* VIEW 1: OVERVIEW (PROJECT COCKPIT) */}
@@ -1013,35 +1037,63 @@ export function StudentDashboard({
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 3: TASKBOARD (KANBAN) */}
+      {/* VIEW 3: TASKBOARD (KANBAN & SKILLI TASKS) */}
       {/* ========================================================================= */}
-      {currentTab === "kanban" && (
+      {(currentTab === "kanban" || currentTab === "tasks") && (
         <section className="space-y-4 animate-in fade-in duration-150">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <Layers className="h-5 w-5 text-[#1b7056] dark:text-emerald-400" />
-                <span>Agile Sprint Kanban Taskboard</span>
+                <CheckSquare className="h-5 w-5 text-[#1b7056] dark:text-emerald-400" />
+                <span>My Tasks & Agile Deliverables</span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Manage backlog, active tasks, code reviews, and deliverables with your squad.
+                Track, prioritize, and manage project tasks across active capstone sprints.
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <select
-                value={taskFilterLabel}
-                onChange={(e) => setTaskFilterLabel(e.target.value)}
-                className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300"
-              >
-                <option value="ALL">All Domains</option>
-                <option value="Frontend">Frontend</option>
-                <option value="API">API</option>
-                <option value="DevOps">DevOps</option>
-                <option value="Database">Database</option>
-                <option value="AI/ML">AI/ML</option>
-                <option value="Security">Security</option>
-              </select>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* View Switcher: Drag-and-Drop Kanban Board vs Skilli Deliverables List */}
+              <div className="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => setTaskViewMode("board")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    taskViewMode === "board"
+                      ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  <span>Kanban Board</span>
+                </button>
+                <button
+                  onClick={() => setTaskViewMode("list")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    taskViewMode === "list"
+                      ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <List className="h-3.5 w-3.5" />
+                  <span>Deliverables List</span>
+                </button>
+              </div>
+
+              {taskViewMode === "board" && (
+                <select
+                  value={taskFilterLabel}
+                  onChange={(e) => setTaskFilterLabel(e.target.value)}
+                  className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300"
+                >
+                  <option value="ALL">All Domains</option>
+                  <option value="Frontend">Frontend</option>
+                  <option value="API">API</option>
+                  <option value="DevOps">DevOps</option>
+                  <option value="Database">Database</option>
+                  <option value="AI/ML">AI/ML</option>
+                  <option value="Security">Security</option>
+                </select>
+              )}
 
               <button
                 onClick={() => setShowTaskModal(true)}
@@ -1053,6 +1105,126 @@ export function StudentDashboard({
             </div>
           </div>
 
+          {taskViewMode === "list" ? (
+            <div className="space-y-4">
+              {/* Search + Status Filters */}
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="flex-1 flex items-center gap-3 w-full">
+                  <Search className="h-4 w-4 text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search tasks by title, student name, or project..."
+                    value={taskSearchQuery}
+                    onChange={(e) => setTaskSearchQuery(e.target.value)}
+                    className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {["ALL", "TO DO", "IN PROGRESS", "IN REVIEW", "COMPLETED"].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setTaskStatusFilter(s)}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                        taskStatusFilter === s
+                          ? "bg-[#1b7056] text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tasks List */}
+              {project.tasks.filter((t) => {
+                if (taskStatusFilter !== "ALL") {
+                  const mapped = taskStatusFilter.replace(" ", "_");
+                  if (t.status !== mapped && t.status !== taskStatusFilter && (taskStatusFilter === "COMPLETED" ? t.status !== "DONE" : true)) return false;
+                }
+                if (taskSearchQuery.trim()) {
+                  return t.title.toLowerCase().includes(taskSearchQuery.toLowerCase());
+                }
+                return true;
+              }).length > 0 ? (
+                <div className="space-y-2">
+                  {project.tasks
+                    .filter((t) => {
+                      if (taskStatusFilter !== "ALL") {
+                        const mapped = taskStatusFilter.replace(" ", "_");
+                        if (t.status !== mapped && t.status !== taskStatusFilter && (taskStatusFilter === "COMPLETED" ? t.status !== "DONE" : true)) return false;
+                      }
+                      if (taskSearchQuery.trim()) {
+                        return t.title.toLowerCase().includes(taskSearchQuery.toLowerCase());
+                      }
+                      return true;
+                    })
+                    .map((task) => (
+                      <div
+                        key={task.id}
+                        className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4 flex items-center justify-between gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <CheckCircle2
+                            className={`h-4 w-4 shrink-0 ${
+                              task.status === "DONE" ? "text-emerald-500" : "text-slate-400"
+                            }`}
+                          />
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                              {task.title}
+                            </div>
+                            {task.description && (
+                              <div className="text-xs text-slate-500 truncate">
+                                {task.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span
+                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                              task.status === "DONE"
+                                ? "bg-emerald-500/15 text-emerald-500"
+                                : task.status === "IN_PROGRESS"
+                                ? "bg-blue-500/15 text-blue-500"
+                                : task.status === "IN_REVIEW"
+                                ? "bg-amber-500/15 text-amber-500"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                            }`}
+                          >
+                            {task.status.replace("_", " ")}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                              task.priority === "URGENT"
+                                ? "bg-red-500/15 text-red-500"
+                                : task.priority === "HIGH"
+                                ? "bg-orange-500/15 text-orange-500"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                            }`}
+                          >
+                            {task.priority}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-12 text-center flex flex-col items-center justify-center space-y-3">
+                  <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400">
+                    <CheckSquare className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    No tasks found
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-sm">
+                    Your assigned project deliverables will appear here once assigned by your mentor.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-2">
             {kanbanColumns.map((col) => {
               const columnTasks = filteredTasks.filter((t) => t.status === col.id);
@@ -1188,6 +1360,7 @@ export function StudentDashboard({
               );
             })}
           </div>
+          )}
         </section>
       )}
 
@@ -1619,6 +1792,61 @@ export function StudentDashboard({
             </div>
           </div>
         </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SKILLI FULL-PAGE HUB VIEWS */}
+      {/* ========================================================================= */}
+      {currentTab === "projects" && (
+        <ProjectsView project={project} user={user} />
+      )}
+
+      {currentTab === "mentorship" && (
+        <MentorshipView project={project} />
+      )}
+
+      {currentTab === "calendar" && (
+        <CalendarView />
+      )}
+
+      {currentTab === "documents" && (
+        <DocumentsView />
+      )}
+
+      {currentTab === "research" && (
+        <ResearchView />
+      )}
+
+      {currentTab === "resources" && (
+        <ResourcesView />
+      )}
+
+      {currentTab === "blackbook" && (
+        <BlackbookView project={project} />
+      )}
+
+      {currentTab === "integrations" && (
+        <IntegrationsView />
+      )}
+
+      {currentTab === "repos" && (
+        <ReposView project={project} />
+      )}
+
+      {currentTab === "figma" && (
+        <FigmaView />
+      )}
+
+      {currentTab === "miro" && (
+        <MiroView />
+      )}
+
+      {currentTab === "sessions" && (
+        <SessionsView user={user} />
+      )}
+
+      {currentTab === "portfolio" && (
+        <PortfolioView user={user} />
       )}
 
       {/* ======================================================== */}
