@@ -43,6 +43,7 @@ import {
   KanbanSquare,
   BookOpen,
   Download,
+  GripVertical,
   GraduationCap,
   Code2,
   FileCode2,
@@ -97,6 +98,10 @@ export function StudentDashboard({
   const [newTaskAssigneeId, setNewTaskAssigneeId] = useState(project.teamMembers[0]?.id || "mem-1");
   const [newTaskDueDate, setNewTaskDueDate] = useState("Oct 15");
   const [taskFilterLabel, setTaskFilterLabel] = useState("ALL");
+
+  // Drag and drop state for Kanban Taskboard
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
 
   // Project Settings / Edit Modal state
   const [showEditProjectModal, setShowEditProjectModal] = useState(false);
@@ -292,6 +297,61 @@ export function StudentDashboard({
 
     const moved = updatedTasks.find((t) => t.id === taskId);
     showToast(`Task moved to ${moved?.status.replace("_", " ")}`);
+  };
+
+  // HTML5 Drag & Drop Handlers for Kanban
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    setDraggingTaskId(taskId);
+    e.dataTransfer.setData("text/plain", taskId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragEnd = () => {
+    setDraggingTaskId(null);
+    setDragOverColumn(null);
+  };
+
+  const handleDragOverCol = (e: React.DragEvent, colId: TaskStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverColumn !== colId) {
+      setDragOverColumn(colId);
+    }
+  };
+
+  const handleDragLeaveCol = (e: React.DragEvent, colId: TaskStatus) => {
+    if (dragOverColumn === colId) {
+      setDragOverColumn(null);
+    }
+  };
+
+  const handleDropOnCol = (e: React.DragEvent, targetStatus: TaskStatus) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("text/plain") || draggingTaskId;
+    setDragOverColumn(null);
+    setDraggingTaskId(null);
+
+    if (!taskId) return;
+
+    const targetTask = project.tasks.find((t) => t.id === taskId);
+    if (!targetTask) return;
+
+    if (targetTask.status === targetStatus) return;
+
+    const updatedTasks = project.tasks.map((t) => {
+      if (t.id === taskId) {
+        return { ...t, status: targetStatus };
+      }
+      return t;
+    });
+
+    onUpdateProject({
+      ...project,
+      tasks: updatedTasks,
+    });
+
+    const colLabel = kanbanColumns.find((c) => c.id === targetStatus)?.label || targetStatus;
+    showToast(`✓ Moved "${targetTask.title.slice(0, 25)}..." to ${colLabel}`);
   };
 
   const handleCreateTask = (e: React.FormEvent) => {
@@ -996,13 +1056,21 @@ export function StudentDashboard({
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-2">
             {kanbanColumns.map((col) => {
               const columnTasks = filteredTasks.filter((t) => t.status === col.id);
+              const isOver = dragOverColumn === col.id;
               return (
                 <div
                   key={col.id}
-                  className="flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 p-3 min-h-[420px]"
+                  onDragOver={(e) => handleDragOverCol(e, col.id)}
+                  onDragLeave={(e) => handleDragLeaveCol(e, col.id)}
+                  onDrop={(e) => handleDropOnCol(e, col.id)}
+                  className={`flex flex-col rounded-2xl border transition-all duration-200 min-h-[440px] p-3 ${
+                    isOver
+                      ? "border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/40 scale-[1.01]"
+                      : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                  }`}
                 >
                   {/* Column Header */}
-                  <div className="flex items-center justify-between pb-3 px-1">
+                  <div className="flex items-center justify-between pb-3 px-1 border-b border-slate-200/60 dark:border-slate-800/60 mb-2">
                     <div className="flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full ${col.dotColor}`}></span>
                       <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -1017,83 +1085,103 @@ export function StudentDashboard({
                   {/* Tasks Column */}
                   <div className="flex-1 space-y-2.5 overflow-y-auto">
                     {columnTasks.length === 0 ? (
-                      <div className="h-36 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-[11px] text-slate-400 text-center p-3">
-                        No tasks in {col.label}
+                      <div
+                        className={`h-36 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-[11px] text-center p-3 transition-colors ${
+                          isOver
+                            ? "border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 font-bold"
+                            : "border-slate-200 dark:border-slate-800 text-slate-400"
+                        }`}
+                      >
+                        <span>{isOver ? `Drop to move to ${col.label}` : `No tasks in ${col.label}`}</span>
+                        {!isOver && <span className="text-[10px] text-slate-400 mt-1">Drag tasks here</span>}
                       </div>
                     ) : (
-                      columnTasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-2xs space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
-                        >
-                          <div className="flex items-start justify-between gap-1.5">
-                            <span
-                              className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getPriorityBadge(
-                                task.priority
-                              )}`}
-                            >
-                              {task.priority}
-                            </span>
-
-                            <button
-                              onClick={() => deleteTask(task.id)}
-                              className="text-slate-300 hover:text-red-500 transition-colors p-0.5 cursor-pointer"
-                              title="Delete Task"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-
-                          <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                            {task.title}
-                          </h4>
-
-                          {task.description && (
-                            <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                              {task.description}
-                            </p>
-                          )}
-
-                          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400">
-                            <div
-                              className="flex items-center gap-1.5"
-                              title={`Assigned to ${task.assignee?.name || "Scholar"}`}
-                            >
-                              <div className="h-5 w-5 rounded-full bg-[#1b7056] text-white flex items-center justify-center font-bold text-[9px]">
-                                {task.assignee?.name
-                                  ? task.assignee.name
-                                      .split(" ")
-                                      .filter(Boolean)
-                                      .map((w: string) => w[0])
-                                      .join("")
-                                      .slice(0, 2)
-                                      .toUpperCase()
-                                  : "SC"}
+                      columnTasks.map((task) => {
+                        const isDragging = draggingTaskId === task.id;
+                        return (
+                          <div
+                            key={task.id}
+                            draggable={true}
+                            onDragStart={(e) => handleDragStart(e, task.id)}
+                            onDragEnd={handleDragEnd}
+                            className={`rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-2xs space-y-2 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 transition-all cursor-grab active:cursor-grabbing select-none ${
+                              isDragging
+                                ? "opacity-35 scale-95 border-emerald-500 ring-2 ring-emerald-500/30 shadow-lg"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-1.5">
+                              <div className="flex items-center gap-1.5">
+                                <GripVertical className="h-3.5 w-3.5 text-slate-400 cursor-grab shrink-0" />
+                                <span
+                                  className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getPriorityBadge(
+                                    task.priority
+                                  )}`}
+                                >
+                                  {task.priority}
+                                </span>
                               </div>
-                              <span className="truncate max-w-[80px]">
-                                {task.assignee?.name ? task.assignee.name.split(" ")[0] : "Assignee"}
-                              </span>
+
+                              <button
+                                onClick={() => deleteTask(task.id)}
+                                className="text-slate-300 hover:text-red-500 transition-colors p-0.5 cursor-pointer"
+                                title="Delete Task"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
                             </div>
 
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => shiftTask(task.id, "prev")}
-                                className="h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
-                                title="Move backward"
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                              {task.title}
+                            </h4>
+
+                            {task.description && (
+                              <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                                {task.description}
+                              </p>
+                            )}
+
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400">
+                              <div
+                                className="flex items-center gap-1.5"
+                                title={`Assigned to ${task.assignee?.name || "Scholar"}`}
                               >
-                                <ChevronLeft className="h-3 w-3" />
-                              </button>
-                              <button
-                                onClick={() => shiftTask(task.id, "next")}
-                                className="h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
-                                title="Move forward"
-                              >
-                                <ChevronRight className="h-3 w-3" />
-                              </button>
+                                <div className="h-5 w-5 rounded-full bg-[#1b7056] text-white flex items-center justify-center font-bold text-[9px]">
+                                  {task.assignee?.name
+                                    ? task.assignee.name
+                                        .split(" ")
+                                        .filter(Boolean)
+                                        .map((w: string) => w[0])
+                                        .join("")
+                                        .slice(0, 2)
+                                        .toUpperCase()
+                                    : "SC"}
+                                </div>
+                                <span className="truncate max-w-[80px]">
+                                  {task.assignee?.name ? task.assignee.name.split(" ")[0] : "Assignee"}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => shiftTask(task.id, "prev")}
+                                  className="h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                                  title="Move backward"
+                                >
+                                  <ChevronLeft className="h-3 w-3" />
+                                </button>
+                                <button
+                                  onClick={() => shiftTask(task.id, "next")}
+                                  className="h-6 w-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                                  title="Move forward"
+                                >
+                                  <ChevronRight className="h-3 w-3" />
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </div>
