@@ -61,7 +61,7 @@ export function Navbar({ currentRole, onRoleChange, activeView, user }: NavbarPr
       case "STUDENT":
         return {
           title: "Student View",
-          badge: "Aarav Sharma • 2401098 (SY MCA)",
+          badge: `${user?.name || "Parth Deshmukh"} • ${user?.rollNumber || "2401089"} (${user?.division || "Div A"})`,
           icon: GraduationCap,
           color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
         };

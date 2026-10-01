@@ -1,90 +1,26 @@
-import { ProjectData } from "./types";
+import { ProjectData, Milestone, RubricCriterion, Mentor, StudentUser } from "./types";
 
-export const initialProject: ProjectData = {
-  id: "proj-2026-imcc-placeai",
-  name: "PlaceAI - Autonomous Placement Intelligence & Technical Assessment Platform",
-  description:
-    "An enterprise-grade, institutional placement preparation and candidate telemetry platform built for MES IMCC Pune. Integrates proctored online coding compilers with testcase validation, automated ATS resume scoring, peer direct messaging, Supabase cloud profiles, and cross-platform Android Capacitor deployment.",
-  type: "CAPSTONE",
-  department: "Department of Computer Applications (MCA)",
-  academicYear: "SY MCA (2024-2026)",
-  division: "Division A",
-  progressPercentage: 82,
-  status: "Active",
-  technologies: [
-    "JavaScript",
-    "TypeScript",
-    "Node.js",
-    "Supabase",
-    "PostgreSQL",
-    "Next.js",
-    "Capacitor",
-    "Android",
-    "TailwindCSS",
-    "Docker",
-  ],
-  objectives: [
-    "Build proctored browser-based code execution sandbox with real-time testcase grading",
-    "Deploy persistent Supabase authentication with auto-refreshing JWT session resilience",
-    "Construct Capacitor Android mobile container and live continuous APK delivery pipeline",
-    "Develop candidate analytics cockpit with ATS keyword extraction and peer networking",
-  ],
-  repositoryUrl: "https://github.com/parthd45/placeai",
-  figmaUrl: "https://www.figma.com/design/placeai-architecture",
-  miroUrl: "https://miro.com/app/board/placeai-system-flow",
-  inviteCode: "IMCC-CAP-7942",
-  maxTeamSize: 4,
-  teamMembers: [
-    {
-      id: "mem-lead",
-      name: "Parth Deshmukh",
-      role: "Team Lead",
-      rollNumber: "2401089",
-      email: "parth.deshmukh@mesimcc.edu.in",
-      avatar: "https://ui-avatars.com/api/?name=Parth+Deshmukh&background=1b7056&color=fff",
-      skills: ["Next.js", "TypeScript", "PostgreSQL", "Capacitor"],
-      joinedAt: "Aug 15, 2026",
-    },
-    {
-      id: "mem-2",
-      name: "Sneha Joshi",
-      role: "Cloud/DevOps Engineer",
-      rollNumber: "2401138",
-      email: "sneha.j@mesimcc.edu.in",
-      avatar: "https://ui-avatars.com/api/?name=Sneha+Joshi&background=2563eb&color=fff",
-      skills: ["Docker", "Kubernetes", "AWS", "CI/CD"],
-      joinedAt: "Aug 18, 2026",
-    },
-    {
-      id: "mem-3",
-      name: "Rohan Kulkarni",
-      role: "ML Engineer",
-      rollNumber: "2401121",
-      email: "rohan.k@mesimcc.edu.in",
-      avatar: "https://ui-avatars.com/api/?name=Rohan+Kulkarni&background=7c3aed&color=fff",
-      skills: ["Python", "FastAPI", "TensorFlow", "Scikit-Learn"],
-      joinedAt: "Aug 20, 2026",
-    },
-  ],
-  mentors: [
-    {
-      id: "men-1",
-      name: "Dr. Shrikant Joshi",
-      designation: "Head of Department & Capstone Guide",
-      department: "Department of Computer Applications (MCA)",
-      email: "shrikant.joshi@mesimcc.edu.in",
-      avatar: "https://ui-avatars.com/api/?name=Dr+Shrikant+Joshi&background=0f172a&color=fff",
-    },
-    {
-      id: "men-2",
-      name: "Prof. Minakshi More",
-      designation: "Associate Professor & Technical Reviewer",
-      department: "Department of Computer Applications (MCA)",
-      email: "minakshi.more@mesimcc.edu.in",
-      avatar: "https://ui-avatars.com/api/?name=Prof+Minakshi+More&background=0f172a&color=fff",
-    },
-  ],
-  milestones: [
+export const defaultMentors: Mentor[] = [
+  {
+    id: "men-1",
+    name: "Dr. Shrikant Joshi",
+    designation: "Head of Department & Capstone Guide",
+    department: "Department of Computer Applications (MCA)",
+    email: "shrikant.joshi@mesimcc.edu.in",
+    avatar: "https://ui-avatars.com/api/?name=Dr+Shrikant+Joshi&background=0f172a&color=fff",
+  },
+  {
+    id: "men-2",
+    name: "Prof. Minakshi More",
+    designation: "Associate Professor & Technical Reviewer",
+    department: "Department of Computer Applications (MCA)",
+    email: "minakshi.more@mesimcc.edu.in",
+    avatar: "https://ui-avatars.com/api/?name=Prof+Minakshi+More&background=0f172a&color=fff",
+  },
+];
+
+export function createDefaultMilestones(): Milestone[] {
+  return [
     {
       id: "m-1",
       name: "Problem Definition & Synopsis Defense",
@@ -93,175 +29,64 @@ export const initialProject: ProjectData = {
         "Submission of abstract, architectural feasibility study, comparative literature analysis, and tech stack approval from IMCC department committee.",
       startDate: "2026-08-01",
       dueDate: "2026-08-25",
-      status: "COMPLETED",
-      score: { obtained: 20, max: 20 },
-      feedback:
-        "Strong proposal addressing real campus placement preparation challenges. Approved for engineering phase.",
-      submissionFiles: [
-        {
-          name: "IMCC_MCA_PlaceAI_Synopsis_Approved.pdf",
-          size: "3.4 MB",
-          url: "#",
-          uploadedAt: "2026-08-24",
-        },
-      ],
+      status: "PENDING",
+      submissionFiles: [],
     },
     {
       id: "m-2",
       name: "SRS Specification, Database Schemas & Architecture Design",
       phase: "Phase 2: Architectural Design",
       description:
-        "Comprehensive ER diagrams, Supabase PostgreSQL schemas, Capacitor Android bridge lifecycle, and API contract specifications.",
+        "Comprehensive ER diagrams, relational PostgreSQL schemas, API contracts, and security architecture specifications.",
       startDate: "2026-08-26",
       dueDate: "2026-09-15",
-      status: "COMPLETED",
-      score: { obtained: 25, max: 25 },
-      feedback:
-        "Well-structured schema contracts with role-based policies and persistent token management.",
-      submissionFiles: [
-        {
-          name: "PlaceAI_SRS_Architecture_Specification.pdf",
-          size: "5.8 MB",
-          url: "#",
-          uploadedAt: "2026-09-14",
-        },
-      ],
+      status: "PENDING",
+      submissionFiles: [],
     },
     {
       id: "m-3",
-      name: "Core Engine Implementation & Microservice API Integration",
+      name: "Core Engine Implementation & Working Prototype",
       phase: "Phase 3: Core Implementation",
       description:
-        "In-browser proctored compiler engine, automated testcase evaluation, peer real-time messaging, and profile intelligence.",
+        "Full-stack microservices, business logic, asynchronous pipelines, and functional frontend client prototype.",
       startDate: "2026-09-16",
       dueDate: "2026-10-05",
-      status: "IN_REVIEW",
-      feedback:
-        "Demonstration scheduled with Dr. Shrikant Joshi. Code verification on GitHub repository parthd45/placeai in progress.",
-      submissionFiles: [
-        {
-          name: "PlaceAI_Sprint3_Compiler_Engine_Report.pdf",
-          size: "7.4 MB",
-          url: "#",
-          uploadedAt: "2026-09-29",
-        },
-      ],
+      status: "PENDING",
+      submissionFiles: [],
     },
     {
       id: "m-4",
-      name: "Proctored Validation, Test Coverage & Performance Benchmarks",
+      name: "Validation, Automated Testing & Security Audit",
       phase: "Phase 4: Testing & Security",
       description:
-        "End-to-end load testing, security audits for candidate submissions, edge CDN cache optimizations, and Android APK compatibility tests.",
+        "End-to-end integration tests, load testing, security vulnerability audit, and cross-platform mobile verification.",
       startDate: "2026-10-06",
       dueDate: "2026-10-28",
-      status: "IN_PROGRESS",
+      status: "PENDING",
+      submissionFiles: [],
     },
     {
       id: "m-5",
-      name: "Production Deployment, Thesis Defense & Final Viva Voce",
+      name: "Production Deployment, Thesis Defense & University Viva Voce",
       phase: "Phase 5: External Examination",
       description:
         "Live production defense before the university external committee and industry technical adjudicators with final bound thesis.",
       startDate: "2026-10-29",
       dueDate: "2026-11-20",
       status: "PENDING",
+      submissionFiles: [],
     },
-  ],
-  tasks: [
-    {
-      id: "t-1",
-      title: "Configure Supabase JWT Token Refresh & Persistent Session",
-      description: "Implement local storage fallback to ensure persistent candidate authentication across browser restarts.",
-      status: "DONE",
-      priority: "HIGH",
-      assignee: {
-        id: "mem-lead",
-        name: "Parth Deshmukh",
-        role: "Team Lead",
-        rollNumber: "2401089",
-        email: "parth.deshmukh@mesimcc.edu.in",
-        avatar: "https://ui-avatars.com/api/?name=Parth+Deshmukh&background=1b7056&color=fff",
-      },
-      dueDate: "Sep 28",
-      labels: ["Security", "Database"],
-    },
-    {
-      id: "t-2",
-      title: "Develop Browser-Based Proctored Code Execution Sandbox",
-      description: "Build interactive DSA coding practice interface with real-time testcase assertions and execution timing.",
-      status: "DONE",
-      priority: "URGENT",
-      assignee: {
-        id: "mem-lead",
-        name: "Parth Deshmukh",
-        role: "Team Lead",
-        rollNumber: "2401089",
-        email: "parth.deshmukh@mesimcc.edu.in",
-        avatar: "https://ui-avatars.com/api/?name=Parth+Deshmukh&background=1b7056&color=fff",
-      },
-      dueDate: "Sep 30",
-      labels: ["Frontend", "Compiler"],
-    },
-    {
-      id: "t-3",
-      title: "Implement Live Peer-to-Peer Campus Chat & Presence Tracking",
-      description: "Real-time communication channels for verified students with online presence indicator.",
-      status: "IN_REVIEW",
-      priority: "HIGH",
-      assignee: {
-        id: "mem-3",
-        name: "Rohan Kulkarni",
-        role: "ML Engineer",
-        rollNumber: "2401121",
-        email: "rohan.k@mesimcc.edu.in",
-        avatar: "https://ui-avatars.com/api/?name=Rohan+Kulkarni&background=7c3aed&color=fff",
-      },
-      dueDate: "Oct 2",
-      labels: ["API", "WebSockets"],
-    },
-    {
-      id: "t-4",
-      title: "Package Capacitor Android WebView with Continuous Delivery",
-      description: "Synchronize local webDir assets and ensure allowNavigation rules for Supabase and Vercel domains.",
-      status: "IN_PROGRESS",
-      priority: "MEDIUM",
-      assignee: {
-        id: "mem-2",
-        name: "Sneha Joshi",
-        role: "Cloud/DevOps Engineer",
-        rollNumber: "2401138",
-        email: "sneha.j@mesimcc.edu.in",
-        avatar: "https://ui-avatars.com/api/?name=Sneha+Joshi&background=2563eb&color=fff",
-      },
-      dueDate: "Oct 5",
-      labels: ["Mobile", "Android"],
-    },
-    {
-      id: "t-5",
-      title: "Configure Edge CDN Cache-Control Headers on Vercel Pipeline",
-      description: "Ensure index.html and dynamic API routes bypass stale browser caching while caching static assets.",
-      status: "TODO",
-      priority: "MEDIUM",
-      assignee: {
-        id: "mem-2",
-        name: "Sneha Joshi",
-        role: "Cloud/DevOps Engineer",
-        rollNumber: "2401138",
-        email: "sneha.j@mesimcc.edu.in",
-        avatar: "https://ui-avatars.com/api/?name=Sneha+Joshi&background=2563eb&color=fff",
-      },
-      dueDate: "Oct 10",
-      labels: ["DevOps", "Vercel"],
-    },
-  ],
-  rubricCriteria: [
+  ];
+}
+
+export function createDefaultRubricCriteria(): RubricCriterion[] {
+  return [
     {
       id: "c-1",
       title: "Problem Understanding & Literature Synthesis",
       description: "Depth of domain research, clarity of objectives, and relevance to industry requirements.",
       maxScore: 20,
-      assignedScore: 19,
+      assignedScore: 0,
       weightage: "20%",
     },
     {
@@ -269,7 +94,7 @@ export const initialProject: ProjectData = {
       title: "Architecture, Data Modeling & System Design",
       description: "Robustness of relational schemas, API contracts, security authentication, and scalability.",
       maxScore: 25,
-      assignedScore: 24,
+      assignedScore: 0,
       weightage: "25%",
     },
     {
@@ -277,7 +102,7 @@ export const initialProject: ProjectData = {
       title: "Implementation Depth & Code Quality",
       description: "Code modularity, idiomatic standards, Git hygiene on GitHub, and asynchronous paradigms.",
       maxScore: 30,
-      assignedScore: 28,
+      assignedScore: 0,
       weightage: "30%",
     },
     {
@@ -285,7 +110,7 @@ export const initialProject: ProjectData = {
       title: "Validation, Testing & Deployment",
       description: "Automated unit test coverage, APK compilation, security headers, and production deployment.",
       maxScore: 15,
-      assignedScore: 14,
+      assignedScore: 0,
       weightage: "15%",
     },
     {
@@ -293,55 +118,114 @@ export const initialProject: ProjectData = {
       title: "Viva Defense, Presentation & Documentation",
       description: "Technical Q&A defense before committee, clarity of explanation, and formal documentation.",
       maxScore: 10,
-      assignedScore: 9,
+      assignedScore: 0,
       weightage: "10%",
     },
-  ],
+  ];
+}
+
+/**
+ * Creates a 100% REAL Capstone Squad with ZERO mock data.
+ * Contains only the creating student and open slots for real teammates.
+ */
+export function createNewCapstoneSquad(
+  creator: StudentUser,
+  details: {
+    name: string;
+    description: string;
+    technologies: string[];
+    repositoryUrl?: string;
+    figmaUrl?: string;
+    miroUrl?: string;
+    role?: string;
+    inviteCode?: string;
+  }
+): ProjectData {
+  const code =
+    details.inviteCode ||
+    `IMCC-CAP-${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const squadId = `squad-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+  return {
+    id: squadId,
+    name: details.name,
+    description: details.description,
+    type: "CAPSTONE",
+    department: creator.department || "Department of Computer Applications (MCA)",
+    academicYear: "SY MCA (2024-2026)",
+    division: creator.division || "Division A",
+    progressPercentage: 0,
+    status: "Active",
+    technologies: details.technologies.length > 0 ? details.technologies : ["TypeScript", "Next.js", "Node.js", "PostgreSQL"],
+    objectives: [
+      "Implement verified full-stack architecture with production telemetry",
+      "Deploy persistent cloud database schemas with role-based security",
+      "Integrate automated CI/CD continuous deployment pipeline",
+      "Successfully defend project viva before MES IMCC Capstone Committee",
+    ],
+    repositoryUrl: details.repositoryUrl || creator.githubUrl || "",
+    figmaUrl: details.figmaUrl || "",
+    miroUrl: details.miroUrl || "",
+    inviteCode: code,
+    maxTeamSize: 4,
+    teamMembers: [
+      {
+        id: creator.id,
+        name: creator.name,
+        role: (details.role as any) || "Team Lead",
+        rollNumber: creator.rollNumber,
+        email: creator.email,
+        avatar: creator.avatar,
+        skills: creator.skills || [],
+        joinedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      },
+    ],
+    mentors: defaultMentors,
+    milestones: createDefaultMilestones(),
+    tasks: [], // ZERO fake tasks. Pure real sprint tasks created by the team.
+    rubricCriteria: createDefaultRubricCriteria(),
+  };
+}
+
+/**
+ * Empty baseline project - no fake members, 0 tasks.
+ */
+export const initialProject: ProjectData = {
+  id: "proj-unassigned",
+  name: "Capstone Project",
+  description: "No project synopsis submitted yet.",
+  type: "CAPSTONE",
+  department: "Department of Computer Applications (MCA)",
+  academicYear: "SY MCA (2024-2026)",
+  division: "Division A",
+  progressPercentage: 0,
+  status: "Pending Approval",
+  technologies: [],
+  objectives: [],
+  repositoryUrl: "",
+  figmaUrl: "",
+  miroUrl: "",
+  inviteCode: "IMCC-CAP-0000",
+  maxTeamSize: 4,
+  teamMembers: [], // ZERO fake members
+  mentors: defaultMentors,
+  milestones: createDefaultMilestones(),
+  tasks: [], // ZERO fake tasks
+  rubricCriteria: createDefaultRubricCriteria(),
 };
 
 export const sampleDepartmentTeams = [
   {
-    id: "proj-1",
+    id: "proj-imcc-placeai",
     name: "PlaceAI - Placement Intelligence & Technical Assessment Platform",
     batch: "SY MCA - Div A",
     lead: "Parth Deshmukh (2401089)",
     mentor: "Dr. Shrikant Joshi",
-    progress: 82,
+    progress: 85,
     status: "Active",
-    lastSubmission: "Compiler Engine & Sprint 3 Review",
+    lastSubmission: "Working Prototype & Proctored Compiler Engine",
     pendingAction: "Mentor Review Required",
-  },
-  {
-    id: "proj-2",
-    name: "Automated Healthcare Telemetry & Predictive Analytics System",
-    batch: "SY MCA - Div B",
-    lead: "Ananya Deshmukh (2401104)",
-    mentor: "Prof. Minakshi More",
-    progress: 88,
-    status: "Active",
-    lastSubmission: "Phase 3 Model Metrics & API Specs",
-    pendingAction: "Approved",
-  },
-  {
-    id: "proj-3",
-    name: "Decentralized Academic Credential Verification System",
-    batch: "SY MCA - Div A",
-    lead: "Rohan Kulkarni (2401121)",
-    mentor: "Dr. Shrikant Joshi",
-    progress: 68,
-    status: "Active",
-    lastSubmission: "Smart Contract Specification v1",
-    pendingAction: "Approved",
-  },
-  {
-    id: "proj-4",
-    name: "Smart Campus Resource Allocation & Attendance Telemetry",
-    batch: "FY MCA - Div A",
-    lead: "Sneha Joshi (2401138)",
-    mentor: "Prof. Minakshi More",
-    progress: 55,
-    status: "Active",
-    lastSubmission: "SRS Architecture Proposal",
-    pendingAction: "Synopsis Approved",
+    inviteCode: "IMCC-CAP-7942",
   },
 ];

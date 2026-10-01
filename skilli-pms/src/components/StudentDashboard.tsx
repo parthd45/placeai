@@ -46,12 +46,14 @@ interface StudentDashboardProps {
   project: ProjectData;
   onUpdateProject: (updated: ProjectData) => void;
   user?: StudentUser | null;
+  onLeaveSquad?: () => void;
 }
 
 export function StudentDashboard({
   project,
   onUpdateProject,
   user,
+  onLeaveSquad,
 }: StudentDashboardProps) {
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -110,44 +112,7 @@ export function StudentDashboard({
             }
           } catch (e) {}
         }
-        return [
-          {
-            id: "peer-1",
-            name: "Sneha Joshi",
-            rollNumber: "2401138",
-            email: "sneha.j@mesimcc.edu.in",
-            role: "Cloud/DevOps Engineer",
-            skills: ["Docker", "Kubernetes", "AWS", "CI/CD"],
-            avatar: "https://ui-avatars.com/api/?name=Sneha+Joshi&background=2563eb&color=fff",
-          },
-          {
-            id: "peer-2",
-            name: "Tanmay Patil",
-            rollNumber: "2401150",
-            email: "tanmay.p@mesimcc.edu.in",
-            role: "UI/UX Designer",
-            skills: ["Figma", "Design Systems", "Prototyping"],
-            avatar: "https://ui-avatars.com/api/?name=Tanmay+Patil&background=0284c7&color=fff",
-          },
-          {
-            id: "peer-3",
-            name: "Rohan Kulkarni",
-            rollNumber: "2401121",
-            email: "rohan.k@mesimcc.edu.in",
-            role: "ML Engineer",
-            skills: ["Python", "FastAPI", "TensorFlow"],
-            avatar: "https://ui-avatars.com/api/?name=Rohan+Kulkarni&background=7c3aed&color=fff",
-          },
-          {
-            id: "peer-4",
-            name: "Ananya Deshmukh",
-            rollNumber: "2401104",
-            email: "ananya.d@mesimcc.edu.in",
-            role: "Full-Stack Dev",
-            skills: ["React", "Node.js", "PostgreSQL"],
-            avatar: "https://ui-avatars.com/api/?name=Ananya+Deshmukh&background=db2777&color=fff",
-          },
-        ];
+        return [];
       })();
 
   // Copy Squad Invite Code to Clipboard
@@ -660,7 +625,7 @@ export function StudentDashboard({
           </div>
         </div>
 
-        {/* Member Cards Grid */}
+        {/* Member Cards Grid with Open Slots */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {project.teamMembers.map((member) => {
             const isLead = member.role === "Team Lead";
@@ -750,6 +715,33 @@ export function StudentDashboard({
                       </button>
                     )}
                   </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Open Team Slots for Teammate Formation */}
+          {Array.from({ length: Math.max(0, (project.maxTeamSize || 4) - project.teamMembers.length) }).map((_, idx) => {
+            const slotNum = project.teamMembers.length + idx + 1;
+            return (
+              <div
+                key={`open-slot-${slotNum}`}
+                onClick={() => setShowAddMemberModal(true)}
+                className="cursor-pointer rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-emerald-500/60 bg-slate-50/40 dark:bg-slate-900/20 p-4 flex flex-col items-center justify-center text-center space-y-2.5 transition-all group min-h-[160px]"
+              >
+                <div className="h-10 w-10 rounded-full border border-dashed border-slate-300 dark:border-slate-700 group-hover:border-emerald-500 group-hover:bg-emerald-500/10 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors">
+                  <UserPlus className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    Open Slot {slotNum} of {project.maxTeamSize || 4}
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-medium mt-0.5">
+                    Click to Invite Teammate
+                  </div>
+                </div>
+                <div className="text-[10px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                  Code: {project.inviteCode || "IMCC-CAP-7942"}
                 </div>
               </div>
             );
@@ -846,8 +838,8 @@ export function StudentDashboard({
                           <div className="flex items-center gap-1.5" title={`Assigned to ${task.assignee?.name || "Scholar"}`}>
                             <div className="h-5 w-5 rounded-full bg-[#1b7056] text-white flex items-center justify-center font-bold text-[9px]">
                               {task.assignee?.name
-                                ? task.assignee.name.slice(0, 2).toUpperCase()
-                                : "AS"}
+                                ? task.assignee.name.split(" ").filter(Boolean).map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+                                : "SC"}
                             </div>
                             <span className="truncate max-w-[80px]">
                               {task.assignee?.name ? task.assignee.name.split(" ")[0] : "Assignee"}
@@ -1033,7 +1025,18 @@ export function StudentDashboard({
                   Verified student peers from your college cohort looking for capstone team members:
                 </p>
                 <div className="max-h-60 overflow-y-auto space-y-2">
-                  {peerScholars.map((p) => {
+                  {peerScholars.length === 0 ? (
+                    <div className="p-6 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 space-y-2">
+                      <Users className="h-8 w-8 mx-auto text-slate-400 opacity-60" />
+                      <div className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                        No peers currently in cohort queue
+                      </div>
+                      <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                        Use the "Add by Details / Roll No" tab to invite a classmate directly by roll number, or share your Squad Passcode (<span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{project.inviteCode || "IMCC-CAP-7942"}</span>).
+                      </p>
+                    </div>
+                  ) : (
+                    peerScholars.map((p) => {
                     const alreadyIn = project.teamMembers.some((m) => m.rollNumber === p.rollNumber);
                     return (
                       <div
@@ -1083,9 +1086,10 @@ export function StudentDashboard({
                         </button>
                       </div>
                     );
-                  })}
-                </div>
+                  })
+                )}
               </div>
+            </div>
             )}
 
             {/* Tab 2: Manual Form */}
@@ -1347,20 +1351,36 @@ export function StudentDashboard({
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setShowEditProjectModal(false)}
-                  className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 text-xs font-bold shadow-md cursor-pointer"
-                >
-                  Save Changes
-                </button>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                {onLeaveSquad && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to exit this squad? You will return to the Team Discovery & Formation portal.")) {
+                        setShowEditProjectModal(false);
+                        onLeaveSquad();
+                      }
+                    }}
+                    className="rounded-xl border border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 px-3 py-2 text-xs font-semibold"
+                  >
+                    Leave / Switch Squad
+                  </button>
+                )}
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditProjectModal(false)}
+                    className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 text-xs font-bold shadow-md cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </form>
           </div>
