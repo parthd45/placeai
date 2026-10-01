@@ -200,7 +200,7 @@ export async function fetchAllSessions(userEmail: string = "parth.deshmukh@mesim
   // If no sessions yet, seed initial sessions
   if (userSessions.length === 0) {
     userSessions = getSeedSessions(userEmail, currentSessionId);
-    await syncSessionsToCloudAndLocal(userSessions, allSessions);
+    await syncSessionsToCloudAndLocal(userSessions, userEmail);
   }
 
   // Ensure current device session is registered and updated with "active right now"
@@ -221,7 +221,7 @@ export async function fetchAllSessions(userEmail: string = "parth.deshmukh@mesim
       isCurrent: true,
     };
     userSessions.unshift(newCurrent);
-    await syncSessionsToCloudAndLocal(userSessions, allSessions);
+    await syncSessionsToCloudAndLocal(userSessions, userEmail);
   } else {
     // Update last active
     currentExists.lastActiveAt = new Date().toISOString();
@@ -236,36 +236,47 @@ export async function fetchAllSessions(userEmail: string = "parth.deshmukh@mesim
 }
 
 /**
- * Save sessions to Cloud Registry and LocalStorage
+ * Save sessions to Cloud Registry and LocalStorage with strict user isolation
  */
 export async function syncSessionsToCloudAndLocal(
   userSessions: UserSession[],
-  allSessionsMaster?: UserSession[]
+  userEmail: string = "parth.deshmukh@mesimcc.edu.in"
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // Save to localStorage immediately
+  const normalizedEmail = userEmail.toLowerCase().trim();
+
+  // Save to user-scoped localStorage key so users on the same machine never see each other's sessions
   try {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_${normalizedEmail}`, JSON.stringify(userSessions));
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userSessions));
   } catch (e) {}
 
-  // Broadcast to other tabs in the same browser
+  // Broadcast to other tabs belonging to this user
   try {
     if (typeof BroadcastChannel !== "undefined") {
-      const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
-      bc.postMessage({ type: "SESSIONS_UPDATED", sessions: userSessions });
+      const bc = new BroadcastChannel(`${BROADCAST_CHANNEL_NAME}_${normalizedEmail}`);
+      bc.postMessage({ type: "SESSIONS_UPDATED", userEmail: normalizedEmail, sessions: userSessions });
       bc.close();
     }
   } catch (e) {}
 
-  // Merge with other users' sessions if any, and push to cloud registry
-  const combined = [...userSessions];
-  if (allSessionsMaster && allSessionsMaster.length > 0) {
-    const otherUsers = allSessionsMaster.filter(
-      (s) => !userSessions.some((u) => u.id === s.id)
-    );
-    combined.push(...otherUsers);
-  }
+  // Fetch latest master list from cloud to preserve other users' isolated sessions
+  let otherUsersSessions: UserSession[] = [];
+  try {
+    const res = await fetch(CLOUD_REGISTRY_URL, { cache: "no-store", signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      const json = await res.json();
+      if (json?.data?.sessions && Array.isArray(json.data.sessions)) {
+        otherUsersSessions = json.data.sessions.filter(
+          (s: UserSession) => s.userEmail && s.userEmail.toLowerCase().trim() !== normalizedEmail
+        );
+      }
+    }
+  } catch (e) {}
+
+  // Combine ONLY this user's sessions with other users' untouched sessions
+  const combined = [...userSessions, ...otherUsersSessions];
 
   try {
     await fetch(CLOUD_REGISTRY_URL, {
@@ -300,7 +311,7 @@ export async function revokeSession(
     target.lastActiveAt = new Date().toISOString();
   }
 
-  await syncSessionsToCloudAndLocal(sessions);
+  await syncSessionsToCloudAndLocal(sessions, userEmail);
 
   // Notify any listeners
   try {
@@ -332,7 +343,7 @@ export async function revokeAllOtherSessions(
     }
   }
 
-  await syncSessionsToCloudAndLocal(sessions);
+  await syncSessionsToCloudAndLocal(sessions, userEmail);
 
   try {
     if (typeof BroadcastChannel !== "undefined") {

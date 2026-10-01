@@ -56,7 +56,9 @@ module.exports = async (req, res) => {
           allSessions.unshift({ ...session, status: 'active', lastActiveAt: new Date().toISOString() });
         }
       } else if (action === 'revoke' && sessionId) {
-        const target = allSessions.find((s) => s.id === sessionId);
+        const target = allSessions.find(
+          (s) => s.id === sessionId && s.userEmail && s.userEmail.toLowerCase().trim() === email
+        );
         if (target) {
           target.status = 'revoked';
           target.lastActiveAt = new Date().toISOString();
