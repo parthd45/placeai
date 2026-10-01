@@ -4,7 +4,7 @@
  * real milestones (skills, projects, experience, resume, education, LinkedIn sync),
  * calculates real active streaks, and renders real contribution green dots.
  * 
- * NOTE: 100% Real Data Driven. No fake random seeds.
+ * 100% Real Data Driven. Zero Fake / Minimum Values.
  */
 
 (function () {
@@ -15,12 +15,12 @@
       this.userId = null;
       this.BASE_STORAGE_KEY = 'placeai_real_activity_map';
       this.BASE_LOG_KEY = 'placeai_real_activity_log';
+      this.BASE_GH_KEY = 'placeai_real_github_map';
       this.clearLegacyFakeData();
     }
 
     clearLegacyFakeData() {
       try {
-        // Remove legacy fake generated map if it exists
         localStorage.removeItem('placeai_activity_map');
         localStorage.removeItem('placeai_activity_log');
       } catch (e) {
@@ -39,6 +39,10 @@
 
     getLogKey() {
       return this.userId ? `${this.BASE_LOG_KEY}_${this.userId}` : this.BASE_LOG_KEY;
+    }
+
+    getGitHubKey() {
+      return this.userId ? `${this.BASE_GH_KEY}_${this.userId}` : this.BASE_GH_KEY;
     }
 
     getTodayKey() {
@@ -66,6 +70,30 @@
       }
     }
 
+    getGitHubMap() {
+      try {
+        const raw = localStorage.getItem(this.getGitHubKey());
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    saveGitHubMap(map) {
+      try {
+        localStorage.setItem(this.getGitHubKey(), JSON.stringify(map));
+      } catch (e) {
+        console.warn('Could not save GitHub activity map:', e);
+      }
+    }
+
+    clearGitHubContributions() {
+      try {
+        localStorage.removeItem(this.getGitHubKey());
+      } catch (e) {}
+      this.recalculateCombinedMap();
+    }
+
     getStoredLogs() {
       try {
         const raw = localStorage.getItem(this.getLogKey());
@@ -77,15 +105,54 @@
 
     saveStoredLogs(logs) {
       try {
-        localStorage.setItem(this.getLogKey(), JSON.stringify(logs.slice(0, 50)));
+        localStorage.setItem(this.getLogKey(), JSON.stringify(logs.slice(0, 100)));
       } catch (e) {
         console.warn('Could not save activity logs:', e);
       }
     }
 
     /**
+     * Recalculates the master activity map cleanly from:
+     * 1. Authentic GitHub contribution calendar (ghMap)
+     * 2. Legitimate student actions logged in PlaceAI (getStoredLogs)
+     * Guaranteed ZERO fake or forced 1-point increments for today.
+     */
+    recalculateCombinedMap() {
+      const ghMap = this.getGitHubMap();
+      const logs = this.getStoredLogs();
+      const combined = {};
+
+      // 1. Ingest authentic GitHub contributions
+      Object.keys(ghMap).forEach(d => {
+        const c = Number(ghMap[d]);
+        if (!isNaN(c) && c >= 0) {
+          combined[d] = c;
+        }
+      });
+
+      // 2. Ingest genuine PlaceAI logged activities
+      logs.forEach(log => {
+        if (log && log.timestamp) {
+          const d = log.timestamp.split('T')[0];
+          const pts = Number(log.points) || 1;
+          combined[d] = (combined[d] || 0) + pts;
+        }
+      });
+
+      this.saveStoredMap(combined);
+
+      const today = this.getTodayKey();
+      window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
+        detail: { date: today, count: combined[today] || 0 }
+      }));
+
+      return combined;
+    }
+
+    /**
      * Synchronize and compute real contributions from actual Supabase User Profile data.
      * Ensures all real skills, projects, experience, education, bio, and resume are credited.
+     * ZERO artificial increments: if user did not commit today or perform actions today, count is 0.
      * @param {Object} profile - User profile object from Supabase
      * @param {Object} user - Supabase auth user object
      */
@@ -97,84 +164,37 @@
         this.setUserId(profile.id);
       }
 
-      const map = this.getStoredMap();
-      const today = this.getTodayKey();
-
-      // Determine real registration / account creation date
-      let accountDate = today;
-      if (user && user.created_at) {
-        accountDate = user.created_at.split('T')[0];
-      } else if (profile && profile.created_at) {
-        accountDate = profile.created_at.split('T')[0];
-      }
-
-      // Calculate real activity points from actual user data
-      let basePoints = 0;
-
-      // 1. Account registration milestone (on actual creation date, NOT today)
-      if (!map[accountDate]) {
-        map[accountDate] = 2; // Real registration contribution
-      } else if (accountDate !== today && basePoints > 0) {
-        // Attribute initial profile setup actions to the account creation date
-        map[accountDate] = Math.max(map[accountDate], Math.min(basePoints, 8));
-      }
-
-      // 2. Accurately compute TODAY'S contributions based on actual actions performed today
-      const todayLogs = this.getStoredLogs().filter(log => {
-        const logDate = log.timestamp ? log.timestamp.split('T')[0] : '';
-        return logDate === today;
-      });
-      const todayLoggedPoints = todayLogs.reduce((sum, l) => sum + (Number(l.points) || 1), 0);
-
-      // Preserve higher contributions already recorded for today (e.g. from GitHub live commits)
-      const currentToday = map[today] || 0;
-      if (todayLoggedPoints > 0) {
-        map[today] = Math.max(currentToday, todayLoggedPoints);
-      } else {
-        // Daily active session check-in = minimum 1 contribution point
-        map[today] = Math.max(currentToday, 1);
-      }
-
-      this.saveStoredMap(map);
-
-      // Dispatch event to update the heatmap
-      window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
-        detail: { date: today, count: map[today] || 1 }
-      }));
+      // Re-aggregate map accurately
+      this.recalculateCombinedMap();
     }
 
     /**
-     * Merge real GitHub contribution calendar data
+     * Merge authentic GitHub contribution calendar data.
+     * Updates the dedicated GitHub map and recalculates the combined map.
      * @param {Array} contributions - Array of { date: 'YYYY-MM-DD', count: number }
      */
     mergeGitHubContributions(contributions) {
-      if (!Array.isArray(contributions) || contributions.length === 0) return;
-      const map = this.getStoredMap();
+      if (!Array.isArray(contributions)) return;
+      const ghMap = {};
 
       contributions.forEach(item => {
-        if (item.date && typeof item.count === 'number' && item.count > 0) {
-          map[item.date] = Math.max(map[item.date] || 0, item.count);
+        if (item && item.date && typeof item.count === 'number') {
+          ghMap[item.date] = Math.max(0, item.count);
         }
       });
 
-      this.saveStoredMap(map);
-      window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
-        detail: { count: map[this.getTodayKey()] || 0 }
-      }));
+      this.saveGitHubMap(ghMap);
+      this.recalculateCombinedMap();
     }
 
     /**
-     * Record a real action performed by the user
-     * @param {string} actionType - 'skill', 'project', 'experience', 'education', 'resume', 'linkedin_sync'
+     * Record a real action performed by the user in PlaceAI
+     * @param {string} actionType - 'skill', 'project', 'experience', 'education', 'resume', 'dsa_problem', 'github_push'
      * @param {number} points - Contribution points
      * @param {string} description - Real description label
      */
     recordActivity(actionType, points = 1, description = '') {
       const today = this.getTodayKey();
-      const map = this.getStoredMap();
-
-      map[today] = (map[today] || 0) + points;
-      this.saveStoredMap(map);
 
       // Add to recent activity log
       const logs = this.getStoredLogs();
@@ -186,13 +206,11 @@
       });
       this.saveStoredLogs(logs);
 
-      // Dispatch event to re-render heatmap and stats live
-      window.dispatchEvent(new CustomEvent('placeai:activity-recorded', {
-        detail: { date: today, count: map[today], points, description }
-      }));
+      // Recalculate accurately
+      const map = this.recalculateCombinedMap();
 
-      console.log(`[Real Activity Recorded] ${actionType} (+${points} pts). Today's total: ${map[today]}`);
-      return map[today];
+      console.log(`[Real Activity Recorded] ${actionType} (+${points} pts). Today's total: ${map[today] || 0}`);
+      return map[today] || 0;
     }
 
     /**
@@ -246,7 +264,7 @@
 
       allDates.forEach(d => {
         if ((map[d] || 0) > 0) {
-          const curD = new Date(d);
+          const curD = new Date(d + 'T00:00:00');
           if (prevDate) {
             const diffDays = Math.round((curD - prevDate) / (1000 * 60 * 60 * 24));
             if (diffDays === 1) {
@@ -264,9 +282,9 @@
 
       // Compute current streak starting from today or yesterday
       const today = new Date();
-      let checkDate = new Date(today);
+      let checkDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const todayKey = this.getTodayKey();
-      if (!map[todayKey]) {
+      if (!map[todayKey] || map[todayKey] <= 0) {
         checkDate.setDate(checkDate.getDate() - 1);
       }
 

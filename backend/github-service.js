@@ -242,59 +242,42 @@
       skillsSet.add('Git');
       skillsSet.add('GitHub');
 
-      // 8. Extract Study / Education
+      // 8. Extract Study / Education (Authentic README parsing only - ZERO hallucinated institutions)
       const educationList = [];
       let educationLevel = '';
       let collegeName = '';
       let courseName = '';
-      let graduationYear = new Date().getFullYear();
+      let graduationYear = null;
 
-      // Check for MCA
-      if (/MCA\b/i.test(combinedText)) {
-        const imcc = /IMCC/i.test(combinedText);
-        educationList.push({
-          level: 'Postgraduate',
-          college: imcc ? 'IMCC Pune' : 'Pune Institute',
-          course: 'MCA - Master of Computer Applications',
-          graduation_year: 2025,
-          current: true
-        });
-        educationLevel = 'Postgraduate';
-        collegeName = imcc ? 'IMCC Pune' : 'Pune Institute';
-        courseName = 'MCA - Master of Computer Applications';
-        graduationYear = 2025;
-      }
+      // Only extract if explicitly stated in README
+      const degreeRegex = /\b(MCA|BCA|B\.?Tech|M\.?Tech|B\.?E\.|B\.?S\.|M\.?S\.|B\.?Sc|M\.?Sc|Master of Computer Applications|Bachelor of Computer Applications|Bachelor of Technology)\b/i;
+      const degMatch = readmeText.match(degreeRegex);
 
-      // Check for BCA
-      if (/BCA\b/i.test(combinedText)) {
-        educationList.push({
-          level: 'Undergraduate',
-          college: 'University of Pune',
-          course: 'BCA - Bachelor of Computer Applications',
-          graduation_year: 2023,
-          current: false
-        });
-        if (!educationLevel) {
-          educationLevel = 'Undergraduate';
-          collegeName = 'University of Pune';
-          courseName = 'BCA - Bachelor of Computer Applications';
-          graduationYear = 2023;
+      if (degMatch) {
+        const deg = degMatch[1].trim();
+        const isPostgrad = /MCA|M\.?Tech|M\.?S\.|Master/i.test(deg);
+        educationLevel = isPostgrad ? 'Postgraduate' : 'Undergraduate';
+        courseName = deg;
+
+        // Only assign college if an actual institution name appears nearby (e.g. at XYZ Institute/University/College)
+        const instituteMatch = readmeText.match(/(?:at|from)\s+([A-Z][A-Za-z0-9\s&]{2,40}(?:College|University|Institute|Campus|Academy|School|[A-Z]{3,}))/);
+        if (instituteMatch) {
+          collegeName = instituteMatch[1].trim();
         }
-      }
 
-      // Check for B.Tech / B.E / Engineering
-      if (/B\.?Tech|B\.?E\.|Engineering/i.test(combinedText) && educationList.length === 0) {
+        // Only assign year if explicitly present e.g. 2021-2025 or Class of 2024
+        const yearMatch = readmeText.match(/\b(201\d|202\d)\s*[-–]\s*(202\d|203\d)\b/);
+        if (yearMatch) {
+          graduationYear = parseInt(yearMatch[2], 10);
+        }
+
         educationList.push({
-          level: 'Undergraduate',
-          college: user.company || 'Engineering College',
-          course: 'B.Tech Computer Science & Engineering',
-          graduation_year: 2024,
-          current: false
+          level: educationLevel,
+          college: collegeName || '',
+          course: courseName,
+          graduation_year: graduationYear,
+          current: graduationYear ? graduationYear >= new Date().getFullYear() : true
         });
-        educationLevel = 'Undergraduate';
-        collegeName = user.company || 'Engineering College';
-        courseName = 'B.Tech Computer Science & Engineering';
-        graduationYear = 2024;
       }
 
       // 9. Extract Featured Projects & Repositories (Universal Dynamic Engine for ALL Users)
@@ -424,13 +407,18 @@
         portfolioUrl = `https://${portfolioUrl}`;
       }
 
-      // 11. Extract Preferred Roles / Career Interests
+      // 11. Extract Preferred Roles / Career Interests (Inferred authentically from skills & repos)
       let preferredRoles = '';
       const rolesMatch = readmeText.match(/Career\s+Interests[\s\S]*?\*\*([^*]+)\*\*/i);
       if (rolesMatch) {
         preferredRoles = rolesMatch[1].replace(/•/g, ',').split(',').map(s => s.trim()).filter(Boolean).join(', ');
       } else {
-        preferredRoles = 'Data Analytics, Data Science, Software Development, Full-Stack Development';
+        const topLangs = Array.from(skillsSet);
+        const inferred = [];
+        if (topLangs.some(l => /react|javascript|typescript|vue|html|css/i.test(l))) inferred.push('Full-Stack Development', 'Web Development');
+        if (topLangs.some(l => /python|pandas|numpy|sql|data/i.test(l))) inferred.push('Data Analytics', 'Python Development');
+        if (topLangs.some(l => /java|c\+\+|c#|go|rust/i.test(l))) inferred.push('Software Engineering');
+        preferredRoles = inferred.length > 0 ? Array.from(new Set(inferred)).join(', ') : 'Software Development';
       }
 
       // 12. City / Location
@@ -442,8 +430,8 @@
           username: u,
           first_name: firstName,
           last_name: lastName,
-          bio: bioBrief || user.bio || 'Developer passionate about software engineering and problem solving.',
-          current_designation: headline || 'Software Developer',
+          bio: bioBrief || user.bio || '',
+          current_designation: headline || (user.company ? user.company.replace(/^@/, '') : '') || '',
           city: city,
           location: user.location || city,
           portfolio_url: portfolioUrl,
@@ -684,20 +672,23 @@
             const liveDayMap = {};
             events.forEach(evt => {
               if (evt.created_at) {
-                // Parse date in user's local timezone
+                // Parse date in UTC to match GitHub contribution calendar
                 const d = new Date(evt.created_at);
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
+                const y = d.getUTCFullYear();
+                const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(d.getUTCDate()).padStart(2, '0');
                 const dateKey = `${y}-${m}-${day}`;
 
-                let weight = 1;
-                if (evt.type === 'PullRequestEvent') {
-                  weight = 2;
-                } else if (evt.type === 'PushEvent') {
-                  weight = (evt.payload && (evt.payload.size || evt.payload.distinct_size)) || (evt.payload && evt.payload.commits ? evt.payload.commits.length : 1) || 1;
+                // ONLY count events that qualify as GitHub contributions:
+                // Branch creations (CreateEvent), starring (WatchEvent), forks, comments do NOT count as commits.
+                if (evt.type === 'PushEvent') {
+                  const count = (evt.payload && (evt.payload.distinct_size || (evt.payload.commits && evt.payload.commits.length) || evt.payload.size)) || 1;
+                  liveDayMap[dateKey] = (liveDayMap[dateKey] || 0) + count;
+                } else if (evt.type === 'PullRequestEvent' && evt.payload && evt.payload.action === 'opened') {
+                  liveDayMap[dateKey] = (liveDayMap[dateKey] || 0) + 1;
+                } else if (evt.type === 'IssuesEvent' && evt.payload && evt.payload.action === 'opened') {
+                  liveDayMap[dateKey] = (liveDayMap[dateKey] || 0) + 1;
                 }
-                liveDayMap[dateKey] = (liveDayMap[dateKey] || 0) + weight;
               }
             });
 
@@ -711,7 +702,7 @@
             const now = new Date();
             const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            // Merge live events into contributions
+            // Merge live events into contributions only if live count is genuinely higher
             Object.keys(liveDayMap).forEach(d => {
               const liveCount = liveDayMap[d];
               if (contribMap[d]) {

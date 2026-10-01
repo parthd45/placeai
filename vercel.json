@@ -34,6 +34,22 @@
   ],
   "routes": [
     {
+      "src": "/pms/dashboard",
+      "dest": "/pms/dashboard.html"
+    },
+    {
+      "src": "/pms/auth/login",
+      "dest": "/pms/auth/login.html"
+    },
+    {
+      "src": "/pms/auth/register",
+      "dest": "/pms/auth/register.html"
+    },
+    {
+      "src": "/pms/?$",
+      "dest": "/pms/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }

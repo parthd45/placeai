@@ -4,7 +4,8 @@
   "description": "PlaceAI Mobile Application",
   "main": "index.html",
   "scripts": {
-    "sync": "cap sync android"
+    "sync": "cap sync android",
+    "build:pms": "npm --prefix skilli-pms run build && node -e \"const fs=require('fs'); fs.cpSync('skilli-pms/out', 'pms', {recursive:true});\""
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

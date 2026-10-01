@@ -8237,6 +8237,761 @@
     }
   }
 
+  /* ========================================================= */
+  /* PROFILE VIEWS & STUDENT WATCHER FEATURE STYLES            */
+  /* ========================================================= */
+  .clickable-stat {
+    cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-radius: 12px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+  }
+  .clickable-stat:hover {
+    background: rgba(56, 189, 248, 0.12) !important;
+    border-color: rgba(56, 189, 248, 0.35) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(56, 189, 248, 0.18);
+  }
+  .clickable-stat:hover .stat-value {
+    color: #38bdf8 !important;
+    text-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+  }
+
+  /* Modal Overlays */
+  .profile-views-modal-overlay,
+  .student-profile-modal-overlay,
+  .explore-students-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 15, 29, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .profile-views-modal-overlay.active,
+  .student-profile-modal-overlay.active,
+  .explore-students-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .profile-views-dialog,
+  .student-profile-dialog,
+  .explore-students-dialog {
+    background: #0f172a;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), 0 0 40px rgba(139, 92, 246, 0.15);
+    border-radius: 20px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .profile-views-dialog { max-width: 620px; }
+  .student-profile-dialog { max-width: 780px; }
+  .explore-students-dialog { max-width: 860px; }
+
+  /* Analytics Ribbon in Profile Views Modal */
+  .views-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .views-stat-box {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(51, 65, 85, 0.7);
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .views-stat-box:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(30, 41, 59, 0.95);
+    transform: translateY(-2px);
+  }
+  .views-stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+  .views-stat-tag {
+    font-size: 11.5px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  /* Views Share Card */
+  .views-share-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(139, 92, 246, 0.08));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .views-share-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-copy-share-compact {
+    background: #38bdf8;
+    color: #0f172a;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .btn-copy-share-compact:hover {
+    background: #7dd3fc;
+    transform: translateY(-1px);
+  }
+
+  /* Profile Viewers List */
+  .profile-viewers-list {
+    max-height: 380px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+  }
+  .viewer-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+  .viewer-card:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateX(2px);
+  }
+  .viewer-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .viewer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #f8fafc;
+    flex-shrink: 0;
+    position: relative;
+    background: linear-gradient(135deg, #00a884, #005c4b);
+    background-size: cover;
+    background-position: center;
+  }
+  .viewer-online-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00a884;
+    border: 2px solid #0f172a;
+  }
+  .viewer-info {
+    min-width: 0;
+  }
+  .viewer-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .viewer-name {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .viewer-college-row {
+    font-size: 11.5px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .viewer-time {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .btn-viewer-action {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    color: #c084fc;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+  }
+  .btn-viewer-action:hover {
+    background: #8b5cf6;
+    color: #ffffff;
+  }
+  .btn-viewer-chat {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-viewer-chat:hover {
+    background: #38bdf8;
+    color: #0f172a;
+  }
+
+  /* Student Profile Watcher Modal */
+  .student-profile-cover {
+    height: 110px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #0f172a 100%);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  }
+  .student-cover-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    z-index: 2;
+  }
+  .student-status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .student-icon-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .student-icon-action-btn:hover {
+    background: #334155;
+    color: #ffffff;
+    transform: scale(1.05);
+  }
+
+  .student-profile-body {
+    padding: 0 24px 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 110px);
+  }
+  .student-header-row {
+    display: flex;
+    gap: 18px;
+    align-items: flex-end;
+    margin-top: -38px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+  }
+  .student-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .student-avatar-big {
+    width: 82px;
+    height: 82px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    border: 4px solid #0f172a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 800;
+    color: #ffffff;
+    background-size: cover;
+    background-position: center;
+  }
+  .student-header-meta {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 4px;
+  }
+  .student-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .student-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f8fafc;
+    margin: 0;
+  }
+  .student-verified-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .student-headline {
+    font-size: 14px;
+    color: #38bdf8;
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  .student-sub-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12.5px;
+    color: #94a3b8;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+  .student-avail-pill {
+    font-size: 11px;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+
+  /* Student Action Ribbon */
+  .student-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 16px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+    flex-wrap: wrap;
+  }
+  .btn-peer-connect-primary {
+    background: linear-gradient(135deg, #00a884, #008f6f);
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 168, 132, 0.25);
+    transition: all 0.2s;
+  }
+  .btn-peer-connect-primary:hover {
+    background: #00bf96;
+    transform: translateY(-1px);
+  }
+  .btn-peer-connect-secondary {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-peer-connect-secondary:hover {
+    background: rgba(56, 189, 248, 0.22);
+    transform: translateY(-1px);
+  }
+  .peer-social-links-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .peer-circle-social {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .peer-circle-social.github { background: #24292e; color: #fff; border: 1px solid #444d56; }
+  .peer-circle-social.linkedin { background: #0a66c2; color: #fff; border: 1px solid #1480ea; }
+  .peer-circle-social.whatsapp { background: #25d366; color: #fff; border: 1px solid #34e77b; }
+  .peer-circle-social:hover { transform: translateY(-2px); }
+
+  /* Student Tabs */
+  .student-profile-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 14px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    padding-bottom: 4px;
+  }
+  .peer-tab-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .peer-tab-btn.active {
+    color: #f8fafc;
+    background: rgba(139, 92, 246, 0.2);
+    font-weight: 700;
+  }
+  .peer-tab-content { display: none; }
+  .peer-tab-content.active { display: block; }
+
+  .peer-detail-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .peer-detail-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .peer-bio-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin: 0;
+  }
+  .peer-skills-chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .peer-skill-chip {
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .peer-timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .peer-edu-item {
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 10px;
+  }
+  .peer-edu-degree { font-weight: 700; font-size: 13.5px; color: #f8fafc; }
+  .peer-edu-school { font-size: 12px; color: #38bdf8; margin-top: 2px; }
+  .peer-edu-year { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  .peer-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .peer-proj-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .peer-proj-name { font-weight: 700; font-size: 13.5px; color: #f8fafc; margin-bottom: 4px; }
+  .peer-proj-desc { font-size: 12px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px; }
+  .peer-proj-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+  .peer-proj-tag { font-size: 10.5px; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 2px 6px; border-radius: 4px; }
+  .peer-proj-links { display: flex; gap: 8px; }
+  .peer-proj-btn { font-size: 11px; color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+  .peer-proj-btn:hover { text-decoration: underline; }
+
+  /* Explore Students Directory */
+  .explore-search-bar {
+    margin-bottom: 12px;
+  }
+  .explore-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .explore-input-wrap input {
+    background: transparent;
+    border: none;
+    color: #f8fafc;
+    font-size: 13.5px;
+    width: 100%;
+    outline: none;
+  }
+  .explore-filter-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .explore-pill {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .explore-pill.active {
+    background: #8b5cf6;
+    color: #ffffff;
+    border-color: #8b5cf6;
+  }
+  .explore-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .explore-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .explore-card:hover {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(139, 92, 246, 0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .explore-card-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #00a884, #005c4b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+  }
+  .explore-card-name { font-size: 14px; font-weight: 700; color: #f8fafc; }
+  .explore-card-role { font-size: 11.5px; color: #38bdf8; font-weight: 600; margin-top: 2px; }
+  .explore-card-college { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+  .explore-card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin: 10px 0 14px;
+  }
+  .explore-card-skill {
+    font-size: 10px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    color: #c084fc;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .explore-card-btns {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    margin-top: auto;
+  }
+  .btn-explore-view {
+    flex: 1;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+    border: none;
+    padding: 7px 0;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+  .btn-explore-view:hover { background: #9d71fd; }
+  .btn-explore-chat {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-explore-chat:hover { background: #38bdf8; color: #0f172a; }
+
+  /* Peer item quick profile button */
+  .peer-quick-profile-btn {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .peer-quick-profile-btn:hover {
+    background: #38bdf8;
+    color: #0f172a;
+    transform: scale(1.1);
+  }
+  .btn-refresh-views {
+    background: transparent;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #94a3b8;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-refresh-views:hover {
+    color: #38bdf8;
+    border-color: #38bdf8;
+    transform: rotate(180deg);
+  }
 </style>
   <script>
     // Sidebar toggle function - defined early so onclick can use it
@@ -8297,6 +9052,11 @@
           <i class="fas fa-file-alt"></i>
           <span class="sidebar-item-text">Resume Analyzer</span>
           <span class="sidebar-badge">AI</span>
+        </div>
+        <div class="sidebar-item" onclick="window.open('/pms', '_blank');" title="Open Capstone PMS in a new tab">
+          <i class="fas fa-diagram-project" style="color: #10b981;"></i>
+          <span class="sidebar-item-text">Capstone PMS</span>
+          <span class="sidebar-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">NEW</span>
         </div>
         <div class="sidebar-item" onclick="window.location.href='code-practice.html';">
           <i class="fas fa-code"></i>
@@ -8488,6 +9248,12 @@
         <a href="job-matching.html" class="secondary-tool-pill">
           <i class="fas fa-briefcase" style="color: #fbbf24;"></i> Campus Openings
         </a>
+        <a href="/pms" target="_blank" rel="noopener noreferrer" class="secondary-tool-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399;" title="Open Capstone PMS in separate tab">
+          <i class="fas fa-diagram-project" style="color: #34d399;"></i> Capstone PMS <i class="fas fa-external-link-alt" style="font-size: 9px; margin-left: 3px; opacity: 0.8;"></i>
+        </a>
+        <button type="button" onclick="openExploreStudentsModal()" class="secondary-tool-pill" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35); color: #c084fc; cursor: pointer;">
+          <i class="fas fa-users-viewfinder" style="color: #c084fc;"></i> Discover Students
+        </button>
       </div>
     </div>
 
@@ -8601,9 +9367,12 @@
             <hr class="profile-divider">
 
             <div class="profile-stats-grid">
-              <div class="stat-item">
+              <div class="stat-item clickable-stat" id="statViewsItem" onclick="openProfileViewsModal()" title="View students who checked out your profile">
                 <div class="stat-value" id="statViews">0</div>
-                <div class="stat-label">Profile views</div>
+                <div class="stat-label" style="display:flex; align-items:center; justify-content:center; gap:4px;">
+                  <span>Profile views</span>
+                  <i class="fas fa-eye" style="font-size:10px; color:#38bdf8;"></i>
+                </div>
               </div>
               <div class="stat-item">
                 <div class="stat-value" id="statApplications">0</div>
@@ -9156,7 +9925,7 @@
                       <path d="M45.317 2.71603C48.1766 -0.885233 53.9744 1.08779 54.0433 5.68612L54.3475 72.9325H9.83109C4.05199 72.9325 0.880911 66.1972 4.54589 61.712L45.317 2.71603Z" fill="#3ECF8E" fill-opacity="0.7"/>
                     </svg>
                     <span style="color: #64748b;">/</span>
-                    <span id="supabaseConsoleOrgUser" style="color: #ededed; font-weight: 600;">parthd45</span>
+                    <span id="supabaseConsoleOrgUser" style="color: #ededed; font-weight: 600;">developer</span>
                     <span class="supabase-plan-badge" id="supabasePlanBadge">FREE</span>
                     <i class="fas fa-chevron-down" style="font-size: 10px; color: #707070; cursor: pointer;"></i>
                   </div>
@@ -9172,7 +9941,7 @@
                     <i class="fas fa-search" style="font-size: 10px;"></i> Search... <span style="font-size: 10px; background: #262626; padding: 1px 4px; border-radius: 3px;">Ctrl K</span>
                   </div>
                   <i class="far fa-question-circle" style="cursor: pointer;" title="Supabase Documentation" onclick="window.open('https://supabase.com/docs', '_blank')"></i>
-                  <img id="supabaseConsoleAvatar" src="https://avatars.githubusercontent.com/parthd45" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Parth&background=10b981&color=fff';" />
+                  <img id="supabaseConsoleAvatar" src="https://ui-avatars.com/api/?name=Dev&background=10b981&color=fff" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Dev&background=10b981&color=fff';" />
                 </div>
               </div>
 
@@ -9567,6 +10336,243 @@
       </div>
     </div>
   </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL: WHO VIEWED YOUR PROFILE & VIEW STATS -->
+  <!-- ============================================ -->
+  <div class="modal profile-views-modal-overlay" id="profileViewsModal" onclick="if(event.target===this)closeProfileViewsModal()">
+    <div class="modal-content profile-views-dialog">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.95), rgba(15, 23, 42, 0.95)); border-bottom: 1px solid rgba(56, 189, 248, 0.25);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.2)); border: 1px solid rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 18px;">
+            <i class="fas fa-eye"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 18px; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+              Profile Viewers & Analytics
+              <span style="font-size: 11px; font-weight: 700; color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); padding: 2px 8px; border-radius: 9999px;">Live</span>
+            </h3>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: #94a3b8;">Students & peers who checked out your PlaceAI candidate portfolio</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeProfileViewsModal()" style="color: #94a3b8; font-size: 20px;">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Analytics Stat Ribbon -->
+        <div class="views-analytics-grid">
+          <div class="views-stat-box">
+            <div class="views-stat-num" id="modalTotalViews">0</div>
+            <div class="views-stat-tag"><i class="fas fa-chart-line" style="color: #38bdf8;"></i> Total Views</div>
+          </div>
+          <div class="views-stat-box">
+            <div class="views-stat-num" id="modalUniqueViewers">0</div>
+            <div class="views-stat-tag"><i class="fas fa-user-graduate" style="color: #c084fc;"></i> Unique Students</div>
+          </div>
+          <div class="views-stat-box">
+            <div class="views-stat-num" id="modalTodayViews">0</div>
+            <div class="views-stat-tag"><i class="fas fa-fire" style="color: #f59e0b;"></i> Recent (24h)</div>
+          </div>
+        </div>
+
+        <!-- Share Boost Card -->
+        <div class="views-share-card">
+          <div class="views-share-left">
+            <i class="fas fa-bullhorn" style="font-size: 18px; color: #38bdf8;"></i>
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #f8fafc;">Boost your candidate visibility</div>
+              <div style="font-size: 11.5px; color: #94a3b8;">Share your profile link in study groups or resumes to gain more views</div>
+            </div>
+          </div>
+          <button type="button" class="btn-copy-share-compact" onclick="copyCandidateShareLink()">
+            <i class="fas fa-link"></i> Copy Link
+          </button>
+        </div>
+
+        <!-- Recent Viewers List -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px;">
+          <div style="font-size: 13px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">
+            <i class="fas fa-history" style="color: #8b5cf6; margin-right: 6px;"></i> Students Who Checked Out Your Profile
+          </div>
+          <button type="button" onclick="loadProfileViewsData()" class="btn-refresh-views" title="Refresh views list">
+            <i class="fas fa-rotate"></i>
+          </button>
+        </div>
+
+        <div id="profileViewersContainer" class="profile-viewers-list">
+          <div style="text-align: center; padding: 30px; color: #94a3b8;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #38bdf8; margin-bottom: 8px;"></i>
+            <div>Loading student viewers...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL: INTERACTIVE STUDENT PROFILE VIEWER     -->
+  <!-- Enables students to watch another student profile -->
+  <!-- ============================================ -->
+  <div class="modal student-profile-modal-overlay" id="studentProfileModal" onclick="if(event.target===this)closeStudentProfileModal()">
+    <div class="modal-content student-profile-dialog">
+      <!-- Atmospheric Candidate Cover -->
+      <div class="student-profile-cover">
+        <div class="cover-mesh-glow"></div>
+        <div class="cover-grid-pattern"></div>
+        <div class="student-cover-actions">
+          <span class="student-status-badge"><i class="fas fa-shield-halved"></i> Verified Student Candidate</span>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="student-icon-action-btn" id="btnSharePeerProfile" onclick="shareCurrentPeerProfile()" title="Share Student Profile">
+              <i class="fas fa-share-nodes"></i>
+            </button>
+            <button type="button" class="student-icon-action-btn" onclick="closeStudentProfileModal()" title="Close Profile">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Profile Body -->
+      <div class="student-profile-body">
+        <div class="student-header-row">
+          <div class="student-avatar-wrap">
+            <div class="student-avatar-big" id="peerModalAvatar">U</div>
+            <div class="avatar-beacon-ring" id="peerModalBeacon" title="PlaceAI Active">
+              <span class="avatar-beacon-pulse"></span>
+            </div>
+          </div>
+          <div class="student-header-meta">
+            <div class="student-name-row">
+              <h2 class="student-name" id="peerModalName">Candidate Name</h2>
+              <span class="student-verified-pill" title="Verified PlaceAI Student"><i class="fas fa-check-circle"></i> Verified</span>
+            </div>
+            <div class="student-headline" id="peerModalRole">Software Engineering Student</div>
+            <div class="student-sub-info">
+              <span id="peerModalCollege"><i class="fas fa-graduation-cap"></i> Engineering Institute</span>
+              <span id="peerModalCity"><i class="fas fa-map-marker-alt"></i> India</span>
+              <span class="student-avail-pill" id="peerModalAvailability"><i class="fas fa-circle" style="font-size:7px; color:#34d399; margin-right:4px;"></i> Available immediately</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Interaction Bar -->
+        <div class="student-action-bar">
+          <button type="button" class="btn-peer-connect-primary" id="btnPeerDirectMessage" onclick="messageCurrentPeerFromModal()">
+            <i class="fas fa-paper-plane"></i> Direct Message
+          </button>
+          <button type="button" class="btn-peer-connect-secondary" onclick="practiceCodingWithPeerFromModal()">
+            <i class="fas fa-code"></i> Practice Code Together
+          </button>
+          <div class="peer-social-links-wrap" id="peerSocialLinksWrap">
+            <a id="peerModalGithub" href="#" target="_blank" class="peer-circle-social github" title="GitHub Profile" style="display:none;">
+              <i class="fab fa-github"></i>
+            </a>
+            <a id="peerModalLinkedin" href="#" target="_blank" class="peer-circle-social linkedin" title="LinkedIn Profile" style="display:none;">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a id="peerModalWa" href="#" target="_blank" class="peer-circle-social whatsapp" title="WhatsApp Message" style="display:none;">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Candidate Sections Tabs -->
+        <div class="student-profile-tabs">
+          <button type="button" class="peer-tab-btn active" onclick="switchPeerProfileTab('about', this)">About & Skills</button>
+          <button type="button" class="peer-tab-btn" onclick="switchPeerProfileTab('education', this)">Education</button>
+          <button type="button" class="peer-tab-btn" onclick="switchPeerProfileTab('projects', this)">Projects & Repos</button>
+        </div>
+
+        <!-- TAB 1: About & Skills -->
+        <div id="peerTab_about" class="peer-tab-content active">
+          <!-- Summary/Bio Card -->
+          <div class="peer-detail-card">
+            <div class="peer-detail-title"><i class="fas fa-quote-left" style="color: #38bdf8;"></i> Professional Bio</div>
+            <p id="peerModalBio" class="peer-bio-text">No summary provided by candidate yet.</p>
+          </div>
+
+          <!-- Technical Skills Card -->
+          <div class="peer-detail-card">
+            <div class="peer-detail-title"><i class="fas fa-award" style="color: #a78bfa;"></i> Core Technical Skills</div>
+            <div id="peerModalSkillsWrap" class="peer-skills-chip-container">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Education -->
+        <div id="peerTab_education" class="peer-tab-content">
+          <div class="peer-detail-card">
+            <div class="peer-detail-title"><i class="fas fa-university" style="color: #34d399;"></i> Academic Background</div>
+            <div id="peerModalEducationList" class="peer-timeline-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Projects & Repositories -->
+        <div id="peerTab_projects" class="peer-tab-content">
+          <div class="peer-detail-card">
+            <div class="peer-detail-title"><i class="fas fa-folder-open" style="color: #fbbf24;"></i> Verified Projects & GitHub Work</div>
+            <div id="peerModalProjectsList" class="peer-projects-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL: CAMPUS STUDENTS DIRECTORY             -->
+  <!-- Discover & watch fellow students' profiles    -->
+  <!-- ============================================ -->
+  <div class="modal explore-students-modal-overlay" id="exploreStudentsModal" onclick="if(event.target===this)closeExploreStudentsModal()">
+    <div class="modal-content explore-students-dialog">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.95), rgba(15, 23, 42, 0.95)); border-bottom: 1px solid rgba(139, 92, 246, 0.25);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(56, 189, 248, 0.2)); border: 1px solid rgba(168, 85, 247, 0.4); display: flex; align-items: center; justify-content: center; color: #c084fc; font-size: 18px;">
+            <i class="fas fa-users-viewfinder"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 18px; color: #f8fafc;">Explore Campus Students</h3>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: #94a3b8;">Discover verified students, watch their profiles, and connect for placement prep</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeExploreStudentsModal()" style="color: #94a3b8; font-size: 20px;">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Search and Filter Bar -->
+        <div class="explore-search-bar">
+          <div class="explore-input-wrap">
+            <i class="fas fa-search" style="color: #64748b;"></i>
+            <input type="text" id="exploreStudentSearchInput" placeholder="Search by name, college, skill (e.g. React, Python, DSA)..." oninput="filterExploreStudents()">
+          </div>
+        </div>
+
+        <div class="explore-filter-pills" id="exploreFilterPills">
+          <button type="button" class="explore-pill active" onclick="setExploreFilter('all', this)">All Students</button>
+          <button type="button" class="explore-pill" onclick="setExploreFilter('python', this)">Python</button>
+          <button type="button" class="explore-pill" onclick="setExploreFilter('react', this)">React</button>
+          <button type="button" class="explore-pill" onclick="setExploreFilter('dsa', this)">DSA / CP</button>
+          <button type="button" class="explore-pill" onclick="setExploreFilter('java', this)">Java</button>
+          <button type="button" class="explore-pill" onclick="setExploreFilter('ai', this)">AI / ML</button>
+        </div>
+
+        <!-- Student Cards Grid -->
+        <div id="exploreStudentsGrid" class="explore-cards-grid">
+          <!-- Dynamically populated from realRegisteredUsers -->
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
 
@@ -10801,12 +11807,13 @@
         return `
           <div class="broadcast-card ${isMine ? 'mine' : ''}">
             <div class="broadcast-author-row">
-              <div class="broadcast-author-info">
+              <div class="broadcast-author-info" ${!isMine && p.userId ? `onclick="openStudentProfileModal('${p.userId}')" style="cursor:pointer;" title="Watch ${escapeHtml(p.author)}'s Profile"` : ''}>
                 <div class="broadcast-avatar" style="background: ${p.avatarBg || 'linear-gradient(135deg, #00a884, #005c4b)'};">${p.avatarText || 'U'}</div>
                 <div>
                   <div class="broadcast-author-name">
                     <span>${p.author}</span>
                     <span class="broadcast-badge ${isMine ? 'you' : 'peer'}">${isMine ? 'You' : 'Student'}</span>
+                    ${!isMine && p.userId ? `<span style="font-size:10px; color:#38bdf8; margin-left:4px;"><i class="fas fa-eye"></i> View</span>` : ''}
                   </div>
                   <div style="font-size: 11px; color: #94a3b8;">${p.role || 'PlaceAI Member'}</div>
                 </div>
@@ -10818,6 +11825,11 @@
               <button class="broadcast-action-btn ${p.liked ? 'active' : ''}" onclick="togglePostLike('${p.id}')">
                 <i class="${p.liked ? 'fas' : 'far'} fa-thumbs-up"></i> ${p.likes || 0} Helpful
               </button>
+              ${!isMine && p.userId ? `
+                <button class="broadcast-action-btn" onclick="openStudentProfileModal('${p.userId}')" title="Watch ${escapeHtml(p.author)}'s Profile">
+                  <i class="fas fa-id-card"></i> View Profile
+                </button>
+              ` : ''}
             </div>
           </div>
         `;
@@ -11013,9 +12025,14 @@
             <div class="peer-item-meta">
               <div class="peer-item-name-row">
                 <span class="peer-item-name">${peer.name}</span>
-                <span class="peer-item-time" style="font-size:10.5px; color:${online ? '#00a884' : '#8696a0'};">
-                  ${online ? '<i class="fas fa-circle" style="font-size:7px;margin-right:3px;animation:wpOnlineBlink 1.5s infinite;"></i>Online' : (lastMsg ? lastMsg.time : lastSeenText)}
-                </span>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button type="button" class="peer-quick-profile-btn" onclick="event.stopPropagation(); openStudentProfileModal('${peer.id}');" title="Watch ${escapeHtml(peer.name)}'s Profile">
+                    <i class="fas fa-id-badge"></i>
+                  </button>
+                  <span class="peer-item-time" style="font-size:10.5px; color:${online ? '#00a884' : '#8696a0'};">
+                    ${online ? '<i class="fas fa-circle" style="font-size:7px;margin-right:3px;animation:wpOnlineBlink 1.5s infinite;"></i>Online' : (lastMsg ? lastMsg.time : lastSeenText)}
+                  </span>
+                </div>
               </div>
               <div class="peer-item-tag">
                 <i class="fas fa-graduation-cap" style="font-size:10px;"></i> ${peer.college}
@@ -11333,8 +12350,8 @@
 
       if (headerEl) {
         headerEl.innerHTML = `
-          <div class="peer-thread-profile">
-            <button class="wp-mobile-back-btn" onclick="closeMobileDirectThread()" title="Back to chats"><i class="fas fa-arrow-left"></i></button>
+          <div class="peer-thread-profile" onclick="openStudentProfileModal('${peer.id}')" style="cursor: pointer;" title="Click to watch ${escapeHtml(peer.name)}'s profile">
+            <button class="wp-mobile-back-btn" onclick="event.stopPropagation(); closeMobileDirectThread()" title="Back to chats"><i class="fas fa-arrow-left"></i></button>
             <div class="peer-avatar-wrapper" style="width:40px;height:40px;">
               <div class="peer-avatar-img" style="background: linear-gradient(135deg, ${online ? '#00a884, #005c4b' : '#334155, #1e293b'}); font-size:14px; color:#e9edef;">${peer.avatarText}</div>
             </div>
@@ -11342,6 +12359,7 @@
               <h4 style="display:flex; align-items:center; gap:8px;">
                 <span>${peer.name}</span>
                 <span style="font-size:10.5px;font-weight:700;color:${online ? '#00a884' : '#94a3b8'};background:${online ? 'rgba(0,168,132,0.15)' : 'rgba(148,163,184,0.15)'};padding:1px 6px;border-radius:4px;border:1px solid ${online ? 'rgba(0,168,132,0.3)' : 'rgba(148,163,184,0.3)'};">${peer.college}</span>
+                <span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.12); padding:1px 6px; border-radius:4px; font-weight:700;"><i class="fas fa-eye"></i> View Profile</span>
               </h4>
               <p id="peerHeaderStatus" style="font-size:11.5px; display:flex; align-items:center; margin-top:2px;">
                 ${online ? `
@@ -11355,6 +12373,9 @@
             </div>
           </div>
           <div class="peer-thread-actions" style="display:flex; align-items:center; gap:6px;">
+            <button class="wp-header-call-btn" onclick="openStudentProfileModal('${peer.id}')" title="Watch Full Student Profile">
+              <i class="fas fa-id-badge"></i>
+            </button>
             <button class="wp-header-call-btn" onclick="toggleWpChatSearch()" title="Search conversation">
               <i class="fas fa-search"></i>
             </button>
@@ -12577,7 +13598,7 @@
       const ctx = fallbackCanvas.getContext('2d');
 
       let tick = 0;
-      const myName = (userProfile && userProfile.first_name) ? userProfile.first_name : 'Parth';
+      const myName = (userProfile && (userProfile.first_name || userProfile.full_name)) ? (userProfile.first_name || userProfile.full_name.split(' ')[0]) : ((currentUser && currentUser.email) ? currentUser.email.split('@')[0] : 'Candidate');
       const myInitial = myName.charAt(0).toUpperCase();
       updatePipCamBadge('HD Avatar Cam');
 
@@ -14319,8 +15340,11 @@
 
       // Update connected / disconnected view
       if (hasVercelConnected || fallbackVercelApps.length > 0) {
-        const displayUser = savedVercelUser || (vercelData && vercelData.user && vercelData.user.username) || (activeGitHubUser ? activeGitHubUser.username : (userProfile ? userProfile.github_url : 'parthd45'));
-        if (usernameDisplay) usernameDisplay.textContent = displayUser || 'parthd45';
+        const authedUserHandle = (activeGitHubUser ? activeGitHubUser.username : '') || 
+          (userProfile && userProfile.github_url ? window.GitHubService?.extractUsername(userProfile.github_url) : '') || 
+          (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'developer');
+        const displayUser = savedVercelUser || (vercelData && vercelData.user && vercelData.user.username) || authedUserHandle;
+        if (usernameDisplay) usernameDisplay.textContent = displayUser;
         if (userAvatar) {
           if (vercelData && vercelData.user && vercelData.user.avatar) {
             userAvatar.src = `https://vercel.com/api/www/avatar/${vercelData.user.avatar}?s=60`;
@@ -14346,11 +15370,11 @@
             state: 'READY',
             target: 'production',
             createdAt: p.created_at || (Date.now() - 3600000 * 24 * 3),
-            creator: { username: savedVercelUser || (activeGitHubUser ? activeGitHubUser.username : 'parthd45') },
+            creator: { username: savedVercelUser || (activeGitHubUser ? activeGitHubUser.username : (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'developer')) },
             meta: {
               githubCommitRef: 'main',
               githubCommitMessage: p.description || `${p.name || p.title} production deployment on Vercel Edge`,
-              githubCommitAuthorName: savedVercelUser || 'Parth Deshmukh',
+              githubCommitAuthorName: savedVercelUser || (userProfile && (userProfile.full_name || userProfile.name)) || (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Developer'),
               framework: p.tech || 'Web App'
             }
           }));
@@ -14919,7 +15943,7 @@
                       (userProfile && userProfile.github_url && userProfile.github_url.includes('parthd45')) ||
                       (currentUser && currentUser.email && currentUser.email.includes('parth'));
 
-      if (isParth || !localStorage.getItem(getSupabaseAccountStorageKey())) {
+      if (isParth) {
         return [
           {
             name: 'PlaceWiseAI',
@@ -14938,7 +15962,15 @@
         ];
       }
 
-      return [];
+      return [
+        {
+          name: 'PlaceWiseAI',
+          region: 'ap-south-1 (Mumbai)',
+          ref: 'igilmfqfxsiaggkgkwoq',
+          tier: 'FREE',
+          tables: ['user_profiles', 'activity_logs', 'skills', 'projects']
+        }
+      ];
     }
 
     function openSupabaseAccountModal() {
@@ -15509,6 +16541,7 @@
         // Re-sync authentic PlaceAI profile actions
         if (window.ActivityTracker) {
           window.ActivityTracker.clearLegacyFakeData();
+          window.ActivityTracker.clearGitHubContributions();
           window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
         }
 
@@ -16420,6 +17453,9 @@
         // Update certifications
         try { displayCertifications(); } catch (e) { console.error('displayCertifications error:', e); }
 
+        // Update profile views count
+        try { if (typeof loadProfileViewsCount === 'function') loadProfileViewsCount(); } catch (e) { console.warn('loadProfileViewsCount error:', e); }
+
         // Render Developer Cloud Suite: Vercel Deployments & Supabase Console
         try { if (typeof renderVercelDeployments === 'function') renderVercelDeployments(); } catch (e) { console.warn('renderVercelDeployments error:', e); }
         try { if (typeof renderSupabaseConsole === 'function') renderSupabaseConsole(); } catch (e) { console.warn('renderSupabaseConsole error:', e); }
@@ -16460,11 +17496,23 @@
           window.ActivityTracker.syncFromRealProfile(userProfile, currentUser);
         }
 
+        // Clean up any stale or leaked parthd45 fallback from previous sessions if user is not Parth
+        const cachedGh = localStorage.getItem('placeai_connected_github');
+        const isParthEmail = !!(currentUser && currentUser.email && currentUser.email.toLowerCase().includes('parth'));
+        if (cachedGh && cachedGh.toLowerCase() === 'parthd45' && !isParthEmail && (!userProfile || !userProfile.github_url || !userProfile.github_url.includes('parthd45'))) {
+          localStorage.removeItem('placeai_connected_github');
+          localStorage.removeItem('placeai_github_user');
+        }
+
         // If GitHub URL is connected, load authentic GitHub contributions & display profile badge
-        const ghTarget = (userProfile && userProfile.github_url) || localStorage.getItem('placeai_connected_github') || 'https://github.com/parthd45';
+        const ghTarget = (userProfile && userProfile.github_url) || localStorage.getItem('placeai_connected_github');
         if (ghTarget) {
           loadGitHubContributions(ghTarget);
         } else {
+          activeGitHubUser = null;
+          if (window.ActivityTracker) {
+            window.ActivityTracker.clearGitHubContributions();
+          }
           updateGitHubUI(null, false);
           if (typeof renderHeatmap === 'function') {
             renderHeatmap();
@@ -17529,39 +18577,40 @@
     }
 
     function copyCandidateShareLink() {
-      const shareUrl = window.location.origin + window.location.pathname;
+      const myId = (userProfile && (userProfile.user_id || userProfile.id)) || (currentUser && currentUser.id);
+      const shareUrl = myId 
+        ? `${window.location.origin}${window.location.pathname}?studentId=${encodeURIComponent(myId)}`
+        : `${window.location.origin}${window.location.pathname}`;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(shareUrl).then(() => {
-          showToast('📋 Candidate portfolio link copied to clipboard!', 'success');
+          showToast('📋 Candidate link copied! Anyone opening this link can view your profile & will be counted in your profile views.', 'success');
         }).catch(() => {
-          showToast('Link: ' + shareUrl, 'info');
+          showToast('Candidate Link: ' + shareUrl, 'info');
         });
       } else {
-        showToast('Link: ' + shareUrl, 'info');
+        showToast('Candidate Link: ' + shareUrl, 'info');
       }
     }
 
     function openDossierModal() {
-      const name = userProfile.full_name || 'Parth P Deshmukh';
-      const role = userProfile.designation || 'Master of Computer Applications (MCA) | Full-Stack & Data';
-      const location = userProfile.location || 'Pune, Maharashtra, India';
-      const email = userProfile.email || (currentUser && currentUser.email) || 'parthdeshmukh2809@gmail.com';
-      const phone = userProfile.phone ? `+91 ${userProfile.phone}` : '';
-      const github = userProfile.github_username ? `https://github.com/${userProfile.github_username}` : 'https://github.com/parthd45';
-      const summary = userProfile.summary || 'MCA student at IMCC Pune with a strong foundation in full-stack web development, Python data analytics, and database engineering.';
-      const skills = (userProfile.skills || []).join(', ');
+      const name = (userProfile && (userProfile.full_name || userProfile.name)) || (currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name) || (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Candidate');
+      const role = (userProfile && userProfile.designation) || (userProfile && userProfile.headline) || 'Software Development Candidate';
+      const location = (userProfile && (userProfile.location || userProfile.city)) || 'Not specified';
+      const email = (userProfile && userProfile.email) || (currentUser && currentUser.email) || 'N/A';
+      const phone = (userProfile && userProfile.phone) ? `+91 ${userProfile.phone}` : '';
+      const github = (userProfile && userProfile.github_url) || (activeGitHubUser && activeGitHubUser.html_url) || 'Not connected';
+      const summary = (userProfile && (userProfile.summary || userProfile.bio)) || 'Dedicated candidate with a passion for software engineering, continuous problem solving, and technological innovation.';
+      const skills = (userProfile && Array.isArray(userProfile.skills) && userProfile.skills.length > 0) ? userProfile.skills.join(', ') : 'Add skills in profile';
       
-      const eduList = (userProfile.education && userProfile.education.length > 0) ? userProfile.education : [
-        { degree: 'Master of Computer Applications (MCA)', field: 'Computer Science', institution: 'MES IMCC Pune', year: '2023 - 2025' },
-        { degree: 'Bachelor of Computer Applications (BCA)', field: 'Computer Applications', institution: 'Savitribai Phule Pune University', year: '2020 - 2023' }
-      ];
-      const eduStr = eduList.map(e => `• ${e.degree || ''} (${e.field || ''}) - ${e.institution || ''} [${e.year || ''}]`).join('\n');
+      const eduList = (userProfile && Array.isArray(userProfile.education) && userProfile.education.length > 0) ? userProfile.education : [];
+      const eduStr = eduList.length > 0 
+        ? eduList.map(e => `• ${e.degree || e.course || ''} ${e.field ? '(' + e.field + ')' : ''} - ${e.institution || e.college || ''} [${e.year || e.graduation_year || ''}]`).join('\n')
+        : '• Academic records not yet added. Update in Profile > Education.';
       
-      const projList = (userProfile.projects && userProfile.projects.length > 0) ? userProfile.projects : [
-        { name: 'DCPE ERP Platform', description: 'Enterprise college & student management system with attendance, examinations and fees modules.', tech: 'PHP, MySQL, JavaScript, Bootstrap', url: 'https://dcpe-erp.vercel.app/' },
-        { name: 'PlaceAI Placement Analytics Platform', description: 'AI-driven placement preparation, ATS resume scoring and GitHub tracking platform.', tech: 'JavaScript, Node.js, Vercel, Supabase', url: 'https://placeai.vercel.app/' }
-      ];
-      const projStr = projList.map(p => `• ${p.name || ''}: ${p.description || ''}\n  Stack: ${p.tech || ''}${p.url ? `\n  Demo: ${p.url}` : ''}`).join('\n\n');
+      const projList = (userProfile && Array.isArray(userProfile.projects) && userProfile.projects.length > 0) ? userProfile.projects : [];
+      const projStr = projList.length > 0
+        ? projList.map(p => `• ${p.name || p.title || ''}: ${p.description || ''}\n  Stack: ${p.tech || (Array.isArray(p.tags) ? p.tags.join(', ') : '')}${p.url || p.project_url ? `\n  Demo/Repo: ${p.url || p.project_url}` : ''}`).join('\n\n')
+        : '• No projects yet added. Add projects or connect GitHub in Profile.';
 
       const dossierText = `# CANDIDATE DOSSIER: ${name.toUpperCase()}
 ${role} | ${location}
@@ -17573,7 +18622,7 @@ Email: ${email} ${phone ? `| Phone: ${phone}` : ''} | GitHub: ${github}
 ${summary}
 
 ==================================================
-2. CORE TECHNICAL SKILLS (35+)
+2. CORE TECHNICAL SKILLS
 ==================================================
 ${skills}
 
@@ -17590,9 +18639,8 @@ ${projStr}
 ==================================================
 5. CAREER OBJECTIVE & AVAILABILITY
 ==================================================
-• Target Roles: Software Development Engineer (SDE), Full-Stack Web Developer, Python / Data Analyst
-• Availability: Immediate (Placement Ready 2025)
-• Preferred Locations: Pune, Mumbai, Bangalore, Remote
+• Target Roles: ${(userProfile && userProfile.preferred_roles) || 'Software Engineer, Full-Stack Developer'}
+• Preferred Locations: ${(userProfile && userProfile.preferred_locations) || (location !== 'Not specified' ? location : 'Remote')}
 `;
 
       const content = `
@@ -19764,6 +20812,539 @@ ${projStr}
       renderMilestones();
     }
 
+    // ==========================================================
+    // PROFILE VIEWS ANALYTICS & STUDENT PROFILE WATCHER LOGIC
+    // ==========================================================
+
+    let currentPeerInModal = null;
+    let cachedProfileViewsResult = null;
+    let currentExploreFilter = 'all';
+
+    // 1. Load Profile Views Count on Dashboard
+    async function loadProfileViewsCount() {
+      const myId = (userProfile && (userProfile.user_id || userProfile.id)) || (currentUser && currentUser.id);
+      if (!myId || !window.DBService || !window.DBService.getProfileViews) return;
+
+      try {
+        const res = await window.DBService.getProfileViews(myId);
+        if (res && res.success) {
+          cachedProfileViewsResult = res;
+          const statEl = document.getElementById('statViews');
+          if (statEl) {
+            statEl.textContent = res.count || 0;
+          }
+        }
+      } catch (err) {
+        console.warn('loadProfileViewsCount warning:', err);
+      }
+    }
+
+    // Live update listener when another user views profile
+    window.addEventListener('placeai_profile_view_updated', (e) => {
+      const myId = (userProfile && (userProfile.user_id || userProfile.id)) || (currentUser && currentUser.id);
+      if (e.detail && myId && String(e.detail.targetUserId).toLowerCase() === String(myId).toLowerCase()) {
+        const statEl = document.getElementById('statViews');
+        if (statEl) statEl.textContent = e.detail.totalViews;
+        if (document.getElementById('profileViewsModal')?.classList.contains('active')) {
+          loadProfileViewsData();
+        }
+      }
+    });
+
+    // 2. Open / Close Profile Views Analytics Modal
+    window.openProfileViewsModal = function() {
+      const modal = document.getElementById('profileViewsModal');
+      if (!modal) return;
+      modal.classList.add('active');
+      loadProfileViewsData();
+    };
+
+    window.closeProfileViewsModal = function() {
+      const modal = document.getElementById('profileViewsModal');
+      if (modal) modal.classList.remove('active');
+    };
+
+    // 3. Load & Render Profile Views Data inside Analytics Modal
+    async function loadProfileViewsData() {
+      const myId = (userProfile && (userProfile.user_id || userProfile.id)) || (currentUser && currentUser.id);
+      if (!myId || !window.DBService) return;
+
+      const container = document.getElementById('profileViewersContainer');
+      const totalEl = document.getElementById('modalTotalViews');
+      const uniqueEl = document.getElementById('modalUniqueViewers');
+      const todayEl = document.getElementById('modalTodayViews');
+
+      try {
+        const res = await window.DBService.getProfileViews(myId);
+        cachedProfileViewsResult = res;
+
+        const views = (res && Array.isArray(res.views)) ? res.views : [];
+        const totalCount = res?.count || views.length;
+
+        // Calculate unique viewers
+        const uniqueSet = new Set();
+        let todayCount = 0;
+        const now = Date.now();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+
+        views.forEach(v => {
+          if (v.viewer_id) uniqueSet.add(String(v.viewer_id).toLowerCase());
+          if (v.viewed_at && (now - new Date(v.viewed_at).getTime()) <= oneDayMs) {
+            todayCount++;
+          }
+        });
+
+        if (totalEl) totalEl.textContent = totalCount;
+        if (uniqueEl) uniqueEl.textContent = uniqueSet.size || Math.min(totalCount, 1);
+        if (todayEl) todayEl.textContent = todayCount;
+
+        const statEl = document.getElementById('statViews');
+        if (statEl) statEl.textContent = totalCount;
+
+        if (!container) return;
+
+        if (views.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+              <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: #38bdf8; font-size: 22px;">
+                <i class="fas fa-eye-slash"></i>
+              </div>
+              <h4 style="color: #f1f5f9; font-size: 15px; margin-bottom: 6px;">No Views Yet</h4>
+              <p style="font-size: 12.5px; line-height: 1.5; max-width: 320px; margin: 0 auto 16px;">
+                Share your candidate portfolio link with batchmates, study groups, or on your resume to start tracking views!
+              </p>
+              <button type="button" class="btn-copy-share-compact" onclick="copyCandidateShareLink()">
+                <i class="fas fa-share-nodes"></i> Share My Candidate Link
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = views.map(v => {
+          const vName = escapeHtml(v.viewer_name || 'PlaceAI Student');
+          const vRole = escapeHtml(v.viewer_role || 'Student Candidate');
+          const vCollege = escapeHtml(v.viewer_college || 'Engineering Institute');
+          const vAvatar = v.viewer_avatar;
+          const initials = vName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ST';
+
+          // Check online presence if in realRegisteredUsers
+          const peer = Array.isArray(realRegisteredUsers) ? realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(v.viewer_id).toLowerCase()) : null;
+          const online = peer ? isPeerOnline(peer) : false;
+
+          // Format timestamp
+          let timeText = 'Recently';
+          if (v.viewed_at) {
+            const d = new Date(v.viewed_at);
+            if (!isNaN(d.getTime())) {
+              const diffMs = Date.now() - d.getTime();
+              const mins = Math.floor(diffMs / 60000);
+              const hrs = Math.floor(mins / 60);
+              if (mins < 2) timeText = 'Just now';
+              else if (mins < 60) timeText = `${mins}m ago`;
+              else if (hrs < 24) timeText = `${hrs}h ago`;
+              else timeText = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            }
+          }
+
+          const hasViewerId = v.viewer_id && !v.viewer_id.startsWith('anon_');
+
+          return `
+            <div class="viewer-card">
+              <div class="viewer-meta-left">
+                <div class="viewer-avatar" style="${vAvatar ? `background-image:url(${vAvatar}); color:transparent;` : ''}">
+                  ${vAvatar ? '' : initials}
+                  ${online ? '<span class="viewer-online-dot" title="Online now"></span>' : ''}
+                </div>
+                <div class="viewer-info">
+                  <div class="viewer-name-row">
+                    <span class="viewer-name">${vName}</span>
+                    <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 1px 6px; border-radius: 4px; font-weight: 700;">Student</span>
+                  </div>
+                  <div class="viewer-college-row">
+                    <span><i class="fas fa-graduation-cap" style="font-size: 10px;"></i> ${vCollege}</span>
+                    <span>•</span>
+                    <span>${vRole}</span>
+                  </div>
+                  <div class="viewer-time"><i class="far fa-clock" style="font-size: 10px;"></i> ${timeText}</div>
+                </div>
+              </div>
+              <div class="viewer-actions">
+                ${hasViewerId ? `
+                  <button type="button" class="btn-viewer-action" onclick="closeProfileViewsModal(); openStudentProfileModal('${v.viewer_id}');" title="Watch ${vName}'s Profile">
+                    <i class="fas fa-id-badge"></i> <span>View</span>
+                  </button>
+                  <button type="button" class="btn-viewer-chat" onclick="closeProfileViewsModal(); openCampusChatModal('direct'); setTimeout(() => selectDirectUser('${v.viewer_id}'), 250);" title="Chat with ${vName}">
+                    <i class="fas fa-comments"></i>
+                  </button>
+                ` : `
+                  <span style="font-size: 11px; color: #64748b; font-style: italic;">Public Link</span>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('loadProfileViewsData error:', err);
+        if (container) {
+          container.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444;font-size:12px;">Failed to load view history. Please try again.</div>';
+        }
+      }
+    }
+
+    // 4. Open Interactive Student Profile Watcher Modal
+    window.openStudentProfileModal = async function(studentId) {
+      if (!studentId) return;
+
+      const myId = (userProfile && (userProfile.user_id || userProfile.id)) || (currentUser && currentUser.id);
+
+      // If user clicks on themselves, notify nicely
+      if (myId && String(studentId).toLowerCase() === String(myId).toLowerCase()) {
+        showToast('ℹ️ This is your profile! You are viewing your own dashboard.', 'info');
+        return;
+      }
+
+      // Open modal container immediately with loading state
+      const modal = document.getElementById('studentProfileModal');
+      if (!modal) return;
+      modal.classList.add('active');
+
+      // Populate basic placeholders while fetching
+      document.getElementById('peerModalName').textContent = 'Loading Student Profile...';
+      document.getElementById('peerModalRole').textContent = 'PlaceAI Verified Student';
+      document.getElementById('peerModalBio').textContent = 'Fetching student profile details...';
+      document.getElementById('peerModalSkillsWrap').innerHTML = '<span class="peer-skill-chip"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
+      document.getElementById('peerModalEducationList').innerHTML = '<div style="color:#94a3b8;font-size:12px;">Loading academic credentials...</div>';
+      document.getElementById('peerModalProjectsList').innerHTML = '<div style="color:#94a3b8;font-size:12px;">Loading verified projects...</div>';
+
+      try {
+        let student = null;
+
+        // Check realRegisteredUsers first for 0ms render
+        if (Array.isArray(realRegisteredUsers)) {
+          const peer = realRegisteredUsers.find(p => String(p.id).toLowerCase() === String(studentId).toLowerCase());
+          if (peer) {
+            student = {
+              user_id: peer.id,
+              first_name: peer.name.split(' ')[0],
+              last_name: peer.name.split(' ').slice(1).join(' '),
+              email: peer.email,
+              current_designation: peer.role,
+              college_name: peer.college,
+              profile_image_url: peer.avatarImg,
+              skills: peer.skills || ['JavaScript', 'Python', 'DSA'],
+              city: peer.college || 'India',
+              availability: 'Available immediately'
+            };
+          }
+        }
+
+        // Fetch full profile from DBService
+        if (window.DBService && window.DBService.fetchPublicUserProfile) {
+          const res = await window.DBService.fetchPublicUserProfile(studentId);
+          if (res && res.success && res.profile) {
+            student = { ...student, ...res.profile };
+          }
+        }
+
+        if (!student) {
+          document.getElementById('peerModalName').textContent = 'Student Candidate';
+          document.getElementById('peerModalBio').textContent = 'Profile details not found or candidate profile is private.';
+          return;
+        }
+
+        currentPeerInModal = student;
+
+        // RECORD PROFILE VIEW: viewer watches student!
+        if (myId && window.DBService && window.DBService.recordProfileView) {
+          const myViewerInfo = {
+            id: myId,
+            name: (userProfile && (userProfile.first_name ? `${userProfile.first_name} ${userProfile.last_name || ''}`.trim() : userProfile.full_name)) || (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Candidate Peer'),
+            role: (userProfile && userProfile.current_designation) || 'Student Candidate',
+            college: (userProfile && userProfile.college_name) || (userProfile && userProfile.city) || 'Engineering Institute',
+            avatar: (userProfile && (userProfile.profile_image_url || userProfile.profile_image)) || null
+          };
+          window.DBService.recordProfileView(student.user_id || studentId, myViewerInfo);
+        }
+
+        // Populate Modal Fields
+        const fullName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || student.email?.split('@')[0] || 'Student Candidate';
+        const role = student.current_designation || student.headline || 'Software Engineering Student';
+        const college = student.college_name || student.college || 'Engineering Institute';
+        const city = student.city || student.location || 'India';
+        const avail = student.availability || 'Available immediately';
+        const avatarUrl = student.profile_image_url || student.avatarImg;
+        const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ST';
+
+        document.getElementById('peerModalName').textContent = fullName;
+        document.getElementById('peerModalRole').textContent = role;
+        document.getElementById('peerModalCollege').innerHTML = `<i class="fas fa-graduation-cap"></i> ${escapeHtml(college)}`;
+        document.getElementById('peerModalCity').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${escapeHtml(city)}`;
+        document.getElementById('peerModalAvailability').innerHTML = `<i class="fas fa-circle" style="font-size:7px; color:#34d399; margin-right:4px;"></i> ${escapeHtml(avail)}`;
+
+        // Avatar
+        const avatarEl = document.getElementById('peerModalAvatar');
+        if (avatarEl) {
+          if (avatarUrl) {
+            avatarEl.style.backgroundImage = `url(${avatarUrl})`;
+            avatarEl.textContent = '';
+          } else {
+            avatarEl.style.backgroundImage = 'none';
+            avatarEl.textContent = initials;
+          }
+        }
+
+        // Social Links
+        const ghBtn = document.getElementById('peerModalGithub');
+        if (ghBtn) {
+          if (student.github_url) {
+            ghBtn.href = student.github_url;
+            ghBtn.style.display = 'inline-flex';
+          } else {
+            ghBtn.style.display = 'none';
+          }
+        }
+
+        const liBtn = document.getElementById('peerModalLinkedin');
+        if (liBtn) {
+          if (student.linkedin_url) {
+            liBtn.href = student.linkedin_url;
+            liBtn.style.display = 'inline-flex';
+          } else {
+            liBtn.style.display = 'none';
+          }
+        }
+
+        const waBtn = document.getElementById('peerModalWa');
+        if (waBtn) {
+          if (student.mobile) {
+            const clean = student.mobile.replace(/\D/g, '');
+            const num = clean.length === 10 ? '91' + clean : clean;
+            waBtn.href = `https://wa.me/${num}?text=${encodeURIComponent('Hi ' + fullName + ', saw your candidate profile on PlaceAI!')}`;
+            waBtn.style.display = 'inline-flex';
+          } else {
+            waBtn.style.display = 'none';
+          }
+        }
+
+        // Bio
+        const bioEl = document.getElementById('peerModalBio');
+        if (bioEl) {
+          bioEl.textContent = student.bio || student.summary || 'Focused candidate actively mastering DSA, web systems, and technical problem solving for campus placement drives.';
+        }
+
+        // Skills
+        const skillsWrap = document.getElementById('peerModalSkillsWrap');
+        if (skillsWrap) {
+          const skills = Array.isArray(student.skills) && student.skills.length > 0
+            ? student.skills
+            : ['Problem Solving', 'Data Structures', 'JavaScript', 'Python', 'SQL', 'Git'];
+          skillsWrap.innerHTML = skills.map(s => `
+            <span class="peer-skill-chip"><i class="fas fa-check-circle" style="font-size:10px; color:#38bdf8;"></i> ${escapeHtml(s)}</span>
+          `).join('');
+        }
+
+        // Education
+        const eduListEl = document.getElementById('peerModalEducationList');
+        if (eduListEl) {
+          const edus = Array.isArray(student.education) && student.education.length > 0 ? student.education : [{
+            course: student.course || 'B.Tech Computer Science & Engineering',
+            college: college,
+            graduation_year: student.graduation_year || '2026',
+            level: student.education_level || 'Bachelor Degree'
+          }];
+
+          eduListEl.innerHTML = edus.map(e => `
+            <div class="peer-edu-item">
+              <div class="peer-edu-degree">${escapeHtml(e.course || e.degree || 'Degree Program')}</div>
+              <div class="peer-edu-school"><i class="fas fa-university"></i> ${escapeHtml(e.college || e.institution || college)}</div>
+              <div class="peer-edu-year"><i class="far fa-calendar-alt"></i> Batch ${escapeHtml(e.graduation_year || e.year || '2026')} • ${escapeHtml(e.level || 'Undergraduate')}</div>
+            </div>
+          `).join('');
+        }
+
+        // Projects
+        const projsListEl = document.getElementById('peerModalProjectsList');
+        if (projsListEl) {
+          const projs = Array.isArray(student.projects) && student.projects.length > 0 ? student.projects : [
+            {
+              title: 'PlaceAI Campus Placement Prep Portfolio',
+              description: 'Interactive career development suite with algorithmic problem practice and real-time community networking.',
+              tech: 'JavaScript, React, Supabase, Tailwind',
+              url: student.github_url || null
+            }
+          ];
+
+          projsListEl.innerHTML = projs.map(p => {
+            const pName = escapeHtml(p.name || p.title || 'Candidate Project');
+            const pDesc = escapeHtml(p.description || 'Full-stack software engineering project showcasing technical expertise.');
+            const tags = (p.tech ? p.tech.split(',') : (Array.isArray(p.tags) ? p.tags : ['Full Stack', 'Web'])).map(t => t.trim());
+            const pUrl = p.url || p.project_url || p.demo_url || null;
+
+            return `
+              <div class="peer-proj-card">
+                <div class="peer-proj-name"><i class="fas fa-cube" style="color:#38bdf8; margin-right:4px;"></i> ${pName}</div>
+                <div class="peer-proj-desc">${pDesc}</div>
+                <div class="peer-proj-tags">
+                  ${tags.map(t => `<span class="peer-proj-tag">${escapeHtml(t)}</span>`).join('')}
+                </div>
+                ${pUrl ? `
+                  <div class="peer-proj-links">
+                    <a href="${pUrl}" target="_blank" class="peer-proj-btn"><i class="fas fa-external-link-alt"></i> View Code / Live Demo</a>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('');
+        }
+
+      } catch (err) {
+        console.error('openStudentProfileModal error:', err);
+      }
+    };
+
+    window.closeStudentProfileModal = function() {
+      const modal = document.getElementById('studentProfileModal');
+      if (modal) modal.classList.remove('active');
+    };
+
+    window.switchPeerProfileTab = function(tabName, btn) {
+      document.querySelectorAll('.peer-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.peer-tab-content').forEach(c => c.classList.remove('active'));
+
+      if (btn) btn.classList.add('active');
+      const target = document.getElementById('peerTab_' + tabName);
+      if (target) target.classList.add('active');
+    };
+
+    window.messageCurrentPeerFromModal = function() {
+      if (!currentPeerInModal || !currentPeerInModal.user_id) return;
+      const peerId = currentPeerInModal.user_id;
+      closeStudentProfileModal();
+      openCampusChatModal('direct');
+      setTimeout(() => {
+        selectDirectUser(peerId);
+      }, 250);
+    };
+
+    window.practiceCodingWithPeerFromModal = function() {
+      if (!currentPeerInModal) return;
+      window.location.href = 'code-practice.html';
+    };
+
+    window.shareCurrentPeerProfile = function() {
+      if (!currentPeerInModal || !currentPeerInModal.user_id) return;
+      const peerId = currentPeerInModal.user_id;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?studentId=${encodeURIComponent(peerId)}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast(`📋 Copied candidate portfolio link for ${currentPeerInModal.first_name || 'Student'}!`, 'success');
+        });
+      } else {
+        showToast('Link: ' + shareUrl, 'info');
+      }
+    };
+
+    // 5. Explore Students Directory
+    window.openExploreStudentsModal = async function() {
+      const modal = document.getElementById('exploreStudentsModal');
+      if (!modal) return;
+      modal.classList.add('active');
+
+      if (!realRegisteredUsers || realRegisteredUsers.length === 0) {
+        await fetchRealCommunityUsers();
+      }
+      renderExploreStudentsGrid();
+    };
+
+    window.closeExploreStudentsModal = function() {
+      const modal = document.getElementById('exploreStudentsModal');
+      if (modal) modal.classList.remove('active');
+    };
+
+    window.setExploreFilter = function(filter, btn) {
+      currentExploreFilter = filter;
+      document.querySelectorAll('.explore-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderExploreStudentsGrid();
+    };
+
+    window.filterExploreStudents = function() {
+      renderExploreStudentsGrid();
+    };
+
+    function renderExploreStudentsGrid() {
+      const container = document.getElementById('exploreStudentsGrid');
+      if (!container) return;
+
+      const q = (document.getElementById('exploreStudentSearchInput')?.value || '').toLowerCase().trim();
+      const myId = currentUser ? String(currentUser.id).toLowerCase() : null;
+
+      let students = (realRegisteredUsers || []).filter(p => {
+        if (myId && String(p.id).toLowerCase() === myId) return false;
+
+        // Search query
+        if (q) {
+          const matchName = (p.name || '').toLowerCase().includes(q);
+          const matchCollege = (p.college || '').toLowerCase().includes(q);
+          const matchRole = (p.role || '').toLowerCase().includes(q);
+          const matchSkill = (p.skills || []).some(s => s.toLowerCase().includes(q));
+          if (!matchName && !matchCollege && !matchRole && !matchSkill) return false;
+        }
+
+        // Category filter
+        if (currentExploreFilter !== 'all') {
+          const f = currentExploreFilter.toLowerCase();
+          const matchSkill = (p.skills || []).some(s => s.toLowerCase().includes(f));
+          const matchRole = (p.role || '').toLowerCase().includes(f);
+          if (!matchSkill && !matchRole) return false;
+        }
+
+        return true;
+      });
+
+      if (students.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #94a3b8;">
+            <i class="fas fa-user-slash" style="font-size: 26px; color: #64748b; margin-bottom: 8px;"></i>
+            <div style="font-size: 14px; font-weight: 600; color: #e2e8f0;">No students match criteria</div>
+            <div style="font-size: 12px; margin-top: 4px;">Try searching with different keywords or filter tags.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = students.map(s => {
+        const online = isPeerOnline(s);
+        const topSkills = (s.skills && s.skills.length > 0 ? s.skills : ['DSA', 'React', 'Python']).slice(0, 3);
+        const avatarUrl = s.avatarImg;
+
+        return `
+          <div class="explore-card">
+            <div class="explore-card-avatar" style="${avatarUrl ? `background-image:url(${avatarUrl}); color:transparent;` : ''}">
+              ${avatarUrl ? '' : s.avatarText}
+              ${online ? '<span class="viewer-online-dot" title="Online now"></span>' : ''}
+            </div>
+            <div class="explore-card-name">${escapeHtml(s.name)}</div>
+            <div class="explore-card-role">${escapeHtml(s.role)}</div>
+            <div class="explore-card-college"><i class="fas fa-graduation-cap"></i> ${escapeHtml(s.college)}</div>
+            <div class="explore-card-skills">
+              ${topSkills.map(sk => `<span class="explore-card-skill">${escapeHtml(sk)}</span>`).join('')}
+            </div>
+            <div class="explore-card-btns">
+              <button type="button" class="btn-explore-view" onclick="closeExploreStudentsModal(); openStudentProfileModal('${s.id}');">
+                <i class="fas fa-eye"></i> Watch Profile
+              </button>
+              <button type="button" class="btn-explore-chat" onclick="closeExploreStudentsModal(); openCampusChatModal('direct'); setTimeout(() => selectDirectUser('${s.id}'), 250);" title="Chat with ${escapeHtml(s.name)}">
+                <i class="fas fa-comment"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // High-speed instant Dashboard initialization
     let dashboardInitStarted = false;
     async function initializeDashboard() {
@@ -19774,6 +21355,21 @@ ${projStr}
         await checkAuthentication();
       } catch (e) {
         console.warn('Dashboard init warning:', e);
+      }
+
+      // Check for peer profile viewing via URL: ?studentId=xxx or ?profile=xxx or ?viewStudent=xxx
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetStudentId = urlParams.get('studentId') || urlParams.get('profile') || urlParams.get('viewStudent');
+        if (targetStudentId) {
+          setTimeout(() => {
+            if (typeof openStudentProfileModal === 'function') {
+              openStudentProfileModal(targetStudentId);
+            }
+          }, 800);
+        }
+      } catch (e) {
+        console.warn('URL studentId check warning:', e);
       }
     }
 
