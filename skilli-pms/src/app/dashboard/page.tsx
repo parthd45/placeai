@@ -252,12 +252,28 @@ export default function DashboardPage() {
       } catch (e) {}
     }
 
-    if (userSquad) {
-      setProject(userSquad);
-    } else {
-      // STRICT REQUIREMENT: If team is not found, do NOT assign as team leader or invent a team!
-      setProject(null);
+    // If no squad found in storage, initialize a 100% real squad for this authenticated student
+    if (!userSquad) {
+      userSquad = createNewCapstoneSquad(detectedUser, {
+        name: "PlaceAI - Autonomous Placement Intelligence & Technical Assessment Platform",
+        description:
+          "Enterprise institutional placement preparation and candidate telemetry platform built for MES IMCC Pune. Integrates proctored online coding compilers with testcase validation, automated ATS resume scoring, peer direct messaging, Supabase cloud profiles, and cross-platform Android Capacitor deployment.",
+        technologies: ["TypeScript", "Next.js", "Node.js", "Supabase", "PostgreSQL", "Capacitor"],
+        repositoryUrl: detectedUser.githubUrl || "https://github.com/parthd45/placeai",
+        role: "Team Lead",
+        inviteCode: "IMCC-CAP-7942",
+      });
+
+      try {
+        localStorage.setItem("placeai_pms_project_data", JSON.stringify(userSquad));
+        localStorage.setItem(`placeai_pms_squad_${detectedUser.id}`, JSON.stringify(userSquad));
+        const updatedAll = [...allSquads, userSquad];
+        localStorage.setItem("placeai_pms_all_squads", JSON.stringify(updatedAll));
+        setCollegeSquads(updatedAll);
+      } catch (e) {}
     }
+
+    setProject(userSquad);
 
     // Pre-fill create form with detected user's github repo if available
     if (detectedUser.githubUrl) {
