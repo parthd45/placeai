@@ -1070,6 +1070,7 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [removingIds, setRemovingIds] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isSelfRevoked, setIsSelfRevoked] = useState(false);
@@ -1093,7 +1094,8 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
     if (showIndicator) setIsRefreshing(true);
     try {
       const data = await fetchAllSessions(userEmail);
-      setSessions(data);
+      // Only keep active, non-revoked sessions so revoked slides are permanently removed
+      setSessions(data.filter((s) => s.status !== "revoked"));
     } catch (e) {
       console.warn("Could not load sessions:", e);
     } finally {
@@ -1118,45 +1120,63 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
       loadSessions();
     }, 5000);
 
-    // Listen to inter-tab broadcast channel
+    // Listen to inter-tab broadcast channels (general & user-scoped)
     let bc: BroadcastChannel | null = null;
+    let bcUser: BroadcastChannel | null = null;
     try {
       if (typeof BroadcastChannel !== "undefined") {
+        const normalizedEmail = userEmail.toLowerCase().trim();
         bc = new BroadcastChannel("placeai_session_sync_bus");
-        bc.onmessage = (event) => {
+        bcUser = new BroadcastChannel(`placeai_session_sync_bus_${normalizedEmail}`);
+
+        const handleMsg = (event: MessageEvent) => {
           if (event.data?.type === "SESSIONS_UPDATED") {
-            setSessions(event.data.sessions);
+            setSessions(event.data.sessions.filter((s: UserSession) => s.status !== "revoked"));
           } else if (event.data?.type === "SESSION_REVOKED") {
             if (event.data.revokedSessionId === currentSessionId) {
               setIsSelfRevoked(true);
             } else {
-              loadSessions();
+              setSessions((prev) => prev.filter((s) => s.id !== event.data.revokedSessionId && s.status !== "revoked"));
             }
           } else if (event.data?.type === "ALL_OTHER_SESSIONS_REVOKED") {
             if (event.data.currentSessionId !== currentSessionId) {
               setIsSelfRevoked(true);
             } else {
-              loadSessions();
+              setSessions((prev) => prev.filter((s) => s.id === currentSessionId && s.status !== "revoked"));
             }
           }
         };
+
+        bc.onmessage = handleMsg;
+        bcUser.onmessage = handleMsg;
       }
     } catch (e) {}
 
     return () => {
       clearInterval(interval);
       if (bc) bc.close();
+      if (bcUser) bcUser.close();
     };
   }, [userEmail, currentSessionId]);
 
   const handleRevokeSingle = async (sessId: string, deviceName: string) => {
     setRevokingId(sessId);
+    // Mark for slide-out animation
+    setRemovingIds((prev) => [...prev, sessId]);
+
+    // Animate removal after brief slide-out transition so slide removes cleanly
+    setTimeout(() => {
+      setSessions((prev) => prev.filter((s) => s.id !== sessId));
+      setRemovingIds((prev) => prev.filter((id) => id !== sessId));
+    }, 280);
+
     try {
       const res = await revokeSession(sessId, userEmail);
-      setSessions(res.updatedSessions);
-      showToast(`🔒 Session for "${deviceName}" has been revoked! That login is now terminated.`);
+      setSessions(res.updatedSessions.filter((s) => s.status !== "revoked" && s.id !== sessId));
+      showToast(`🔒 Session for "${deviceName}" has been revoked and removed!`);
     } catch (e) {
       showToast("❌ Could not revoke session. Please try again.");
+      loadSessions();
     } finally {
       setRevokingId(null);
     }
@@ -1164,12 +1184,21 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
 
   const handleTerminateAllOthers = async () => {
     setRevokingId("ALL_OTHERS");
+    const otherIds = otherSessions.map((s) => s.id);
+    setRemovingIds((prev) => [...prev, ...otherIds]);
+
+    setTimeout(() => {
+      setSessions((prev) => prev.filter((s) => s.id === currentSessionId));
+      setRemovingIds([]);
+    }, 280);
+
     try {
       const res = await revokeAllOtherSessions(userEmail);
-      setSessions(res.updatedSessions);
-      showToast(`🛡️ Successfully terminated ${res.count} other active login session(s)!`);
+      setSessions(res.updatedSessions.filter((s) => s.status !== "revoked"));
+      showToast(`🛡️ All other active device sessions have been terminated and removed!`);
     } catch (e) {
       showToast("❌ Could not terminate sessions. Please try again.");
+      loadSessions();
     } finally {
       setRevokingId(null);
     }
@@ -1198,7 +1227,7 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
   };
 
   const currentSession = sessions.find((s) => s.isCurrent) || sessions[0];
-  const otherSessions = sessions.filter((s) => s.id !== currentSession?.id);
+  const otherSessions = sessions.filter((s) => s.id !== currentSession?.id && s.status !== "revoked");
   const activeCount = sessions.filter((s) => s.status === "active").length;
 
   return (
@@ -1403,29 +1432,23 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
         </div>
 
         {otherSessions.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-3 transition-all duration-300">
             {otherSessions.map((s) => {
-              const isRevoked = s.status === "revoked";
+              const isRemoving = removingIds.includes(s.id);
               const isBeingRevoked = revokingId === s.id;
 
               return (
                 <div
                   key={s.id}
-                  className={`rounded-xl border p-4 transition-all duration-200 ${
-                    isRevoked
-                      ? "border-red-950/40 bg-slate-900/30 opacity-60"
-                      : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                  className={`rounded-xl border border-slate-800 bg-slate-900/60 p-4 transition-all duration-300 ease-out hover:border-slate-700 ${
+                    isRemoving
+                      ? "opacity-0 -translate-x-8 scale-95 pointer-events-none max-h-0 py-0 overflow-hidden my-0 border-transparent"
+                      : "opacity-100 translate-x-0 scale-100"
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start sm:items-center gap-3">
-                      <div
-                        className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isRevoked
-                            ? "bg-red-500/10 text-red-400"
-                            : "bg-blue-500/10 text-blue-400"
-                        }`}
-                      >
+                      <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-500/10 text-blue-400">
                         {s.deviceType === "mobile" ? (
                           <Smartphone className="h-5 w-5" />
                         ) : s.deviceType === "tablet" ? (
@@ -1440,14 +1463,8 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
                           <span className="text-sm font-bold text-white truncate">
                             {s.deviceName}
                           </span>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                              isRevoked
-                                ? "bg-red-500/15 text-red-400 border border-red-500/20"
-                                : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                            }`}
-                          >
-                            {isRevoked ? "Revoked / Signed Out" : "Active Session"}
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                            Active Session
                           </span>
                         </div>
                         <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
@@ -1475,22 +1492,15 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
                         <Copy className="h-3.5 w-3.5" />
                       </button>
 
-                      {isRevoked ? (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 text-red-400 border border-red-900/40 text-xs font-semibold select-none">
-                          <XCircle className="h-3.5 w-3.5" />
-                          <span>Terminated</span>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleRevokeSingle(s.id, s.deviceName)}
-                          disabled={isBeingRevoked}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
-                          title="Immediately log out this device"
-                        >
-                          <Trash2 className={`h-3.5 w-3.5 ${isBeingRevoked ? "animate-spin" : ""}`} />
-                          <span>{isBeingRevoked ? "Revoking..." : "Revoke Session"}</span>
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleRevokeSingle(s.id, s.deviceName)}
+                        disabled={isBeingRevoked || isRemoving}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                        title="Immediately revoke and remove this session"
+                      >
+                        <Trash2 className={`h-3.5 w-3.5 ${isBeingRevoked ? "animate-spin" : ""}`} />
+                        <span>{isBeingRevoked ? "Revoking..." : "Revoke Session"}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1498,7 +1508,7 @@ export function SessionsView({ user }: { user?: StudentUser | null }) {
             })}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center space-y-2">
+          <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center space-y-2 animate-in fade-in duration-200">
             <Monitor className="h-6 w-6 text-slate-600 mx-auto" />
             <h4 className="text-xs font-bold text-slate-400">No other active sessions detected</h4>
             <p className="text-[11px] text-slate-500 max-w-sm mx-auto">

@@ -316,9 +316,14 @@ export async function revokeSession(
   // Notify any listeners
   try {
     if (typeof BroadcastChannel !== "undefined") {
-      const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
-      bc.postMessage({ type: "SESSION_REVOKED", revokedSessionId: sessionIdToRevoke });
-      bc.close();
+      const payload = { type: "SESSION_REVOKED", revokedSessionId: sessionIdToRevoke, userEmail };
+      const bc1 = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      bc1.postMessage(payload);
+      bc1.close();
+
+      const bc2 = new BroadcastChannel(`${BROADCAST_CHANNEL_NAME}_${userEmail.toLowerCase().trim()}`);
+      bc2.postMessage(payload);
+      bc2.close();
     }
   } catch (e) {}
 
@@ -347,9 +352,14 @@ export async function revokeAllOtherSessions(
 
   try {
     if (typeof BroadcastChannel !== "undefined") {
-      const bc = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
-      bc.postMessage({ type: "ALL_OTHER_SESSIONS_REVOKED", currentSessionId });
-      bc.close();
+      const payload = { type: "ALL_OTHER_SESSIONS_REVOKED", currentSessionId, userEmail };
+      const bc1 = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      bc1.postMessage(payload);
+      bc1.close();
+
+      const bc2 = new BroadcastChannel(`${BROADCAST_CHANNEL_NAME}_${userEmail.toLowerCase().trim()}`);
+      bc2.postMessage(payload);
+      bc2.close();
     }
   } catch (e) {}
 
