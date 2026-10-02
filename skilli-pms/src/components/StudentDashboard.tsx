@@ -56,6 +56,7 @@ import {
 } from "lucide-react";
 import {
   ProjectsView,
+  TasksView,
   MentorshipView,
   CalendarView,
   DocumentsView,
@@ -1799,6 +1800,10 @@ export function StudentDashboard({
       {/* ========================================================================= */}
       {currentTab === "projects" && (
         <ProjectsView project={project} user={user} />
+      )}
+
+      {currentTab === "tasks" && (
+        <TasksView project={project} onUpdateProject={onUpdateProject} />
       )}
 
       {currentTab === "mentorship" && (
